@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -89,9 +90,9 @@ const CreateAccount = () => {
 
   return (
     <>
-      <ActionIcon size="input-sm" onClick={open}>
-        <PlusIcon />
-      </ActionIcon>
+      <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
+        <PlusIcon size={22} />
+      </Button>
       <Modal
         opened={opened}
         onClose={close}
@@ -119,6 +120,9 @@ const CreateAccount = () => {
             elevation={0}
           />
           <Button
+            variant="filled"
+            color="primary"
+            size="compact-sm"
             loading={
               createAccountMutation.isPending ||
               createInstitutionMutation.isPending

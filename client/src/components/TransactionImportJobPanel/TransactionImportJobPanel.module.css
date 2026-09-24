@@ -6,10 +6,6 @@
   cursor: move;
 }
 
-.collapseButton {
-  flex: 0 0 auto;
-}
-
 .tab {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;

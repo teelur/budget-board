@@ -1,4 +1,5 @@
-import { Button, Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { MoveRightIcon } from "lucide-react";
 import { SignDisplay } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
@@ -46,8 +47,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const formatSensitiveAmount = (
     amount: number,
     signDisplay = SignDisplay.Auto,
-  ): string =>
-    formatAmount(amount, true, signDisplay);
+  ): string => formatAmount(amount, true, signDisplay);
 
   return (
     <Drawer
@@ -134,24 +134,30 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 <PrimaryHeading order={5}>{t("value_trends")}</PrimaryHeading>
               }
             >
-              <Group>
+              <Group gap="0.5rem">
                 <Button
-                  variant={chartLookbackMonths === 3 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  size="compact-xs"
+                  selected={chartLookbackMonths === 3}
                   onClick={() => setChartLookbackMonths(3)}
                 >
                   {t("3_months")}
                 </Button>
                 <Button
-                  variant={chartLookbackMonths === 6 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  size="compact-xs"
+                  selected={chartLookbackMonths === 6}
                   onClick={() => setChartLookbackMonths(6)}
                 >
                   {t("6_months")}
                 </Button>
                 <Button
-                  variant={chartLookbackMonths === 12 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  size="compact-xs"
+                  selected={chartLookbackMonths === 12}
                   onClick={() => setChartLookbackMonths(12)}
                 >
                   {t("12_months")}

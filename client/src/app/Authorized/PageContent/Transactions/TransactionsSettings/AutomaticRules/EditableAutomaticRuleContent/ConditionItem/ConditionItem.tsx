@@ -1,4 +1,5 @@
-import { ActionIcon, ComboboxItem, Group } from "@mantine/core";
+import { ComboboxItem, Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { getDefaultValue } from "~/helpers/automaticRules";
@@ -201,8 +202,9 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
         {props.allowDelete && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon
-              color="var(--button-color-destructive)"
-              size="sm"
+              variant="filled"
+              color="error"
+              size="compact-xs"
               h="100%"
               onClick={() => props.doDelete?.(props.index)}
             >

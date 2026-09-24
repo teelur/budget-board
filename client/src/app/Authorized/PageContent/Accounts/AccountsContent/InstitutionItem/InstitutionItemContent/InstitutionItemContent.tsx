@@ -1,4 +1,5 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { PencilIcon } from "lucide-react";
 import React from "react";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
@@ -20,8 +21,9 @@ const InstitutionItemContent = (
       <Group gap="0.5rem">
         <PrimaryHeading size="lg">{props.institution.name}</PrimaryHeading>
         <ActionIcon
-          variant="transparent"
-          size="md"
+          variant="ghost"
+          color="primary"
+          size="xs"
           onClick={(e) => {
             e.stopPropagation();
             props.toggle();

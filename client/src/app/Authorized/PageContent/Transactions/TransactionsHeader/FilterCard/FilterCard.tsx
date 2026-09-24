@@ -1,6 +1,7 @@
 import classes from "./FilterCard.module.css";
 
-import { Flex, Stack, Button } from "@mantine/core";
+import { Flex, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
@@ -43,12 +44,10 @@ const FilterCard = (): React.ReactNode => {
         >
           <PrimaryHeading order={5}>{t("filters")}</PrimaryHeading>
           <Button
-            className={classes.clearButton}
-            w="100%"
-            size="xs"
-            variant={
-              transactionFilters.isEqual(new Filters()) ? "outline" : "primary"
-            }
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+selected={!transactionFilters.isEqual(new Filters())}
             onClick={() => {
               setTransactionFilters(new Filters());
             }}

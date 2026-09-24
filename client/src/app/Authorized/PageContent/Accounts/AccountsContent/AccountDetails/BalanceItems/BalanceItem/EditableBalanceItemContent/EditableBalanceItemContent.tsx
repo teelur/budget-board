@@ -1,4 +1,5 @@
-import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
@@ -90,9 +91,10 @@ const EditableBalanceItemContent = (
       </Stack>
       <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
         <ActionIcon
-          h="100%"
           variant="outline"
-          size="md"
+          color="primary"
+          size="xs"
+          h="100%"
           onClick={(e) => {
             e.stopPropagation();
             props.doUnSelect();
@@ -101,9 +103,10 @@ const EditableBalanceItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
         <ActionIcon
+          variant="filled"
+          color="error"
+          size="xs"
           h="100%"
-          size="sm"
-          bg="var(--button-color-destructive)"
           onClick={() => deleteBalanceMutation.mutate(props.balance.id)}
         >
           <Trash2Icon size={16} />

@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Tooltip } from "@mantine/core";
+import { Tooltip } from "@mantine/core";
+import { Button, ActionIcon } from "@teelur/budget-board-ui";
 import { CloudSyncIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -18,11 +19,12 @@ const SyncButton = ({ compact = false }: SyncButtonProps): React.ReactNode => {
     return (
       <Tooltip label={syncLabel}>
         <ActionIcon
+          variant="ghost"
+          color="primary"
+          size="sm"
           aria-label={syncLabel}
           loading={syncMutation.isPending}
           onClick={() => syncMutation.mutateAsync()}
-          size="lg"
-          variant="subtle"
         >
           <CloudSyncIcon size={20} />
         </ActionIcon>
@@ -32,6 +34,9 @@ const SyncButton = ({ compact = false }: SyncButtonProps): React.ReactNode => {
 
   return (
     <Button
+      variant="filled"
+      color="primary"
+      size="sm"
       onClick={() => syncMutation.mutateAsync()}
       loading={syncMutation.isPending}
     >

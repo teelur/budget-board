@@ -1,11 +1,5 @@
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Button, ActionIcon } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
@@ -117,8 +111,9 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon
                 variant="outline"
+                color="primary"
+                size="xs"
                 h="100%"
-                size="md"
                 onClick={(e) => {
                   e.stopPropagation();
                   props.toggle();
@@ -153,12 +148,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             />
             <Group gap="0.5rem">
               <Button
-                bg={
-                  hideAccountField.getValue()
-                    ? "var(--button-color-warning)"
-                    : undefined
-                }
-                variant={hideAccountField.getValue() ? "filled" : "outline"}
+                variant="filled"
+                color="primary"
+                size="sm"
+                selected={hideAccountField.getValue()}
                 onClick={() =>
                   hideAccountField.setValue(!hideAccountField.getValue())
                 }
@@ -166,14 +159,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 {t("hide_account")}
               </Button>
               <Button
-                bg={
-                  hideTransactionsField.getValue()
-                    ? "var(--accent-color-purple)"
-                    : undefined
-                }
-                variant={
-                  hideTransactionsField.getValue() ? "filled" : "outline"
-                }
+                variant="filled"
+                color="secondary"
+                size="sm"
+                selected={hideTransactionsField.getValue()}
                 onClick={() =>
                   hideTransactionsField.setValue(
                     !hideTransactionsField.getValue(),

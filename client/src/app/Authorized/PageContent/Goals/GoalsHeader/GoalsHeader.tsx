@@ -1,4 +1,5 @@
-import { Button, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import AddGoalModal from "./AddGoalModal/AddGoalModal";
 import { useTranslation } from "react-i18next";
@@ -13,12 +14,10 @@ const GoalsHeader = (props: GoalsHeaderProps): React.ReactNode => {
   return (
     <Group justify="flex-end" align="center" gap="0.5rem">
       <Button
-        variant="outline"
-        color={
-          props.includeInterest
-            ? "var(--button-color-confirm)"
-            : "var(--button-color-destructive)"
-        }
+        variant="filled"
+        color="primary"
+        size="xs"
+        selected={props.includeInterest}
         onClick={props.toggleIncludeInterest}
       >
         {t("include_interest")}

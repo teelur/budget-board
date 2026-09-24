@@ -1,4 +1,5 @@
-import { Alert, Button, Checkbox, Divider, Group, Stack } from "@mantine/core";
+import { Alert, Checkbox, Divider, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import {
@@ -276,10 +277,12 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
               {t("duplicate_review_error_message")}
             </PrimaryText>
             <Button
-              w="fit-content"
+              variant="filled"
+              color="primary"
+              size="compact-sm"
+              rightSection={<RefreshCwIcon size={16} />}
               loading={transactionsQuery.isRefetching}
               onClick={() => transactionsQuery.refetch()}
-              leftSection={<RefreshCwIcon size={16} />}
             >
               {t("retry")}
             </Button>
@@ -360,14 +363,21 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
       )}
       <Group w="100%">
         <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
           flex="1 1 auto"
-          onClick={props.goBackToPreviousDialog}
           leftSection={<MoveLeftIcon size={16} />}
+          onClick={props.goBackToPreviousDialog}
         >
           {t("back")}
         </Button>
         <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
           flex="1 1 auto"
+          rightSection={<MoveRightIcon size={16} />}
           disabled={
             transactionsQuery.isPending ||
             transactionsQuery.isError ||
@@ -377,7 +387,6 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
             transactionsQuery.isPending || transactionsQuery.isRefetching
           }
           onClick={() => props.advanceToNextDialog(filteredTransactions)}
-          rightSection={<MoveRightIcon size={16} />}
         >
           {t("next")}
         </Button>

@@ -1,17 +1,11 @@
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import Card from "~/components/core/Card/Card";
 import {
   INetWorthWidgetGroup,
   INetWorthWidgetLine,
 } from "~/models/widgetSettings";
 import NetWorthLineItem from "./NetWorthLineItem/NetWorthLineItem";
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
 import { GripVertical, PlusIcon } from "lucide-react";
 import {
   INetWorthWidgetLineCreateRequest,
@@ -91,7 +85,13 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
       <Group gap="0.5rem">
         {props.isSortable && (
           <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
-            <Button h="100%" px={0} w={{ base: 25, xs: 30 }} radius="lg">
+            <Button
+              variant="filled"
+              color="primary"
+              h="100%"
+              px={0}
+              w={{ base: 25, xs: 30 }}
+            >
               <GripVertical size={25} />
             </Button>
           </Flex>
@@ -99,7 +99,9 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
         <Stack flex="1 0 auto" gap="0.5rem">
           <Group justify="flex-end">
             <ActionIcon
-              size="sm"
+              variant="filled"
+              color="primary"
+              size="compact-xs"
               loading={createNetWorthWidgetLineMutation.isPending}
               onClick={async () =>
                 await createNetWorthWidgetLineMutation.mutateAsync({
@@ -110,7 +112,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
                 } as INetWorthWidgetLineCreateRequest)
               }
             >
-              <PlusIcon />
+              <PlusIcon size={20} />
             </ActionIcon>
           </Group>
           <DragDropProvider

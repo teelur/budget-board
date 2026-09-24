@@ -1,11 +1,5 @@
-import {
-  Button,
-  Checkbox,
-  Group,
-  ScrollArea,
-  Skeleton,
-  Stack,
-} from "@mantine/core";
+import { Checkbox, Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
@@ -103,9 +97,11 @@ const AccountsWidgetSettings = ({
     return (
       <>
         <Button
-          variant={showAll ? "filled" : "outline"}
+          variant="filled"
+          color="primary"
+          size="compact-sm"
+          selected={showAll}
           onClick={() => setShowAll((prev) => !prev)}
-          size="xs"
         >
           {t("show_all")}
         </Button>
@@ -156,17 +152,27 @@ const AccountsWidgetSettings = ({
       onClose={handleClose}
       title={<PrimaryText size="md">{t("accounts_settings")}</PrimaryText>}
     >
-      <Stack gap="0.5rem">
+      <Stack gap="0.75rem">
         <DimmedText size="sm">
           {t("accounts_settings_widget_message")}
         </DimmedText>
         {getAccountsWidgetSettingsContent()}
-        <Group w="100%" justify="flex-end" mt="xs" gap="0.5rem">
-          <Button flex={1} variant="default" onClick={handleClose}>
+        <Group gap="0.5rem">
+          <Button
+            variant="filled"
+            color="neutral"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={handleClose}
+          >
             {t("cancel")}
           </Button>
           <Button
-            flex={1}
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            flex="1 1 0"
+            loading={updateWidgetSettingsMutation.isPending}
             onClick={() => {
               updateWidgetSettingsMutation.mutate([
                 {
@@ -177,7 +183,6 @@ const AccountsWidgetSettings = ({
                 },
               ]);
             }}
-            loading={updateWidgetSettingsMutation.isPending}
           >
             {t("save")}
           </Button>

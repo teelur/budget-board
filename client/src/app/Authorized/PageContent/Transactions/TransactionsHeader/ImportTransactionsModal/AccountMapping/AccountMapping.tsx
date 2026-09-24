@@ -1,4 +1,5 @@
-import { Stack, Divider, Group, Button } from "@mantine/core";
+import { Stack, Divider, Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import AccountMappingItem from "./AccountMappingItem/AccountMappingItem";
@@ -74,21 +75,27 @@ const AccountMapping = (props: AccountMappingProps) => {
       )}
       <Group w="100%">
         <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
           flex="1 1 auto"
-          onClick={() => props.goBackToPreviousDialog()}
           leftSection={<MoveLeftIcon size={16} />}
+          onClick={() => props.goBackToPreviousDialog()}
         >
           {t("back")}
         </Button>
         <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
           flex="1 1 auto"
+          disabled={filteredImportData.length === 0}
           onClick={() =>
             props.advanceToNextDialog(
               filteredImportData,
               props.accountNameToAccountIdMap,
             )
           }
-          disabled={filteredImportData.length === 0}
         >
           {t("next")}
         </Button>

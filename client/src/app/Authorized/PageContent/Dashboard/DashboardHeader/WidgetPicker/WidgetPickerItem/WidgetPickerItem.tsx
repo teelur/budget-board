@@ -1,4 +1,5 @@
-import { Badge, Button, Group, Stack } from "@mantine/core";
+import { Badge, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -42,8 +43,9 @@ const WidgetPickerItem = ({
         <DimmedText size="xs">{t(widget.descriptionKey)}</DimmedText>
       </Stack>
       <Button
+        variant="filled"
+        color="primary"
         size="xs"
-        variant="light"
         leftSection={<PlusIcon size={12} />}
         disabled={isDisabled}
         onClick={() => handleAdd(widget.widgetType)}

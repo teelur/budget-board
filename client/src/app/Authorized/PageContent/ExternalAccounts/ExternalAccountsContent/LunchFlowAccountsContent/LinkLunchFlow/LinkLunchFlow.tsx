@@ -1,4 +1,5 @@
-import { Button, LoadingOverlay, Stack } from "@mantine/core";
+import { LoadingOverlay, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { isNotEmpty, useField } from "@mantine/form";
 import Card from "~/components/core/Card/Card";
@@ -31,6 +32,9 @@ const LinkLunchFlow = (): React.ReactNode => {
             elevation={1}
           />
           <Button
+            variant="filled"
+            color="primary"
+            size="xs"
             onClick={() => {
               lunchFlowKeyField.validate();
 

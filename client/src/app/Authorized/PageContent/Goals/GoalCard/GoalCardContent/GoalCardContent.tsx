@@ -1,6 +1,7 @@
 import classes from "./GoalCardContent.module.css";
 
-import { ActionIcon, Badge, Flex, Group, Stack } from "@mantine/core";
+import { Badge, Flex, Group, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { SignDisplay } from "~/helpers/currency";
@@ -47,8 +48,9 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
               </Badge>
             )}
             <ActionIcon
-              variant="transparent"
-              size="md"
+              variant="ghost"
+              color="primary"
+              size="compact-xs"
               onClick={(e) => {
                 e.stopPropagation();
                 props.toggleIsSelected();
@@ -110,9 +112,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                 amount: formatSensitiveAmount(
                   props.goal.monthlyContributionProgress,
                 ),
-                total: formatSensitiveAmount(
-                  props.goal.monthlyContribution,
-                ),
+                total: formatSensitiveAmount(props.goal.monthlyContribution),
               }}
               components={[
                 <StatusText
