@@ -163,11 +163,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 color="secondary"
                 size="sm"
                 selected={hideTransactionsField.getValue()}
-                bg={
-                  hideTransactionsField.getValue()
-                    ? "var(--accent-color-purple)"
-                    : undefined
-                }
                 onClick={() =>
                   hideTransactionsField.setValue(
                     !hideTransactionsField.getValue(),

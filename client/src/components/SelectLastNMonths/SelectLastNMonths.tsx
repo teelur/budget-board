@@ -24,7 +24,7 @@ const SelectLastNMonths = (props: SelectLastNMonthsProps) => {
           variant="filled"
           color="primary"
           size={props.size}
-          selected={props.selectedMonths.length !== months}
+          selected={props.selectedMonths.length === months}
           key={months}
           onClick={() => {
             const newMonths: Date[] = [];

@@ -94,7 +94,7 @@ const NetWorthCardSettings = ({
             variant="filled"
             color="primary"
             size="compact-sm"
-            selected={!isSortable}
+            selected={isSortable}
             flex="1 1 0"
             onClick={toggleIsSortable}
           >

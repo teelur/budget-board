@@ -41,6 +41,7 @@ const NetCashFlowTab = (): React.ReactNode => {
         selectedMonths={selectedMonths}
         setSelectedMonths={setSelectedMonths}
         size="compact-sm"
+        showClearButton
       />
       <NetCashFlowChart
         transactions={transactionsQuery.data ?? []}

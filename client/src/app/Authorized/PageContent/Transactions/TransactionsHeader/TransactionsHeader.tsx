@@ -161,7 +161,7 @@ const TransactionsHeader = (
             variant="filled"
             color="primary"
             size="compact-sm"
-            selected={!canSelectMultiple}
+            selected={canSelectMultiple}
             rightSection={<ListChecksIcon size="1rem" />}
             onClick={toggleSelectMultiple}
           >

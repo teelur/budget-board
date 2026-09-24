@@ -100,7 +100,7 @@ const AccountsWidgetSettings = ({
           variant="filled"
           color="primary"
           size="compact-sm"
-          selected={!showAll}
+          selected={showAll}
           onClick={() => setShowAll((prev) => !prev)}
         >
           {t("show_all")}

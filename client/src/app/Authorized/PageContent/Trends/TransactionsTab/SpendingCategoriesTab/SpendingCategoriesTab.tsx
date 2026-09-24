@@ -72,7 +72,7 @@ const SpendingCategoriesTab = (): React.ReactNode => {
           variant="filled"
           color="primary"
           size="compact-sm"
-          selected={!showSubcategories}
+          selected={showSubcategories}
           onClick={() => setShowSubcategories((v) => !v)}
         >
           {showSubcategories

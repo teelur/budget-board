@@ -40,6 +40,7 @@ const FlowsTab = (): React.ReactNode => {
         selectedMonths={selectedMonths}
         setSelectedMonths={setSelectedMonths}
         size="compact-sm"
+        showClearButton
       />
       <FlowsChart
         transactions={transactionsQuery.data ?? []}

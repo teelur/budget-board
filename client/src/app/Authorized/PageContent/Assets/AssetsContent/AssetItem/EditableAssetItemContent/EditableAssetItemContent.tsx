@@ -107,7 +107,7 @@ const EditableAssetItemContent = (
               variant="filled"
               color="primary"
               size="sm"
-              selected={!hideAssetField.getValue()}
+              selected={hideAssetField.getValue()}
               onClick={() => {
                 updateAssetMutation.mutate(
                   {
