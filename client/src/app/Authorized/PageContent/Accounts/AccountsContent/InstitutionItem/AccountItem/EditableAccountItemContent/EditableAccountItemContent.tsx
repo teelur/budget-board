@@ -15,7 +15,6 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
 
 interface EditableAccountItemContentProps {
@@ -27,7 +26,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
-  const { decimalPlaces } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
   const updateAccountMutation = useUpdateAccountMutation();
 
