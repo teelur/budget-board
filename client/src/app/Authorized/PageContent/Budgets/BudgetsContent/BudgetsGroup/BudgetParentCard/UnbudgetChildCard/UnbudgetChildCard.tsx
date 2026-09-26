@@ -56,7 +56,7 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
           <PrimaryText className={classes.text} elevation={1}>
             <SensitiveAmount
               amount={props.amount * (props.isIncome ? 1 : -1)}
-              includeCents={false}
+              decimalPlaces={0}
             />
           </PrimaryText>
           {props.selectedDate && (

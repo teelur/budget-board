@@ -42,11 +42,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const chartSeries = buildValueChartSeries(props.items);
 
   const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(
-      value,
-      false,
-      SignDisplay.Auto,
-    );
+    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
   };
 
   const sortedChartValues = React.useMemo(() => {

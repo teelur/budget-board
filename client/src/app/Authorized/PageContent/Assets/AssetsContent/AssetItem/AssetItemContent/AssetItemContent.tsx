@@ -91,7 +91,6 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
                 date: dayjs(props.asset.purchaseDate).format(dateFormat),
                 price: formatSensitiveAmount(
                   props.asset.purchasePrice ?? 0,
-                  true,
                   SignDisplay.Auto,
                 ),
               })}

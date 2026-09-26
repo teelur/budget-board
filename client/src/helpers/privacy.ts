@@ -5,7 +5,7 @@ export const maskedAmountText = "••••";
 
 export const formatSensitiveAmount = (
   amount: number,
-  includeCents: boolean,
+  decimalPlaces: number,
   currency: string,
   signDisplay: SignDisplay,
   locale: string,
@@ -17,7 +17,7 @@ export const formatSensitiveAmount = (
 
   return convertNumberToCurrency(
     amount,
-    includeCents,
+    decimalPlaces,
     currency,
     signDisplay,
     locale,

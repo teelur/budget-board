@@ -10,6 +10,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { mantineDateFormat } from "~/helpers/datetime";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface SetTargetProps {
   goBackToPreviousDialog: () => void;
@@ -37,6 +38,7 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { decimalPlaces } = useUserSettings();
 
   useDidUpdate(() => {
     goalCompleteDateField.reset();
@@ -82,7 +84,7 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
           placeholder={t("enter_monthly_contribution")}
           prefix={currencySymbol}
           min={0}
-          decimalScale={2}
+          decimalScale={decimalPlaces}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
           {...goalMonthlyContributionField.getInputProps()}

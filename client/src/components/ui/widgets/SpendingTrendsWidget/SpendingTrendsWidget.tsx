@@ -66,13 +66,10 @@ const SpendingTrendsWidget = (): React.ReactNode => {
   };
 
   const getSpendingComparisonString = (): string => {
-    // Need to round this number to the nearest cent
-    const spendingComparisonNumber =
-      Math.round((getSpendingComparison() + Number.EPSILON) * 100) / 100;
+    const spendingComparisonNumber = getSpendingComparison();
 
     const amount = formatSensitiveAmount(
       Math.abs(spendingComparisonNumber),
-      true,
       SignDisplay.Auto,
     );
 

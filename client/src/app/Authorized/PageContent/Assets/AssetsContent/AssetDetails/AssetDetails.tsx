@@ -47,7 +47,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const formatSensitiveAmount = (
     amount: number,
     signDisplay = SignDisplay.Auto,
-  ): string => formatAmount(amount, true, signDisplay);
+  ): string => formatAmount(amount, signDisplay);
 
   return (
     <Drawer

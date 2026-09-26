@@ -63,7 +63,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const isMobile = useIsMobile();
   const accountsQuery = useAccountsQuery();
   const updateTransactionsMutation = useUpdateTransactionsMutation();
@@ -366,7 +366,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 prefix={getCurrencySymbol(preferredCurrency)}
                 thousandSeparator={thousandsSeparator}
                 decimalSeparator={decimalSeparator}
-                decimalScale={2}
+                decimalScale={decimalPlaces}
                 fixedDecimalScale
                 w={140}
                 elevation={1}

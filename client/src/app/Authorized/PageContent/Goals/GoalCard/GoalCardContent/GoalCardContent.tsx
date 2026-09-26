@@ -29,7 +29,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { dayjs, intlLocale } = useLocale();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, false, SignDisplay.Auto);
+    formatAmount(amount, SignDisplay.Auto, undefined, 0);
 
   return (
     <Group style={{ containerType: "inline-size" }} wrap="nowrap">

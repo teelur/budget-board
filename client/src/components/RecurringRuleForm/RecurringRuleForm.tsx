@@ -51,7 +51,7 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allTransactionCategories } = useTransactionCategories();
   const accountsQuery = useAccountsQuery();
   const createMutation = useCreateRecurringRuleMutation();
@@ -373,7 +373,7 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         }
         placeholder={t("enter_amount")}
         prefix={getCurrencySymbol(preferredCurrency)}
-        decimalScale={2}
+        decimalScale={decimalPlaces}
         thousandSeparator={thousandsSeparator}
         decimalSeparator={decimalSeparator}
         {...amountField.getInputProps()}

@@ -43,7 +43,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, false, SignDisplay.Auto);
+    formatAmount(amount, SignDisplay.Auto, undefined, 0);
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
   const projectedAmount = props.projectedAmount ?? props.amount;
@@ -149,6 +149,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       onBlur={() => handleEdit(newLimitField.getValue())}
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
+                      decimalScale={0}
                       min={0}
                       max={999999}
                       step={1}
