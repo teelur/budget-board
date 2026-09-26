@@ -15,6 +15,7 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
 
 interface EditableAccountItemContentProps {
@@ -26,6 +27,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
+  const { decimalPlaces } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
   const updateAccountMutation = useUpdateAccountMutation();
 
@@ -125,7 +127,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             <NumberInput
               {...interestRateField.getInputProps()}
               label={<PrimaryText size="xs">{t("interest_rate")}</PrimaryText>}
-              decimalScale={2}
+              decimalScale={decimalPlaces}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
               min={0}

@@ -87,7 +87,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   ];
 
   const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(value, false, SignDisplay.Auto);
+    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
   };
 
   if (props.isPending) {

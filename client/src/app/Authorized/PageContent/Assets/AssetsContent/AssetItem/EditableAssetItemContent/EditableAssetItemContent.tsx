@@ -38,7 +38,7 @@ const EditableAssetItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allAssetTypes } = useAssetTypes();
   const updateAssetMutation = useUpdateAssetMutation();
   const deleteAssetMutation = useDeleteAssetsMutation();
@@ -174,7 +174,7 @@ const EditableAssetItemContent = (
                 prefix={getCurrencySymbol(preferredCurrency)}
                 thousandSeparator={thousandsSeparator}
                 decimalSeparator={decimalSeparator}
-                decimalScale={2}
+                decimalScale={decimalPlaces}
                 fixedDecimalScale
                 onBlur={() =>
                   updateAssetMutation.mutate({
@@ -219,7 +219,7 @@ const EditableAssetItemContent = (
                 prefix={getCurrencySymbol(preferredCurrency)}
                 thousandSeparator={thousandsSeparator}
                 decimalSeparator={decimalSeparator}
-                decimalScale={2}
+                decimalScale={decimalPlaces}
                 fixedDecimalScale
                 onBlur={() => {
                   updateAssetMutation.mutate({

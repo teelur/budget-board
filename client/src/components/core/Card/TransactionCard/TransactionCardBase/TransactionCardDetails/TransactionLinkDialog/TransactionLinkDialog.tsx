@@ -4,7 +4,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { getCurrencySymbol } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { useLinkTransactionsMutation } from "~/hooks/mutations/transactions/useLinkTransactionsMutation";
 import { useUnlinkTransactionMutation } from "~/hooks/mutations/transactions/useUnlinkTransactionMutation";
 import { useTransactionLinkCandidatesQuery } from "~/hooks/queries/useTransactionLinkCandidatesQuery";
@@ -25,8 +25,8 @@ const TransactionLinkDialog = ({
   transaction,
 }: TransactionLinkDialogProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const [linkOpened, { open: openLink, close: closeLink }] =
     useDisclosure(false);
   const [unlinkOpened, { open: openUnlink, close: closeUnlink }] =
@@ -49,9 +49,6 @@ const TransactionLinkDialog = ({
   );
   const linkMutation = useLinkTransactionsMutation();
   const unlinkMutation = useUnlinkTransactionMutation();
-
-  const formatAmount = (amount: number) =>
-    `${getCurrencySymbol(preferredCurrency)}${amount.toFixed(2)}`;
   const formatDate = (date: string) => dayjs(date).format(longDateFormat);
 
   const onOpenLink = () => {
@@ -123,7 +120,13 @@ const TransactionLinkDialog = ({
           <DimmedText size="sm">
             {t("link_transfer_source", {
               account: transaction.accountName,
-              amount: formatAmount(transaction.amount),
+              amount: convertNumberToCurrency(
+                transaction.amount,
+                decimalPlaces,
+                preferredCurrency,
+                SignDisplay.Auto,
+                intlLocale,
+              ),
               date: formatDate(transaction.date),
             })}
           </DimmedText>

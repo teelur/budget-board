@@ -18,6 +18,7 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 const FilterCard = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -29,6 +30,7 @@ const FilterCard = (): React.ReactNode => {
     decimalSeparator,
     currencySymbol,
   } = useLocale();
+  const { decimalPlaces } = useUserSettings();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
@@ -47,7 +49,7 @@ const FilterCard = (): React.ReactNode => {
             variant="filled"
             color="primary"
             size="compact-sm"
-selected={!transactionFilters.isEqual(new Filters())}
+            selected={!transactionFilters.isEqual(new Filters())}
             onClick={() => {
               setTransactionFilters(new Filters());
             }}
@@ -160,7 +162,7 @@ selected={!transactionFilters.isEqual(new Filters())}
               setTransactionFilters(newFilters);
             }}
             prefix={currencySymbol}
-            decimalScale={2}
+            decimalScale={decimalPlaces}
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
             elevation={1}
@@ -185,7 +187,7 @@ selected={!transactionFilters.isEqual(new Filters())}
               setTransactionFilters(newFilters);
             }}
             prefix={currencySymbol}
-            decimalScale={2}
+            decimalScale={decimalPlaces}
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
             elevation={1}

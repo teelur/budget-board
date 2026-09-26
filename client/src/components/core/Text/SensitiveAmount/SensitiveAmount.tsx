@@ -7,49 +7,49 @@ import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsPr
 
 interface SensitiveAmountProps {
   amount: number;
-  includeCents?: boolean;
   currency?: string;
   signDisplay?: SignDisplay;
+  decimalPlaces?: number;
 }
 
 export const useSensitiveAmountFormatter = (): ((
   amount: number,
-  includeCents?: boolean,
   signDisplay?: SignDisplay,
   currency?: string,
+  decimalPlaces?: number,
 ) => string) => {
   const { intlLocale } = useLocale();
   const { isPrivacyModeEnabled } = usePrivacyMode();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
 
   return React.useCallback(
     (
       amount: number,
-      includeCents = true,
       signDisplay = SignDisplay.Auto,
       currency?: string,
+      decimalPlacesOverride?: number,
     ): string =>
       formatSensitiveAmount(
         amount,
-        includeCents,
+        decimalPlacesOverride ?? decimalPlaces,
         currency ?? preferredCurrency,
         signDisplay,
         intlLocale,
         isPrivacyModeEnabled,
       ),
-    [intlLocale, isPrivacyModeEnabled, preferredCurrency],
+    [decimalPlaces, intlLocale, isPrivacyModeEnabled, preferredCurrency],
   );
 };
 
 const SensitiveAmount = ({
   amount,
-  includeCents = true,
   currency,
   signDisplay = SignDisplay.Auto,
+  decimalPlaces,
 }: SensitiveAmountProps): React.ReactNode => {
   const formatAmount = useSensitiveAmountFormatter();
 
-  return formatAmount(amount, includeCents, signDisplay, currency);
+  return formatAmount(amount, signDisplay, currency, decimalPlaces);
 };
 
 export default SensitiveAmount;

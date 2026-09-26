@@ -19,12 +19,16 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
+import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
 
 const SettingsUser = (): React.ReactNode => {
   const currencyField = useField({
     initialValue: "",
+  });
+  const decimalPlacesField = useField<number>({
+    initialValue: 2,
   });
   const languageField = useField({
     initialValue: "",
@@ -37,8 +41,12 @@ const SettingsUser = (): React.ReactNode => {
   });
 
   const { t } = useTranslation();
-  const { preferredCurrency, preferredLanguage, preferredDateFormat } =
-    useUserSettings();
+  const {
+    preferredCurrency,
+    decimalPlaces,
+    preferredLanguage,
+    preferredDateFormat,
+  } = useUserSettings();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const updateUserSettingsMutation = useUpdateUserSettingsMutation();
 
@@ -51,6 +59,10 @@ const SettingsUser = (): React.ReactNode => {
   React.useEffect(() => {
     currencyField.setValue(preferredCurrency);
   }, [preferredCurrency]);
+
+  React.useEffect(() => {
+    decimalPlacesField.setValue(decimalPlaces);
+  }, [decimalPlaces]);
 
   React.useEffect(() => {
     languageField.setValue(preferredLanguage);
@@ -80,6 +92,23 @@ const SettingsUser = (): React.ReactNode => {
           label={<PrimaryText size="sm">{t("appearance_mode")}</PrimaryText>}
           value={colorScheme}
           onChange={(value) => setColorScheme(value as MantineColorScheme)}
+          elevation={0}
+        />
+        <NumberInput
+          label={<PrimaryText size="sm">{t("decimal_places")}</PrimaryText>}
+          description={t("decimal_places_description")}
+          min={0}
+          max={3}
+          step={1}
+          allowDecimal={false}
+          allowNegative={false}
+          {...decimalPlacesField.getInputProps()}
+          onChange={(value) => {
+            if (typeof value === "number" && Number.isInteger(value)) {
+              decimalPlacesField.setValue(value);
+              updateUserSettingsMutation.mutate({ decimalPlaces: value });
+            }
+          }}
           elevation={0}
         />
         <Select
