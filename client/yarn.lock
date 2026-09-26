@@ -1574,15 +1574,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@teelur/budget-board-ui@npm:0.1.0-canary.22.62da001":
-  version: 0.1.0-canary.22.62da001
-  resolution: "@teelur/budget-board-ui@npm:0.1.0-canary.22.62da001"
+"@teelur/budget-board-ui@npm:^0.2.0-canary.26.270edcd":
+  version: 0.2.0-canary.26.270edcd
+  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.26.270edcd"
   peerDependencies:
     "@mantine/core": ^9.6.1
     "@mantine/hooks": ^9.6.1
     react: ^19.3.0
     react-dom: ^19.3.0
-  checksum: 10c0/a644a363ccad0155fdc4853995f343702d789c4a8236faa5e0c7c865091d19301908fe319671ba8956efb7922df051175bbbd931e7adfb2e1dceb4545bf5250e
+  checksum: 10c0/e3c69c084cd36b7fd0ee5c988770181311a9b655ea56a50bdf6085886bc94077a2f71e8011197adcbd172967500ab28136eebd935376f5cfbff04dfe166df309
   languageName: node
   linkType: hard
 
@@ -2538,7 +2538,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.103.1"
     "@tanstack/react-query-devtools": "npm:^5.103.1"
     "@tanstack/react-virtual": "npm:^3.14.13"
-    "@teelur/budget-board-ui": "npm:0.1.0-canary.22.62da001"
+    "@teelur/budget-board-ui": "npm:^0.2.0-canary.26.270edcd"
     "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^26.6.1"
     "@types/papaparse": "npm:^5.5.2"

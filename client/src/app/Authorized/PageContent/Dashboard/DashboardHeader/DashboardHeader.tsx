@@ -1,5 +1,5 @@
-import { Group, SegmentedControl } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group } from "@mantine/core";
+import { Button, SegmentedControl } from "@teelur/budget-board-ui";
 import DashboardEditor from "./DashboardEditor/DashboardEditor";
 import { LayoutIcon } from "lucide-react";
 import React from "react";
@@ -31,13 +31,14 @@ const DashboardHeader = ({
         <Group>
           {isEditMode && (
             <SegmentedControl
+              size="xs"
               value={editTarget}
-              onChange={(v) => setEditTarget(v as "lg" | "sm")}
-              size="sm"
               data={[
                 { label: t("desktop"), value: "lg" },
                 { label: t("mobile"), value: "sm" },
               ]}
+              onChange={(v) => setEditTarget(v as "lg" | "sm")}
+              aria-label={t("edit_target")}
             />
           )}
         </Group>

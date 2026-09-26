@@ -1,5 +1,5 @@
-import { Group, SegmentedControl, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { Button, SegmentedControl } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { Link2OffIcon, Repeat2Icon } from "lucide-react";
 import React from "react";
@@ -98,16 +98,19 @@ const RecurringRuleAction = (
         <Stack gap="0.75rem">
           {hasExistingRules && (
             <SegmentedControl
+              color="secondary"
+              size="compact-sm"
               fullWidth
               value={mode}
-              onChange={(value) => setMode(value as RecurringRuleMode)}
               data={[
-                { value: "new", label: t("add_recurring_rule") },
+                { value: "new", label: t("new_rule") },
                 {
                   value: "existing",
-                  label: t("use_existing_recurring_rule"),
+                  label: t("existing_rule"),
                 },
               ]}
+              onChange={(value) => setMode(value as RecurringRuleMode)}
+              aria-label={t("recurring_rule_mode")}
             />
           )}
           {mode === "new" ? (
