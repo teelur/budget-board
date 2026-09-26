@@ -416,7 +416,7 @@
     <value>L'organisation SimpleFIN à laquelle vous tentez d'accéder n'existe pas.</value>
   </data>
   <data name="SimpleFinAccessTokenParseError" xml:space="preserve">
-    <value>The provided SimpleFIN access token is invalid or malformed.</value>
+    <value>Le jeton d'accès SimpleFIN fourni est invalide ou mal formé.</value>
   </data>
   <data name="TagAddRemoveOverlapError" xml:space="preserve">
     <value>Un tag ne peut pas être ajouté et supprimé dans la même requête.</value>
@@ -428,10 +428,10 @@
     <value>Les valeurs des tags ne peuvent pas dépasser 50 caractères.</value>
   </data>
   <data name="AutomaticRuleInvalidAmountExpressionError" xml:space="preserve">
-    <value>The amount expression '{0}' is invalid.</value>
+    <value>L'expression de montant « {0} » est non valide.</value>
   </data>
   <data name="AutomaticRuleInvalidActionCombinationError" xml:space="preserve">
-    <value>The action '{1}' cannot be used with the field '{0}'.</value>
+    <value>L'action « {1} » ne peut pas être utilisée avec le champ « {0} ».</value>
   </data>
   <data name="AutomaticRuleDivisionByZeroError" xml:space="preserve">
     <value>Un montant ne peut pas être divisé par zéro.</value>
@@ -440,7 +440,7 @@
     <value>Un montant produit par l'opération arithmétique dépasse la plage autorisée.</value>
   </data>
   <data name="AutomaticRuleInvalidTagsError" xml:space="preserve">
-    <value>Les tags doivent être fournies sous la forme JSON (tableau de chaînes de caractères)</value>
+    <value>Les étiquettes doivent être fournies sous la forme JSON (tableau de chaînes de caractères).</value>
   </data>
   <data name="TransactionImportIdempotencyKeyTooLongError" xml:space="preserve">
     <value>L'en-tête Idempotency-Key ne peut pas dépasser {0} caractères.</value>
@@ -470,54 +470,57 @@
     <value>La transaction n'est pas liée.</value>
   </data>
   <data name="RecurringRuleAccountMismatchError" xml:space="preserve">
-    <value>The recurring rule and transaction must belong to the same account.</value>
+    <value>La règle récurrente et l'opération doivent appartenir au même compte.</value>
   </data>
   <data name="RecurringRuleAccountNotFoundError" xml:space="preserve">
-    <value>The account for this recurring rule does not exist.</value>
+    <value>Le compte associé à cette règle récurrente n'existe pas.</value>
   </data>
   <data name="RecurringRuleAccountAndStartDateRequiredError" xml:space="preserve">
-    <value>Recurring rule account and start date are required.</value>
+    <value>Le compte de la règle récurrente et la date de début sont obligatoires.</value>
   </data>
   <data name="RecurringRuleEndDateBeforeStartDateError" xml:space="preserve">
-    <value>Recurring rule end date must not precede its start date.</value>
+    <value>La date de fin d'une règle récurrente ne doit pas être antérieure à sa date de début.</value>
   </data>
   <data name="RecurringRuleInvalidAmountModeError" xml:space="preserve">
-    <value>Invalid recurring amount mode.</value>
+    <value>Mode de montant récurrent invalide.</value>
   </data>
   <data name="RecurringRuleInvalidCadenceError" xml:space="preserve">
-    <value>Invalid recurring cadence.</value>
+    <value>Cadence de récurrence non valide.</value>
   </data>
   <data name="RecurringCadenceRequiredError" xml:space="preserve">
-    <value>Cadence is required.</value>
+    <value>Une cadence est requise.</value>
   </data>
   <data name="RecurringCadenceInvalidDefinitionError" xml:space="preserve">
-    <value>Cadence must be a valid recurrence definition.</value>
+    <value>La cadence doit être une définition de récurrence valide.</value>
   </data>
   <data name="RecurringCadenceUnsupportedVersionError" xml:space="preserve">
-    <value>Cadence version is not supported.</value>
+    <value>La version de cadence n'est pas prise en charge.</value>
   </data>
   <data name="RecurringCadenceUnsupportedUnitError" xml:space="preserve">
-    <value>Cadence unit is not supported.</value>
+    <value>L'unité de cadence n'est pas prise en charge.</value>
   </data>
   <data name="RecurringCadenceInvalidIntervalError" xml:space="preserve">
-    <value>Cadence interval must be positive.</value>
+    <value>L'intervalle de cadence doit être positif.</value>
   </data>
   <data name="RecurringCadenceUnsupportedModeError" xml:space="preserve">
-    <value>Cadence mode is not supported.</value>
+    <value>Le mode cadence n'est pas pris en charge.</value>
   </data>
   <data name="RecurringCadenceMaximumOccurrencesError" xml:space="preserve">
-    <value>Cadence occurrences per unit exceed the supported maximum.</value>
+    <value>Le nombre d'occurrences de cadence par unité dépasse le maximum pris en charge.</value>
   </data>
   <data name="RecurringRuleNotFoundError" xml:space="preserve">
-    <value>The recurring rule you are trying to access does not exist.</value>
+    <value>La règle récurrente à laquelle vous tentez d'accéder n'existe pas.</value>
   </data>
   <data name="RecurringRuleZeroAmountError" xml:space="preserve">
-    <value>Recurring rule amount must not be zero.</value>
+    <value>Le montant de la règle récurrente ne doit pas être nul.</value>
   </data>
   <data name="TransactionAlreadyRecurringError" xml:space="preserve">
-    <value>This transaction is already associated with a recurring rule.</value>
+    <value>Cette opération est déjà associée à une règle récurrente.</value>
   </data>
   <data name="TransactionCategoryIconTooLongError" xml:space="preserve">
-    <value>The transaction category icon is too long.</value>
+    <value>L'icône de la catégorie d'opération est trop longue.</value>
+  </data>
+  <data name="InvalidDecimalPlacesError" xml:space="preserve">
+    <value>The number of decimal places must be between 0 and 3.</value>
   </data>
 </root>

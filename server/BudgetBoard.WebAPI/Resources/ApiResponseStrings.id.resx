@@ -68,7 +68,7 @@
         <value>Akun Dikunci Dikarenakan Beberapa Percobaan Masuk Gagal</value>
   </data>
   <data name="AuthCodeRequired" xml:space="preserve">
-        <value>Kode authorisasi diperlukan</value>
+        <value>Kode otorisasi wajib diisi.</value>
   </data>
   <data name="AuthFailed" xml:space="preserve">
         <value>Autentikasi gagal.</value>
@@ -129,5 +129,11 @@
   </data>
   <data name="OidcExplicitLinkRequiredError" xml:space="preserve">
     <value>Akun dengan email ini telah ada. Masuk dan sambungkan OIDC akun anda dari Setelan Akun.</value>
+  </data>
+  <data name="InvalidUpdateChannel" xml:space="preserve">
+    <value>Saluran tersebut harus berstatus ‘stable’ atau ‘dev’.</value>
+  </data>
+  <data name="UpdateChannelNotSupported" xml:space="preserve">
+    <value>Saluran pembaruan ini tidak didukung.</value>
   </data>
 </root>
