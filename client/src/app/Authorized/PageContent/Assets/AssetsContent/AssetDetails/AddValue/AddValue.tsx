@@ -23,7 +23,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const createValueMutation = useCreateValueMutation({
     assetId: props.assetId,
   });
@@ -49,7 +49,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
         {...amountField.getInputProps()}
         label={<PrimaryText size="xs">{t("amount")}</PrimaryText>}
         prefix={getCurrencySymbol(preferredCurrency)}
-        decimalScale={2}
+        decimalScale={decimalPlaces}
         thousandSeparator={thousandsSeparator}
         decimalSeparator={decimalSeparator}
         elevation={0}

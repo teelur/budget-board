@@ -9,6 +9,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUpdateValueMutation } from "~/hooks/mutations/values/useUpdateValueMutation";
 import { useDeleteValueMutation } from "~/hooks/mutations/values/useDeleteValueMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableValueItemContentProps {
   value: IValueResponse;
@@ -26,6 +27,7 @@ const EditableValueItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { decimalPlaces } = useUserSettings();
   const updateValueMutation = useUpdateValueMutation({
     assetId: props.value.assetID,
   });
@@ -75,7 +77,7 @@ const EditableValueItemContent = (
           prefix={getCurrencySymbol(props.userCurrency)}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
-          decimalScale={2}
+          decimalScale={decimalPlaces}
           fixedDecimalScale
           onBlur={() => {
             valueAmountField.getInputProps().onBlur();

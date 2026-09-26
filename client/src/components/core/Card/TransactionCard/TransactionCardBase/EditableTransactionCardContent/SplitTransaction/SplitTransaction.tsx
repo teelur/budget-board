@@ -37,7 +37,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
 
   const { t } = useTranslation();
   const { thousandsSeparator, decimalSeparator } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const splitTransactionMutation = useSplitTransactionMutation();
 
   return (
@@ -53,7 +53,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
             label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
             {...amountField.getInputProps()}
             prefix={getCurrencySymbol(preferredCurrency)}
-            decimalScale={2}
+            decimalScale={decimalPlaces}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}
             maw={200}

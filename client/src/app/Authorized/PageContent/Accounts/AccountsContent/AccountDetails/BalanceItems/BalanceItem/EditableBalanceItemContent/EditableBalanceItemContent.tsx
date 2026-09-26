@@ -9,6 +9,7 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUpdateBalanceMutation } from "~/hooks/mutations/balances/useUpdateBalanceMutation";
 import { useDeleteBalanceMutation } from "~/hooks/mutations/balances/useDeleteBalanceMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableBalanceItemContentProps {
   balance: IBalanceResponse;
@@ -26,6 +27,7 @@ const EditableBalanceItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { decimalPlaces } = useUserSettings();
   const updateBalanceMutation = useUpdateBalanceMutation({
     accountID: props.balance.accountID,
   });
@@ -75,7 +77,7 @@ const EditableBalanceItemContent = (
           prefix={getCurrencySymbol(props.userCurrency)}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
-          decimalScale={2}
+          decimalScale={decimalPlaces}
           fixedDecimalScale
           onBlur={() => {
             const { onBlur } = balanceAmountField.getInputProps();

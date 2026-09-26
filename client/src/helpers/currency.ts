@@ -12,20 +12,16 @@ export enum SignDisplay {
  * provided ISO 4217 currency code. It ensures that negative zero (`-0`) is normalized
  * to `0` in the output by adding `0` to the input number before formatting.
  *
- * Notes:
- * - `shouldIncludeCents` controls whether two fraction digits are shown (e.g. cents).
- * - The function uses the runtime/default locale (by passing `undefined`) so the
- *   formatted output respects the user's locale settings.
+ * The function uses the supplied locale and configured number of fraction digits.
  *
  * @param number - The numeric value to format.
- * @param shouldIncludeCents - When `true`, output includes two fraction digits; when
- *   `false`, output shows no fraction digits.
+ * @param decimalPlaces - The number of fraction digits to display.
  * @param currency - The ISO 4217 currency code to use (e.g. `"USD"`, `"EUR"`).
  * @returns The formatted currency string for the current locale (for example `"$1,234.56"`).
  */
 export const convertNumberToCurrency = (
   number: number,
-  shouldIncludeCents: boolean,
+  decimalPlaces: number,
   currency: string,
   signDisplay: SignDisplay,
   locale: string,
@@ -34,8 +30,8 @@ export const convertNumberToCurrency = (
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    maximumFractionDigits: shouldIncludeCents ? 2 : 0,
-    minimumFractionDigits: shouldIncludeCents ? 2 : 0,
+    maximumFractionDigits: decimalPlaces,
+    minimumFractionDigits: decimalPlaces,
     signDisplay: signDisplay ?? SignDisplay.Auto,
   }).format(number + 0);
 };

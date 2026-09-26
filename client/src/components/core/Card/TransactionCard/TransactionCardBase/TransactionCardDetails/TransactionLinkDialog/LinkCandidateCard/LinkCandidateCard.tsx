@@ -1,7 +1,7 @@
 import { Stack, Text } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { getCurrencySymbol } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ITransaction } from "~/models/transaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -20,9 +20,15 @@ const LinkCandidateCard = ({
   onSelect,
 }: LinkCandidateCardProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
-  const { preferredCurrency } = useUserSettings();
-  const amount = `${getCurrencySymbol(preferredCurrency)}${candidate.amount.toFixed(2)}`;
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const amount = convertNumberToCurrency(
+    candidate.amount,
+    decimalPlaces,
+    preferredCurrency,
+    SignDisplay.Auto,
+    intlLocale,
+  );
   const date = dayjs(candidate.date).format(longDateFormat);
 
   return (

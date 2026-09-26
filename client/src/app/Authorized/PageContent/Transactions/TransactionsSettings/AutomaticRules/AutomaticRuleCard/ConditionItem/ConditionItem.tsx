@@ -11,6 +11,7 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface ConditionItemProps {
   condition: IRuleParameterResponse;
@@ -22,6 +23,7 @@ interface ConditionItemProps {
 const ConditionItem = (props: ConditionItemProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { decimalPlaces } = useUserSettings();
 
   const fieldLabelKey = ConditionTransactionFields.find(
     (field) => field.value === props.condition.field,
@@ -48,6 +50,7 @@ const ConditionItem = (props: ConditionItemProps) => {
             props.condition.field,
             props.condition.value,
             props.currency,
+            decimalPlaces,
             props.categories,
             formatDate,
             intlLocale,

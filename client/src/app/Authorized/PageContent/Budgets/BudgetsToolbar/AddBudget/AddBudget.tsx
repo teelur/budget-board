@@ -25,7 +25,7 @@ interface AddBudgetProps {
 const AddBudget = (props: AddBudgetProps): React.ReactNode => {
   const { t } = useTranslation();
   const { thousandsSeparator, decimalSeparator, dayjs } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allTransactionCategories } = useTransactionCategories();
   const createBudgetMutation = useCreateBudgetMutation();
 
@@ -58,7 +58,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
               w="100%"
               prefix={getCurrencySymbol(preferredCurrency)}
               min={0}
-              decimalScale={2}
+              decimalScale={decimalPlaces}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
               elevation={1}

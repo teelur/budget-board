@@ -50,7 +50,7 @@ const UnbudgetedChildCard = (
           </PrimaryText>
           <Group gap="sm">
             <PrimaryText className={classes.text}>
-              <SensitiveAmount amount={props.amount} includeCents={false} />
+              <SensitiveAmount amount={props.amount} decimalPlaces={0} />
             </PrimaryText>
             {props.selectedDate && (
               <ActionIcon

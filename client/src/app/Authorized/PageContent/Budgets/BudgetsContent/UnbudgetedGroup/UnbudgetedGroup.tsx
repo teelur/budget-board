@@ -80,7 +80,7 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
           <Group justify="space-between" align="center" w="100%" pr="0.25rem">
             <PrimaryText size="lg">{t("unbudgeted")}</PrimaryText>
             <PrimaryText size="lg">
-              <SensitiveAmount amount={total} includeCents={false} />
+              <SensitiveAmount amount={total} decimalPlaces={0} />
             </PrimaryText>
           </Group>
         }

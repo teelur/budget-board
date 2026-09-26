@@ -26,7 +26,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const { budgetWarningThreshold } = useUserSettings();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, false, SignDisplay.Auto);
+    formatAmount(amount, SignDisplay.Auto, undefined, 0);
 
   const percentComplete = Math.round(
     ((props.amount *

@@ -40,7 +40,8 @@ const FlowsChart = (props: FlowsChartProps): React.ReactNode => {
   );
 
   const valueFormatter = React.useCallback(
-    (value: number) => formatSensitiveAmount(value, false, SignDisplay.Auto),
+    (value: number) =>
+      formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0),
     [formatSensitiveAmount],
   );
 

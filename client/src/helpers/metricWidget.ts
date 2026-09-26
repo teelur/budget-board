@@ -441,6 +441,7 @@ export interface MetricDataContext {
   accountTypes: IAccountType[];
   getCategoryType: (category: string) => string;
   preferredCurrency: string;
+  decimalPlaces: number;
   intlLocale: string;
 }
 
@@ -448,13 +449,14 @@ function formatValue(
   value: number,
   format: MetricFormat,
   currency: string,
+  decimalPlaces: number,
   locale: string,
 ): string {
   switch (format) {
     case "currency":
       return convertNumberToCurrency(
         value,
-        true,
+        decimalPlaces,
         currency,
         SignDisplay.Auto,
         locale,
@@ -686,6 +688,7 @@ function resolveExpression(
       value,
       getMetricFormat(token),
       ctx.preferredCurrency,
+      ctx.decimalPlaces,
       ctx.intlLocale,
     );
   } catch {

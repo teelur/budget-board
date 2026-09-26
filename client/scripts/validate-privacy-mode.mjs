@@ -148,11 +148,7 @@ test("metric templates report whether they contain currency metrics", async () =
 test("privacy mode provider wraps the authorized app tree", async () => {
   const source = await readSource("src/App.tsx");
 
-  assertIncludes(
-    source,
-    "PrivacyModeProvider",
-    "src/App.tsx",
-  );
+  assertIncludes(source, "PrivacyModeProvider", "src/App.tsx");
   assertOrder(
     source,
     ["<UserSettingsProvider>", "<LocaleProvider>", "<PrivacyModeProvider>"],
@@ -197,7 +193,7 @@ test("sensitive amount formatting is shared by string and jsx callers", async ()
   );
   assertIncludes(
     componentSource,
-    "return formatAmount(amount, includeCents, signDisplay, currency);",
+    "return formatAmount(amount, signDisplay, currency, decimalPlaces);",
     "SensitiveAmount.tsx",
   );
   assertIncludes(
@@ -216,7 +212,7 @@ test("privacy button and compact sync controls remain reachable in the header", 
   assertIncludes(header, "<PrivacyModeButton />", "Header.tsx");
   assertIncludes(
     header,
-    '<SyncButton compact={isCompactHeader} />',
+    "<SyncButton compact={isCompactHeader} />",
     "Header.tsx",
   );
   assertIncludes(header, 'useMediaQuery("(max-width: 30em)"', "Header.tsx");
@@ -247,11 +243,7 @@ test("status text hides status color while privacy mode is enabled", async () =>
 
   assertIncludes(source, "usePrivacyMode", "StatusText.tsx");
   assertIncludes(source, "isPrivacyModeEnabled", "StatusText.tsx");
-  assertIncludes(
-    source,
-    "var(--base-color-text-primary)",
-    "StatusText.tsx",
-  );
+  assertIncludes(source, "var(--base-color-text-primary)", "StatusText.tsx");
   assertOrder(
     source,
     ["const color = isPrivacyModeEnabled", "getStatusColor("],
