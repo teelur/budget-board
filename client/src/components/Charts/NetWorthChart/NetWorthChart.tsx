@@ -97,11 +97,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   ];
 
   const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(
-      value,
-      false,
-      SignDisplay.Auto,
-    );
+    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
   };
 
   const liabilityAccountTypes = allAccountTypes

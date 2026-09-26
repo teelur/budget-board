@@ -46,10 +46,10 @@ const EditableGoalCardContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, false, SignDisplay.Auto);
+    formatAmount(amount, SignDisplay.Auto, undefined, 0);
   const updateGoalMutation = useUpdateGoalMutation();
   const deleteGoalMutation = useDeleteGoalMutation();
   const completeGoalMutation = useCompleteGoalMutation();
@@ -165,6 +165,7 @@ const EditableGoalCardContent = (
                       prefix={getCurrencySymbol(preferredCurrency)}
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
+                      decimalScale={decimalPlaces}
                       {...goalTargetAmountField.getInputProps()}
                       onBlur={() => {
                         if (goalTargetAmountField.getValue() > 0) {
@@ -305,6 +306,7 @@ const EditableGoalCardContent = (
                       prefix={getCurrencySymbol(preferredCurrency)}
                       thousandSeparator={thousandsSeparator}
                       decimalSeparator={decimalSeparator}
+                      decimalScale={decimalPlaces}
                       {...goalMonthlyContributionField.getInputProps()}
                       onBlur={() => {
                         if (goalMonthlyContributionField.getValue() > 0) {

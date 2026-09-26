@@ -33,7 +33,7 @@ const CreateTransactionModal = (): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const createTransactionMutation = useCreateTransactionMutation();
@@ -129,7 +129,7 @@ const CreateTransactionModal = (): React.ReactNode => {
               label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
               placeholder={t("enter_amount")}
               prefix={getCurrencySymbol(preferredCurrency)}
-              decimalScale={2}
+              decimalScale={decimalPlaces}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
               {...amountField.getInputProps()}

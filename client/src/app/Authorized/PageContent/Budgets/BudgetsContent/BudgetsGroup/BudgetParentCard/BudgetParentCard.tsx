@@ -62,7 +62,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const { allTransactionCategories } = useTransactionCategories();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, false, SignDisplay.Auto);
+    formatAmount(amount, SignDisplay.Auto, undefined, 0);
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
@@ -306,6 +306,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         onBlur={() => handleEdit(newLimitField.getValue())}
                         thousandSeparator={thousandsSeparator}
                         decimalSeparator={decimalSeparator}
+                        decimalScale={0}
                         min={childLimitsTotal}
                         max={999999}
                         step={1}

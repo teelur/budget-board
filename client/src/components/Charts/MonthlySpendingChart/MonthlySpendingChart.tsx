@@ -82,11 +82,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
       return "";
     }
 
-    return formatSensitiveAmount(
-      value,
-      false,
-      SignDisplay.Auto,
-    );
+    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
   };
 
   return (
@@ -95,9 +91,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
         <DimmedText size="sm">
           {props.invertData ? t("average_spending") : t("average_income")}
         </DimmedText>
-        <DimmedText size="sm">
-          {chartValueFormatter(average)}
-        </DimmedText>
+        <DimmedText size="sm">{chartValueFormatter(average)}</DimmedText>
       </Group>
       <BarChart
         h={400}
