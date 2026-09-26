@@ -306,6 +306,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         onBlur={() => handleEdit(newLimitField.getValue())}
                         thousandSeparator={thousandsSeparator}
                         decimalSeparator={decimalSeparator}
+                        decimalScale={0}
                         min={childLimitsTotal}
                         max={999999}
                         step={1}

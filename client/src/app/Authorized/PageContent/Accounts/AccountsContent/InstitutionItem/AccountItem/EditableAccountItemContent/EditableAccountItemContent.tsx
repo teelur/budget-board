@@ -127,7 +127,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             <NumberInput
               {...interestRateField.getInputProps()}
               label={<PrimaryText size="xs">{t("interest_rate")}</PrimaryText>}
-              decimalScale={decimalPlaces}
+              decimalScale={2}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
               min={0}
