@@ -1,6 +1,6 @@
 import React from "react";
-import { Group, SegmentedControl, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { Button, SegmentedControl } from "@teelur/budget-board-ui";
 import { MoveLeftIcon } from "lucide-react";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -53,16 +53,18 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
   return (
     <Stack gap={"1rem"}>
       <SegmentedControl
+        color="secondary"
+        size="compact-sm"
+        fullWidth
         value={targetType}
-        onChange={(value) =>
-          setTargetType(value as "completeDate" | "monthlyContribution")
-        }
         data={[
           { label: t("complete_date"), value: "completeDate" },
           { label: t("monthly_contribution"), value: "monthlyContribution" },
         ]}
-        radius="sm"
-        color={"indigo"}
+        onChange={(value) =>
+          setTargetType(value as "completeDate" | "monthlyContribution")
+        }
+        aria-label={t("target_type")}
       />
       {targetType === "completeDate" && (
         <DateInput

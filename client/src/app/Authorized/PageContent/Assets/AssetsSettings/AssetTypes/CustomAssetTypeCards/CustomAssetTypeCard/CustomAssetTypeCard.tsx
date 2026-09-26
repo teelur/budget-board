@@ -1,12 +1,5 @@
-import {
-  Badge,
-  Flex,
-  Group,
-  LoadingOverlay,
-  SegmentedControl,
-  Stack,
-} from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { Badge, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, Button, SegmentedControl } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -81,9 +74,14 @@ const CustomAssetTypeCard = (
             <Stack gap="0.25rem" justify="center">
               <PrimaryText size="sm">{t("category_level")}</PrimaryText>
               <SegmentedControl
-                color="var(--mantine-primary-color-filled)"
-                radius="md"
+                color="secondary"
+                size="compact-sm"
+                fullWidth
                 value={isChildType ? "child" : "parent"}
+                data={[
+                  { label: t("parent"), value: "parent" },
+                  { label: t("child"), value: "child" },
+                ]}
                 onChange={(val) => {
                   const child = val === "child";
                   setIsChildType(child);
@@ -91,10 +89,7 @@ const CustomAssetTypeCard = (
                     parentField.reset();
                   }
                 }}
-                data={[
-                  { label: t("parent"), value: "parent" },
-                  { label: t("child"), value: "child" },
-                ]}
+                aria-label={t("category_level")}
               />
             </Stack>
             {isChildType && (
