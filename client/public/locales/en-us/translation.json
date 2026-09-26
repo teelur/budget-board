@@ -524,7 +524,7 @@
   "portuguese_brazilian": "Portuguese (Brazil)",
   "preferred_currency": "Preferred Currency",
   "decimal_places": "Decimal Places",
-  "decimal_places_description": "Controls the number of decimal places shown and allowed for monetary amounts. This may differ from your currency's conventional precision.",
+  "decimal_places_description": "Controls the number of decimal places shown and allowed for monetary amounts.",
   "preferred_date_format": "Preferred Date Format",
   "preferred_language": "Preferred Language",
   "preferred_language_description": "Translations may be incorrect or incomplete. If you notice any issues, please consider contributing a fix on <0>Weblate</0>.",

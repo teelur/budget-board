@@ -94,23 +94,6 @@ const SettingsUser = (): React.ReactNode => {
           onChange={(value) => setColorScheme(value as MantineColorScheme)}
           elevation={0}
         />
-        <NumberInput
-          label={<PrimaryText size="sm">{t("decimal_places")}</PrimaryText>}
-          description={t("decimal_places_description")}
-          min={0}
-          max={3}
-          step={1}
-          allowDecimal={false}
-          allowNegative={false}
-          {...decimalPlacesField.getInputProps()}
-          onChange={(value) => {
-            if (typeof value === "number" && Number.isInteger(value)) {
-              decimalPlacesField.setValue(value);
-              updateUserSettingsMutation.mutate({ decimalPlaces: value });
-            }
-          }}
-          elevation={0}
-        />
         <Select
           label={<PrimaryText size="sm">{t("preferred_currency")}</PrimaryText>}
           placeholder={t("select_currency")}
@@ -123,6 +106,25 @@ const SettingsUser = (): React.ReactNode => {
               updateUserSettingsMutation.mutate({
                 currency: value,
               });
+            }
+          }}
+          elevation={0}
+        />
+        <NumberInput
+          label={<PrimaryText size="sm">{t("decimal_places")}</PrimaryText>}
+          description={
+            <DimmedText size="xs">{t("decimal_places_description")}</DimmedText>
+          }
+          min={0}
+          max={3}
+          step={1}
+          allowDecimal={false}
+          allowNegative={false}
+          {...decimalPlacesField.getInputProps()}
+          onChange={(value) => {
+            if (typeof value === "number" && Number.isInteger(value)) {
+              decimalPlacesField.setValue(value);
+              updateUserSettingsMutation.mutate({ decimalPlaces: value });
             }
           }}
           elevation={0}
