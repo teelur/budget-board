@@ -520,4 +520,7 @@
   <data name="TransactionCategoryIconTooLongError" xml:space="preserve">
     <value>L'icône de la catégorie d'opération est trop longue.</value>
   </data>
+  <data name="InvalidDecimalPlacesError" xml:space="preserve">
+    <value>The number of decimal places must be between 0 and 3.</value>
+  </data>
 </root>
