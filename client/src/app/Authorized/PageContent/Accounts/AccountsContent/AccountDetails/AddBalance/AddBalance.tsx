@@ -23,7 +23,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const createBalanceMutation = useCreateBalanceMutation({
     accountId: props.accountId,
   });
@@ -48,7 +48,7 @@ const AddBalance = (props: AddBalanceProps): React.ReactNode => {
         {...amountField.getInputProps()}
         label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
         prefix={getCurrencySymbol(preferredCurrency)}
-        decimalScale={2}
+        decimalScale={decimalPlaces}
         decimalSeparator={decimalSeparator}
         thousandSeparator={thousandsSeparator}
         elevation={0}

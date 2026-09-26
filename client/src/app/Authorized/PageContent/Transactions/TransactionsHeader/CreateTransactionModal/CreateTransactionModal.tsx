@@ -32,7 +32,7 @@ const CreateTransactionModal = (): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const createTransactionMutation = useCreateTransactionMutation();
@@ -101,44 +101,46 @@ const CreateTransactionModal = (): React.ReactNode => {
           <PrimaryHeading order={4}>{t("create_transaction")}</PrimaryHeading>
         }
       >
-        <Stack gap="0.25rem">
-          <DateInput
-            label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
-            placeholder={t("select_a_date")}
-            {...dateField.getInputProps()}
-            locale={dayjsLocale}
-            valueFormat={longDateFormat}
-            elevation={0}
-          />
-          <TextInput
-            label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
-            placeholder={t("enter_merchant_name")}
-            {...merchantNameField.getInputProps()}
-            elevation={0}
-          />
-          <CategorySelect
-            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
-            categories={transactionCategories}
-            {...categoryField.getInputProps()}
-            withinPortal
-            elevation={0}
-          />
-          <NumberInput
-            label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
-            placeholder={t("enter_amount")}
-            prefix={getCurrencySymbol(preferredCurrency)}
-            decimalScale={2}
-            thousandSeparator={thousandsSeparator}
-            decimalSeparator={decimalSeparator}
-            {...amountField.getInputProps()}
-            elevation={0}
-          />
-          <AccountMultiSelect
-            label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
-            {...accountIdsField.getInputProps()}
-            maxSelectedValues={1}
-            elevation={0}
-          />
+        <Stack gap="1rem">
+          <Stack gap="0.25rem">
+            <DateInput
+              label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
+              placeholder={t("select_a_date")}
+              {...dateField.getInputProps()}
+              locale={dayjsLocale}
+              valueFormat={longDateFormat}
+              elevation={0}
+            />
+            <TextInput
+              label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+              placeholder={t("enter_merchant_name")}
+              {...merchantNameField.getInputProps()}
+              elevation={0}
+            />
+            <CategorySelect
+              label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+              categories={transactionCategories}
+              {...categoryField.getInputProps()}
+              withinPortal
+              elevation={0}
+            />
+            <NumberInput
+              label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+              placeholder={t("enter_amount")}
+              prefix={getCurrencySymbol(preferredCurrency)}
+              decimalScale={decimalPlaces}
+              thousandSeparator={thousandsSeparator}
+              decimalSeparator={decimalSeparator}
+              {...amountField.getInputProps()}
+              elevation={0}
+            />
+            <AccountMultiSelect
+              label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+              {...accountIdsField.getInputProps()}
+              maxSelectedValues={1}
+              elevation={0}
+            />
+          </Stack>
           <Button
             mt="0.25rem"
             onClick={onSubmit}

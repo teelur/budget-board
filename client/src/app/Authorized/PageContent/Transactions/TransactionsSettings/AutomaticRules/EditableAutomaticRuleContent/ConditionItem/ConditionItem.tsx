@@ -35,7 +35,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjsLocale, longDateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
 
   const getValueInput = (): React.ReactNode => {
     if (props.ruleParameter.field === "merchant") {
@@ -66,7 +66,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             })
           }
           prefix={getCurrencySymbol(preferredCurrency)}
-          decimalScale={2}
+          decimalScale={decimalPlaces}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
           elevation={1}

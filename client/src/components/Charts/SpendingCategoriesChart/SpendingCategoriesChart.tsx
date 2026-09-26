@@ -264,7 +264,7 @@ const SpendingCategoriesChart = (
   const outerRadius = showSubcategories ? (isNarrow ? 75 : 93) : undefined;
 
   const formatValue = (value: number) =>
-    formatSensitiveAmount(value, true, SignDisplay.Auto);
+    formatSensitiveAmount(value, SignDisplay.Auto);
 
   return (
     <Stack w="100%" gap="xs">

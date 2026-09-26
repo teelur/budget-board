@@ -108,7 +108,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
                     props.categoryTree.value.toLocaleLowerCase(),
                   ) ?? 0
                 }
-                includeCents={false}
+                decimalPlaces={0}
               />
             </PrimaryText>
             {props.selectedDate && props.categoryTree.value.length !== 0 && (

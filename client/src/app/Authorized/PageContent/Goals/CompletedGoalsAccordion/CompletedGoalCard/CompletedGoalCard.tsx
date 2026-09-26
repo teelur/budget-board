@@ -41,7 +41,6 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
                     props.goal.amount,
                     props.goal.initialAmount,
                   ),
-                  true,
                   SignDisplay.Auto,
                 ),
               }}

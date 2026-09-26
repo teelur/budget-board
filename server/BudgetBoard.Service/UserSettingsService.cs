@@ -52,6 +52,7 @@ public class UserSettingsService(
         }
 
         HandleCurrencyChange();
+        HandleDecimalPlacesChange();
         HandleLanguageChange();
         HandleDateFormatChange();
         HandleBudgetWarningThresholdChange();
@@ -114,6 +115,27 @@ public class UserSettingsService(
             }
 
             userSettings.Language = request.Language.ToLowerInvariant();
+        }
+
+        void HandleDecimalPlacesChange()
+        {
+            if (
+                !request.DecimalPlaces.HasValue
+                || userSettings.DecimalPlaces == request.DecimalPlaces.Value
+            )
+            {
+                return;
+            }
+
+            if (request.DecimalPlaces.Value < 0 || request.DecimalPlaces.Value > 3)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["InvalidDecimalPlacesLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidDecimalPlacesError"]
+                );
+            }
+
+            userSettings.DecimalPlaces = request.DecimalPlaces.Value;
         }
 
         void HandleDateFormatChange()

@@ -41,7 +41,7 @@ const MetricWidget = ({
   onSettingsClose,
 }: MetricWidgetProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { intlLocale, dayjs } = useLocale();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const { allAccountTypes, isPending: accountTypesPending } = useAccountTypes();
@@ -144,6 +144,7 @@ const MetricWidget = ({
       accountTypes: allAccountTypes ?? [],
       getCategoryType,
       preferredCurrency,
+      decimalPlaces,
       intlLocale,
     }),
     [
@@ -156,6 +157,7 @@ const MetricWidget = ({
       allAccountTypes,
       getCategoryType,
       preferredCurrency,
+      decimalPlaces,
       intlLocale,
     ],
   );

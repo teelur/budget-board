@@ -71,6 +71,7 @@ export const getFormattedValue = (
   field: string,
   value: string,
   currency: string,
+  decimalPlaces: number,
   categories: ICategory[],
   formatDate: (dateStr: string) => string,
   intlLocale: string,
@@ -86,7 +87,7 @@ export const getFormattedValue = (
 
       return convertNumberToCurrency(
         Number(value),
-        true,
+        decimalPlaces,
         currency,
         SignDisplay.Auto,
         intlLocale,
