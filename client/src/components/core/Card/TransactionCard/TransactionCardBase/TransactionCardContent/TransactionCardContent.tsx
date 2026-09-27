@@ -74,7 +74,7 @@ const TransactionCardContent = (
           <AmountText
             amount={props.transaction.amount}
             size="md"
-            disableStatusColor={isPrivacyModeEnabled}
+            isSensitive={isPrivacyModeEnabled}
           >
             <SensitiveAmount amount={props.transaction.amount} />
           </AmountText>

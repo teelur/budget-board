@@ -77,7 +77,7 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
                   total={props.limit}
                   type={statusType}
                   warningThreshold={props.budgetWarningThreshold}
-                  disableStatusColor={isPrivacyModeEnabled}
+                  isSensitive={isPrivacyModeEnabled}
                   className={classes.inlineText}
                   key="amount"
                 />,
@@ -101,7 +101,7 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
               amount={props.amount}
               total={props.limit}
               type={statusType}
-              disableStatusColor={isPrivacyModeEnabled}
+              isSensitive={isPrivacyModeEnabled}
               warningThreshold={props.budgetWarningThreshold}
               className={`${classes.heroAmount} ${classes.inlineText}`}
               key="amount"

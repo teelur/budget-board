@@ -113,7 +113,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
         <AmountText
           amount={props.account.currentBalance}
           size="md"
-          disableStatusColor={isPrivacyModeEnabled}
+          isSensitive={isPrivacyModeEnabled}
         >
           <SensitiveAmount amount={props.account.currentBalance} />
         </AmountText>

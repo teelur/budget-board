@@ -55,7 +55,7 @@ const EditableInstitutionItemContent = (
       <AmountText
         amount={props.totalBalance}
         size="md"
-        disableStatusColor={isPrivacyModeEnabled}
+        isSensitive={isPrivacyModeEnabled}
       >
         <SensitiveAmount amount={props.totalBalance} />
       </AmountText>

@@ -37,7 +37,7 @@ const InstitutionItemContent = (
       <AmountText
         amount={props.totalBalance}
         size="lg"
-        disableStatusColor={isPrivacyModeEnabled}
+        isSensitive={isPrivacyModeEnabled}
       >
         <SensitiveAmount amount={props.totalBalance} />
       </AmountText>

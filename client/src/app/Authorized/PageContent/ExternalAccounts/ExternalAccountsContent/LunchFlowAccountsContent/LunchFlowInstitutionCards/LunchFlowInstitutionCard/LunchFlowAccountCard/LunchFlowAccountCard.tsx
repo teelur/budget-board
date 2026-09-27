@@ -177,7 +177,7 @@ const LunchFlowAccountCard = (
             <AmountText
               amount={props.lunchFlowAccount.balance}
               size="sm"
-              disableStatusColor={isPrivacyModeEnabled}
+              isSensitive={isPrivacyModeEnabled}
             >
               <SensitiveAmount
                 amount={props.lunchFlowAccount.balance}

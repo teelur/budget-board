@@ -38,7 +38,7 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
       <AmountText
         amount={props.value.amount}
         size="md"
-        disableStatusColor={isPrivacyModeEnabled}
+        isSensitive={isPrivacyModeEnabled}
       >
         <SensitiveAmount
           amount={props.value.amount}

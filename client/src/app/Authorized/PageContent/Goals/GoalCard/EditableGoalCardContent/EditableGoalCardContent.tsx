@@ -293,7 +293,7 @@ const EditableGoalCardContent = (
                         amount={props.goal.monthlyContributionProgress}
                         total={props.goal.monthlyContribution}
                         type={StatusColorType.Target}
-                        disableStatusColor={isPrivacyModeEnabled}
+                        isSensitive={isPrivacyModeEnabled}
                         size="md"
                         key="amount"
                       />,
@@ -347,7 +347,7 @@ const EditableGoalCardContent = (
                       amount={props.goal.monthlyContributionProgress}
                       total={props.goal.monthlyContribution}
                       type={StatusColorType.Target}
-                      disableStatusColor={isPrivacyModeEnabled}
+                      isSensitive={isPrivacyModeEnabled}
                       size="md"
                       key="amount"
                     />,

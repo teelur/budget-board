@@ -97,7 +97,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   <AmountText
                     amount={props.asset.sellPrice - props.asset.purchasePrice}
                     size="xs"
-                    disableStatusColor={isPrivacyModeEnabled}
+                    isSensitive={isPrivacyModeEnabled}
                   >
                     <SensitiveAmount
                       amount={props.asset.sellPrice - props.asset.purchasePrice}

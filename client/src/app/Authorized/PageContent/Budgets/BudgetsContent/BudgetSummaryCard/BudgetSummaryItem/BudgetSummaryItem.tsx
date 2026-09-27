@@ -56,7 +56,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     type: props.budgetValueType,
     warningThreshold: budgetWarningThreshold,
     size: "md" as const,
-    disableStatusColor: isPrivacyModeEnabled,
+    isSensitive: isPrivacyModeEnabled,
   };
   const projectedStatusTextProps = {
     amount: props.projectedAmount ?? 0,
@@ -64,7 +64,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     type: props.budgetValueType,
     warningThreshold: budgetWarningThreshold,
     size: "sm" as const,
-    disableStatusColor: isPrivacyModeEnabled,
+    isSensitive: isPrivacyModeEnabled,
   };
 
   const i18nKey = props.total

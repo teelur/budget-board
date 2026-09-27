@@ -129,7 +129,7 @@ const EditableAssetItemContent = (
           <AmountText
             size="md"
             amount={props.asset.currentValue}
-            disableStatusColor={isPrivacyModeEnabled}
+            isSensitive={isPrivacyModeEnabled}
           >
             <SensitiveAmount amount={props.asset.currentValue ?? 0} />
           </AmountText>

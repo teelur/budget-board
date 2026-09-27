@@ -177,7 +177,7 @@ const SimpleFinAccountCard = (
             <AmountText
               amount={props.simpleFinAccount.balance}
               size="sm"
-              disableStatusColor={isPrivacyModeEnabled}
+              isSensitive={isPrivacyModeEnabled}
             >
               <SensitiveAmount
                 amount={props.simpleFinAccount.balance}

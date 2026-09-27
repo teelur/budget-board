@@ -26,7 +26,7 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
       <AmountText
         amount={props.totalBalance}
         size="md"
-        disableStatusColor={isPrivacyModeEnabled}
+        isSensitive={isPrivacyModeEnabled}
       >
         <SensitiveAmount amount={props.totalBalance} />
       </AmountText>

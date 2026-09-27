@@ -84,7 +84,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
         <AmountText
           amount={props.asset.currentValue ?? 0}
           size="md"
-          disableStatusColor={isPrivacyModeEnabled}
+          isSensitive={isPrivacyModeEnabled}
         >
           <SensitiveAmount amount={props.asset.currentValue ?? 0} />
         </AmountText>

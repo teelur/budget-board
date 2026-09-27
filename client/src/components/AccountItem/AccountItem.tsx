@@ -51,7 +51,7 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
         <AmountText
           amount={props.account.currentBalance}
           size="md"
-          disableStatusColor={isPrivacyModeEnabled}
+          isSensitive={isPrivacyModeEnabled}
           className={classes.amount}
         >
           <SensitiveAmount amount={props.account.currentBalance} />

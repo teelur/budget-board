@@ -180,7 +180,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                       <AmountText
                         size="sm"
                         amount={occurrence.amount}
-                        disableStatusColor={isPrivacyModeEnabled}
+                        isSensitive={isPrivacyModeEnabled}
                       >
                         <SensitiveAmount amount={occurrence.amount} />
                       </AmountText>
