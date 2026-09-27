@@ -1,6 +1,7 @@
 import classes from "./TransactionCardContent.module.css";
 
-import { Badge, Flex, Tooltip } from "@mantine/core";
+import { Flex, Tooltip } from "@mantine/core";
+import { Badge } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
@@ -64,7 +65,7 @@ const TransactionCardContent = (
         justify="space-between"
       >
         <Flex className={classes.categoryContainer}>
-          <Badge size="md">
+          <Badge variant="filled" color="primary" size="xs">
             {getFormattedCategoryValue(categoryValue, props.categories)}
           </Badge>
         </Flex>
