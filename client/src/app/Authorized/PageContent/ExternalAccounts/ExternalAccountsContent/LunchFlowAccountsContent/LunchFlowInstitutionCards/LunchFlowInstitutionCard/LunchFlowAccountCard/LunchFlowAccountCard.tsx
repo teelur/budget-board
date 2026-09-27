@@ -1,5 +1,5 @@
-import { Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, Badge } from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -86,17 +86,17 @@ const LunchFlowAccountCard = (
 
   const getBadgeForAccountName = (): React.ReactElement => {
     return props.lunchFlowAccount.linkedAccountId ? (
-      <Badge key="value" size="sm" />
+      <Badge key="value" variant="filled" color="primary" size="xs" />
     ) : (
-      <Badge key="value" size="sm" color="gray" />
+      <Badge key="value" variant="light" color="muted" size="xs" />
     );
   };
 
   const getBadgeForSyncStartDate = (): React.ReactElement => {
     return props.lunchFlowAccount.syncStartDate ? (
-      <Badge key="value" size="sm" color="var(--accent-color-purple)" />
+      <Badge key="value" variant="filled" color="secondary" size="xs" />
     ) : (
-      <Badge key="value" size="sm" color="gray" />
+      <Badge key="value" variant="light" color="muted" size="xs" />
     );
   };
 
@@ -219,7 +219,7 @@ const LunchFlowAccountCard = (
                     ]}
                   />
                   {isLinkedAccountDeleted && (
-                    <Badge size="sm" color="var(--button-color-destructive)">
+                    <Badge variant="filled" color="error" size="xs">
                       {t("deleted")}
                     </Badge>
                   )}

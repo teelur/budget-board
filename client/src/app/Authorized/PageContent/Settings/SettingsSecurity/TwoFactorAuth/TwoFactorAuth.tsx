@@ -1,12 +1,11 @@
 import {
-  Badge,
   Group,
   LoadingOverlay,
   Stack,
   CopyButton,
   Skeleton,
 } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Badge, Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTwoFactorAuthenticationQuery } from "~/hooks/queries/useTwoFactorAuthenticationQuery";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -224,9 +223,11 @@ const TwoFactorAuth = (): React.ReactNode => {
         <Group gap="1rem">
           <PrimaryText size="lg">{t("two_factor_authentication")}</PrimaryText>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
-            <Badge color="var(--button-color-confirm)">{t("enabled")}</Badge>
+            <Badge variant="light" color="success" size="xs">
+              {t("enabled")}
+            </Badge>
           ) : (
-            <Badge color="var(--button-color-destructive)">
+            <Badge variant="light" color="error" size="xs">
               {t("disabled")}
             </Badge>
           )}

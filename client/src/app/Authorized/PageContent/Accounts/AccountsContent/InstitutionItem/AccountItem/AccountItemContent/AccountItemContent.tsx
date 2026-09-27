@@ -1,5 +1,5 @@
-import { Badge, Group, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon, Badge } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -24,15 +24,15 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
   const { dayjs, dateFormat, intlLocale } = useLocale();
   const { allAccountTypes } = useAccountTypes();
 
-  const getAccountSourceBadgeColor = (): string => {
+  const getAccountSourceBadgeColor = (): "info" | "success" | "neutral" => {
     switch (props.account.source) {
       case AccountSource.SimpleFIN:
-        return "blue";
+        return "info";
       case AccountSource.LunchFlow:
-        return "green";
+        return "success";
       case AccountSource.Manual:
       default:
-        return "gray";
+        return "neutral";
     }
   };
 
@@ -83,7 +83,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           >
             <PencilIcon size={16} />
           </ActionIcon>
-          <Badge>
+          <Badge variant="filled" color="primary" size="xs">
             {t("interest_rate_message", {
               rate: new Intl.NumberFormat(intlLocale, {
                 style: "percent",
@@ -92,14 +92,20 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
             })}
           </Badge>
           {props.account.hideAccount && (
-            <Badge bg="var(--accent-color-orange)">{t("hidden")}</Badge>
+            <Badge variant="filled" color="secondary" size="xs">
+              {t("hidden")}
+            </Badge>
           )}
           {props.account.hideTransactions && (
-            <Badge bg="var(--accent-color-purple)">
+            <Badge variant="filled" color="accent" size="xs">
               {t("hidden_transactions")}
             </Badge>
           )}
-          <Badge bg={getAccountSourceBadgeColor()}>
+          <Badge
+            variant="filled"
+            color={getAccountSourceBadgeColor()}
+            size="xs"
+          >
             {t(props.account.source)}
           </Badge>
         </Group>

@@ -149,7 +149,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             <Group gap="0.5rem">
               <Button
                 variant="filled"
-                color="primary"
+                color="secondary"
                 size="sm"
                 selected={hideAccountField.getValue()}
                 onClick={() =>
@@ -160,7 +160,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               </Button>
               <Button
                 variant="filled"
-                color="secondary"
+                color="accent"
                 size="sm"
                 selected={hideTransactionsField.getValue()}
                 onClick={() =>

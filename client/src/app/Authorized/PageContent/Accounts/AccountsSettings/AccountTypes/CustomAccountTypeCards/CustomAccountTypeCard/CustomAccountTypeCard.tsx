@@ -1,5 +1,10 @@
-import { Badge, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Button, SegmentedControl } from "@teelur/budget-board-ui";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  SegmentedControl,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -194,8 +199,12 @@ const CustomAccountTypeCard = (
             ) : (
               <PrimaryText size="sm">{props.accountType.value}</PrimaryText>
             )}
-            {props.isBuiltIn && <Badge size="xs">{t("built_in")}</Badge>}
-            <Badge size="xs" variant="outline">
+            {props.isBuiltIn && (
+              <Badge variant="filled" color="primary" size="xs">
+                {t("built_in")}
+              </Badge>
+            )}
+            <Badge variant="outline" color="primary" size="xs">
               {props.accountType.classification === "asset"
                 ? t("asset")
                 : t("liability")}

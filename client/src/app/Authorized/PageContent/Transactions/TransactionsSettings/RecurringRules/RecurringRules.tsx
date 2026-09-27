@@ -1,5 +1,5 @@
-import { Badge, Group, Skeleton, Stack, Tooltip } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { Group, Skeleton, Stack, Tooltip } from "@mantine/core";
+import { ActionIcon, Badge, Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -41,11 +41,13 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
             <PrimaryText>
               {props.rule.merchantName || t("any_merchant")}
             </PrimaryText>
-            <Badge variant="light">
+            <Badge variant="outline" color="primary" size="xs">
               {getRecurringCadenceLabel(props.rule.cadence, t)}
             </Badge>
             {!props.rule.isActive && (
-              <Badge color="gray">{t("inactive")}</Badge>
+              <Badge variant="filled" color="error" size="xs">
+                {t("inactive")}
+              </Badge>
             )}
           </Group>
           <DimmedText size="sm">

@@ -1,5 +1,5 @@
-import { Badge, Group, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon, Badge } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import React from "react";
 import { SignDisplay } from "~/helpers/currency";
@@ -70,10 +70,14 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             <PencilIcon size={16} />
           </ActionIcon>
           {props.asset.sellDate && props.asset.sellPrice && (
-            <Badge bg="var(--button-color-confirm)">{t("sold")}</Badge>
+            <Badge variant="filled" color="success" size="xs">
+              {t("sold")}
+            </Badge>
           )}
           {props.asset.hide && (
-            <Badge bg="var(--button-color-warning)">{t("hidden")}</Badge>
+            <Badge variant="filled" color="primary" size="xs">
+              {t("hidden")}
+            </Badge>
           )}
         </Group>
         <StatusText amount={props.asset.currentValue ?? 0} size="md">

@@ -1,7 +1,7 @@
 import classes from "./GoalCardContent.module.css";
 
-import { Badge, Flex, Group, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { Flex, Group, Stack } from "@mantine/core";
+import { ActionIcon, Badge } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { SignDisplay } from "~/helpers/currency";
@@ -38,7 +38,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
           <Group align="center" gap={10} wrap="nowrap">
             <PrimaryText size="lg">{props.goal.name}</PrimaryText>
             {props.includeInterest && props.goal.interestRate && (
-              <Badge variant="light" flex="0 0 auto">
+              <Badge variant="light" color="primary" size="xs">
                 {t("interest_rate_apr", {
                   rate: new Intl.NumberFormat(intlLocale, {
                     style: "percent",

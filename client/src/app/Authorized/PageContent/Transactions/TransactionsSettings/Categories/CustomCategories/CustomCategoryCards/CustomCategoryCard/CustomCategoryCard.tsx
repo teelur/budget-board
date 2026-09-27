@@ -1,5 +1,10 @@
-import { Badge, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Button, SegmentedControl } from "@teelur/budget-board-ui";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  SegmentedControl,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -187,12 +192,20 @@ const CustomCategoryCard = (
             ) : (
               <PrimaryText size="sm">{props.category.value}</PrimaryText>
             )}
-            {props.isBuiltIn && <Badge size="xs">{t("built_in")}</Badge>}
-            <Badge size="xs" variant="outline">
-              {props.category.categoryType === CategoryTypes.Income
-                ? t("income")
-                : t("expense")}
-            </Badge>
+            {props.isBuiltIn && (
+              <Badge variant="light" color="primary" size="xs">
+                {t("built_in")}
+              </Badge>
+            )}
+            {props.category.categoryType === CategoryTypes.Income ? (
+              <Badge variant="filled" color="success" size="xs">
+                {t("income")}
+              </Badge>
+            ) : (
+              <Badge variant="filled" color="error" size="xs">
+                {t("expense")}
+              </Badge>
+            )}
           </Group>
           <Flex justify="flex-end" flex="1 1 auto" gap="0.25rem">
             {!props.isBuiltIn && (

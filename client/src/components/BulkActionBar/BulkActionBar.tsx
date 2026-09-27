@@ -5,9 +5,8 @@ import {
   Portal,
   Stack,
   Transition,
-  Badge,
 } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, Button } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { TrashIcon } from "lucide-react";
 import React from "react";
@@ -304,7 +303,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 {t("clear_selection")}
               </Button>
               {singleSelectedAccount && (
-                <Badge size="sm" variant="outline">
+                <Badge variant="outline" color="primary" size="sm">
                   {singleSelectedAccount.name}
                 </Badge>
               )}

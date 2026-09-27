@@ -1,5 +1,10 @@
-import { Badge, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Button, SegmentedControl } from "@teelur/budget-board-ui";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  SegmentedControl,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -155,7 +160,11 @@ const CustomAssetTypeCard = (
             ) : (
               <PrimaryText size="sm">{props.assetType.value}</PrimaryText>
             )}
-            {props.isBuiltIn && <Badge size="xs">{t("built_in")}</Badge>}
+            {props.isBuiltIn && (
+              <Badge variant="filled" color="primary" size="xs">
+                {t("built_in")}
+              </Badge>
+            )}
           </Group>
           <Flex justify="flex-end" flex="1 1 auto" gap="0.25rem">
             {!props.isBuiltIn && (
