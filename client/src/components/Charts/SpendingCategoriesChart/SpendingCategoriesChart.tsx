@@ -120,7 +120,9 @@ const SpendingCategoriesChart = (
 
   const { innerChartData, outerChartData } = React.useMemo(() => {
     const translateName = (name: string) =>
-      name === uncategorizedTransactionCategory ? t("uncategorized") : name;
+      name.toLowerCase() === uncategorizedTransactionCategory
+        ? t("uncategorized")
+        : name;
 
     const rawInner = buildSpendingCategoryChartData(
       filteredTransactions,
