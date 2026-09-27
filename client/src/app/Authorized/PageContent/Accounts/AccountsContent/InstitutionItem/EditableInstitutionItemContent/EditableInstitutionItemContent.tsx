@@ -1,10 +1,10 @@
 import { Group, LoadingOverlay } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useField } from "@mantine/form";
 import { PencilIcon } from "lucide-react";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useUpdateInstitutionMutation } from "~/hooks/mutations/institutions/useUpdateInstitutionMutation";
 
@@ -21,6 +21,7 @@ const EditableInstitutionItemContent = (
     initialValue: props.institution.name,
   });
 
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateInstitutionMutation = useUpdateInstitutionMutation();
 
   return (
@@ -51,9 +52,13 @@ const EditableInstitutionItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <StatusText amount={props.totalBalance} size="md">
+      <AmountText
+        amount={props.totalBalance}
+        size="md"
+        disableStatusColor={isPrivacyModeEnabled}
+      >
         <SensitiveAmount amount={props.totalBalance} />
-      </StatusText>
+      </AmountText>
     </Group>
   );
 };

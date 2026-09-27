@@ -1,10 +1,9 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon, Badge } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import {
   getIsParentAccountType,
   getParentAccountType,
@@ -13,6 +12,7 @@ import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmo
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface IAccountItemContentProps {
   account: IAccountResponse;
@@ -23,6 +23,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
   const { allAccountTypes } = useAccountTypes();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const getAccountSourceBadgeColor = (): "info" | "success" | "neutral" => {
     switch (props.account.source) {
@@ -109,9 +110,13 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
             {t(props.account.source)}
           </Badge>
         </Group>
-        <StatusText amount={props.account.currentBalance} size="md">
+        <AmountText
+          amount={props.account.currentBalance}
+          size="md"
+          disableStatusColor={isPrivacyModeEnabled}
+        >
           <SensitiveAmount amount={props.account.currentBalance} />
-        </StatusText>
+        </AmountText>
       </Group>
       <Group justify="space-between" align="center">
         {getAccountTypeDisplay()}

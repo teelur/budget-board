@@ -1,5 +1,6 @@
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { Button, ActionIcon } from "@teelur/budget-board-ui";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { Button, ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
@@ -7,7 +8,6 @@ import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
@@ -27,6 +27,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const { dayjs, dateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
   const { allAccountTypes } = useAccountTypes();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateAccountMutation = useUpdateAccountMutation();
 
   const accountNameField = useField<string>({
@@ -173,9 +174,13 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               </Button>
             </Group>
           </Group>
-          <StatusText amount={props.account.currentBalance} size="md">
+          <AmountText
+            amount={props.account.currentBalance}
+            size="md"
+            disableStatusColor={isPrivacyModeEnabled}
+          >
             <SensitiveAmount amount={props.account.currentBalance} />
-          </StatusText>
+          </AmountText>
         </Group>
         <Group justify="space-between" align="center">
           <CategorySelect

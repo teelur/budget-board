@@ -17,7 +17,8 @@ import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { CategoryTypes } from "~/models/category";
 import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { AmountText } from "@teelur/budget-board-ui";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const { dayjs } = useLocale();
   const { allTransactionCategories, getCategoryType } =
     useTransactionCategories();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const transactionsQuery = useTransactionsQuery();
   const forecastQuery = useRecurringForecastQuery({
     month: props.month,
@@ -175,9 +177,13 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                       <PrimaryText size="sm">
                         {dayjs(occurrence.date).format("LL")}
                       </PrimaryText>
-                      <StatusText size="sm" amount={occurrence.amount}>
+                      <AmountText
+                        size="sm"
+                        amount={occurrence.amount}
+                        disableStatusColor={isPrivacyModeEnabled}
+                      >
                         <SensitiveAmount amount={occurrence.amount} />
-                      </StatusText>
+                      </AmountText>
                     </Group>
                   ))}
                 </Stack>

@@ -1,7 +1,8 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon, Badge } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import React from "react";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { SignDisplay } from "~/helpers/currency";
 import SensitiveAmount, {
   useSensitiveAmountFormatter,
@@ -9,7 +10,6 @@ import SensitiveAmount, {
 import { IAssetResponse } from "~/models/asset";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -25,6 +25,7 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
   const { dayjs, dateFormat } = useLocale();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
   const { allAssetTypes } = useAssetTypes();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const getAssetTypeDisplay = (): React.ReactNode => {
     if (!props.asset.type || props.asset.type.length === 0) {
@@ -80,9 +81,13 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             </Badge>
           )}
         </Group>
-        <StatusText amount={props.asset.currentValue ?? 0} size="md">
+        <AmountText
+          amount={props.asset.currentValue ?? 0}
+          size="md"
+          disableStatusColor={isPrivacyModeEnabled}
+        >
           <SensitiveAmount amount={props.asset.currentValue ?? 0} />
-        </StatusText>
+        </AmountText>
       </Group>
       <Group justify="space-between" align="center">
         <Group gap="0.5rem">

@@ -1,5 +1,5 @@
 import { Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -7,7 +7,6 @@ import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -20,6 +19,7 @@ import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { useUpdateAssetMutation } from "~/hooks/mutations/assets/useUpdateAssetMutation";
 import { useDeleteAssetsMutation } from "~/hooks/mutations/assets/useDeleteAssetsMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface EditableAssetItemContentProps {
   asset: IAssetResponse;
@@ -40,6 +40,7 @@ const EditableAssetItemContent = (
   } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allAssetTypes } = useAssetTypes();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateAssetMutation = useUpdateAssetMutation();
   const deleteAssetMutation = useDeleteAssetsMutation();
 
@@ -125,9 +126,13 @@ const EditableAssetItemContent = (
               {t("hide_asset")}
             </Button>
           </Group>
-          <StatusText size="md" amount={props.asset.currentValue}>
+          <AmountText
+            size="md"
+            amount={props.asset.currentValue}
+            disableStatusColor={isPrivacyModeEnabled}
+          >
             <SensitiveAmount amount={props.asset.currentValue ?? 0} />
-          </StatusText>
+          </AmountText>
         </Group>
         <Group justify="space-between" align="flex-end">
           <Group gap="1rem" align="flex-end">

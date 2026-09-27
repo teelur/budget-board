@@ -1,7 +1,7 @@
 import classes from "./GoalCardContent.module.css";
 
 import { Flex, Group, Stack } from "@mantine/core";
-import { ActionIcon, Badge } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { SignDisplay } from "~/helpers/currency";
@@ -11,12 +11,12 @@ import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -27,6 +27,7 @@ interface GoalCardContentProps {
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
     formatAmount(amount, SignDisplay.Auto, undefined, 0);
@@ -115,10 +116,11 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                 total: formatSensitiveAmount(props.goal.monthlyContribution),
               }}
               components={[
-                <StatusText
+                <AmountText
                   amount={props.goal.monthlyContributionProgress}
                   total={props.goal.monthlyContribution}
                   type={StatusColorType.Target}
+                  disableStatusColor={isPrivacyModeEnabled}
                   size="md"
                   key="amount"
                 />,

@@ -1,18 +1,18 @@
 import classes from "./TransactionCardContent.module.css";
 
 import { Flex, Tooltip } from "@mantine/core";
-import { Badge } from "@teelur/budget-board-ui";
+import { Badge, AmountText } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import { getFormattedCategoryValue } from "~/helpers/category";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Repeat2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface TransactionCardContentProps {
   transaction: ITransaction;
@@ -25,6 +25,7 @@ const TransactionCardContent = (
 ): React.ReactNode => {
   const { dayjs, longDateFormat } = useLocale();
   const { t } = useTranslation();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const categoryValue =
     (props.transaction.subcategory ?? "").length > 0
@@ -70,9 +71,13 @@ const TransactionCardContent = (
           </Badge>
         </Flex>
         <Flex className={classes.amountContainer}>
-          <StatusText amount={props.transaction.amount} size="md">
+          <AmountText
+            amount={props.transaction.amount}
+            size="md"
+            disableStatusColor={isPrivacyModeEnabled}
+          >
             <SensitiveAmount amount={props.transaction.amount} />
-          </StatusText>
+          </AmountText>
         </Flex>
       </Flex>
     </Flex>

@@ -1,8 +1,9 @@
 import { Group } from "@mantine/core";
+import { AmountText } from "@teelur/budget-board-ui";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface NetWorthItemProps {
   title: string;
@@ -11,6 +12,8 @@ interface NetWorthItemProps {
 }
 
 const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
+  const { isPrivacyModeEnabled } = usePrivacyMode();
+
   return (
     <Group
       p={0}
@@ -20,9 +23,13 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
       gap="0.25rem"
     >
       <PrimaryText fw={600}>{props.title}</PrimaryText>
-      <StatusText amount={props.totalBalance}>
+      <AmountText
+        amount={props.totalBalance}
+        size="md"
+        disableStatusColor={isPrivacyModeEnabled}
+      >
         <SensitiveAmount amount={props.totalBalance} />
-      </StatusText>
+      </AmountText>
     </Group>
   );
 };

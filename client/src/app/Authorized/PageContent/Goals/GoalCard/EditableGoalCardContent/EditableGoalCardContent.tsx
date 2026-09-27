@@ -1,7 +1,7 @@
 import classes from "./EditableGoalCardContent.module.css";
 
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Badge, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, Button, AmountText } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
@@ -16,7 +16,6 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { StatusColorType } from "~/helpers/budgets";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Progress from "~/components/core/Progress/Progress";
@@ -27,6 +26,7 @@ import { useCompleteGoalMutation } from "~/hooks/mutations/goals/useCompleteGoal
 import { useUpdateGoalMutation } from "~/hooks/mutations/goals/useUpdateGoalMutation";
 import { useDeleteGoalMutation } from "~/hooks/mutations/goals/useDeleteGoalMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -47,6 +47,7 @@ const EditableGoalCardContent = (
     decimalSeparator,
   } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
     formatAmount(amount, SignDisplay.Auto, undefined, 0);
@@ -288,10 +289,11 @@ const EditableGoalCardContent = (
                       ),
                     }}
                     components={[
-                      <StatusText
+                      <AmountText
                         amount={props.goal.monthlyContributionProgress}
                         total={props.goal.monthlyContribution}
                         type={StatusColorType.Target}
+                        disableStatusColor={isPrivacyModeEnabled}
                         size="md"
                         key="amount"
                       />,
@@ -341,10 +343,11 @@ const EditableGoalCardContent = (
                     ),
                   }}
                   components={[
-                    <StatusText
+                    <AmountText
                       amount={props.goal.monthlyContributionProgress}
                       total={props.goal.monthlyContribution}
                       type={StatusColorType.Target}
+                      disableStatusColor={isPrivacyModeEnabled}
                       size="md"
                       key="amount"
                     />,

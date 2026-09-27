@@ -1,7 +1,7 @@
 import { Group } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { PencilIcon } from "lucide-react";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { IValueResponse } from "~/models/value";
@@ -15,6 +15,8 @@ interface ValueItemContentProps {
 
 const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
   const { dayjs, longDateFormat } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
+
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
@@ -33,12 +35,16 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <StatusText amount={props.value.amount} size="md">
+      <AmountText
+        amount={props.value.amount}
+        size="md"
+        disableStatusColor={isPrivacyModeEnabled}
+      >
         <SensitiveAmount
           amount={props.value.amount}
           currency={props.userCurrency}
         />
-      </StatusText>
+      </AmountText>
     </Group>
   );
 };

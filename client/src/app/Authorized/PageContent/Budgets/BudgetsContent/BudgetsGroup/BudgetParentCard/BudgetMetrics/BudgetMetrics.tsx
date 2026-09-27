@@ -1,13 +1,14 @@
 import classes from "./BudgetMetrics.module.css";
 
 import { Box, Group } from "@mantine/core";
+import { AmountText } from "@teelur/budget-board-ui";
 import React from "react";
 import { Trans } from "react-i18next";
 import { StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface BudgetMetricsProps {
   amount: number;
@@ -19,6 +20,8 @@ interface BudgetMetricsProps {
 }
 
 const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
+  const { isPrivacyModeEnabled } = usePrivacyMode();
+
   const budgetSign = props.isIncome ? 1 : -1;
   const forecastAmount = props.projectedAmount - props.amount;
   const hasProjection = roundAwayFromZero(forecastAmount) !== 0;
@@ -68,12 +71,13 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
               i18nKey="budget_left_after_predictions_styled"
               values={{ amount: props.formatAmount(projectedRemaining) }}
               components={[
-                <StatusText
+                <AmountText
                   size="sm"
                   amount={props.projectedAmount}
                   total={props.limit}
                   type={statusType}
                   warningThreshold={props.budgetWarningThreshold}
+                  disableStatusColor={isPrivacyModeEnabled}
                   className={classes.inlineText}
                   key="amount"
                 />,
@@ -93,10 +97,11 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
           i18nKey="budget_left_styled"
           values={{ amount: props.formatAmount(actualRemaining) }}
           components={[
-            <StatusText
+            <AmountText
               amount={props.amount}
               total={props.limit}
               type={statusType}
+              disableStatusColor={isPrivacyModeEnabled}
               warningThreshold={props.budgetWarningThreshold}
               className={`${classes.heroAmount} ${classes.inlineText}`}
               key="amount"

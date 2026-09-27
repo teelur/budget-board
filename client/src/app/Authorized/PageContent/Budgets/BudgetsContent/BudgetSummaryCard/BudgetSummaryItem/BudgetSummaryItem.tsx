@@ -4,13 +4,14 @@ import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { roundAwayFromZero } from "~/helpers/utils";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { AmountText } from "@teelur/budget-board-ui";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -24,6 +25,7 @@ interface BudgetSummaryItemProps {
 
 const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const { budgetWarningThreshold } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
     formatAmount(amount, SignDisplay.Auto, undefined, 0);
@@ -54,6 +56,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     type: props.budgetValueType,
     warningThreshold: budgetWarningThreshold,
     size: "md" as const,
+    disableStatusColor: isPrivacyModeEnabled,
   };
   const projectedStatusTextProps = {
     amount: props.projectedAmount ?? 0,
@@ -61,6 +64,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     type: props.budgetValueType,
     warningThreshold: budgetWarningThreshold,
     size: "sm" as const,
+    disableStatusColor: isPrivacyModeEnabled,
   };
 
   const i18nKey = props.total
@@ -73,11 +77,11 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
 
   const transComponents = props.total
     ? [
-        <StatusText {...statusTextProps} key="amount" />,
+        <AmountText {...statusTextProps} key="amount" />,
         <DimmedText size="sm" key="of" />,
         <PrimaryText size="md" key="total" />,
       ]
-    : [<StatusText {...statusTextProps} key="amount" />];
+    : [<AmountText {...statusTextProps} key="amount" />];
   const projectedI18nKey = props.total
     ? "budget_projected_fraction_styled"
     : "budget_projected_styled";
@@ -87,13 +91,13 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
   const projectedTransComponents = props.total
     ? [
         <DimmedText size="xs" key="label" />,
-        <StatusText {...projectedStatusTextProps} key="amount" />,
+        <AmountText {...projectedStatusTextProps} key="amount" />,
         <DimmedText size="xs" key="of" />,
         <PrimaryText size="sm" key="total" />,
       ]
     : [
         <DimmedText size="xs" key="label" />,
-        <StatusText {...projectedStatusTextProps} key="amount" />,
+        <AmountText {...projectedStatusTextProps} key="amount" />,
       ];
 
   return (

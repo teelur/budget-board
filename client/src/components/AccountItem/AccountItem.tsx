@@ -6,10 +6,11 @@ import { IAccountResponse } from "~/models/account";
 import React from "react";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "../core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "../core/Text/StatusText/StatusText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { AmountText } from "@teelur/budget-board-ui";
 
 interface AccountItemProps {
   account: IAccountResponse;
@@ -19,6 +20,7 @@ interface AccountItemProps {
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dateFormat } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   return (
     <Group
@@ -46,12 +48,14 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
         </DimmedText>
       </Stack>
       <Stack h="100%" justify="flex-start">
-        <StatusText
-          className={classes.amount}
+        <AmountText
           amount={props.account.currentBalance}
+          size="md"
+          disableStatusColor={isPrivacyModeEnabled}
+          className={classes.amount}
         >
           <SensitiveAmount amount={props.account.currentBalance} />
-        </StatusText>
+        </AmountText>
       </Stack>
     </Group>
   );

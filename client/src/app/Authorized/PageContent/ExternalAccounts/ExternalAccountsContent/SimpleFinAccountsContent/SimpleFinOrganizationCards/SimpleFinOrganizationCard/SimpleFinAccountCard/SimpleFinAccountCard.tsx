@@ -1,5 +1,5 @@
 import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Badge } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -12,7 +12,6 @@ import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useDeleteSimpleFinAccountMutation } from "~/hooks/mutations/simpleFinAccounts/useDeleteSimpleFinAccountMutation";
 import { useUpdateLinkedAccountMutation } from "~/hooks/mutations/simpleFinAccounts/useUpdateLinkedAccountMutation";
 import { useUpdateSyncStartDateMutation } from "~/hooks/mutations/simpleFinAccounts/useUpdateSyncStartDateMutation";
@@ -21,6 +20,7 @@ import { useSimpleFinAccountsQuery } from "~/hooks/queries/useSimpleFinAccountsQ
 import { AccountSource } from "~/models/account";
 import { ISimpleFinAccountResponse } from "~/models/simpleFinAccount";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface ISimpleFinAccountCardProps {
   simpleFinAccount: ISimpleFinAccountResponse;
@@ -44,6 +44,7 @@ const SimpleFinAccountCard = (
 
   const { t } = useTranslation();
   const { dayjs, dateFormat, dayjsLocale } = useLocale();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const accountsQuery = useAccountsQuery();
   const updateLinkedAccountMutation = useUpdateLinkedAccountMutation();
   const updateSyncStartDateMutation = useUpdateSyncStartDateMutation();
@@ -173,12 +174,16 @@ const SimpleFinAccountCard = (
                 <PencilIcon size={16} />
               </ActionIcon>
             </Group>
-            <StatusText size="sm" amount={props.simpleFinAccount.balance}>
+            <AmountText
+              amount={props.simpleFinAccount.balance}
+              size="sm"
+              disableStatusColor={isPrivacyModeEnabled}
+            >
               <SensitiveAmount
                 amount={props.simpleFinAccount.balance}
                 currency={accountCurrency}
               />
-            </StatusText>
+            </AmountText>
           </Group>
           <Group justify="space-between" align="center">
             <Group gap="0.5rem">
