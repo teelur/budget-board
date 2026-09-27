@@ -1,5 +1,5 @@
-import { Badge, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, Badge } from "@teelur/budget-board-ui";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
 import { IAccountResponse } from "~/models/account";
@@ -39,7 +39,9 @@ const DeletedAccountCard = (
                 : t("unknown_institution")}
             </DimmedText>
           </Stack>
-          <Badge bg="blue">{t(props.account.source)}</Badge>
+          <Badge variant="filled" color="primary" size="xs">
+            {t(props.account.source)}
+          </Badge>
         </Group>
         <Group style={{ alignSelf: "stretch" }} wrap="nowrap" gap="0.5rem">
           <ActionIcon

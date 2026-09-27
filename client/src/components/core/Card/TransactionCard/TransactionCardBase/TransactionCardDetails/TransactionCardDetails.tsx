@@ -2,10 +2,11 @@ import classes from "./TransactionCardDetails.module.css";
 
 import { ITransaction } from "~/models/transaction";
 import React from "react";
-import { Badge, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { Badge } from "@teelur/budget-board-ui";
 
 interface TransactionCardDetailsProps {
   transaction: ITransaction;
@@ -56,7 +57,7 @@ const TransactionCardDetails = ({
         {transaction.tags?.length ? (
           <Group className={classes.tags} gap="0.25rem">
             {transaction.tags.map((tag) => (
-              <Badge key={tag} size="sm" variant="light">
+              <Badge variant="light" color="primary" size="sm" key={tag}>
                 {tag}
               </Badge>
             ))}

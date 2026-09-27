@@ -1,7 +1,7 @@
 import classes from "./EditableGoalCardContent.module.css";
 
-import { Badge, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, Badge, Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
@@ -102,7 +102,7 @@ const EditableGoalCardContent = (
                 elevation={1}
               />
               {props.includeInterest && props.goal.interestRate && (
-                <Badge variant="light">
+                <Badge variant="light" color="primary" size="xs">
                   {t("interest_rate_apr", {
                     rate: new Intl.NumberFormat(intlLocale, {
                       style: "percent",

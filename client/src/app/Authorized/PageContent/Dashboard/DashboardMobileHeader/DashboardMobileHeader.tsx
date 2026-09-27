@@ -1,5 +1,5 @@
-import { Badge, Group } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group } from "@mantine/core";
+import { Badge, Button } from "@teelur/budget-board-ui";
 import { LayoutIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -20,7 +20,11 @@ const DashboardMobileHeader = ({
   return (
     <Group justify="space-between" align="center">
       <Group>
-        {isEditMode && <Badge variant="light">{t("mobile")}</Badge>}
+        {isEditMode && (
+          <Badge variant="light" color="primary" size="xs">
+            {t("mobile")}
+          </Badge>
+        )}
       </Group>
       <Group gap={"0.5rem"}>
         {isEditMode ? (
