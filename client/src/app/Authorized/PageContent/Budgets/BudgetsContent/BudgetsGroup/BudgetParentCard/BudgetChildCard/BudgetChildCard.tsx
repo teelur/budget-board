@@ -3,7 +3,7 @@ import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
 import { Box, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
@@ -22,6 +22,7 @@ import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudg
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import CategoryIconPicker from "~/components/CategoryIconPicker/CategoryIconPicker";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface BudgetChildCardProps {
   id: string;
@@ -39,8 +40,9 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { thousandsSeparator, decimalSeparator } = useLocale();
+  const { thousandsSeparator, decimalSeparator, intlLocale } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
     formatAmount(amount, SignDisplay.Auto, undefined, 0);
@@ -172,24 +174,35 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 </>
               ) : (
                 <Trans
-                  i18nKey="budget_amount_fraction_styled"
-                  values={{
-                    amount: formatSensitiveAmount(
-                      props.amount * (props.isIncome ? 1 : -1),
-                    ),
-                    total: formatSensitiveAmount(props.limit),
-                  }}
+                  i18nKey="x_of_y"
                   components={[
-                    <PrimaryText
+                    <AmountText
+                      amount={props.amount}
+                      disableStatusColor
+                      size="md"
+                      isSensitive={isPrivacyModeEnabled}
+                      locale={intlLocale}
+                      currency={preferredCurrency}
+                      decimalPlaces={0}
+                      signDisplay={SignDisplay.Auto}
+                      invertSign={!props.isIncome}
                       className={classes.text}
                       key="amount"
-                      elevation={1}
                     />,
                     <DimmedText size="sm" key="of" elevation={1} />,
-                    <PrimaryText
+                    <AmountText
+                      amount={props.limit}
+                      disableStatusColor
+                      warningThreshold={budgetWarningThreshold}
+                      size="md"
+                      isSensitive={isPrivacyModeEnabled}
+                      locale={intlLocale}
+                      currency={preferredCurrency}
+                      decimalPlaces={0}
+                      signDisplay={SignDisplay.Auto}
+                      invertSign={!props.isIncome}
                       className={classes.text}
                       key="total"
-                      elevation={1}
                     />,
                   ]}
                 />
@@ -229,7 +242,6 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
             projectedAmount={projectedAmount}
             limit={props.limit}
             isIncome={props.isIncome}
-            budgetWarningThreshold={budgetWarningThreshold}
             formatAmount={formatSensitiveAmount}
           />
         </Stack>

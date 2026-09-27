@@ -8,11 +8,11 @@ import {
   getIsParentAccountType,
   getParentAccountType,
 } from "~/helpers/accountType";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IAccountItemContentProps {
   account: IAccountResponse;
@@ -22,6 +22,7 @@ interface IAccountItemContentProps {
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
   const { isPrivacyModeEnabled } = usePrivacyMode();
 
@@ -114,9 +115,10 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           amount={props.account.currentBalance}
           size="md"
           isSensitive={isPrivacyModeEnabled}
-        >
-          <SensitiveAmount amount={props.account.currentBalance} />
-        </AmountText>
+          locale={intlLocale}
+          currency={preferredCurrency}
+          decimalPlaces={decimalPlaces}
+        />
       </Group>
       <Group justify="space-between" align="center">
         {getAccountTypeDisplay()}

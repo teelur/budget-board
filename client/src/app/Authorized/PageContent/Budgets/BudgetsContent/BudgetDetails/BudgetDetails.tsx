@@ -1,5 +1,6 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
 import { getCategoryIcon, getIsParentCategory } from "~/helpers/category";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
@@ -31,7 +32,8 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const chartLookbackMonths = 6;
 
   const { t } = useTranslation();
-  const { dayjs } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allTransactionCategories, getCategoryType } =
     useTransactionCategories();
   const { isPrivacyModeEnabled } = usePrivacyMode();
@@ -181,9 +183,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                         size="sm"
                         amount={occurrence.amount}
                         isSensitive={isPrivacyModeEnabled}
-                      >
-                        <SensitiveAmount amount={occurrence.amount} />
-                      </AmountText>
+                        locale={intlLocale}
+                        currency={preferredCurrency}
+                        decimalPlaces={decimalPlaces}
+                      />
                     </Group>
                   ))}
                 </Stack>

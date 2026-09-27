@@ -46,7 +46,8 @@ const EditableGoalCardContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { preferredCurrency, decimalPlaces, budgetWarningThreshold } =
+    useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
@@ -187,12 +188,8 @@ const EditableGoalCardContent = (
                 </>
               ) : (
                 <Trans
-                  i18nKey="budget_amount_fraction_styled"
+                  i18nKey="x_of_y"
                   values={{
-                    amount: formatSensitiveAmount(
-                      sumAccountsTotalBalance(props.goal.accounts) -
-                        props.goal.initialAmount,
-                    ),
                     total: formatSensitiveAmount(
                       getGoalTargetAmount(
                         props.goal.amount,
@@ -201,9 +198,37 @@ const EditableGoalCardContent = (
                     ),
                   }}
                   components={[
-                    <PrimaryText size="lg" key="amount" />,
+                    <AmountText
+                      amount={
+                        sumAccountsTotalBalance(props.goal.accounts) -
+                        props.goal.initialAmount
+                      }
+                      disableStatusColor
+                      size="lg"
+                      isSensitive={isPrivacyModeEnabled}
+                      locale={intlLocale}
+                      currency={preferredCurrency}
+                      decimalPlaces={0}
+                      signDisplay={SignDisplay.Auto}
+                      invertSign={false}
+                      key="amount"
+                    />,
                     <DimmedText size="md" key="of" />,
-                    <PrimaryText size="lg" key="total" />,
+                    <AmountText
+                      amount={getGoalTargetAmount(
+                        props.goal.amount,
+                        props.goal.initialAmount,
+                      )}
+                      disableStatusColor
+                      size="lg"
+                      isSensitive={isPrivacyModeEnabled}
+                      locale={intlLocale}
+                      currency={preferredCurrency}
+                      decimalPlaces={0}
+                      signDisplay={SignDisplay.Auto}
+                      invertSign={false}
+                      key="total"
+                    />,
                   ]}
                 />
               )}
@@ -282,19 +307,16 @@ const EditableGoalCardContent = (
                 <>
                   <Trans
                     i18nKey="budget_monthly_amount_fraction_editable_styled"
-                    values={{
-                      amount: formatSensitiveAmount(
-                        sumAccountsTotalBalance(props.goal.accounts) -
-                          props.goal.initialAmount,
-                      ),
-                    }}
                     components={[
                       <AmountText
                         amount={props.goal.monthlyContributionProgress}
+                        size="md"
                         total={props.goal.monthlyContribution}
                         type={StatusColorType.Target}
                         isSensitive={isPrivacyModeEnabled}
-                        size="md"
+                        locale={intlLocale}
+                        currency={preferredCurrency}
+                        decimalPlaces={decimalPlaces}
                         key="amount"
                       />,
                       <DimmedText size="sm" key="of" />,
@@ -335,9 +357,6 @@ const EditableGoalCardContent = (
                 <Trans
                   i18nKey="budget_monthly_amount_fraction_styled"
                   values={{
-                    amount: formatSensitiveAmount(
-                      props.goal.monthlyContributionProgress,
-                    ),
                     total: formatSensitiveAmount(
                       props.goal.monthlyContribution,
                     ),
@@ -345,10 +364,13 @@ const EditableGoalCardContent = (
                   components={[
                     <AmountText
                       amount={props.goal.monthlyContributionProgress}
+                      size="md"
                       total={props.goal.monthlyContribution}
                       type={StatusColorType.Target}
                       isSensitive={isPrivacyModeEnabled}
-                      size="md"
+                      locale={intlLocale}
+                      currency={preferredCurrency}
+                      decimalPlaces={decimalPlaces}
                       key="amount"
                     />,
                     <DimmedText size="sm" key="of" />,

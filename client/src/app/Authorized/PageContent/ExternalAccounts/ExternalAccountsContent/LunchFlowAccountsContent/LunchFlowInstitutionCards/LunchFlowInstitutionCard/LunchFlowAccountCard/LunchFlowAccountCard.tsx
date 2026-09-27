@@ -11,7 +11,6 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { useDeleteLunchFlowAccountMutation } from "~/hooks/mutations/lunchFlowAccount/useDeleteLunchFlowAccountMutation";
 import { useUpdateLinkedAccountMutation } from "~/hooks/mutations/lunchFlowAccount/useUpdateLinkedAccountMutation";
 import { useUpdateSyncStartDateMutation } from "~/hooks/mutations/lunchFlowAccount/useUpdateSyncStartDateMutation";
@@ -21,6 +20,7 @@ import { AccountSource } from "~/models/account";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface ILunchFlowAccountCardProps {
   lunchFlowAccount: ILunchFlowAccountResponse;
@@ -43,7 +43,8 @@ const LunchFlowAccountCard = (
   });
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat, dayjsLocale } = useLocale();
+  const { dayjs, dateFormat, dayjsLocale, intlLocale } = useLocale();
+  const { decimalPlaces } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const accountsQuery = useAccountsQuery();
   const updateLinkedAccountMutation = useUpdateLinkedAccountMutation();
@@ -178,12 +179,10 @@ const LunchFlowAccountCard = (
               amount={props.lunchFlowAccount.balance}
               size="sm"
               isSensitive={isPrivacyModeEnabled}
-            >
-              <SensitiveAmount
-                amount={props.lunchFlowAccount.balance}
-                currency={accountCurrency}
-              />
-            </AmountText>
+              locale={intlLocale}
+              currency={accountCurrency}
+              decimalPlaces={decimalPlaces}
+            />
           </Group>
           <Group justify="space-between" align="center">
             <Group gap="0.5rem">

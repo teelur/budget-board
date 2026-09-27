@@ -3,6 +3,8 @@ import classes from "./BudgetMetrics.module.css";
 import { Box, Group } from "@mantine/core";
 import { AmountText } from "@teelur/budget-board-ui";
 import React from "react";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { Trans } from "react-i18next";
 import { StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
@@ -15,11 +17,12 @@ interface BudgetMetricsProps {
   projectedAmount: number;
   limit: number;
   isIncome: boolean;
-  budgetWarningThreshold: number;
   formatAmount: (amount: number) => string;
 }
 
 const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
+  const { intlLocale } = useLocale();
+  const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const budgetSign = props.isIncome ? 1 : -1;
@@ -72,12 +75,15 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
               values={{ amount: props.formatAmount(projectedRemaining) }}
               components={[
                 <AmountText
-                  size="sm"
                   amount={props.projectedAmount}
+                  size="sm"
                   total={props.limit}
                   type={statusType}
-                  warningThreshold={props.budgetWarningThreshold}
+                  warningThreshold={budgetWarningThreshold}
                   isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
                   className={classes.inlineText}
                   key="amount"
                 />,
@@ -102,7 +108,10 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
               total={props.limit}
               type={statusType}
               isSensitive={isPrivacyModeEnabled}
-              warningThreshold={props.budgetWarningThreshold}
+              locale={intlLocale}
+              currency={preferredCurrency}
+              decimalPlaces={0}
+              warningThreshold={budgetWarningThreshold}
               className={`${classes.heroAmount} ${classes.inlineText}`}
               key="amount"
             />,

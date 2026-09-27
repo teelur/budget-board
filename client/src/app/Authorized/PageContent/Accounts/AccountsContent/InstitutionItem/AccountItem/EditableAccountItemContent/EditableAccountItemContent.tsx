@@ -16,6 +16,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -24,8 +25,14 @@ interface EditableAccountItemContentProps {
 
 const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const {
+    dayjs,
+    dateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+    intlLocale,
+  } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateAccountMutation = useUpdateAccountMutation();
@@ -178,9 +185,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             amount={props.account.currentBalance}
             size="md"
             isSensitive={isPrivacyModeEnabled}
-          >
-            <SensitiveAmount amount={props.account.currentBalance} />
-          </AmountText>
+            locale={intlLocale}
+            currency={preferredCurrency}
+            decimalPlaces={decimalPlaces}
+          />
         </Group>
         <Group justify="space-between" align="center">
           <CategorySelect

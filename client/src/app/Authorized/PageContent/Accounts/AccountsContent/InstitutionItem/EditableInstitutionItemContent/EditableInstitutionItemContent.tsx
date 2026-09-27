@@ -7,6 +7,8 @@ import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useUpdateInstitutionMutation } from "~/hooks/mutations/institutions/useUpdateInstitutionMutation";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IEditableInstitutionItemContentProps {
   institution: IInstitution;
@@ -23,6 +25,8 @@ const EditableInstitutionItemContent = (
 
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateInstitutionMutation = useUpdateInstitutionMutation();
+  const { intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
 
   return (
     <Group justify="space-between" align="center" gap="0.5rem">
@@ -54,11 +58,12 @@ const EditableInstitutionItemContent = (
       </Group>
       <AmountText
         amount={props.totalBalance}
-        size="md"
+        size="lg"
         isSensitive={isPrivacyModeEnabled}
-      >
-        <SensitiveAmount amount={props.totalBalance} />
-      </AmountText>
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={decimalPlaces}
+      />
     </Group>
   );
 };

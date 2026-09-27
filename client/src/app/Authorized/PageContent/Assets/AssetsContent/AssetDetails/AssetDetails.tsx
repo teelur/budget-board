@@ -19,6 +19,7 @@ import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
 import SensitiveAmount, {
   useSensitiveAmountFormatter,
 } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -30,7 +31,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const valuesQuery = useValuesQuery({
@@ -98,6 +100,9 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     amount={props.asset.sellPrice - props.asset.purchasePrice}
                     size="xs"
                     isSensitive={isPrivacyModeEnabled}
+                    locale={intlLocale}
+                    currency={preferredCurrency}
+                    decimalPlaces={decimalPlaces}
                   >
                     <SensitiveAmount
                       amount={props.asset.sellPrice - props.asset.purchasePrice}

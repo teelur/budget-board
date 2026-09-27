@@ -6,8 +6,8 @@ import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import { getFormattedCategoryValue } from "~/helpers/category";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Repeat2 } from "lucide-react";
@@ -23,7 +23,8 @@ interface TransactionCardContentProps {
 const TransactionCardContent = (
   props: TransactionCardContentProps,
 ): React.ReactNode => {
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { t } = useTranslation();
   const { isPrivacyModeEnabled } = usePrivacyMode();
 
@@ -75,9 +76,10 @@ const TransactionCardContent = (
             amount={props.transaction.amount}
             size="md"
             isSensitive={isPrivacyModeEnabled}
-          >
-            <SensitiveAmount amount={props.transaction.amount} />
-          </AmountText>
+            locale={intlLocale}
+            currency={preferredCurrency}
+            decimalPlaces={decimalPlaces}
+          />
         </Flex>
       </Flex>
     </Flex>

@@ -5,11 +5,11 @@ import { Group, Stack } from "@mantine/core";
 import { IAccountResponse } from "~/models/account";
 import React from "react";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "../core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { AmountText } from "@teelur/budget-board-ui";
 
 interface AccountItemProps {
@@ -19,8 +19,9 @@ interface AccountItemProps {
 
 const AccountItem = (props: AccountItemProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
   const { isPrivacyModeEnabled } = usePrivacyMode();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
 
   return (
     <Group
@@ -52,10 +53,11 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
           amount={props.account.currentBalance}
           size="md"
           isSensitive={isPrivacyModeEnabled}
+          locale={intlLocale}
+          currency={preferredCurrency}
+          decimalPlaces={decimalPlaces}
           className={classes.amount}
-        >
-          <SensitiveAmount amount={props.account.currentBalance} />
-        </AmountText>
+        />
       </Stack>
     </Group>
   );

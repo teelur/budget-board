@@ -6,7 +6,6 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -37,6 +36,7 @@ const EditableAssetItemContent = (
     longDateFormat,
     thousandsSeparator,
     decimalSeparator,
+    intlLocale,
   } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allAssetTypes } = useAssetTypes();
@@ -130,9 +130,10 @@ const EditableAssetItemContent = (
             size="md"
             amount={props.asset.currentValue}
             isSensitive={isPrivacyModeEnabled}
-          >
-            <SensitiveAmount amount={props.asset.currentValue ?? 0} />
-          </AmountText>
+            locale={intlLocale}
+            currency={preferredCurrency}
+            decimalPlaces={decimalPlaces}
+          />
         </Group>
         <Group justify="space-between" align="flex-end">
           <Group gap="1rem" align="flex-end">

@@ -10,7 +10,7 @@ import {
   Popover as MantinePopover,
   Stack,
 } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, Button } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
@@ -39,6 +39,7 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import CategoryIconPicker from "~/components/CategoryIconPicker/CategoryIconPicker";
 import { getCategoryIcon } from "~/helpers/category";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -57,8 +58,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const childrenId = React.useId();
 
   const { t } = useTranslation();
-  const { dayjs, thousandsSeparator, decimalSeparator } = useLocale();
+  const { dayjs, thousandsSeparator, decimalSeparator, intlLocale } =
+    useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { allTransactionCategories } = useTransactionCategories();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
@@ -328,24 +331,37 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   </>
                 ) : (
                   <Trans
-                    i18nKey="budget_amount_fraction_styled"
+                    i18nKey="x_of_y"
                     values={{
-                      amount: formatSensitiveAmount(
-                        amount * (isIncome ? 1 : -1),
-                      ),
                       total: formatSensitiveAmount(limit),
                     }}
                     components={[
-                      <PrimaryText
+                      <AmountText
+                        amount={amount}
+                        disableStatusColor
+                        size="md"
+                        isSensitive={isPrivacyModeEnabled}
+                        locale={intlLocale}
+                        currency={preferredCurrency}
+                        decimalPlaces={0}
+                        signDisplay={SignDisplay.Auto}
+                        invertSign={!isIncome}
                         className={classes.text}
                         key="amount"
-                        elevation={1}
                       />,
                       <DimmedText size="sm" key="of" elevation={1} />,
-                      <PrimaryText
+                      <AmountText
+                        amount={limit}
+                        disableStatusColor
+                        size="md"
+                        isSensitive={isPrivacyModeEnabled}
+                        locale={intlLocale}
+                        currency={preferredCurrency}
+                        decimalPlaces={0}
+                        signDisplay={SignDisplay.Auto}
+                        invertSign={!isIncome}
                         className={classes.text}
                         key="total"
-                        elevation={1}
                       />,
                     ]}
                   />
@@ -383,7 +399,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               projectedAmount={projectedAmount}
               limit={limit}
               isIncome={isIncome}
-              budgetWarningThreshold={budgetWarningThreshold}
               formatAmount={formatSensitiveAmount}
             />
           </Stack>

@@ -71,12 +71,10 @@
   "before": "Antes",
   "both_income_and_expense_values_present_message": "Há valores de receita e despesa na linha {{uid}}.",
   "budget_amount_fraction_editable_total_styled": "<0>{{amount}}</0> <1>de</1>",
-  "budget_amount_fraction_no_total_styled": "<0>{{amount}}</0>",
-  "budget_amount_fraction_styled": "<0>{{amount}}</0> <1>de</1> <2>{{total}}</2>",
   "budget_details": "Detalhes do orçamento",
   "budget_left_styled": "<0>{{amount}}</0> <1>restantes</1>",
   "budget_monthly_amount_fraction_editable_styled": "<0>{{amount}}</0> <1>de</1>",
-  "budget_monthly_amount_fraction_styled": "<0>{{amount}}</0> <1>de</1> <2>{{total}}</2> <1>este mês</1>",
+  "budget_monthly_amount_fraction_styled": "<0/> <1>de</1> <2>{{total}}</2> <1>este mês</1>",
   "budget_previous_month_no_budgets": "O mês anterior não tem orçamentos.",
   "budget_projected_editable_styled": "<0>Projetado:</0>",
   "budget_projected_styled": "<0>Projetado:</0> <1>{{amount}}</1>",
@@ -548,5 +546,6 @@
   "welcome_to": "Bem-vindo ao",
   "widget_already_added": "Já adicionado",
   "widget_no_items_configured_message": "Nenhum item está configurado para este widget.",
+  "x_of_y": "<0/> <1>de</1> <2/>",
   "yyyy_mm_dd": "AAAA{{separator}}MM{{separator}}DD"
 }

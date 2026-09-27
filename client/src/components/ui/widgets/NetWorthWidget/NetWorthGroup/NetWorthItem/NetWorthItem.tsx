@@ -1,18 +1,20 @@
 import { Group } from "@mantine/core";
 import { AmountText } from "@teelur/budget-board-ui";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface NetWorthItemProps {
   title: string;
   totalBalance: number;
-  userCurrency: string;
 }
 
 const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
   const { isPrivacyModeEnabled } = usePrivacyMode();
+  const { intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
 
   return (
     <Group
@@ -22,14 +24,15 @@ const NetWorthItem = (props: NetWorthItemProps): React.ReactNode => {
       wrap="nowrap"
       gap="0.25rem"
     >
-      <PrimaryText fw={600}>{props.title}</PrimaryText>
+      <PrimaryText>{props.title}</PrimaryText>
       <AmountText
         amount={props.totalBalance}
         size="md"
         isSensitive={isPrivacyModeEnabled}
-      >
-        <SensitiveAmount amount={props.totalBalance} />
-      </AmountText>
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={decimalPlaces}
+      />
     </Group>
   );
 };

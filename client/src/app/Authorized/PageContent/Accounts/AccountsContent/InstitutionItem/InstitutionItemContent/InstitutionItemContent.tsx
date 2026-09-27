@@ -3,6 +3,8 @@ import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { PencilIcon } from "lucide-react";
 import React from "react";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { IInstitution } from "~/models/institution";
@@ -17,6 +19,8 @@ const InstitutionItemContent = (
   props: IInstitutionItemContentProps,
 ): React.ReactNode => {
   const { isPrivacyModeEnabled } = usePrivacyMode();
+  const { intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
 
   return (
     <Group justify="space-between" align="center">
@@ -38,9 +42,10 @@ const InstitutionItemContent = (
         amount={props.totalBalance}
         size="lg"
         isSensitive={isPrivacyModeEnabled}
-      >
-        <SensitiveAmount amount={props.totalBalance} />
-      </AmountText>
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={decimalPlaces}
+      />
     </Group>
   );
 };

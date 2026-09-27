@@ -3,18 +3,18 @@ import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { IValueResponse } from "~/models/value";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface ValueItemContentProps {
   value: IValueResponse;
-  userCurrency: string;
   doSelect: () => void;
 }
 
 const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
 
   return (
@@ -39,12 +39,10 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
         amount={props.value.amount}
         size="md"
         isSensitive={isPrivacyModeEnabled}
-      >
-        <SensitiveAmount
-          amount={props.value.amount}
-          currency={props.userCurrency}
-        />
-      </AmountText>
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={decimalPlaces}
+      />
     </Group>
   );
 };

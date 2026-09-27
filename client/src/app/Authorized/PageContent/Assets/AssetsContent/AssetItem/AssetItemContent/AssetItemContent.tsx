@@ -2,6 +2,7 @@ import { Group, Stack } from "@mantine/core";
 import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import React from "react";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { SignDisplay } from "~/helpers/currency";
 import SensitiveAmount, {
@@ -22,7 +23,8 @@ interface AssetItemContentProps {
 
 const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
   const { allAssetTypes } = useAssetTypes();
   const { isPrivacyModeEnabled } = usePrivacyMode();
@@ -85,9 +87,10 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
           amount={props.asset.currentValue ?? 0}
           size="md"
           isSensitive={isPrivacyModeEnabled}
-        >
-          <SensitiveAmount amount={props.asset.currentValue ?? 0} />
-        </AmountText>
+          locale={intlLocale}
+          currency={preferredCurrency}
+          decimalPlaces={decimalPlaces}
+        />
       </Group>
       <Group justify="space-between" align="center">
         <Group gap="0.5rem">

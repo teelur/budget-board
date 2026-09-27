@@ -1574,15 +1574,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@teelur/budget-board-ui@npm:^0.2.0-canary.29.4b318af":
-  version: 0.2.0-canary.29.4b318af
-  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.29.4b318af"
+"@teelur/budget-board-ui@npm:^0.2.0-canary.30.3d7f393":
+  version: 0.2.0-canary.30.3d7f393
+  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.30.3d7f393"
   peerDependencies:
     "@mantine/core": ^9.6.1
     "@mantine/hooks": ^9.6.1
     react: ^19.3.0
     react-dom: ^19.3.0
-  checksum: 10c0/7cf3eef371ef9bad6b3dceeb86e09b7efbec6de19c46bca79eb5dedfa36fa06585751f90e239765769419d412b69fde33dfc46225e447fb2950c7d712863032d
+  checksum: 10c0/7afddc08b0aa5fd2851733cdc771fc4a7098200a088c4396847552fed28b5fcdeee80cf7af17818047a6c8c736d9d4855fc587797777eb4defaa488462072bfd
   languageName: node
   linkType: hard
 
@@ -2538,7 +2538,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.103.1"
     "@tanstack/react-query-devtools": "npm:^5.103.1"
     "@tanstack/react-virtual": "npm:^3.14.13"
-    "@teelur/budget-board-ui": "npm:^0.2.0-canary.29.4b318af"
+    "@teelur/budget-board-ui": "npm:^0.2.0-canary.30.3d7f393"
     "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^26.6.1"
     "@types/papaparse": "npm:^5.5.2"
@@ -2568,6 +2568,8 @@ __metadata:
     postcss: "npm:^8.5.28"
     postcss-preset-mantine: "npm:^1.18.0"
     postcss-simple-vars: "npm:^7.0.1"
+    prettier: "npm:^3.9.9"
+    prettier-plugin-sort-json: "npm:^4.2.0"
     qrcode.react: "npm:^4.2.0"
     react: "npm:^19.3.0"
     react-dom: "npm:^19.3.0"
@@ -5162,6 +5164,24 @@ __metadata:
   version: 1.2.1
   resolution: "prelude-ls@npm:1.2.1"
   checksum: 10c0/b00d617431e7886c520a6f498a2e14c75ec58f6d93ba48c3b639cf241b54232d90daa05d83a9e9b9fef6baa63cb7e1e4602c2372fea5bc169668401eb127d0cd
+  languageName: node
+  linkType: hard
+
+"prettier-plugin-sort-json@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "prettier-plugin-sort-json@npm:4.2.0"
+  peerDependencies:
+    prettier: ^3.0.0
+  checksum: 10c0/e1eea20998bd32da682d226c0eeb39f8a33548299f7092aa89c28caf1c171524a408d6b06773ef953b688f48577edaa3bfd7965e4b39a7e64c78dd9796216be3
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^3.9.9":
+  version: 3.9.9
+  resolution: "prettier@npm:3.9.9"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10c0/d50ea2537b2ff7dbd5088a214f4d936484e55c665cea2185b477a55b0770be55f3b156a71f63a9a639def6b334667bb327139dc85f2a1041c0a34752cdc74647
   languageName: node
   linkType: hard
 

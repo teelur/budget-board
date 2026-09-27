@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "format:locales": "prettier --write \"public/locales/**/*.json\"",
     "test:privacy-mode": "node scripts/validate-privacy-mode.mjs",
     "preview": "vite preview"
   },
@@ -30,7 +31,7 @@
     "@mantine/spotlight": "^9.6.1",
     "@tanstack/react-query": "^5.103.1",
     "@tanstack/react-virtual": "^3.14.13",
-    "@teelur/budget-board-ui": "^0.2.0-canary.29.4b318af",
+    "@teelur/budget-board-ui": "^0.2.0-canary.30.3d7f393",
     "@types/papaparse": "^5.5.2",
     "axios": "^1.20.0",
     "dayjs": "^1.11.23",
@@ -75,6 +76,8 @@
     "postcss": "^8.5.28",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
+    "prettier": "^3.9.9",
+    "prettier-plugin-sort-json": "^4.2.0",
     "typescript": "7.0.2",
     "typescript-eslint": "^8.70.0",
     "vite": "^8.3.0"

@@ -73,15 +73,14 @@
   "before": "Ранее",
   "both_income_and_expense_values_present_message": "Для строки {{uid}} указаны значения и доходов, и расходов",
   "budget_amount_fraction_editable_total_styled": "<0>{{amount}}</0> <1>of</1>",
-  "budget_amount_fraction_no_total_styled": "<0>{{amount}}</0>",
-  "budget_amount_fraction_styled": "<0>{{amount}}</0> <1>из</1> <2>{{total}}</2>",
   "budget_details": "Подробности бюджета",
   "budget_left_styled": "<0>{{amount}}</0> <1>осталось</1>",
   "budget_monthly_amount_fraction_editable_styled": "<0>{{amount}}</0> <1>из</1>",
-  "budget_monthly_amount_fraction_styled": "<0>{{amount}}</0> <1>из</1> <2>{{total}}</2> <1> в этом месяце</1>",
+  "budget_monthly_amount_fraction_styled": "<0/> <1>из</1> <2>{{total}}</2> <1> в этом месяце</1>",
   "budget_previous_month_no_budgets": "Для прошлых месяцев нет бюджетов.",
   "budget_projected_editable_styled": "<0>Прогнозируется:</0>",
   "budget_projected_styled": "<0>Прогнозируется:</0> <1>{{amount}}</1>",
   "budget_summary": "Сводка бюджета",
-  "budget_warning_threshold": "Порог предупреждения о бюджете"
+  "budget_warning_threshold": "Порог предупреждения о бюджете",
+  "x_of_y": "<0/> <1>из</1> <2/>"
 }
