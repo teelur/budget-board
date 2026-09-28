@@ -14,7 +14,6 @@ import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsPr
 
 interface EditableValueItemContentProps {
   value: IValueResponse;
-  userCurrency: string;
   doUnSelect: () => void;
 }
 
@@ -28,7 +27,7 @@ const EditableValueItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { decimalPlaces } = useUserSettings();
+  const { decimalPlaces, preferredCurrency } = useUserSettings();
   const updateValueMutation = useUpdateValueMutation({
     assetId: props.value.assetID,
   });
@@ -75,7 +74,7 @@ const EditableValueItemContent = (
         <NumberInput
           {...valueAmountField.getInputProps()}
           flex="1 1 auto"
-          prefix={getCurrencySymbol(props.userCurrency)}
+          prefix={getCurrencySymbol(preferredCurrency)}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
           decimalScale={decimalPlaces}

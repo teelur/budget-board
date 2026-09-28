@@ -1,11 +1,12 @@
 import { Divider, Flex, Pagination, Stack, Table } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { ITransactionImportTableData } from "~/models/transaction";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
@@ -16,7 +17,9 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const itemsPerPage = 10;
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const [page, setPage] = React.useState(1);
 
@@ -66,7 +69,14 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                   <Table.Td>{row.merchantName}</Table.Td>
                   <Table.Td>{row.category}</Table.Td>
                   <Table.Td>
-                    <SensitiveAmount amount={row.amount ?? 0} />
+                    <AmountText
+                      amount={row.amount ?? 0}
+                      size="sm"
+                      isSensitive={isPrivacyModeEnabled}
+                      locale={intlLocale}
+                      currency={preferredCurrency}
+                      decimalPlaces={decimalPlaces}
+                    />
                   </Table.Td>
                   <Table.Td>{row.account}</Table.Td>
                   <Table.Td>{row.notes}</Table.Td>

@@ -5,13 +5,6 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
-interface SensitiveAmountProps {
-  amount: number;
-  currency?: string;
-  signDisplay?: SignDisplay;
-  decimalPlaces?: number;
-}
-
 export const useSensitiveAmountFormatter = (): ((
   amount: number,
   signDisplay?: SignDisplay,
@@ -40,16 +33,3 @@ export const useSensitiveAmountFormatter = (): ((
     [decimalPlaces, intlLocale, isPrivacyModeEnabled, preferredCurrency],
   );
 };
-
-const SensitiveAmount = ({
-  amount,
-  currency,
-  signDisplay = SignDisplay.Auto,
-  decimalPlaces,
-}: SensitiveAmountProps): React.ReactNode => {
-  const formatAmount = useSensitiveAmountFormatter();
-
-  return formatAmount(amount, signDisplay, currency, decimalPlaces);
-};
-
-export default SensitiveAmount;

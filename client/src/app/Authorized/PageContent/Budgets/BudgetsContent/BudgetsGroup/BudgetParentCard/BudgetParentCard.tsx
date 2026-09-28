@@ -10,7 +10,7 @@ import {
   Popover as MantinePopover,
   Stack,
 } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, Button } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
 import React from "react";
 import { useDisclosure } from "@mantine/hooks";
@@ -24,7 +24,6 @@ import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import Popover from "~/components/core/Popover/Popover";
 import Progress from "~/components/core/Progress/Progress";
@@ -39,6 +38,7 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import CategoryIconPicker from "~/components/CategoryIconPicker/CategoryIconPicker";
 import { getCategoryIcon } from "~/helpers/category";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 export interface BudgetParentCardProps {
   categoryTree: ICategoryNode;
@@ -57,12 +57,11 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const childrenId = React.useId();
 
   const { t } = useTranslation();
-  const { dayjs, thousandsSeparator, decimalSeparator } = useLocale();
+  const { dayjs, thousandsSeparator, decimalSeparator, intlLocale } =
+    useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const { allTransactionCategories } = useTransactionCategories();
-  const formatAmount = useSensitiveAmountFormatter();
-  const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, SignDisplay.Auto, undefined, 0);
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
@@ -203,6 +202,53 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
 
   const childCards = buildChildren();
 
+  const getElementForLimit = () => {
+    if (isSelected) {
+      return (
+        <Flex onClick={(e) => e.stopPropagation()}>
+          <NumberInput
+            {...newLimitField.getInputProps()}
+            onBlur={() => handleEdit(newLimitField.getValue())}
+            thousandSeparator={thousandsSeparator}
+            decimalSeparator={decimalSeparator}
+            decimalScale={0}
+            min={childLimitsTotal}
+            max={999999}
+            step={1}
+            prefix={getCurrencySymbol(preferredCurrency)}
+            placeholder={t("enter_limit")}
+            size="xs"
+            styles={{
+              root: {
+                maxWidth: "100px",
+              },
+              input: {
+                padding: "0 10px",
+                fontSize: "16px",
+              },
+            }}
+            elevation={1}
+          />
+        </Flex>
+      );
+    }
+
+    return (
+      <AmountText
+        amount={limit}
+        disableStatusColor
+        size="md"
+        isSensitive={isPrivacyModeEnabled}
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={0}
+        signDisplay={SignDisplay.Auto}
+        className={classes.text}
+        key="total"
+      />
+    );
+  };
+
   return (
     <Card p={0} w="100%" elevation={1}>
       <Box
@@ -281,75 +327,27 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   <PencilIcon size={16} />
                 </ActionIcon>
               </Group>
-              <Group gap="0.5rem" justify="flex-end" align="center">
-                {isSelected ? (
-                  <>
-                    <Trans
-                      i18nKey="budget_amount_fraction_editable_total_styled"
-                      values={{
-                        amount: formatSensitiveAmount(
-                          amount * (isIncome ? 1 : -1),
-                        ),
-                      }}
-                      components={[
-                        <PrimaryText
-                          className={classes.text}
-                          key="amount"
-                          elevation={1}
-                        />,
-                        <DimmedText size="sm" key="of" elevation={1} />,
-                      ]}
-                    />
-                    <Flex onClick={(e) => e.stopPropagation()}>
-                      <NumberInput
-                        {...newLimitField.getInputProps()}
-                        onBlur={() => handleEdit(newLimitField.getValue())}
-                        thousandSeparator={thousandsSeparator}
-                        decimalSeparator={decimalSeparator}
-                        decimalScale={0}
-                        min={childLimitsTotal}
-                        max={999999}
-                        step={1}
-                        prefix={getCurrencySymbol(preferredCurrency)}
-                        placeholder={t("enter_limit")}
-                        size="xs"
-                        styles={{
-                          root: {
-                            maxWidth: "100px",
-                          },
-                          input: {
-                            padding: "0 10px",
-                            fontSize: "16px",
-                          },
-                        }}
-                        elevation={1}
-                      />
-                    </Flex>
-                  </>
-                ) : (
-                  <Trans
-                    i18nKey="budget_amount_fraction_styled"
-                    values={{
-                      amount: formatSensitiveAmount(
-                        amount * (isIncome ? 1 : -1),
-                      ),
-                      total: formatSensitiveAmount(limit),
-                    }}
-                    components={[
-                      <PrimaryText
-                        className={classes.text}
-                        key="amount"
-                        elevation={1}
-                      />,
-                      <DimmedText size="sm" key="of" elevation={1} />,
-                      <PrimaryText
-                        className={classes.text}
-                        key="total"
-                        elevation={1}
-                      />,
-                    ]}
-                  />
-                )}
+              <Group gap="0.25rem" justify="flex-end" align="center">
+                <Trans
+                  i18nKey="x_of_y"
+                  components={[
+                    <AmountText
+                      amount={amount}
+                      disableStatusColor
+                      size="md"
+                      isSensitive={isPrivacyModeEnabled}
+                      locale={intlLocale}
+                      currency={preferredCurrency}
+                      decimalPlaces={0}
+                      signDisplay={SignDisplay.Auto}
+                      invertSign={!isIncome}
+                      className={classes.text}
+                      key="amount"
+                    />,
+                    <DimmedText size="sm" key="of" elevation={1} />,
+                    getElementForLimit(),
+                  ]}
+                />
               </Group>
             </Group>
             <Group
@@ -383,8 +381,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               projectedAmount={projectedAmount}
               limit={limit}
               isIncome={isIncome}
-              budgetWarningThreshold={budgetWarningThreshold}
-              formatAmount={formatSensitiveAmount}
             />
           </Stack>
           {isSelected && (

@@ -1,5 +1,6 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
 import { getCategoryIcon, getIsParentCategory } from "~/helpers/category";
 import { getDateFromMonthsAgo } from "~/helpers/datetime";
@@ -16,8 +17,8 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { CategoryTypes } from "~/models/category";
 import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { AmountText } from "@teelur/budget-board-ui";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -30,9 +31,11 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   const chartLookbackMonths = 6;
 
   const { t } = useTranslation();
-  const { dayjs } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allTransactionCategories, getCategoryType } =
     useTransactionCategories();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const transactionsQuery = useTransactionsQuery();
   const forecastQuery = useRecurringForecastQuery({
     month: props.month,
@@ -175,9 +178,14 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                       <PrimaryText size="sm">
                         {dayjs(occurrence.date).format("LL")}
                       </PrimaryText>
-                      <StatusText size="sm" amount={occurrence.amount}>
-                        <SensitiveAmount amount={occurrence.amount} />
-                      </StatusText>
+                      <AmountText
+                        size="sm"
+                        amount={occurrence.amount}
+                        isSensitive={isPrivacyModeEnabled}
+                        locale={intlLocale}
+                        currency={preferredCurrency}
+                        decimalPlaces={decimalPlaces}
+                      />
                     </Group>
                   ))}
                 </Stack>

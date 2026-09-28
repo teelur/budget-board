@@ -1,15 +1,14 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon, Badge } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import React from "react";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { SignDisplay } from "~/helpers/currency";
-import SensitiveAmount, {
-  useSensitiveAmountFormatter,
-} from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { IAssetResponse } from "~/models/asset";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -22,9 +21,11 @@ interface AssetItemContentProps {
 
 const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
   const { allAssetTypes } = useAssetTypes();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const getAssetTypeDisplay = (): React.ReactNode => {
     if (!props.asset.type || props.asset.type.length === 0) {
@@ -80,9 +81,14 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
             </Badge>
           )}
         </Group>
-        <StatusText amount={props.asset.currentValue ?? 0} size="md">
-          <SensitiveAmount amount={props.asset.currentValue ?? 0} />
-        </StatusText>
+        <AmountText
+          amount={props.asset.currentValue ?? 0}
+          size="md"
+          isSensitive={isPrivacyModeEnabled}
+          locale={intlLocale}
+          currency={preferredCurrency}
+          decimalPlaces={decimalPlaces}
+        />
       </Group>
       <Group justify="space-between" align="center">
         <Group gap="0.5rem">

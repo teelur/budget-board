@@ -1,8 +1,9 @@
 import classes from "./GoalCardContent.module.css";
 
 import { Flex, Group, Stack } from "@mantine/core";
-import { ActionIcon, Badge } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
 import React from "react";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
@@ -10,13 +11,13 @@ import { IGoalResponse } from "~/models/goal";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { StatusColorType } from "~/helpers/budgets";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -27,6 +28,8 @@ interface GoalCardContentProps {
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
     formatAmount(amount, SignDisplay.Auto, undefined, 0);
@@ -61,23 +64,39 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             <Trans
-              i18nKey="budget_amount_fraction_styled"
-              values={{
-                amount: formatSensitiveAmount(
-                  sumAccountsTotalBalance(props.goal.accounts) -
-                    props.goal.initialAmount,
-                ),
-                total: formatSensitiveAmount(
-                  getGoalTargetAmount(
+              i18nKey="x_of_y"
+              components={[
+                <AmountText
+                  amount={
+                    sumAccountsTotalBalance(props.goal.accounts) -
+                    props.goal.initialAmount
+                  }
+                  disableStatusColor
+                  size="lg"
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
+                  signDisplay={SignDisplay.Auto}
+                  invertSign={false}
+                  key="amount"
+                />,
+                <DimmedText size="md" key="of" />,
+                <AmountText
+                  amount={getGoalTargetAmount(
                     props.goal.amount,
                     props.goal.initialAmount,
-                  ),
-                ),
-              }}
-              components={[
-                <PrimaryText size="lg" key="amount" />,
-                <DimmedText size="md" key="of" />,
-                <PrimaryText size="lg" key="total" />,
+                  )}
+                  disableStatusColor
+                  size="lg"
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
+                  signDisplay={SignDisplay.Auto}
+                  invertSign={false}
+                  key="total"
+                />,
               ]}
             />
           </Flex>
@@ -91,39 +110,43 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
           elevation={1}
         />
         <Flex className={classes.footer}>
-          <Group align="center" gap="sm">
-            <Flex align="center" gap="0.25rem">
-              <Trans
-                i18nKey="budget_projected_styled"
-                values={{
-                  amount: dayjs(props.goal.completeDate).format("MMMM YYYY"),
-                }}
-                components={[
-                  <DimmedText size="sm" key="label" />,
-                  <PrimaryText size="sm" key="date-not-edit" />,
-                ]}
-              />
-            </Flex>
+          <Group align="center" gap="0.25rem">
+            <DimmedText size="sm" key="label">
+              {t("projected_colon")}
+            </DimmedText>
+            <PrimaryText size="sm" key="date-not-edit">
+              {dayjs(props.goal.completeDate).format("MMMM YYYY")}
+            </PrimaryText>
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             <Trans
-              i18nKey="budget_monthly_amount_fraction_styled"
+              i18nKey="x_of_y_this_month"
               values={{
-                amount: formatSensitiveAmount(
-                  props.goal.monthlyContributionProgress,
-                ),
                 total: formatSensitiveAmount(props.goal.monthlyContribution),
               }}
               components={[
-                <StatusText
+                <AmountText
                   amount={props.goal.monthlyContributionProgress}
+                  size="md"
                   total={props.goal.monthlyContribution}
                   type={StatusColorType.Target}
-                  size="md"
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
                   key="amount"
                 />,
                 <DimmedText size="sm" key="of" />,
-                <PrimaryText size="md" key="total-not-edit" />,
+                <AmountText
+                  amount={props.goal.monthlyContribution}
+                  size="md"
+                  disableStatusColor
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
+                  key="total-not-edit"
+                />,
               ]}
             />
           </Flex>

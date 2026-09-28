@@ -1,13 +1,12 @@
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { Button, ActionIcon } from "@teelur/budget-board-ui";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { Button, ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
 import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
@@ -16,6 +15,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -24,9 +24,16 @@ interface EditableAccountItemContentProps {
 
 const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const {
+    dayjs,
+    dateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+    intlLocale,
+  } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateAccountMutation = useUpdateAccountMutation();
 
   const accountNameField = useField<string>({
@@ -173,9 +180,14 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               </Button>
             </Group>
           </Group>
-          <StatusText amount={props.account.currentBalance} size="md">
-            <SensitiveAmount amount={props.account.currentBalance} />
-          </StatusText>
+          <AmountText
+            amount={props.account.currentBalance}
+            size="md"
+            isSensitive={isPrivacyModeEnabled}
+            locale={intlLocale}
+            currency={preferredCurrency}
+            decimalPlaces={decimalPlaces}
+          />
         </Group>
         <Group justify="space-between" align="center">
           <CategorySelect

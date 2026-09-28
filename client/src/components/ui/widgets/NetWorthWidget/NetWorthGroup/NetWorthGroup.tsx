@@ -7,7 +7,6 @@ import NetWorthItem from "./NetWorthItem/NetWorthItem";
 import { calculateLineTotal } from "~/helpers/widgets";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { IAssetResponse } from "~/models/asset";
 import { IAccountResponse } from "~/models/account";
 
@@ -26,7 +25,6 @@ const NetWorthGroup = ({
 }: NetWorthGroupProps): React.ReactNode => {
   const { allAccountTypes } = useAccountTypes();
   const { allAssetTypes } = useAssetTypes();
-  const { preferredCurrency } = useUserSettings();
 
   const sortedLines = netWorthWidgetGroup.lines
     .slice()
@@ -48,7 +46,6 @@ const NetWorthGroup = ({
             allAccountTypes,
             allAssetTypes,
           )}
-          userCurrency={preferredCurrency ?? "USD"}
         />
       ))}
     </Stack>

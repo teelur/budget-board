@@ -1,12 +1,13 @@
 import { Group, LoadingOverlay } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useField } from "@mantine/form";
 import { PencilIcon } from "lucide-react";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useUpdateInstitutionMutation } from "~/hooks/mutations/institutions/useUpdateInstitutionMutation";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IEditableInstitutionItemContentProps {
   institution: IInstitution;
@@ -21,7 +22,10 @@ const EditableInstitutionItemContent = (
     initialValue: props.institution.name,
   });
 
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateInstitutionMutation = useUpdateInstitutionMutation();
+  const { intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
 
   return (
     <Group justify="space-between" align="center" gap="0.5rem">
@@ -51,9 +55,14 @@ const EditableInstitutionItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <StatusText amount={props.totalBalance} size="md">
-        <SensitiveAmount amount={props.totalBalance} />
-      </StatusText>
+      <AmountText
+        amount={props.totalBalance}
+        size="lg"
+        isSensitive={isPrivacyModeEnabled}
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={decimalPlaces}
+      />
     </Group>
   );
 };

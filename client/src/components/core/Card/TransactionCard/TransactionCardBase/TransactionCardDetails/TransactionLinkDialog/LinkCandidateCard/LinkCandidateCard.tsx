@@ -1,12 +1,15 @@
-import { Stack, Text } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { ITransaction } from "~/models/transaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import Card from "~/components/core/Card/Card";
 import classes from "./LinkCandidateCard.module.css";
+import { AmountText } from "@teelur/budget-board-ui";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface LinkCandidateCardProps {
   candidate: ITransaction;
@@ -22,13 +25,8 @@ const LinkCandidateCard = ({
   const { t } = useTranslation();
   const { dayjs, longDateFormat, intlLocale } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
-  const amount = convertNumberToCurrency(
-    candidate.amount,
-    decimalPlaces,
-    preferredCurrency,
-    SignDisplay.Auto,
-    intlLocale,
-  );
+  const { isPrivacyModeEnabled } = usePrivacyMode();
+
   const date = dayjs(candidate.date).format(longDateFormat);
 
   return (
@@ -56,23 +54,29 @@ const LinkCandidateCard = ({
         className={classes.candidateCard}
         data-selected={isSelected ? "true" : "false"}
       >
-        <div className={classes.candidateContent}>
+        <Group justify="space-between" wrap="nowrap">
           <Stack
             gap={0}
             align="flex-start"
             className={classes.candidateDetails}
           >
-            <Text size="sm" fw={600}>
+            <PrimaryText size="sm" fw={600}>
               {candidate.accountName.trim() || t("unknown_account")}
-            </Text>
-            <Text size="xs">
+            </PrimaryText>
+            <DimmedText size="xs">
               {candidate.merchantName || t("no_merchant_name")} · {date}
-            </Text>
+            </DimmedText>
           </Stack>
-          <Text size="sm" className={classes.candidateAmount}>
-            {amount}
-          </Text>
-        </div>
+          <AmountText
+            amount={candidate.amount}
+            size="sm"
+            isSensitive={isPrivacyModeEnabled}
+            locale={intlLocale}
+            currency={preferredCurrency}
+            decimalPlaces={decimalPlaces}
+            className={classes.candidateAmount}
+          />
+        </Group>
       </Card>
     </div>
   );

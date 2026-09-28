@@ -1,5 +1,6 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, AmountText } from "@teelur/budget-board-ui";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { MoveRightIcon } from "lucide-react";
 import { SignDisplay } from "~/helpers/currency";
 import { IAssetResponse } from "~/models/asset";
@@ -10,15 +11,13 @@ import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import Drawer from "~/components/core/Drawer/Drawer";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
-import SensitiveAmount, {
-  useSensitiveAmountFormatter,
-} from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AssetDetailsProps {
   isOpen: boolean;
@@ -30,7 +29,9 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
   const [chartLookbackMonths, setChartLookbackMonths] = React.useState(6);
 
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const valuesQuery = useValuesQuery({
     assetIds: props.asset ? [props.asset.id] : [],
@@ -93,15 +94,15 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
               props.asset?.sellPrice && (
                 <Stack gap={0} justify="center" align="center">
                   <MoveRightIcon size={32} />
-                  <StatusText
+                  <AmountText
                     amount={props.asset.sellPrice - props.asset.purchasePrice}
                     size="xs"
-                  >
-                    <SensitiveAmount
-                      amount={props.asset.sellPrice - props.asset.purchasePrice}
-                      signDisplay={SignDisplay.Always}
-                    />
-                  </StatusText>
+                    isSensitive={isPrivacyModeEnabled}
+                    locale={intlLocale}
+                    currency={preferredCurrency}
+                    decimalPlaces={decimalPlaces}
+                    signDisplay={SignDisplay.Always}
+                  />
                 </Stack>
               )}
             {dayjs(props.asset?.sellDate).isValid() &&
