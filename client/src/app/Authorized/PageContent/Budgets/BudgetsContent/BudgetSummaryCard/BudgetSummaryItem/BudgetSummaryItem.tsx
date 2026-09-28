@@ -92,7 +92,6 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
               currency={preferredCurrency}
               decimalPlaces={0}
               signDisplay={SignDisplay.Auto}
-              invertSign={invertBudgetSign}
               key="total"
             />,
           ]}
