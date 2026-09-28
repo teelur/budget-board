@@ -16,9 +16,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
-import SensitiveAmount, {
-  useSensitiveAmountFormatter,
-} from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface AssetDetailsProps {
@@ -103,12 +101,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     locale={intlLocale}
                     currency={preferredCurrency}
                     decimalPlaces={decimalPlaces}
-                  >
-                    <SensitiveAmount
-                      amount={props.asset.sellPrice - props.asset.purchasePrice}
-                      signDisplay={SignDisplay.Always}
-                    />
-                  </AmountText>
+                  />
                 </Stack>
               )}
             {dayjs(props.asset?.sellDate).isValid() &&

@@ -3,7 +3,7 @@ import { Group, Skeleton } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { buildFlowsChartData, chartColors } from "~/helpers/charts";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { SignDisplay } from "~/helpers/currency";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";

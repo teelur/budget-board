@@ -3,7 +3,7 @@ import { SignDisplay } from "~/helpers/currency";
 import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans } from "react-i18next";

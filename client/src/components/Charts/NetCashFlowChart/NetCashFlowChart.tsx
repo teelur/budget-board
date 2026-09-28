@@ -6,7 +6,7 @@ import { Group, Skeleton } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";

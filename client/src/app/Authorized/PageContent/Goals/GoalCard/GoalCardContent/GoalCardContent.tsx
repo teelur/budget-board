@@ -11,7 +11,7 @@ import { IGoalResponse } from "~/models/goal";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { StatusColorType } from "~/helpers/budgets";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import Progress from "~/components/core/Progress/Progress";

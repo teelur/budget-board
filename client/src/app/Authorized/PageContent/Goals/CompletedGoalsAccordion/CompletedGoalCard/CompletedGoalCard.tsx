@@ -5,7 +5,7 @@ import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";

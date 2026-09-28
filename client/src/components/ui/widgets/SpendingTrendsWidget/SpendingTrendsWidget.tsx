@@ -3,7 +3,7 @@ import { SignDisplay } from "~/helpers/currency";
 import { getRollingTotalSpendingForMonth } from "~/helpers/transactions";
 import { Box, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";

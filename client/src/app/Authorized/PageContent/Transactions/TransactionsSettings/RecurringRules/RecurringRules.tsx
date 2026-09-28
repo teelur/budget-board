@@ -1,5 +1,6 @@
 import { Group, Skeleton, Stack, Tooltip } from "@mantine/core";
-import { ActionIcon, Badge, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, Badge, Button } from "@teelur/budget-board-ui";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -9,7 +10,6 @@ import Modal from "~/components/core/Modal/Modal";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import RecurringRuleForm from "~/components/RecurringRuleForm/RecurringRuleForm";
 import { useDeleteRecurringRuleMutation } from "~/hooks/mutations/recurringRules/useDeleteRecurringRuleMutation";
 import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
@@ -19,6 +19,7 @@ import {
 } from "~/models/recurringRule";
 import { getRecurringCadenceLabel } from "~/helpers/recurringRules";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface RecurringRuleCardProps {
   rule: IRecurringRuleResponse;
@@ -27,7 +28,9 @@ interface RecurringRuleCardProps {
 
 const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const deleteMutation = useDeleteRecurringRuleMutation();
   const category =
     props.rule.subcategory ?? props.rule.category ?? t("any_category");
@@ -60,9 +63,15 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
                 : t("fixed_amount")}
               :
             </DimmedText>
-            <PrimaryText size="sm">
-              <SensitiveAmount amount={props.rule.amount} />
-            </PrimaryText>
+            <AmountText
+              amount={props.rule.amount}
+              size="sm"
+              disableStatusColor
+              isSensitive={isPrivacyModeEnabled}
+              locale={intlLocale}
+              currency={preferredCurrency}
+              decimalPlaces={decimalPlaces}
+            />
             <DimmedText size="sm">
               {t("recurring_matched_transactions", {
                 count: props.rule.matchedTransactionCount,

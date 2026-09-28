@@ -4,7 +4,7 @@ import {
   uncategorizedTransactionCategory,
 } from "~/models/transaction";
 import React from "react";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import {
   buildSpendingCategoryChartData,
   buildSpendingSubcategoryChartData,

@@ -4,7 +4,7 @@ import React from "react";
 import { buildMonthlySpendingChartData } from "~/helpers/charts";
 import { SignDisplay } from "~/helpers/currency";
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 
