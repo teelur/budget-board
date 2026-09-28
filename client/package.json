@@ -8,7 +8,6 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format:locales": "prettier --write \"public/locales/**/*.json\"",
-    "test:privacy-mode": "node scripts/validate-privacy-mode.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
