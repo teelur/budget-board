@@ -1,5 +1,5 @@
 import classes from "./UnbudgetedChildCard.module.css";
-
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { Group, LoadingOverlay } from "@mantine/core";
 import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { CornerDownRightIcon, PlusIcon } from "lucide-react";
@@ -25,6 +25,7 @@ const UnbudgetedChildCard = (
 ): React.ReactNode => {
   const { dayjs, intlLocale } = useLocale();
   const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const createBudgetMutation = useCreateBudgetMutation();
 
   if (roundAwayFromZero(props.amount) === 0) {
@@ -56,7 +57,7 @@ const UnbudgetedChildCard = (
               amount={props.amount}
               disableStatusColor
               size="sm"
-              isSensitive={false}
+              isSensitive={isPrivacyModeEnabled}
               currency={preferredCurrency}
               decimalPlaces={0}
               locale={intlLocale}

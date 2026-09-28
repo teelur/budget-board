@@ -101,6 +101,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     locale={intlLocale}
                     currency={preferredCurrency}
                     decimalPlaces={decimalPlaces}
+                    signDisplay={SignDisplay.Always}
                   />
                 </Stack>
               )}

@@ -55,6 +55,7 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
               locale={intlLocale}
               currency={preferredCurrency}
               decimalPlaces={0}
+              invertSign={!props.isIncome}
               className={classes.inlineText}
               key="amount"
             />
@@ -64,9 +65,7 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
               i18nKey="budget_left_after_predictions_styled"
               components={[
                 <AmountText
-                  amount={roundAwayFromZero(
-                    props.limit - props.projectedAmount * budgetSign,
-                  )}
+                  amount={props.projectedAmount}
                   size="sm"
                   total={props.limit}
                   type={
@@ -76,12 +75,19 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
                   }
                   warningThreshold={budgetWarningThreshold}
                   isSensitive={isPrivacyModeEnabled}
-                  locale={intlLocale}
-                  currency={preferredCurrency}
-                  decimalPlaces={0}
                   className={classes.inlineText}
                   key="amount"
-                />,
+                >
+                  {convertNumberToCurrency(
+                    roundAwayFromZero(
+                      props.limit - props.projectedAmount * budgetSign,
+                    ),
+                    0,
+                    preferredCurrency,
+                    SignDisplay.Auto,
+                    intlLocale,
+                  )}
+                </AmountText>,
                 <DimmedText
                   className={classes.inlineText}
                   size="sm"

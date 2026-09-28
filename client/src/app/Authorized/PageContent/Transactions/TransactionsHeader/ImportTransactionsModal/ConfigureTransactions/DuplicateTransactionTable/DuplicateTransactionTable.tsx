@@ -1,5 +1,6 @@
 import { Divider, Flex, Pagination, Stack, Table } from "@mantine/core";
 import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -27,6 +28,7 @@ const DuplicateTransactionTable = (
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const accountsQuery = useAccountsQuery();
 
   const [page, setPage] = React.useState(1);
@@ -114,6 +116,7 @@ const DuplicateTransactionTable = (
                       <AmountText
                         amount={row.importedTransaction.amount ?? 0}
                         size="sm"
+                        isSensitive={isPrivacyModeEnabled}
                         locale={intlLocale}
                         currency={preferredCurrency}
                         decimalPlaces={decimalPlaces}
@@ -156,6 +159,7 @@ const DuplicateTransactionTable = (
                       <AmountText
                         amount={row.existingTransaction.amount ?? 0}
                         size="sm"
+                        isSensitive={isPrivacyModeEnabled}
                         locale={intlLocale}
                         currency={preferredCurrency}
                         decimalPlaces={decimalPlaces}

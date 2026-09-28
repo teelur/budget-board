@@ -6,6 +6,7 @@ import { ITransactionImportTableData } from "~/models/transaction";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface TransactionsTableProps {
   tableData: ITransactionImportTableData[];
@@ -18,6 +19,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const [page, setPage] = React.useState(1);
 
@@ -70,6 +72,7 @@ const TransactionsTable = (props: TransactionsTableProps): React.ReactNode => {
                     <AmountText
                       amount={row.amount ?? 0}
                       size="sm"
+                      isSensitive={isPrivacyModeEnabled}
                       locale={intlLocale}
                       currency={preferredCurrency}
                       decimalPlaces={decimalPlaces}

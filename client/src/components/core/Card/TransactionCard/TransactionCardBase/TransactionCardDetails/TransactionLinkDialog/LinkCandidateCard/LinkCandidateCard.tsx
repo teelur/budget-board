@@ -9,6 +9,7 @@ import classes from "./LinkCandidateCard.module.css";
 import { AmountText } from "@teelur/budget-board-ui";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface LinkCandidateCardProps {
   candidate: ITransaction;
@@ -24,6 +25,7 @@ const LinkCandidateCard = ({
   const { t } = useTranslation();
   const { dayjs, longDateFormat, intlLocale } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const date = dayjs(candidate.date).format(longDateFormat);
 
@@ -68,6 +70,7 @@ const LinkCandidateCard = ({
           <AmountText
             amount={candidate.amount}
             size="sm"
+            isSensitive={isPrivacyModeEnabled}
             locale={intlLocale}
             currency={preferredCurrency}
             decimalPlaces={decimalPlaces}
