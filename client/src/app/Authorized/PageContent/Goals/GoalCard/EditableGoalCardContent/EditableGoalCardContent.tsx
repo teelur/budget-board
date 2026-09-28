@@ -14,7 +14,6 @@ import { getGoalTargetAmount } from "~/helpers/goals";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { StatusColorType } from "~/helpers/budgets";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
@@ -46,12 +45,8 @@ const EditableGoalCardContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency, decimalPlaces, budgetWarningThreshold } =
-    useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
-  const formatAmount = useSensitiveAmountFormatter();
-  const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, SignDisplay.Auto, undefined, 0);
   const updateGoalMutation = useUpdateGoalMutation();
   const deleteGoalMutation = useDeleteGoalMutation();
   const completeGoalMutation = useCompleteGoalMutation();
@@ -70,6 +65,147 @@ const EditableGoalCardContent = (
       ? props.goal.completeDate
       : null,
   });
+
+  const getElementForMonthlyContribution = () => {
+    if (props.goal.isMonthlyContributionEditable) {
+      return (
+        <Flex onClick={(e) => e.stopPropagation()}>
+          <NumberInput
+            size="xs"
+            maw={100}
+            min={0}
+            prefix={getCurrencySymbol(preferredCurrency)}
+            thousandSeparator={thousandsSeparator}
+            decimalSeparator={decimalSeparator}
+            decimalScale={decimalPlaces}
+            {...goalMonthlyContributionField.getInputProps()}
+            onBlur={() => {
+              if (goalMonthlyContributionField.getValue() > 0) {
+                updateGoalMutation.mutate({
+                  id: props.goal.id,
+                  monthlyContribution: goalMonthlyContributionField.getValue(),
+                });
+              } else {
+                showNotification({
+                  type: NotificationType.Error,
+                  message: t("invalid_monthly_contribution"),
+                });
+              }
+            }}
+            elevation={1}
+          />
+        </Flex>
+      );
+    }
+
+    return (
+      <AmountText
+        amount={props.goal.monthlyContribution}
+        size="md"
+        disableStatusColor
+        isSensitive={isPrivacyModeEnabled}
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={0}
+        key="total-not-edit"
+      />
+    );
+  };
+
+  const getElementForCompleteDate = () => {
+    if (props.goal.completeDate) {
+      return (
+        <Flex
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <DateInput
+            className="h-8"
+            {...goalTargetDateField.getInputProps()}
+            locale={dayjsLocale}
+            valueFormat={longDateFormat}
+            onChange={(date) => {
+              const parsedDate = dayjs(date);
+
+              if (parsedDate.isValid()) {
+                goalTargetDateField.setValue(parsedDate.toDate());
+                updateGoalMutation.mutate({
+                  id: props.goal.id,
+                  completeDate: parsedDate.format("YYYY-MM-DD"),
+                });
+              } else {
+                showNotification({
+                  type: NotificationType.Error,
+                  message: t("invalid_target_date"),
+                });
+              }
+            }}
+          />
+        </Flex>
+      );
+    }
+
+    return (
+      <PrimaryText size="sm" key="date-not-edit">
+        {dayjs(props.goal.completeDate).format("MMMM YYYY")}
+      </PrimaryText>
+    );
+  };
+
+  const getElementForTargetAmount = () => {
+    if (props.goal.amount !== 0) {
+      return (
+        <Flex
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <NumberInput
+            maw={100}
+            min={0}
+            prefix={getCurrencySymbol(preferredCurrency)}
+            thousandSeparator={thousandsSeparator}
+            decimalSeparator={decimalSeparator}
+            decimalScale={decimalPlaces}
+            {...goalTargetAmountField.getInputProps()}
+            onBlur={() => {
+              if (goalTargetAmountField.getValue() > 0) {
+                updateGoalMutation.mutate({
+                  id: props.goal.id,
+                  amount: goalTargetAmountField.getValue(),
+                });
+              } else {
+                showNotification({
+                  type: NotificationType.Error,
+                  message: t("invalid_target_amount"),
+                });
+              }
+            }}
+            elevation={1}
+          />
+        </Flex>
+      );
+    }
+
+    return (
+      <AmountText
+        amount={getGoalTargetAmount(
+          props.goal.amount,
+          props.goal.initialAmount,
+        )}
+        disableStatusColor
+        size="lg"
+        isSensitive={isPrivacyModeEnabled}
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={0}
+        signDisplay={SignDisplay.Auto}
+        invertSign={false}
+        key="total"
+      />
+    );
+  };
 
   return (
     <>
@@ -141,97 +277,26 @@ const EditableGoalCardContent = (
               </ActionIcon>
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
-              {props.goal.amount !== 0 ? (
-                <>
-                  <Trans
-                    i18nKey="budget_amount_fraction_editable_total_styled"
-                    values={{
-                      amount: formatSensitiveAmount(
-                        sumAccountsTotalBalance(props.goal.accounts) -
-                          props.goal.initialAmount,
-                      ),
-                    }}
-                    components={[
-                      <PrimaryText size="lg" key="amount" />,
-                      <DimmedText size="sm" key="of" />,
-                    ]}
-                  />
-                  <Flex
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <NumberInput
-                      maw={100}
-                      min={0}
-                      prefix={getCurrencySymbol(preferredCurrency)}
-                      thousandSeparator={thousandsSeparator}
-                      decimalSeparator={decimalSeparator}
-                      decimalScale={decimalPlaces}
-                      {...goalTargetAmountField.getInputProps()}
-                      onBlur={() => {
-                        if (goalTargetAmountField.getValue() > 0) {
-                          updateGoalMutation.mutate({
-                            id: props.goal.id,
-                            amount: goalTargetAmountField.getValue(),
-                          });
-                        } else {
-                          showNotification({
-                            type: NotificationType.Error,
-                            message: t("invalid_target_amount"),
-                          });
-                        }
-                      }}
-                      elevation={1}
-                    />
-                  </Flex>
-                </>
-              ) : (
-                <Trans
-                  i18nKey="x_of_y"
-                  values={{
-                    total: formatSensitiveAmount(
-                      getGoalTargetAmount(
-                        props.goal.amount,
-                        props.goal.initialAmount,
-                      ),
-                    ),
-                  }}
-                  components={[
-                    <AmountText
-                      amount={
-                        sumAccountsTotalBalance(props.goal.accounts) -
-                        props.goal.initialAmount
-                      }
-                      disableStatusColor
-                      size="lg"
-                      isSensitive={isPrivacyModeEnabled}
-                      locale={intlLocale}
-                      currency={preferredCurrency}
-                      decimalPlaces={0}
-                      signDisplay={SignDisplay.Auto}
-                      invertSign={false}
-                      key="amount"
-                    />,
-                    <DimmedText size="md" key="of" />,
-                    <AmountText
-                      amount={getGoalTargetAmount(
-                        props.goal.amount,
-                        props.goal.initialAmount,
-                      )}
-                      disableStatusColor
-                      size="lg"
-                      isSensitive={isPrivacyModeEnabled}
-                      locale={intlLocale}
-                      currency={preferredCurrency}
-                      decimalPlaces={0}
-                      signDisplay={SignDisplay.Auto}
-                      invertSign={false}
-                      key="total"
-                    />,
-                  ]}
-                />
-              )}
+              <Trans
+                i18nKey="x_of_y"
+                components={[
+                  <AmountText
+                    amount={
+                      sumAccountsTotalBalance(props.goal.accounts) -
+                      props.goal.initialAmount
+                    }
+                    size="lg"
+                    disableStatusColor
+                    isSensitive={isPrivacyModeEnabled}
+                    locale={intlLocale}
+                    currency={preferredCurrency}
+                    decimalPlaces={0}
+                    key="amount"
+                  />,
+                  <DimmedText size="sm" key="of" />,
+                  getElementForTargetAmount(),
+                ]}
+              />
             </Flex>
           </Flex>
           <Progress
@@ -245,139 +310,30 @@ const EditableGoalCardContent = (
           <Flex className={classes.footer}>
             <Group align="center" gap="sm">
               <Flex align="center" gap="0.25rem">
-                {props.goal.isCompleteDateEditable ? (
-                  <>
-                    <Trans
-                      i18nKey="budget_projected_editable_styled"
-                      values={{
-                        amount: formatSensitiveAmount(
-                          sumAccountsTotalBalance(props.goal.accounts) -
-                            props.goal.initialAmount,
-                        ),
-                      }}
-                      components={[<DimmedText size="sm" key="label" />]}
-                    />
-                    <Flex
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                    >
-                      <DateInput
-                        className="h-8"
-                        {...goalTargetDateField.getInputProps()}
-                        locale={dayjsLocale}
-                        valueFormat={longDateFormat}
-                        onChange={(date) => {
-                          const parsedDate = dayjs(date);
-
-                          if (parsedDate.isValid()) {
-                            goalTargetDateField.setValue(parsedDate.toDate());
-                            updateGoalMutation.mutate({
-                              id: props.goal.id,
-                              completeDate: parsedDate.format("YYYY-MM-DD"),
-                            });
-                          } else {
-                            showNotification({
-                              type: NotificationType.Error,
-                              message: t("invalid_target_date"),
-                            });
-                          }
-                        }}
-                      />
-                    </Flex>
-                  </>
-                ) : (
-                  <Trans
-                    i18nKey="budget_projected_styled"
-                    values={{
-                      amount: dayjs(props.goal.completeDate).format(
-                        "MMMM YYYY",
-                      ),
-                    }}
-                    components={[
-                      <DimmedText size="sm" key="label" />,
-                      <PrimaryText size="sm" key="date-not-edit" />,
-                    ]}
-                  />
-                )}
+                <DimmedText size="sm">{t("projected_colon")}</DimmedText>
+                {getElementForCompleteDate()}
               </Flex>
             </Group>
             <Flex justify="flex-end" align="center" gap="0.25rem">
-              {props.goal.isMonthlyContributionEditable ? (
-                <>
-                  <Trans
-                    i18nKey="budget_monthly_amount_fraction_editable_styled"
-                    components={[
-                      <AmountText
-                        amount={props.goal.monthlyContributionProgress}
-                        size="md"
-                        total={props.goal.monthlyContribution}
-                        type={StatusColorType.Target}
-                        isSensitive={isPrivacyModeEnabled}
-                        locale={intlLocale}
-                        currency={preferredCurrency}
-                        decimalPlaces={decimalPlaces}
-                        key="amount"
-                      />,
-                      <DimmedText size="sm" key="of" />,
-                    ]}
-                  />
-                  <Flex onClick={(e) => e.stopPropagation()}>
-                    <NumberInput
-                      size="sm"
-                      maw={100}
-                      min={0}
-                      prefix={getCurrencySymbol(preferredCurrency)}
-                      thousandSeparator={thousandsSeparator}
-                      decimalSeparator={decimalSeparator}
-                      decimalScale={decimalPlaces}
-                      {...goalMonthlyContributionField.getInputProps()}
-                      onBlur={() => {
-                        if (goalMonthlyContributionField.getValue() > 0) {
-                          updateGoalMutation.mutate({
-                            id: props.goal.id,
-                            monthlyContribution:
-                              goalMonthlyContributionField.getValue(),
-                          });
-                        } else {
-                          showNotification({
-                            type: NotificationType.Error,
-                            message: t("invalid_monthly_contribution"),
-                          });
-                        }
-                      }}
-                      elevation={1}
-                    />
-                  </Flex>
-                  <DimmedText size="sm">
-                    {t("editable_amount_fraction_this_month")}
-                  </DimmedText>
-                </>
-              ) : (
-                <Trans
-                  i18nKey="budget_monthly_amount_fraction_styled"
-                  values={{
-                    total: formatSensitiveAmount(
-                      props.goal.monthlyContribution,
-                    ),
-                  }}
-                  components={[
-                    <AmountText
-                      amount={props.goal.monthlyContributionProgress}
-                      size="md"
-                      total={props.goal.monthlyContribution}
-                      type={StatusColorType.Target}
-                      isSensitive={isPrivacyModeEnabled}
-                      locale={intlLocale}
-                      currency={preferredCurrency}
-                      decimalPlaces={decimalPlaces}
-                      key="amount"
-                    />,
-                    <DimmedText size="sm" key="of" />,
-                    <PrimaryText size="md" key="total-not-edit" />,
-                  ]}
-                />
-              )}
+              <Trans
+                i18nKey="x_of_y_this_month"
+                components={[
+                  <AmountText
+                    amount={props.goal.monthlyContributionProgress}
+                    size="md"
+                    total={props.goal.monthlyContribution}
+                    type={StatusColorType.Target}
+                    isSensitive={isPrivacyModeEnabled}
+                    locale={intlLocale}
+                    currency={preferredCurrency}
+                    decimalPlaces={decimalPlaces}
+                    key="amount"
+                  />,
+                  <DimmedText size="sm" key="of" />,
+                  getElementForMonthlyContribution(),
+                  <DimmedText size="sm" key="this_month" />,
+                ]}
+              />
             </Flex>
           </Flex>
         </Stack>

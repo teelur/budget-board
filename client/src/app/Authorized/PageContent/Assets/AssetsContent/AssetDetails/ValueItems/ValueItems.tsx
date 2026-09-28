@@ -2,7 +2,6 @@ import { Group, Pagination, Stack } from "@mantine/core";
 import React from "react";
 import { IValueResponse } from "~/models/value";
 import ValueItem from "./ValueItem/ValueItem";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface ValueItemsProps {
   values: IValueResponse[];
@@ -10,8 +9,6 @@ interface ValueItemsProps {
 
 const ValueItems = (props: ValueItemsProps): React.ReactNode => {
   const itemsPerPage = 10;
-
-  const { preferredCurrency } = useUserSettings();
 
   const [page, setPage] = React.useState(1);
 
@@ -24,11 +21,7 @@ const ValueItems = (props: ValueItemsProps): React.ReactNode => {
       {props.values
         .slice((page - 1) * itemsPerPage, page * itemsPerPage)
         .map((value) => (
-          <ValueItem
-            key={value.id}
-            value={value}
-            userCurrency={preferredCurrency}
-          />
+          <ValueItem key={value.id} value={value} />
         ))}
       <Group justify="center">
         <Pagination

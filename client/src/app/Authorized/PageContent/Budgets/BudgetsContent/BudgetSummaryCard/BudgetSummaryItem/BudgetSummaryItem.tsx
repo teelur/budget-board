@@ -9,6 +9,7 @@ import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBa
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -25,6 +26,7 @@ interface BudgetSummaryItemProps {
 }
 
 const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
+  const { t } = useTranslation();
   const { intlLocale } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
@@ -118,13 +120,12 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     }
 
     return (
-      <Trans
-        i18nKey="budget_projected_styled"
-        components={[
-          <DimmedText size="xs" key="label" />,
-          <AmountText {...projectedAmountTextProps} key="amount" />,
-        ]}
-      />
+      <>
+        <DimmedText size="xs" key="label">
+          {t("projected_colon")}
+        </DimmedText>
+        <AmountText {...projectedAmountTextProps} key="amount" />
+      </>
     );
   };
 
@@ -143,9 +144,9 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
             {getAmountText()}
           </Flex>
           {hasProjection && (
-            <Flex gap="0.25rem" align="baseline" style={{ maxWidth: "100%" }}>
+            <Group gap="0.25rem" align="baseline" style={{ maxWidth: "100%" }}>
               {getProjectedAmountText()}
-            </Flex>
+            </Group>
           )}
         </Stack>
       </Group>

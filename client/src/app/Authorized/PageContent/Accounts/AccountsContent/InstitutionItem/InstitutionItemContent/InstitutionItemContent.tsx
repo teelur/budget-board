@@ -6,7 +6,6 @@ import React from "react";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { IInstitution } from "~/models/institution";
 
 interface IInstitutionItemContentProps {

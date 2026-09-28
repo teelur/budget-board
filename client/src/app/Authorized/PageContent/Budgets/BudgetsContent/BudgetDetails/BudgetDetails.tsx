@@ -17,7 +17,6 @@ import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHead
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { CategoryTypes } from "~/models/category";
 import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { AmountText } from "@teelur/budget-board-ui";
 

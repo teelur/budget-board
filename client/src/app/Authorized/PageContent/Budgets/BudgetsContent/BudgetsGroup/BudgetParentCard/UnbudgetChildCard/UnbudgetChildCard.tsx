@@ -2,14 +2,16 @@ import classes from "./UnbudgetChildCard.module.css";
 import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { Box, Group, LoadingOverlay } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { roundAwayFromZero } from "~/helpers/utils";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
+import { SignDisplay } from "~/helpers/currency";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface UnbudgetChildCardProps {
   selectedDate: Date | null;
@@ -21,7 +23,9 @@ interface UnbudgetChildCardProps {
 }
 
 const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
-  const { dayjs } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const createBudgetMutation = useCreateBudgetMutation();
 
   if (roundAwayFromZero(props.amount) === 0) {
@@ -53,12 +57,17 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
           {props.category}
         </PrimaryText>
         <Group gap="0.5rem">
-          <PrimaryText className={classes.text} elevation={1}>
-            <SensitiveAmount
-              amount={props.amount * (props.isIncome ? 1 : -1)}
-              decimalPlaces={0}
-            />
-          </PrimaryText>
+          <AmountText
+            amount={props.amount * (props.isIncome ? 1 : -1)}
+            disableStatusColor
+            size="md"
+            isSensitive={isPrivacyModeEnabled}
+            currency={preferredCurrency}
+            decimalPlaces={0}
+            locale={intlLocale}
+            signDisplay={SignDisplay.Auto}
+            className={classes.text}
+          />
           {props.selectedDate && (
             <ActionIcon
               variant="filled"

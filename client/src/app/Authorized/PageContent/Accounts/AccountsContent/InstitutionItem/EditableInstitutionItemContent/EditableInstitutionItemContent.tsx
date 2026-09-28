@@ -4,7 +4,6 @@ import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvi
 import { useField } from "@mantine/form";
 import { PencilIcon } from "lucide-react";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useUpdateInstitutionMutation } from "~/hooks/mutations/institutions/useUpdateInstitutionMutation";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";

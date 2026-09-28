@@ -110,23 +110,17 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
           elevation={1}
         />
         <Flex className={classes.footer}>
-          <Group align="center" gap="sm">
-            <Flex align="center" gap="0.25rem">
-              <Trans
-                i18nKey="budget_projected_styled"
-                values={{
-                  amount: dayjs(props.goal.completeDate).format("MMMM YYYY"),
-                }}
-                components={[
-                  <DimmedText size="sm" key="label" />,
-                  <PrimaryText size="sm" key="date-not-edit" />,
-                ]}
-              />
-            </Flex>
+          <Group align="center" gap="0.25rem">
+            <DimmedText size="sm" key="label">
+              {t("projected_colon")}
+            </DimmedText>
+            <PrimaryText size="sm" key="date-not-edit">
+              {dayjs(props.goal.completeDate).format("MMMM YYYY")}
+            </PrimaryText>
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             <Trans
-              i18nKey="budget_monthly_amount_fraction_styled"
+              i18nKey="x_of_y_this_month"
               values={{
                 total: formatSensitiveAmount(props.goal.monthlyContribution),
               }}
@@ -143,7 +137,16 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   key="amount"
                 />,
                 <DimmedText size="sm" key="of" />,
-                <PrimaryText size="md" key="total-not-edit" />,
+                <AmountText
+                  amount={props.goal.monthlyContribution}
+                  size="md"
+                  disableStatusColor
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
+                  key="total-not-edit"
+                />,
               ]}
             />
           </Flex>

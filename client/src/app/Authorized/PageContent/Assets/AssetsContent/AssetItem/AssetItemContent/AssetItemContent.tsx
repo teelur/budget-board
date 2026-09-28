@@ -5,9 +5,7 @@ import React from "react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { SignDisplay } from "~/helpers/currency";
-import SensitiveAmount, {
-  useSensitiveAmountFormatter,
-} from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { IAssetResponse } from "~/models/asset";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";

@@ -6,7 +6,6 @@ import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 
 interface BalanceItemProps {
   balance: IBalanceResponse;
-  userCurrency: string;
 }
 
 const BalanceItem = (props: BalanceItemProps) => {
@@ -16,13 +15,11 @@ const BalanceItem = (props: BalanceItemProps) => {
       {isSelected ? (
         <EditableBalanceItemContent
           balance={props.balance}
-          userCurrency={props.userCurrency}
           doUnSelect={close}
         />
       ) : (
         <BalanceItemContent
           balance={props.balance}
-          userCurrency={props.userCurrency}
           doSelect={open}
         />
       )}

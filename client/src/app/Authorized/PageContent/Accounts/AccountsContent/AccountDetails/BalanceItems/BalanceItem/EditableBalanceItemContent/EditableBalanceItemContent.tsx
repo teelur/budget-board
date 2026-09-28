@@ -14,7 +14,6 @@ import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsPr
 
 interface EditableBalanceItemContentProps {
   balance: IBalanceResponse;
-  userCurrency: string;
   doUnSelect: () => void;
 }
 
@@ -28,7 +27,7 @@ const EditableBalanceItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { decimalPlaces } = useUserSettings();
+  const { decimalPlaces, preferredCurrency } = useUserSettings();
   const updateBalanceMutation = useUpdateBalanceMutation({
     accountID: props.balance.accountID,
   });
@@ -75,7 +74,7 @@ const EditableBalanceItemContent = (
         <NumberInput
           {...balanceAmountField.getInputProps()}
           flex="1 1 auto"
-          prefix={getCurrencySymbol(props.userCurrency)}
+          prefix={getCurrencySymbol(preferredCurrency)}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
           decimalScale={decimalPlaces}
