@@ -113,7 +113,7 @@ const EditableGoalCardContent = (
   };
 
   const getElementForCompleteDate = () => {
-    if (props.goal.completeDate) {
+if (props.goal.isCompleteDateEditable) {
       return (
         <Flex
           onClick={(e) => {
