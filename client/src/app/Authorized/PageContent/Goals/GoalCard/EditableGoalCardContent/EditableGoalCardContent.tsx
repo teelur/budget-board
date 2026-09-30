@@ -1,7 +1,13 @@
 import classes from "./EditableGoalCardContent.module.css";
 
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Badge, Button, AmountText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  AmountText,
+  Progress,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
@@ -17,8 +23,6 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { StatusColorType } from "~/helpers/budgets";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
-import Progress from "~/components/core/Progress/Progress";
-import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCompleteGoalMutation } from "~/hooks/mutations/goals/useCompleteGoalMutation";
@@ -113,7 +117,7 @@ const EditableGoalCardContent = (
   };
 
   const getElementForCompleteDate = () => {
-if (props.goal.isCompleteDateEditable) {
+    if (props.goal.isCompleteDateEditable) {
       return (
         <Flex
           onClick={(e) => {
@@ -300,12 +304,10 @@ if (props.goal.isCompleteDateEditable) {
             </Flex>
           </Flex>
           <Progress
-            size={18}
-            percentComplete={props.goal.percentComplete}
-            amount={0}
-            limit={0}
-            type={ProgressType.Default}
-            elevation={1}
+            value={props.goal.percentComplete}
+            size="md"
+            label
+            ariaLabel={props.goal.name}
           />
           <Flex className={classes.footer}>
             <Group align="center" gap="sm">

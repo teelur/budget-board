@@ -1,5 +1,5 @@
-import { Group, Progress, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { Button, Progress } from "@teelur/budget-board-ui";
 import { BanIcon } from "lucide-react";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -25,6 +25,16 @@ const ImportProgress = (props: ImportProgressProps) => {
     !isFailed &&
     !isCancelled &&
     !isCancellationRequested;
+  const statusMessage = isFailed
+    ? t("import_failed")
+    : isCancelled
+      ? t("import_stopped")
+      : isCancellationRequested
+        ? t("import_stop_requested")
+        : props.job?.status === "Pending"
+          ? t("import_queued")
+          : t("import_in_progress");
+  const animated = !isFailed && !isCancelled && !isCancellationRequested;
 
   const confirmCancel = async () => {
     setIsConfirmingCancel(false);
@@ -40,25 +50,17 @@ const ImportProgress = (props: ImportProgressProps) => {
       mx="auto"
       py="1rem"
     >
-      <PrimaryText size="md">
-        {isFailed
-          ? t("import_failed")
-          : isCancelled
-            ? t("import_stopped")
-            : isCancellationRequested
-              ? t("import_stop_requested")
-              : props.job?.status === "Pending"
-                ? t("import_queued")
-                : t("import_in_progress")}
-      </PrimaryText>
+      <PrimaryText size="md">{statusMessage}</PrimaryText>
       {props.isLoading && !props.job ? (
-        <Progress value={0} animated />
+        <Progress value={0} animated striped ariaLabel={statusMessage} />
       ) : (
         <>
           <Progress
             value={props.job?.progressPercentage ?? 0}
-            color={isFailed ? "red" : isCancelled ? "yellow" : undefined}
-            animated={!isFailed && !isCancelled && !isCancellationRequested}
+            color={isFailed ? "error" : isCancelled ? "warning" : undefined}
+            animated={animated}
+            striped={animated}
+            ariaLabel={statusMessage}
           />
           <PrimaryText size="sm">
             {t("import_progress", {

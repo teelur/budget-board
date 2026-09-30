@@ -3,7 +3,7 @@ import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
 import { Box, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, Progress } from "@teelur/budget-board-ui";
 import React from "react";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
@@ -12,8 +12,6 @@ import { useDisclosure } from "@mantine/hooks";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import Progress from "~/components/core/Progress/Progress";
-import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import BudgetMetrics from "../BudgetMetrics/BudgetMetrics";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -66,6 +64,26 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
 
   const percentComplete = roundAwayFromZero(
     ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100,
+  );
+
+  const actualProgressValue =
+    props.limit <= 0 ? 0 : Math.min(100, Math.max(0, percentComplete));
+  const projectedPercentComplete =
+    props.limit <= 0
+      ? actualProgressValue
+      : Math.min(
+          100,
+          Math.max(
+            0,
+            roundAwayFromZero(
+              ((projectedAmount * (props.isIncome ? 1 : -1)) / props.limit) *
+                100,
+            ),
+          ),
+        );
+  const projectedProgressValue = Math.max(
+    0,
+    projectedPercentComplete - actualProgressValue,
   );
 
   const getElementForLimit = () => {
@@ -193,34 +211,28 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               />
             </Group>
           </Group>
-          <Group
-            gap="0.5rem"
-            align="center"
-            style={{ containerType: "inline-size" }}
-          >
-            <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
-              <Progress
-                size={10}
-                percentComplete={percentComplete}
-                amount={props.amount}
-                limit={props.limit}
-                projectedAmount={projectedAmount}
-                type={
-                  props.isIncome ? ProgressType.Income : ProgressType.Expense
-                }
-                warningThreshold={budgetWarningThreshold}
-                elevation={1}
-                showPercentLabel={false}
-              />
-            </Flex>
-            <PrimaryText
-              size="sm"
-              elevation={1}
-              style={{ flexShrink: 0, lineHeight: 1 }}
-            >
-              {percentComplete.toFixed(0)}%
-            </PrimaryText>
-          </Group>
+          <Progress
+            amount={props.amount}
+            limit={props.limit}
+            label
+            sections={
+              projectedProgressValue > 0
+                ? [
+                    {
+                      ariaLabel: t("recurring_transactions"),
+                      color: "muted",
+                      striped: true,
+                      animated: true,
+                      value: projectedProgressValue,
+                    },
+                  ]
+                : []
+            }
+            size="xs"
+            type={props.isIncome ? "income" : "expense"}
+            warningThreshold={budgetWarningThreshold}
+            ariaLabel={props.categoryValue}
+          />
           <BudgetMetrics
             amount={props.amount}
             projectedAmount={projectedAmount}

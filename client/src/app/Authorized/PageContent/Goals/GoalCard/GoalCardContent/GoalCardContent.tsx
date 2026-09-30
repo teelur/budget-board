@@ -1,7 +1,12 @@
 import classes from "./GoalCardContent.module.css";
 
 import { Flex, Group, Stack } from "@mantine/core";
-import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  Badge,
+  AmountText,
+  Progress,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
@@ -13,8 +18,6 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { StatusColorType } from "~/helpers/budgets";
-import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
-import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -102,12 +105,10 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
           </Flex>
         </Flex>
         <Progress
-          size={18}
-          percentComplete={props.goal.percentComplete}
-          amount={0}
-          limit={0}
-          type={ProgressType.Default}
-          elevation={1}
+          value={props.goal.percentComplete}
+          size="md"
+          label
+          ariaLabel={props.goal.name}
         />
         <Flex className={classes.footer}>
           <Group align="center" gap="0.25rem">
