@@ -1,13 +1,10 @@
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
   Button,
-  Flex,
-  Group,
-  LoadingOverlay,
   SegmentedControl,
-  Stack,
-} from "@mantine/core";
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -98,9 +95,14 @@ const CustomAccountTypeCard = (
             <Stack gap="0.25rem" justify="center">
               <PrimaryText size="sm">{t("category_level")}</PrimaryText>
               <SegmentedControl
-                color="var(--mantine-primary-color-filled)"
-                radius="md"
+                color="secondary"
+                size="compact-sm"
+                fullWidth
                 value={isChildType ? "child" : "parent"}
+                data={[
+                  { label: t("parent"), value: "parent" },
+                  { label: t("child"), value: "child" },
+                ]}
                 onChange={(val) => {
                   const child = val === "child";
                   setIsChildType(child);
@@ -108,10 +110,7 @@ const CustomAccountTypeCard = (
                     parentField.reset();
                   }
                 }}
-                data={[
-                  { label: t("parent"), value: "parent" },
-                  { label: t("child"), value: "child" },
-                ]}
+                aria-label={t("category_level")}
               />
             </Stack>
             {isChildType ? (
@@ -130,10 +129,10 @@ const CustomAccountTypeCard = (
               <Stack gap="0.25rem">
                 <PrimaryText size="sm">{t("classification")}</PrimaryText>
                 <SegmentedControl
-                  color="var(--mantine-primary-color-filled)"
-                  radius="md"
+                  color="secondary"
+                  size="compact-sm"
+                  fullWidth
                   value={classificationField.getValue()}
-                  onChange={(val) => classificationField.setValue(val)}
                   data={[
                     {
                       label: t("asset"),
@@ -144,15 +143,26 @@ const CustomAccountTypeCard = (
                       value: AccountTypeClassification.Liability,
                     },
                   ]}
+                  onChange={(val) => classificationField.setValue(val)}
+                  aria-label={t("classification")}
                 />
               </Stack>
             )}
             <Group justify="flex-end" gap="0.5rem">
-              <Button variant="default" size="xs" onClick={handleCancel}>
+              <Button
+                variant="filled"
+                color="neutral"
+                size="xs"
+                flex="1 1 auto"
+                onClick={handleCancel}
+              >
                 {t("cancel")}
               </Button>
               <Button
+                variant="filled"
+                color="primary"
                 size="xs"
+                flex="1 1 auto"
                 onClick={() =>
                   updateAccountTypeMutation.mutate(
                     {
@@ -189,8 +199,12 @@ const CustomAccountTypeCard = (
             ) : (
               <PrimaryText size="sm">{props.accountType.value}</PrimaryText>
             )}
-            {props.isBuiltIn && <Badge size="xs">{t("built_in")}</Badge>}
-            <Badge size="xs" variant="outline">
+            {props.isBuiltIn && (
+              <Badge variant="filled" color="primary" size="xs">
+                {t("built_in")}
+              </Badge>
+            )}
+            <Badge variant="outline" color="primary" size="xs">
               {props.accountType.classification === "asset"
                 ? t("asset")
                 : t("liability")}
@@ -200,18 +214,20 @@ const CustomAccountTypeCard = (
             {!props.isBuiltIn && (
               <>
                 <ActionIcon
-                  size="sm"
-                  variant="subtle"
+                  variant="ghost"
+                  color="primary"
+                  size="compact-sm"
                   onClick={() => setIsEditing(true)}
                 >
                   <PencilIcon size="1rem" />
                 </ActionIcon>
                 <ActionIcon
-                  size="sm"
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   onClick={() =>
                     deleteAccountTypeMutation.mutateAsync(props.accountType.id)
                   }
-                  bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />
                 </ActionIcon>

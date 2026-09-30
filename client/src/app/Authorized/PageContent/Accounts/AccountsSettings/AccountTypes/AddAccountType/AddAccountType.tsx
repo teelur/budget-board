@@ -1,4 +1,5 @@
-import { Button, LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
+import { LoadingOverlay, Stack } from "@mantine/core";
+import { Button, SegmentedControl } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -56,9 +57,14 @@ const AddAccountType = (): React.ReactNode => {
         <Stack gap="0.25rem" justify="center">
           <PrimaryText size="sm">{t("category_level")}</PrimaryText>
           <SegmentedControl
-            color="var(--mantine-primary-color-filled)"
-            radius="md"
+            color="secondary"
+            size="compact-sm"
+            fullWidth
             value={isChildType ? "child" : "parent"}
+            data={[
+              { label: t("parent"), value: "parent" },
+              { label: t("child"), value: "child" },
+            ]}
             onChange={(val) => {
               const child = val === "child";
               setIsChildType(child);
@@ -66,10 +72,7 @@ const AddAccountType = (): React.ReactNode => {
                 parentField.reset();
               }
             }}
-            data={[
-              { label: t("parent"), value: "parent" },
-              { label: t("child"), value: "child" },
-            ]}
+            aria-label={t("category_level")}
           />
         </Stack>
         {isChildType ? (
@@ -88,10 +91,10 @@ const AddAccountType = (): React.ReactNode => {
           <Stack gap="0.25rem">
             <PrimaryText size="sm">{t("classification")}</PrimaryText>
             <SegmentedControl
-              color="var(--mantine-primary-color-filled)"
-              radius="md"
+              color="secondary"
+              size="compact-sm"
+              fullWidth
               value={classificationField.getValue()}
-              onChange={(val) => classificationField.setValue(val)}
               data={[
                 { label: t("asset"), value: AccountTypeClassification.Asset },
                 {
@@ -99,11 +102,16 @@ const AddAccountType = (): React.ReactNode => {
                   value: AccountTypeClassification.Liability,
                 },
               ]}
+              onChange={(val) => classificationField.setValue(val)}
+              aria-label={t("classification")}
             />
           </Stack>
         )}
         <Button
-          w="100%"
+          variant="filled"
+          color="primary"
+          size="xs"
+          fullWidth
           onClick={() => {
             createAccountTypeMutation.mutate(
               {

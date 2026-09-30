@@ -1,4 +1,5 @@
-import { ActionIcon, Group, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import {
@@ -69,7 +70,12 @@ const EditableAutomaticRuleContent = (
       <Stack gap="0.5rem">
         <Group align="center" justify="space-between">
           <PrimaryText size="sm">{t("if")}</PrimaryText>
-          <ActionIcon size="sm" onClick={addNewCondition}>
+          <ActionIcon
+            variant="filled"
+            color="primary"
+            size="compact-xs"
+            onClick={addNewCondition}
+          >
             <PlusIcon size={16} />
           </ActionIcon>
         </Group>
@@ -93,7 +99,12 @@ const EditableAutomaticRuleContent = (
       <Stack gap="0.5rem">
         <Group align="center" justify="space-between">
           <PrimaryText size="sm">{t("then")}</PrimaryText>
-          <ActionIcon size="sm" onClick={addNewAction}>
+          <ActionIcon
+            variant="filled"
+            color="primary"
+            size="compact-xs"
+            onClick={addNewAction}
+          >
             <PlusIcon size={16} />
           </ActionIcon>
         </Group>

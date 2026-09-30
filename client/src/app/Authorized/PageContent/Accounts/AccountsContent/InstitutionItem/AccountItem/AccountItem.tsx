@@ -1,6 +1,7 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { Button, Flex, Group, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { GripVertical } from "lucide-react";
 import { IAccountResponse } from "~/models/account";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
@@ -46,8 +47,8 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (
-          <Flex style={{ alignSelf: "stretch" }}>
-            <Button ref={handleRef} h="100%" px={0} w={30} radius="lg">
+          <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
+            <Button variant="filled" color="secondary" h="100%" px={0} w={30}>
               <GripVertical size={25} />
             </Button>
           </Flex>

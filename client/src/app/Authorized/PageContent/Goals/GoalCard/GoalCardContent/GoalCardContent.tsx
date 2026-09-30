@@ -1,7 +1,14 @@
 import classes from "./GoalCardContent.module.css";
 
-import { ActionIcon, Badge, Flex, Group, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  AmountText,
+  Progress,
+} from "@teelur/budget-board-ui";
 import React from "react";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
 import { SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
@@ -9,13 +16,11 @@ import { IGoalResponse } from "~/models/goal";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { StatusColorType } from "~/helpers/budgets";
-import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
-import Progress from "~/components/core/Progress/Progress";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface GoalCardContentProps {
   goal: IGoalResponse;
@@ -26,9 +31,11 @@ interface GoalCardContentProps {
 const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, false, SignDisplay.Auto);
+    formatAmount(amount, SignDisplay.Auto, undefined, 0);
 
   return (
     <Group style={{ containerType: "inline-size" }} wrap="nowrap">
@@ -37,7 +44,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
           <Group align="center" gap={10} wrap="nowrap">
             <PrimaryText size="lg">{props.goal.name}</PrimaryText>
             {props.includeInterest && props.goal.interestRate && (
-              <Badge variant="light" flex="0 0 auto">
+              <Badge variant="light" color="primary" size="xs">
                 {t("interest_rate_apr", {
                   rate: new Intl.NumberFormat(intlLocale, {
                     style: "percent",
@@ -47,8 +54,9 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
               </Badge>
             )}
             <ActionIcon
-              variant="transparent"
-              size="md"
+              variant="ghost"
+              color="primary"
+              size="compact-xs"
               onClick={(e) => {
                 e.stopPropagation();
                 props.toggleIsSelected();
@@ -59,71 +67,87 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             <Trans
-              i18nKey="budget_amount_fraction_styled"
-              values={{
-                amount: formatSensitiveAmount(
-                  sumAccountsTotalBalance(props.goal.accounts) -
-                    props.goal.initialAmount,
-                ),
-                total: formatSensitiveAmount(
-                  getGoalTargetAmount(
+              i18nKey="x_of_y"
+              components={[
+                <AmountText
+                  amount={
+                    sumAccountsTotalBalance(props.goal.accounts) -
+                    props.goal.initialAmount
+                  }
+                  disableStatusColor
+                  size="lg"
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
+                  signDisplay={SignDisplay.Auto}
+                  invertSign={false}
+                  key="amount"
+                />,
+                <DimmedText size="md" key="of" />,
+                <AmountText
+                  amount={getGoalTargetAmount(
                     props.goal.amount,
                     props.goal.initialAmount,
-                  ),
-                ),
-              }}
-              components={[
-                <PrimaryText size="lg" key="amount" />,
-                <DimmedText size="md" key="of" />,
-                <PrimaryText size="lg" key="total" />,
+                  )}
+                  disableStatusColor
+                  size="lg"
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
+                  signDisplay={SignDisplay.Auto}
+                  invertSign={false}
+                  key="total"
+                />,
               ]}
             />
           </Flex>
         </Flex>
         <Progress
-          size={18}
-          percentComplete={props.goal.percentComplete}
-          amount={0}
-          limit={0}
-          type={ProgressType.Default}
-          elevation={1}
+          value={props.goal.percentComplete}
+          size="md"
+          label
+          ariaLabel={props.goal.name}
         />
         <Flex className={classes.footer}>
-          <Group align="center" gap="sm">
-            <Flex align="center" gap="0.25rem">
-              <Trans
-                i18nKey="budget_projected_styled"
-                values={{
-                  amount: dayjs(props.goal.completeDate).format("MMMM YYYY"),
-                }}
-                components={[
-                  <DimmedText size="sm" key="label" />,
-                  <PrimaryText size="sm" key="date-not-edit" />,
-                ]}
-              />
-            </Flex>
+          <Group align="center" gap="0.25rem">
+            <DimmedText size="sm" key="label">
+              {t("projected_colon")}
+            </DimmedText>
+            <PrimaryText size="sm" key="date-not-edit">
+              {dayjs(props.goal.completeDate).format("MMMM YYYY")}
+            </PrimaryText>
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             <Trans
-              i18nKey="budget_monthly_amount_fraction_styled"
+              i18nKey="x_of_y_this_month"
               values={{
-                amount: formatSensitiveAmount(
-                  props.goal.monthlyContributionProgress,
-                ),
-                total: formatSensitiveAmount(
-                  props.goal.monthlyContribution,
-                ),
+                total: formatSensitiveAmount(props.goal.monthlyContribution),
               }}
               components={[
-                <StatusText
+                <AmountText
                   amount={props.goal.monthlyContributionProgress}
+                  size="md"
                   total={props.goal.monthlyContribution}
                   type={StatusColorType.Target}
-                  size="md"
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
                   key="amount"
                 />,
                 <DimmedText size="sm" key="of" />,
-                <PrimaryText size="md" key="total-not-edit" />,
+                <AmountText
+                  amount={props.goal.monthlyContribution}
+                  size="md"
+                  disableStatusColor
+                  isSensitive={isPrivacyModeEnabled}
+                  locale={intlLocale}
+                  currency={preferredCurrency}
+                  decimalPlaces={0}
+                  key="total-not-edit"
+                />,
               ]}
             />
           </Flex>

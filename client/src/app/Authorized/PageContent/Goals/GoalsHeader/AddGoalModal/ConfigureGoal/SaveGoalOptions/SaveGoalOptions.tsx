@@ -6,6 +6,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface SaveGoalOptionsProps {
   targetAmountField: UseFieldReturnType<number, "input", "controlled">;
@@ -15,6 +16,7 @@ interface SaveGoalOptionsProps {
 const SaveGoalOptions = (props: SaveGoalOptionsProps): React.ReactNode => {
   const { t } = useTranslation();
   const { thousandsSeparator, decimalSeparator, currencySymbol } = useLocale();
+  const { decimalPlaces } = useUserSettings();
 
   return (
     <Stack gap={"0.5rem"}>
@@ -23,7 +25,7 @@ const SaveGoalOptions = (props: SaveGoalOptionsProps): React.ReactNode => {
         placeholder={t("enter_target_amount")}
         prefix={currencySymbol}
         min={0}
-        decimalScale={2}
+        decimalScale={decimalPlaces}
         thousandSeparator={thousandsSeparator}
         decimalSeparator={decimalSeparator}
         {...props.targetAmountField.getInputProps()}

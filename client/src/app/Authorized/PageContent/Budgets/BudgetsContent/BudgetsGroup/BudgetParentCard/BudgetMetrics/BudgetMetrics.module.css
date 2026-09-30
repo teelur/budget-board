@@ -44,13 +44,13 @@
 }
 
 .heroAmount {
-  font-size: 1.1rem;
+  font-size: 1rem;
 
   @container (max-width: 380px) {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   @container (max-width: 300px) {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
   }
 }

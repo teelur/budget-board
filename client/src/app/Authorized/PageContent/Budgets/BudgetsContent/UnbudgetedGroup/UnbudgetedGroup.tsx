@@ -1,12 +1,16 @@
 import { Group, Stack } from "@mantine/core";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { SignDisplay } from "~/helpers/currency";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, CategoryTypes, ICategoryNode } from "~/models/category";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
+import { AmountText } from "@teelur/budget-board-ui";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -18,6 +22,9 @@ interface UnbudgetedGroupProps {
 
 const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
+  const { preferredCurrency } = useUserSettings();
+  const { intlLocale } = useLocale();
 
   const total =
     props.categoryTree.reduce((acc, category) => {
@@ -79,9 +86,16 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
         title={
           <Group justify="space-between" align="center" w="100%" pr="0.25rem">
             <PrimaryText size="lg">{t("unbudgeted")}</PrimaryText>
-            <PrimaryText size="lg">
-              <SensitiveAmount amount={total} includeCents={false} />
-            </PrimaryText>
+            <AmountText
+              amount={total}
+              disableStatusColor
+              size="lg"
+              isSensitive={isPrivacyModeEnabled}
+              currency={preferredCurrency}
+              decimalPlaces={0}
+              locale={intlLocale}
+              signDisplay={SignDisplay.Auto}
+            />
           </Group>
         }
       >

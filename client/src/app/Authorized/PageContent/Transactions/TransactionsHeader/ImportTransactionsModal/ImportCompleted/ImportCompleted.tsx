@@ -1,4 +1,5 @@
-import { Button, Group, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { MoveLeftIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -26,7 +27,7 @@ const ImportCompleted = (props: ImportCompletedProps) => {
       <PrimaryText size="md" py="1rem">
         {t(
           props.isCancelled
-            ? "import_cancelled"
+            ? "import_stopped"
             : props.isFailed
               ? "import_failed"
               : props.hasErrors
@@ -36,13 +37,22 @@ const ImportCompleted = (props: ImportCompletedProps) => {
       </PrimaryText>
       <Group w="100%">
         <Button
-          onClick={props.goBackToPreviousDialog}
+          variant="filled"
+          color="primary"
+          size="compact-sm"
           flex="1 1 auto"
           leftSection={<MoveLeftIcon size={16} />}
+          onClick={props.goBackToPreviousDialog}
         >
           {t("back")}
         </Button>
-        <Button onClick={props.closeModal} flex="1 1 auto">
+        <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
+          flex="1 1 auto"
+          onClick={props.closeModal}
+        >
           {t("close")}
         </Button>
       </Group>

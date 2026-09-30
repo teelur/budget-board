@@ -1,4 +1,5 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import {
@@ -215,9 +216,10 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
         {props.allowDelete && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon
+              variant="filled"
+              color="error"
+              size="compact-xs"
               h="100%"
-              size="sm"
-              color="var(--button-color-destructive)"
               onClick={() => props.doDelete(props.index)}
             >
               <Trash2Icon size={16} />

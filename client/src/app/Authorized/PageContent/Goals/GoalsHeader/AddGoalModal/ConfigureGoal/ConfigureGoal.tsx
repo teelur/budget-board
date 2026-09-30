@@ -1,6 +1,7 @@
 import React from "react";
 import { GoalType } from "~/models/goal";
-import { Button, Group, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import TextInput from "~/components/core/Input/TextInput/TextInput";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
@@ -83,7 +84,7 @@ const ConfigureGoal = (props: ConfigureGoalProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap={"1rem"}>
+    <Stack gap="2rem" justify="space-between">
       <Stack gap={"0.5rem"}>
         <TextInput
           label={<PrimaryText size="sm">{t("goal_name")}</PrimaryText>}
@@ -104,10 +105,19 @@ const ConfigureGoal = (props: ConfigureGoalProps): React.ReactNode => {
         )}
       </Stack>
       <Group w="100%">
-        <Button flex="1 1 auto" onClick={() => props.goBackToPreviousDialog()}>
+        <Button
+          variant="filled"
+          color="primary"
+          size="sm"
+          flex="1 1 auto"
+          onClick={() => props.goBackToPreviousDialog()}
+        >
           {<MoveLeftIcon size={16} />}
         </Button>
         <Button
+          variant="filled"
+          color="primary"
+          size="sm"
           flex="1 1 auto"
           disabled={isNextButtonDisabled()}
           onClick={() => {

@@ -256,6 +256,9 @@
     <data name="InvalidCurrencyCodeError" xml:space="preserve">
         <value>The provided currency code is invalid.</value>
     </data>
+    <data name="InvalidDecimalPlacesError" xml:space="preserve">
+        <value>The number of decimal places must be between 0 and 3.</value>
+    </data>
     <data name="InvalidDateFormatError" xml:space="preserve">
         <value>The provided date format is invalid.</value>
     </data>

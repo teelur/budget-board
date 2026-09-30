@@ -55,7 +55,7 @@ const Goals = (): React.ReactNode => {
   };
 
   return (
-    <Stack w="100%" maw={1400}>
+    <Stack w="100%" maw={1400} gap="0.75rem">
       <GoalDetails
         goal={selectedGoal}
         isOpen={isDetailsOpen}

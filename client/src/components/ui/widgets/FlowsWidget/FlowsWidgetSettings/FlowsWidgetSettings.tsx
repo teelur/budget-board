@@ -1,4 +1,5 @@
-import { Button, Group, Select, Stack } from "@mantine/core";
+import { Group, Select, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -8,6 +9,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { parseFlowsConfiguration } from "~/helpers/widgets";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
+import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface FlowsWidgetSettingsProps {
   widget: IWidgetSettingsResponse;
@@ -62,18 +64,30 @@ const FlowsWidgetSettings = ({
       size="sm"
     >
       <Stack gap="0.75rem">
-        <Select
-          label={t("flows_widget_month_count_label")}
-          data={monthOptions}
-          {...monthCountField.getInputProps()}
-        />
-        <DimmedText size="xs">{t("flows_widget_settings_message")}</DimmedText>
-        <Group w="100%" justify="flex-end" mt="xs" gap="0.5rem">
-          <Button flex={1} variant="default" onClick={handleClose}>
+        <Stack gap={0}>
+          <PrimaryText size="sm" fw={600}>
+            {t("flows_widget_month_count_label")}
+          </PrimaryText>
+          <DimmedText size="xs">
+            {t("flows_widget_settings_message")}
+          </DimmedText>
+          <Select data={monthOptions} {...monthCountField.getInputProps()} />
+        </Stack>
+        <Group gap="0.5rem">
+          <Button
+            variant="filled"
+            color="neutral"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={handleClose}
+          >
             {t("cancel")}
           </Button>
           <Button
-            flex={1}
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            flex="1 1 0"
             onClick={() => {
               updateWidgetSettingsMutation.mutate([
                 {

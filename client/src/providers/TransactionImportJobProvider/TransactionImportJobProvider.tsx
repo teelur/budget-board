@@ -115,7 +115,7 @@ export const TransactionImportJobProvider = ({
           importJob.status === "Failed"
             ? "import_failed"
             : importJob.status === "Cancelled"
-              ? "import_cancelled"
+              ? "import_stopped"
               : importJob.status === "CompletedWithErrors"
                 ? "import_completed_with_errors"
                 : "import_completed_successfully",

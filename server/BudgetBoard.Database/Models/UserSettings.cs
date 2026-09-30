@@ -60,6 +60,11 @@ public class UserSettings
     public string Currency { get; set; } = "USD";
 
     /// <summary>
+    /// Number of decimal places used when displaying and entering monetary amounts.
+    /// </summary>
+    public int DecimalPlaces { get; set; } = 2;
+
+    /// <summary>
     /// Gets or sets the language used for the user.
     /// </summary>
     public string Language { get; set; } = "default";

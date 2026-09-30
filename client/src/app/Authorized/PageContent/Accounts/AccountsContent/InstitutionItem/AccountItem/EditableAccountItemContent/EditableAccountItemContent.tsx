@@ -1,19 +1,12 @@
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { Button, ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
 import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
@@ -22,6 +15,7 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableAccountItemContentProps {
   account: IAccountResponse;
@@ -30,9 +24,16 @@ interface EditableAccountItemContentProps {
 
 const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
   const { t } = useTranslation();
-  const { dayjs, dateFormat, thousandsSeparator, decimalSeparator } =
-    useLocale();
+  const {
+    dayjs,
+    dateFormat,
+    thousandsSeparator,
+    decimalSeparator,
+    intlLocale,
+  } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateAccountMutation = useUpdateAccountMutation();
 
   const accountNameField = useField<string>({
@@ -117,8 +118,9 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon
                 variant="outline"
+                color="primary"
+                size="xs"
                 h="100%"
-                size="md"
                 onClick={(e) => {
                   e.stopPropagation();
                   props.toggle();
@@ -153,12 +155,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             />
             <Group gap="0.5rem">
               <Button
-                bg={
-                  hideAccountField.getValue()
-                    ? "var(--button-color-warning)"
-                    : undefined
-                }
-                variant={hideAccountField.getValue() ? "filled" : "outline"}
+                variant="filled"
+                color="secondary"
+                size="sm"
+                selected={hideAccountField.getValue()}
                 onClick={() =>
                   hideAccountField.setValue(!hideAccountField.getValue())
                 }
@@ -166,14 +166,10 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                 {t("hide_account")}
               </Button>
               <Button
-                bg={
-                  hideTransactionsField.getValue()
-                    ? "var(--accent-color-purple)"
-                    : undefined
-                }
-                variant={
-                  hideTransactionsField.getValue() ? "filled" : "outline"
-                }
+                variant="filled"
+                color="accent"
+                size="sm"
+                selected={hideTransactionsField.getValue()}
                 onClick={() =>
                   hideTransactionsField.setValue(
                     !hideTransactionsField.getValue(),
@@ -184,9 +180,14 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               </Button>
             </Group>
           </Group>
-          <StatusText amount={props.account.currentBalance} size="md">
-            <SensitiveAmount amount={props.account.currentBalance} />
-          </StatusText>
+          <AmountText
+            amount={props.account.currentBalance}
+            size="md"
+            isSensitive={isPrivacyModeEnabled}
+            locale={intlLocale}
+            currency={preferredCurrency}
+            decimalPlaces={decimalPlaces}
+          />
         </Group>
         <Group justify="space-between" align="center">
           <CategorySelect

@@ -1,17 +1,18 @@
-import { ActionIcon, Badge, Group, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import {
   getIsParentAccountType,
   getParentAccountType,
 } from "~/helpers/accountType";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { AccountSource, IAccountResponse } from "~/models/account";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface IAccountItemContentProps {
   account: IAccountResponse;
@@ -21,17 +22,19 @@ interface IAccountItemContentProps {
 const AccountItemContent = (props: IAccountItemContentProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allAccountTypes } = useAccountTypes();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
-  const getAccountSourceBadgeColor = (): string => {
+  const getAccountSourceBadgeColor = (): "info" | "success" | "neutral" => {
     switch (props.account.source) {
       case AccountSource.SimpleFIN:
-        return "blue";
+        return "info";
       case AccountSource.LunchFlow:
-        return "green";
+        return "success";
       case AccountSource.Manual:
       default:
-        return "gray";
+        return "neutral";
     }
   };
 
@@ -72,8 +75,9 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
               : t("no_name")}
           </PrimaryText>
           <ActionIcon
-            variant="transparent"
-            size="md"
+            variant="ghost"
+            color="primary"
+            size="compact-xs"
             onClick={(e) => {
               e.stopPropagation();
               props.toggle();
@@ -81,7 +85,7 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
           >
             <PencilIcon size={16} />
           </ActionIcon>
-          <Badge>
+          <Badge variant="filled" color="primary" size="xs">
             {t("interest_rate_message", {
               rate: new Intl.NumberFormat(intlLocale, {
                 style: "percent",
@@ -90,20 +94,31 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
             })}
           </Badge>
           {props.account.hideAccount && (
-            <Badge bg="var(--accent-color-orange)">{t("hidden")}</Badge>
+            <Badge variant="filled" color="secondary" size="xs">
+              {t("hidden")}
+            </Badge>
           )}
           {props.account.hideTransactions && (
-            <Badge bg="var(--accent-color-purple)">
+            <Badge variant="filled" color="accent" size="xs">
               {t("hidden_transactions")}
             </Badge>
           )}
-          <Badge bg={getAccountSourceBadgeColor()}>
+          <Badge
+            variant="filled"
+            color={getAccountSourceBadgeColor()}
+            size="xs"
+          >
             {t(props.account.source)}
           </Badge>
         </Group>
-        <StatusText amount={props.account.currentBalance} size="md">
-          <SensitiveAmount amount={props.account.currentBalance} />
-        </StatusText>
+        <AmountText
+          amount={props.account.currentBalance}
+          size="md"
+          isSensitive={isPrivacyModeEnabled}
+          locale={intlLocale}
+          currency={preferredCurrency}
+          decimalPlaces={decimalPlaces}
+        />
       </Group>
       <Group justify="space-between" align="center">
         {getAccountTypeDisplay()}

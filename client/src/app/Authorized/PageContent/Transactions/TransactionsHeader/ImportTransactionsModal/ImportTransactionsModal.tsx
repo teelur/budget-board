@@ -1,4 +1,5 @@
-import { Button, Stepper } from "@mantine/core";
+import { Stepper } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { FileDownIcon } from "lucide-react";
 import React from "react";
@@ -220,7 +221,9 @@ const ImportTransactionsModal = () => {
   return (
     <>
       <Button
-        size="sm"
+        variant="filled"
+        color="primary"
+        size="xs"
         rightSection={<FileDownIcon size="1rem" />}
         onClick={() => {
           resetData();
@@ -246,12 +249,7 @@ const ImportTransactionsModal = () => {
           </PrimaryHeading>
         }
       >
-        <Stepper
-          active={activeStep}
-          allowNextStepsSelect={false}
-          w="100%"
-          mb="1rem"
-        >
+        <Stepper active={activeStep} allowNextStepsSelect={false} w="100%">
           <Stepper.Step label={t("step_1")} description={t("load_csv")}>
             <LoadCsv
               loadCsv={importCsvData}

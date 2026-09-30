@@ -1,4 +1,5 @@
-import { Button, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -77,11 +78,6 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
 
   return (
     <Stack gap="md" align="center" p="1rem">
-      <LoadingOverlay
-        visible={loginMutation.isPending}
-        zIndex={1000}
-        overlayProps={{ radius: "sm", blur: 2 }}
-      />
       <Stack align="center" gap={5} w="100%">
         <PrimaryText size="md" ta="center">
           {t("use_a_recovery_code")}
@@ -95,18 +91,27 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
         w="100%"
         elevation={1}
       />
-      <Stack gap="0.5rem" w="100%">
-        <Button variant="filled" fullWidth onClick={submitUserLogin}>
-          {t("submit")}
-        </Button>
+      <Group gap="0.5rem" w="100%">
         <Button
-          variant="default"
-          fullWidth
+          variant="filled"
+          color="neutral"
+          size="compact-sm"
+          flex="1 1 0"
           onClick={() => props.setLoginCardState(LoginCardState.Login)}
         >
           {t("return_to_login")}
         </Button>
-      </Stack>
+        <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
+          flex="1 1 0"
+          onClick={submitUserLogin}
+          loading={loginMutation.isPending}
+        >
+          {t("submit")}
+        </Button>
+      </Group>
     </Stack>
   );
 };

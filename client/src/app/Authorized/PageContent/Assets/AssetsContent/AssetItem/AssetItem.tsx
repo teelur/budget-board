@@ -1,6 +1,7 @@
 import React from "react";
+import { Button } from "@teelur/budget-board-ui";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { Button, Flex, Group } from "@mantine/core";
+import { Flex, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IAssetResponse } from "~/models/asset";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
@@ -42,8 +43,8 @@ const AssetItem = (props: AssetItemProps): React.ReactNode => {
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (
-          <Flex style={{ alignSelf: "stretch" }}>
-            <Button ref={handleRef} h="100%" px={0} w={30} radius="lg">
+          <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
+            <Button variant="filled" color="primary" h="100%" px={0} w={30}>
               <GripVertical size={25} />
             </Button>
           </Flex>

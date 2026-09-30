@@ -1,4 +1,5 @@
-import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
@@ -9,10 +10,10 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUpdateBalanceMutation } from "~/hooks/mutations/balances/useUpdateBalanceMutation";
 import { useDeleteBalanceMutation } from "~/hooks/mutations/balances/useDeleteBalanceMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableBalanceItemContentProps {
   balance: IBalanceResponse;
-  userCurrency: string;
   doUnSelect: () => void;
 }
 
@@ -26,6 +27,7 @@ const EditableBalanceItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { decimalPlaces, preferredCurrency } = useUserSettings();
   const updateBalanceMutation = useUpdateBalanceMutation({
     accountID: props.balance.accountID,
   });
@@ -72,10 +74,10 @@ const EditableBalanceItemContent = (
         <NumberInput
           {...balanceAmountField.getInputProps()}
           flex="1 1 auto"
-          prefix={getCurrencySymbol(props.userCurrency)}
+          prefix={getCurrencySymbol(preferredCurrency)}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
-          decimalScale={2}
+          decimalScale={decimalPlaces}
           fixedDecimalScale
           onBlur={() => {
             const { onBlur } = balanceAmountField.getInputProps();
@@ -90,9 +92,10 @@ const EditableBalanceItemContent = (
       </Stack>
       <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
         <ActionIcon
-          h="100%"
           variant="outline"
-          size="md"
+          color="primary"
+          size="xs"
+          h="100%"
           onClick={(e) => {
             e.stopPropagation();
             props.doUnSelect();
@@ -101,9 +104,10 @@ const EditableBalanceItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
         <ActionIcon
+          variant="filled"
+          color="error"
+          size="xs"
           h="100%"
-          size="sm"
-          bg="var(--button-color-destructive)"
           onClick={() => deleteBalanceMutation.mutate(props.balance.id)}
         >
           <Trash2Icon size={16} />

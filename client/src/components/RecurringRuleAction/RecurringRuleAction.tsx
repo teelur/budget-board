@@ -1,6 +1,7 @@
-import { Button, Group, SegmentedControl, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { Button, SegmentedControl } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
-import { Repeat2Icon } from "lucide-react";
+import { Link2OffIcon, Repeat2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import ModalContentHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
@@ -34,9 +35,11 @@ const RecurringRuleAction = (
   if (props.transaction.recurringRuleID) {
     return (
       <Button
+        variant="ghost"
+        color="error"
         size="compact-sm"
-        variant="subtle"
         loading={unassignMutation.isPending}
+        rightSection={<Link2OffIcon size="1rem" />}
         onClick={() => unassignMutation.mutate(props.transaction.id)}
       >
         {t("remove_recurring_rule")}
@@ -69,9 +72,10 @@ const RecurringRuleAction = (
   return (
     <>
       <Button
+        variant="ghost"
+        color="primary"
         size="compact-sm"
-        variant="subtle"
-        leftSection={<Repeat2Icon size="0.85rem" />}
+        rightSection={<Repeat2Icon size="0.85rem" />}
         onClick={() => {
           setMode("new");
           setSelectedRuleID(null);
@@ -94,16 +98,19 @@ const RecurringRuleAction = (
         <Stack gap="0.75rem">
           {hasExistingRules && (
             <SegmentedControl
+              color="secondary"
+              size="compact-sm"
               fullWidth
               value={mode}
-              onChange={(value) => setMode(value as RecurringRuleMode)}
               data={[
-                { value: "new", label: t("add_recurring_rule") },
+                { value: "new", label: t("new_rule") },
                 {
                   value: "existing",
-                  label: t("use_existing_recurring_rule"),
+                  label: t("existing_rule"),
                 },
               ]}
+              onChange={(value) => setMode(value as RecurringRuleMode)}
+              aria-label={t("recurring_rule_mode")}
             />
           )}
           {mode === "new" ? (
@@ -129,7 +136,10 @@ const RecurringRuleAction = (
               />
               <Group>
                 <Button
-                  variant="outline"
+                  variant="filled"
+                  color="primary"
+                  size="compact-sm"
+                  fullWidth
                   disabled={!selectedRuleID}
                   loading={assignMutation.isPending}
                   onClick={assignExistingRule}

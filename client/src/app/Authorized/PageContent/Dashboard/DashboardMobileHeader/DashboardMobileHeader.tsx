@@ -1,4 +1,5 @@
-import { Badge, Button, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { Badge, Button } from "@teelur/budget-board-ui";
 import { LayoutIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -19,27 +20,38 @@ const DashboardMobileHeader = ({
   return (
     <Group justify="space-between" align="center">
       <Group>
-        {isEditMode && <Badge variant="light">{t("mobile")}</Badge>}
+        {isEditMode && (
+          <Badge variant="light" color="primary" size="xs">
+            {t("mobile")}
+          </Badge>
+        )}
       </Group>
       <Group gap={"0.5rem"}>
         {isEditMode ? (
           <>
             <Button
-              variant="subtle"
+              variant="filled"
+              color="warning"
               size="xs"
               loading={resetSmallScreenLayoutMutation.isPending}
               onClick={() => resetSmallScreenLayoutMutation.mutate()}
             >
               {t("reset_to_desktop_order")}
             </Button>
-            <Button size="xs" onClick={() => setIsEditMode(false)}>
+            <Button
+              variant="filled"
+              color="primary"
+              size="xs"
+              onClick={() => setIsEditMode(false)}
+            >
               {t("done_editing")}
             </Button>
           </>
         ) : (
           <Button
+            variant="filled"
+            color="primary"
             size="xs"
-            variant="subtle"
             leftSection={<LayoutIcon size={16} />}
             onClick={() => setIsEditMode(true)}
           >

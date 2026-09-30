@@ -1,14 +1,8 @@
-import {
-  ActionIcon,
-  Divider,
-  Flex,
-  Pagination,
-  Stack,
-  Table,
-} from "@mantine/core";
+import { Divider, Flex, Pagination, Stack, Table } from "@mantine/core";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import {
   ITransaction,
@@ -18,6 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface DuplicateTransactionTableProps {
   tableData: Map<ITransactionImportTableData, ITransaction>;
@@ -31,7 +26,9 @@ const DuplicateTransactionTable = (
   const itemsPerPage = 5;
 
   const { t } = useTranslation();
-  const { dayjs, dateFormat } = useLocale();
+  const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const accountsQuery = useAccountsQuery();
 
   const [page, setPage] = React.useState(1);
@@ -95,14 +92,15 @@ const DuplicateTransactionTable = (
                   <Table.Tr>
                     <Table.Td>
                       <ActionIcon
-                        size="sm"
-                        variant="subtle"
+                        variant="ghost"
+                        color="primary"
+                        size="compact-xs"
                         aria-label={t("restore_transaction")}
                         onClick={() => {
                           props.restoreTransaction(row.importedTransaction.uid);
                         }}
                       >
-                        <Undo2Icon />
+                        <Undo2Icon size={20} />
                       </ActionIcon>
                     </Table.Td>
                     <Table.Td>
@@ -115,8 +113,13 @@ const DuplicateTransactionTable = (
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.merchantName}</Table.Td>
                     <Table.Td>
-                      <SensitiveAmount
+                      <AmountText
                         amount={row.importedTransaction.amount ?? 0}
+                        size="sm"
+                        isSensitive={isPrivacyModeEnabled}
+                        locale={intlLocale}
+                        currency={preferredCurrency}
+                        decimalPlaces={decimalPlaces}
                       />
                     </Table.Td>
                     <Table.Td>{row.importedTransaction.account}</Table.Td>
@@ -153,8 +156,13 @@ const DuplicateTransactionTable = (
                     </Table.Td>
                     <Table.Td>{row.existingTransaction.merchantName}</Table.Td>
                     <Table.Td>
-                      <SensitiveAmount
+                      <AmountText
                         amount={row.existingTransaction.amount ?? 0}
+                        size="sm"
+                        isSensitive={isPrivacyModeEnabled}
+                        locale={intlLocale}
+                        currency={preferredCurrency}
+                        decimalPlaces={decimalPlaces}
                       />
                     </Table.Td>
                     <Table.Td>

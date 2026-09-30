@@ -1,4 +1,5 @@
-import { ActionIcon, Button, Checkbox, Popover, Stack } from "@mantine/core";
+import { Checkbox, Popover, Stack } from "@mantine/core";
+import { ActionIcon, Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
@@ -22,7 +23,7 @@ const DeleteAccountPopover = (
   return (
     <Popover>
       <Popover.Target>
-        <ActionIcon h="100%" size="sm" color="var(--button-color-destructive)">
+        <ActionIcon variant="filled" color="error" size="xs" h="100%">
           <Trash2Icon size={16} />
         </ActionIcon>
       </Popover.Target>
@@ -36,7 +37,9 @@ const DeleteAccountPopover = (
             }
           />
           <Button
-            color="var(--button-color-destructive)"
+            variant="filled"
+            color="error"
+            size="compact-xs"
             loading={deleteAccountMutation.isPending}
             onClick={() =>
               deleteAccountMutation.mutate({

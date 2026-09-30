@@ -1,21 +1,23 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { PencilIcon } from "lucide-react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
 import { IBalanceResponse } from "~/models/balance";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface BalanceItemContentProps {
   balance: IBalanceResponse;
-  userCurrency: string;
   doSelect: () => void;
 }
 
 const BalanceItemContent = (
   props: BalanceItemContentProps,
 ): React.ReactNode => {
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   return (
     <Group justify="space-between" align="center">
@@ -24,8 +26,9 @@ const BalanceItemContent = (
           {dayjs(props.balance.date).format(longDateFormat)}
         </PrimaryText>
         <ActionIcon
-          variant="transparent"
-          size="md"
+          variant="ghost"
+          color="primary"
+          size="compact-xs"
           onClick={(e) => {
             e.stopPropagation();
             props.doSelect();
@@ -34,12 +37,14 @@ const BalanceItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
       </Group>
-      <StatusText amount={props.balance.amount} size="md">
-        <SensitiveAmount
-          amount={props.balance.amount}
-          currency={props.userCurrency}
-        />
-      </StatusText>
+      <AmountText
+        amount={props.balance.amount}
+        size="md"
+        isSensitive={isPrivacyModeEnabled}
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={decimalPlaces}
+      />
     </Group>
   );
 };

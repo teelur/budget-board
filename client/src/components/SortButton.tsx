@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "lucide-react";
 import React from "react";
 
@@ -38,7 +38,7 @@ const SortButton = ({
   };
 
   return (
-    <Button onClick={onClick} rightSection={getSortedIcon()} {...props}>
+    <Button rightSection={getSortedIcon()} onClick={onClick} {...props}>
       {label}
     </Button>
   );

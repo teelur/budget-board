@@ -1,4 +1,5 @@
-import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
@@ -9,10 +10,10 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUpdateValueMutation } from "~/hooks/mutations/values/useUpdateValueMutation";
 import { useDeleteValueMutation } from "~/hooks/mutations/values/useDeleteValueMutation";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface EditableValueItemContentProps {
   value: IValueResponse;
-  userCurrency: string;
   doUnSelect: () => void;
 }
 
@@ -26,6 +27,7 @@ const EditableValueItemContent = (
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { decimalPlaces, preferredCurrency } = useUserSettings();
   const updateValueMutation = useUpdateValueMutation({
     assetId: props.value.assetID,
   });
@@ -72,10 +74,10 @@ const EditableValueItemContent = (
         <NumberInput
           {...valueAmountField.getInputProps()}
           flex="1 1 auto"
-          prefix={getCurrencySymbol(props.userCurrency)}
+          prefix={getCurrencySymbol(preferredCurrency)}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
-          decimalScale={2}
+          decimalScale={decimalPlaces}
           fixedDecimalScale
           onBlur={() => {
             valueAmountField.getInputProps().onBlur();
@@ -92,9 +94,10 @@ const EditableValueItemContent = (
       </Stack>
       <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">
         <ActionIcon
-          h="100%"
           variant="outline"
-          size="md"
+          color="primary"
+          size="sm"
+          h="100%"
           onClick={(e) => {
             e.stopPropagation();
             props.doUnSelect();
@@ -103,9 +106,10 @@ const EditableValueItemContent = (
           <PencilIcon size={16} />
         </ActionIcon>
         <ActionIcon
-          h="100%"
+          variant="filled"
+          color="error"
           size="sm"
-          bg="var(--button-color-destructive)"
+          h="100%"
           onClick={() => deleteValueMutation.mutate(props.value.id)}
         >
           <Trash2Icon size={16} />

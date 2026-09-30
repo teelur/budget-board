@@ -1,4 +1,5 @@
-import { ActionIcon, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
 import { IAssetResponse } from "~/models/asset";
@@ -22,6 +23,9 @@ const DeletedAssetCard = (props: DeletedAssetCardProps): React.ReactNode => {
         </Stack>
         <Group style={{ alignSelf: "stretch" }}>
           <ActionIcon
+            variant="filled"
+            color="primary"
+            size="compact-xs"
             h="100%"
             onClick={() => restoreAssetMutation.mutate(props.asset.id)}
           >

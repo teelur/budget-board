@@ -1,13 +1,10 @@
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
   Button,
-  Flex,
-  Group,
-  LoadingOverlay,
   SegmentedControl,
-  Stack,
-} from "@mantine/core";
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -111,9 +108,14 @@ const CustomCategoryCard = (
             <Stack gap="0.25rem" justify="center">
               <PrimaryText size="sm">{t("category_level")}</PrimaryText>
               <SegmentedControl
-                color="var(--mantine-primary-color-filled)"
-                radius="md"
+                color="secondary"
+                size="compact-sm"
+                fullWidth
                 value={isChildCategory ? "child" : "parent"}
+                data={[
+                  { label: t("parent"), value: "parent" },
+                  { label: t("child"), value: "child" },
+                ]}
                 onChange={(val) => {
                   const child = val === "child";
                   setIsChildCategory(child);
@@ -121,10 +123,7 @@ const CustomCategoryCard = (
                     parentField.reset();
                   }
                 }}
-                data={[
-                  { label: t("parent"), value: "parent" },
-                  { label: t("child"), value: "child" },
-                ]}
+                aria-label={t("category_level")}
               />
             </Stack>
             {isChildCategory ? (
@@ -143,22 +142,36 @@ const CustomCategoryCard = (
               <Stack gap="0.25rem">
                 <PrimaryText size="sm">{t("classification")}</PrimaryText>
                 <SegmentedControl
-                  color="var(--mantine-primary-color-filled)"
-                  radius="md"
+                  color="secondary"
+                  size="compact-sm"
+                  fullWidth
                   value={categoryTypeField.getValue()}
-                  onChange={(val) => categoryTypeField.setValue(val)}
                   data={[
                     { label: t("expense"), value: CategoryTypes.Expense },
                     { label: t("income"), value: CategoryTypes.Income },
                   ]}
+                  onChange={(val) => categoryTypeField.setValue(val)}
+                  aria-label={t("classification")}
                 />
               </Stack>
             )}
             <Group justify="flex-end" gap="0.5rem">
-              <Button variant="default" size="xs" onClick={handleCancel}>
+              <Button
+                variant="filled"
+                color="neutral"
+                size="xs"
+                flex="1 1 0"
+                onClick={handleCancel}
+              >
                 {t("cancel")}
               </Button>
-              <Button size="xs" onClick={handleSave}>
+              <Button
+                variant="filled"
+                color="primary"
+                size="xs"
+                flex="1 1 0"
+                onClick={handleSave}
+              >
                 {t("save")}
               </Button>
             </Group>
@@ -179,25 +192,36 @@ const CustomCategoryCard = (
             ) : (
               <PrimaryText size="sm">{props.category.value}</PrimaryText>
             )}
-            {props.isBuiltIn && <Badge size="xs">{t("built_in")}</Badge>}
-            <Badge size="xs" variant="outline">
-              {props.category.categoryType === CategoryTypes.Income
-                ? t("income")
-                : t("expense")}
-            </Badge>
+            {props.isBuiltIn && (
+              <Badge variant="light" color="primary" size="xs">
+                {t("built_in")}
+              </Badge>
+            )}
+            {props.category.categoryType === CategoryTypes.Income ? (
+              <Badge variant="filled" color="success" size="xs">
+                {t("income")}
+              </Badge>
+            ) : (
+              <Badge variant="filled" color="error" size="xs">
+                {t("expense")}
+              </Badge>
+            )}
           </Group>
           <Flex justify="flex-end" flex="1 1 auto" gap="0.25rem">
             {!props.isBuiltIn && (
               <>
                 <ActionIcon
-                  size="sm"
-                  variant="subtle"
+                  variant="ghost"
+                  color="primary"
+                  size="compact-sm"
                   onClick={() => setIsEditing(true)}
                 >
                   <PencilIcon size="1rem" />
                 </ActionIcon>
                 <ActionIcon
-                  size="sm"
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   onClick={() => {
                     if (!props.isBuiltIn) {
                       deleteTransactionCategoryMutation.mutate(
@@ -205,7 +229,6 @@ const CustomCategoryCard = (
                       );
                     }
                   }}
-                  bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />
                 </ActionIcon>

@@ -1,4 +1,5 @@
-import { Button, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import React from "react";
 import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
@@ -40,6 +41,9 @@ const AssetsSelectHeader = (
           elevation={1}
         />
         <Button
+          variant="filled"
+          color="primary"
+          size="sm"
           onClick={() => {
             props.setSelectedAssetIds(
               assetsQuery.data
@@ -50,7 +54,12 @@ const AssetsSelectHeader = (
         >
           {t("select_all")}
         </Button>
-        <Button onClick={() => props.setSelectedAssetIds([])}>
+        <Button
+          variant="filled"
+          color="primary"
+          size="sm"
+          onClick={() => props.setSelectedAssetIds([])}
+        >
           {t("clear_all")}
         </Button>
       </Group>

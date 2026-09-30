@@ -1,6 +1,7 @@
 import classes from "./FilterCard.module.css";
 
-import { Flex, Stack, Button } from "@mantine/core";
+import { Flex, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
@@ -17,6 +18,7 @@ import TextInput from "~/components/core/Input/TextInput/TextInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 const FilterCard = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -28,6 +30,7 @@ const FilterCard = (): React.ReactNode => {
     decimalSeparator,
     currencySymbol,
   } = useLocale();
+  const { decimalPlaces } = useUserSettings();
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
@@ -43,12 +46,10 @@ const FilterCard = (): React.ReactNode => {
         >
           <PrimaryHeading order={5}>{t("filters")}</PrimaryHeading>
           <Button
-            className={classes.clearButton}
-            w="100%"
-            size="xs"
-            variant={
-              transactionFilters.isEqual(new Filters()) ? "outline" : "primary"
-            }
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            selected={!transactionFilters.isEqual(new Filters())}
             onClick={() => {
               setTransactionFilters(new Filters());
             }}
@@ -161,7 +162,7 @@ const FilterCard = (): React.ReactNode => {
               setTransactionFilters(newFilters);
             }}
             prefix={currencySymbol}
-            decimalScale={2}
+            decimalScale={decimalPlaces}
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
             elevation={1}
@@ -186,7 +187,7 @@ const FilterCard = (): React.ReactNode => {
               setTransactionFilters(newFilters);
             }}
             prefix={currencySymbol}
-            decimalScale={2}
+            decimalScale={decimalPlaces}
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
             elevation={1}

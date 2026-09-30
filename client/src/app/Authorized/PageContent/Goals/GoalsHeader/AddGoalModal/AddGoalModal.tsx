@@ -1,4 +1,5 @@
-import { ActionIcon, Group, Stepper } from "@mantine/core";
+import { Group, Stepper } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
@@ -73,9 +74,9 @@ const AddGoalModal = (): React.ReactNode => {
 
   return (
     <>
-      <ActionIcon size="input-sm" onClick={open}>
-        <PlusIcon />
-      </ActionIcon>
+      <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
+        <PlusIcon size={22} />
+      </Button>
       <Modal
         opened={isOpen}
         onClose={close}
@@ -86,12 +87,7 @@ const AddGoalModal = (): React.ReactNode => {
           </PrimaryHeading>
         }
       >
-        <Stepper
-          active={activeStep}
-          allowNextStepsSelect={false}
-          w="100%"
-          mb="1rem"
-        >
+        <Stepper active={activeStep} allowNextStepsSelect={false} w="100%">
           <Stepper.Step label={t("step_1")} description={t("select_type")}>
             <SelectType
               selectedGoalType={selectedGoalType}

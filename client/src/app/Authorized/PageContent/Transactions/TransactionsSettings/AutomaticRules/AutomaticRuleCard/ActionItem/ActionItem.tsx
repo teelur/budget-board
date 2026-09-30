@@ -1,4 +1,5 @@
-import { Badge, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { Badge } from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -13,6 +14,7 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface ActionItemProps {
   action: IRuleParameterResponse;
@@ -23,6 +25,7 @@ interface ActionItemProps {
 const ActionItem = (props: ActionItemProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { decimalPlaces } = useUserSettings();
 
   const formatDate = (dateStr: string): string =>
     dayjs(dateStr).format(dateFormat);
@@ -36,7 +39,7 @@ const ActionItem = (props: ActionItemProps) => {
 
       return (
         <>
-          <Badge bg="var(--accent-color-purple)" size="sm">
+          <Badge variant="outline" color="secondary" size="xs">
             {t(
               ActionTransactionFields.find(
                 (field) => field.value === props.action.field,
@@ -47,7 +50,7 @@ const ActionItem = (props: ActionItemProps) => {
           {tagValues.length > 0 ? (
             <Group gap="0.25rem">
               {tagValues.map((tag) => (
-                <Badge key={tag} size="sm">
+                <Badge key={tag} variant="filled" color="primary" size="xs">
                   {tag}
                 </Badge>
               ))}
@@ -58,6 +61,7 @@ const ActionItem = (props: ActionItemProps) => {
                 props.action.field,
                 props.action.value,
                 props.currency,
+                decimalPlaces,
                 props.categories,
                 formatDate,
                 intlLocale,

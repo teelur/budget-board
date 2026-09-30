@@ -2,7 +2,6 @@ import { Group, Pagination, Stack } from "@mantine/core";
 import React from "react";
 import { IBalanceResponse } from "~/models/balance";
 import BalanceItem from "./BalanceItem/BalanceItem";
-import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface BalanceItemsProps {
   balances: IBalanceResponse[];
@@ -10,8 +9,6 @@ interface BalanceItemsProps {
 
 const BalanceItems = (props: BalanceItemsProps) => {
   const itemsPerPage = 20;
-
-  const { preferredCurrency } = useUserSettings();
 
   const [page, setPage] = React.useState(1);
 
@@ -24,11 +21,7 @@ const BalanceItems = (props: BalanceItemsProps) => {
       {props.balances
         .slice((page - 1) * itemsPerPage, page * itemsPerPage)
         .map((balance) => (
-          <BalanceItem
-            key={balance.id}
-            balance={balance}
-            userCurrency={preferredCurrency}
-          />
+          <BalanceItem key={balance.id} balance={balance} />
         ))}
       <Group justify="center">
         <Pagination

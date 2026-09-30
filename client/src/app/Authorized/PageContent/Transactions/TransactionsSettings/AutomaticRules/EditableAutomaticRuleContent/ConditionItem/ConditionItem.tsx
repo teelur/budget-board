@@ -1,4 +1,5 @@
-import { ActionIcon, ComboboxItem, Group } from "@mantine/core";
+import { ComboboxItem, Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { getDefaultValue } from "~/helpers/automaticRules";
@@ -35,7 +36,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjsLocale, longDateFormat, thousandsSeparator, decimalSeparator } =
     useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
 
   const getValueInput = (): React.ReactNode => {
     if (props.ruleParameter.field === "merchant") {
@@ -66,7 +67,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             })
           }
           prefix={getCurrencySymbol(preferredCurrency)}
-          decimalScale={2}
+          decimalScale={decimalPlaces}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
           elevation={1}
@@ -201,8 +202,9 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
         {props.allowDelete && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon
-              color="var(--button-color-destructive)"
-              size="sm"
+              variant="filled"
+              color="error"
+              size="compact-xs"
               h="100%"
               onClick={() => props.doDelete?.(props.index)}
             >

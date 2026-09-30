@@ -1,5 +1,6 @@
 import React from "react";
-import { Button, Group, SegmentedControl, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { Button, SegmentedControl } from "@teelur/budget-board-ui";
 import { MoveLeftIcon } from "lucide-react";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -9,6 +10,7 @@ import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { mantineDateFormat } from "~/helpers/datetime";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface SetTargetProps {
   goBackToPreviousDialog: () => void;
@@ -36,6 +38,7 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
+  const { decimalPlaces } = useUserSettings();
 
   useDidUpdate(() => {
     goalCompleteDateField.reset();
@@ -50,16 +53,18 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
   return (
     <Stack gap={"1rem"}>
       <SegmentedControl
+        color="secondary"
+        size="compact-sm"
+        fullWidth
         value={targetType}
-        onChange={(value) =>
-          setTargetType(value as "completeDate" | "monthlyContribution")
-        }
         data={[
           { label: t("complete_date"), value: "completeDate" },
           { label: t("monthly_contribution"), value: "monthlyContribution" },
         ]}
-        radius="sm"
-        color={"indigo"}
+        onChange={(value) =>
+          setTargetType(value as "completeDate" | "monthlyContribution")
+        }
+        aria-label={t("target_type")}
       />
       {targetType === "completeDate" && (
         <DateInput
@@ -81,7 +86,7 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
           placeholder={t("enter_monthly_contribution")}
           prefix={currencySymbol}
           min={0}
-          decimalScale={2}
+          decimalScale={decimalPlaces}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
           {...goalMonthlyContributionField.getInputProps()}
@@ -89,10 +94,19 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
         />
       )}
       <Group w="100%">
-        <Button flex="1 1 0" onClick={() => props.goBackToPreviousDialog()}>
+        <Button
+          variant="filled"
+          color="primary"
+          size="sm"
+          flex="1 1 0"
+          onClick={() => props.goBackToPreviousDialog()}
+        >
           {<MoveLeftIcon size={16} />}
         </Button>
         <Button
+          variant="filled"
+          color="primary"
+          size="sm"
           flex="1 1 0"
           onClick={() => {
             props.createGoal(

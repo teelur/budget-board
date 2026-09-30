@@ -2,14 +2,8 @@ import classes from "./BudgetChildCard.module.css";
 import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
-import {
-  ActionIcon,
-  Box,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Stack,
-} from "@mantine/core";
+import { Box, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { ActionIcon, AmountText, Progress } from "@teelur/budget-board-ui";
 import React from "react";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
@@ -17,7 +11,6 @@ import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import RolloverControl from "../RolloverControl/RolloverControl";
 import Progress from "~/components/core/Progress/Progress";
@@ -29,6 +22,7 @@ import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudg
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import CategoryIconPicker from "~/components/CategoryIconPicker/CategoryIconPicker";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface BudgetChildCardProps {
   id: string;
@@ -48,11 +42,9 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { thousandsSeparator, decimalSeparator } = useLocale();
+  const { thousandsSeparator, decimalSeparator, intlLocale } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
-  const formatAmount = useSensitiveAmountFormatter();
-  const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, false, SignDisplay.Auto);
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
   const projectedAmount = props.projectedAmount ?? props.amount;
@@ -86,6 +78,75 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const percentComplete = roundAwayFromZero(
     ((props.amount * (props.isIncome ? 1 : -1)) / availableLimit) * 100,
   );
+
+  const actualProgressValue =
+    props.limit <= 0 ? 0 : Math.min(100, Math.max(0, percentComplete));
+  const projectedPercentComplete =
+    props.limit <= 0
+      ? actualProgressValue
+      : Math.min(
+          100,
+          Math.max(
+            0,
+            roundAwayFromZero(
+              ((projectedAmount * (props.isIncome ? 1 : -1)) / props.limit) *
+                100,
+            ),
+          ),
+        );
+  const projectedProgressValue = Math.max(
+    0,
+    projectedPercentComplete - actualProgressValue,
+  );
+
+  const getElementForLimit = () => {
+    if (isSelected) {
+      return (
+        <Flex onClick={(e) => e.stopPropagation()}>
+          <NumberInput
+            {...newLimitField.getInputProps()}
+            onBlur={() => handleEdit(newLimitField.getValue())}
+            thousandSeparator={thousandsSeparator}
+            decimalSeparator={decimalSeparator}
+            decimalScale={0}
+            min={0}
+            max={999999}
+            step={1}
+            prefix={getCurrencySymbol(preferredCurrency)}
+            placeholder={t("enter_limit")}
+            size="xs"
+            styles={{
+              root: {
+                maxWidth: "100px",
+              },
+              input: {
+                padding: "0 10px",
+                fontSize: "16px",
+              },
+            }}
+            key="total-edit"
+            elevation={1}
+          />
+        </Flex>
+      );
+    }
+    return (
+      <AmountText
+        amount={props.limit}
+        disableStatusColor
+        size="md"
+        isSensitive={isPrivacyModeEnabled}
+        warningThreshold={budgetWarningThreshold}
+        locale={intlLocale}
+        currency={preferredCurrency}
+        decimalPlaces={0}
+        signDisplay={SignDisplay.Auto}
+        className={classes.text}
+        key="total"
+      />
+    );
+  };
+
   return (
     <Box
       mx="0.25rem"
@@ -117,7 +178,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 <CategoryIconPicker
                   category={props.categoryValue}
                   icon={props.icon}
-                  size="sm"
+                  size="compact-xs"
                 />
               )}
               <PrimaryText className={classes.title} elevation={1}>
@@ -125,8 +186,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 {props.categoryValue}
               </PrimaryText>
               <ActionIcon
-                variant={isSelected ? "outline" : "transparent"}
-                size="sm"
+                variant="ghost"
+                color="primary"
+                size="compact-xs"
+                selected={isSelected}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (props.id.length > 0) {
@@ -238,15 +301,29 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                 elevation={1}
                 showPercentLabel={false}
               />
-            </Flex>
-            <PrimaryText
-              size="sm"
-              elevation={1}
-              style={{ flexShrink: 0, lineHeight: 1 }}
-            >
-              {percentComplete.toFixed(0)}%
-            </PrimaryText>
+            </Group>
           </Group>
+          <Progress
+            amount={props.amount}
+            limit={props.limit}
+            label
+            sections={
+              projectedProgressValue > 0
+                ? [
+                    {
+                      ariaLabel: t("recurring_transactions"),
+                      color: "muted",
+                      striped: true,
+                      value: projectedProgressValue,
+                    },
+                  ]
+                : []
+            }
+            size="xs"
+            type={props.isIncome ? "income" : "expense"}
+            warningThreshold={budgetWarningThreshold}
+            ariaLabel={props.categoryValue}
+          />
           <BudgetMetrics
             amount={props.amount}
             projectedAmount={projectedAmount}
@@ -255,19 +332,19 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               props.rolloverStartMonth !== null ? props.rollover : undefined
             }
             isIncome={props.isIncome}
-            budgetWarningThreshold={budgetWarningThreshold}
-            formatAmount={formatSensitiveAmount}
           />
         </Stack>
         {isSelected && (
           <Group style={{ alignSelf: "stretch" }}>
             <ActionIcon
-              color="var(--button-color-destructive)"
+              variant="filled"
+              color="error"
+              size="compact-sm"
+              h="100%"
               onClick={(e) => {
                 e.stopPropagation();
                 deleteBudgetMutation.mutate(props.id);
               }}
-              h="100%"
             >
               <TrashIcon size="1rem" />
             </ActionIcon>

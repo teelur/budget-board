@@ -1,4 +1,5 @@
-import { Badge, Button, Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
+import { Badge, Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
@@ -30,12 +31,15 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
         <Group>
           <PrimaryHeading order={4}>{t("lunchflow")}</PrimaryHeading>
           {applicationUserQuery.data?.lunchFlowApiKey && (
-            <Badge color="var(--button-color-confirm)">{t("connected")}</Badge>
+            <Badge variant="light" color="success" size="sm">
+              {t("connected")}
+            </Badge>
           )}
         </Group>
         {applicationUserQuery.data?.lunchFlowApiKey && (
           <Button
-            bg="var(--button-color-destructive)"
+            variant="filled"
+            color="error"
             size="xs"
             loading={removeApiKeyMutation.isPending}
             disabled={

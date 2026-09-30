@@ -8,18 +8,7 @@
 .sidebarToggle {
   align-self: center;
   margin: 0.25rem;
-  color: var(--base-color-text-secondary);
   transition: transform 150ms ease;
-
-  &:hover {
-    background-color: var(--elevated-color-input-background);
-    color: var(--base-color-text-primary);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--mantine-primary-color-filled);
-    outline-offset: 1px;
-  }
 }
 
 .sidebarToggleExpanded {
@@ -39,23 +28,6 @@
 .groupLink {
   flex: 1;
   width: auto;
-}
-
-.groupToggle {
-  flex: 0 0 auto;
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--base-color-text-dimmed);
-
-  &:hover {
-    background-color: var(--elevated-color-input-background);
-    color: var(--base-color-text-primary);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--mantine-primary-color-filled);
-    outline-offset: 1px;
-  }
 }
 
 .settingsGroup {
@@ -161,11 +133,6 @@
   }
 }
 
-.updateIcon {
-  flex: 0 0 auto;
-  color: var(--mantine-primary-color-filled);
-}
-
 .updateGlyph {
   flex: 0 0 auto;
   color: var(--base-color-text-primary);
@@ -198,26 +165,6 @@
   color: var(--base-color-text-secondary);
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-.footerIcon {
-  flex: 0 0 auto;
-  color: var(--base-color-text-secondary);
-
-  svg {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  &:hover {
-    color: var(--base-color-text-primary);
-    background-color: var(--elevated-color-input-background);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--mantine-primary-color-filled);
-    outline-offset: 1px;
-  }
 }
 
 .chevronOpen {

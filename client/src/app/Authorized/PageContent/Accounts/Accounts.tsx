@@ -8,7 +8,7 @@ const Accounts = (): React.ReactNode => {
   const [isSortable, { toggle }] = useDisclosure(false);
 
   return (
-    <Stack w="100%" maw={1400}>
+    <Stack w="100%" maw={1400} gap="0.75rem">
       <AccountsHeader isSortable={isSortable} toggleSort={toggle} />
       <AccountsContent isSortable={isSortable} />
     </Stack>

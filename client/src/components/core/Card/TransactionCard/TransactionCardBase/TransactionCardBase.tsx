@@ -1,5 +1,7 @@
 import classes from "./TransactionCardBase.module.css";
 
+import { Collapse, Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
@@ -7,7 +9,6 @@ import TransactionCardContent from "./TransactionCardContent/TransactionCardCont
 import TransactionCardDetails from "./TransactionCardDetails/TransactionCardDetails";
 import Card, { CardProps } from "../../Card";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
-import { ActionIcon, Collapse, Group } from "@mantine/core";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -65,8 +66,9 @@ const TransactionCardBase = ({
 
   const detailsToggle = (
     <ActionIcon
-      variant="subtle"
-      size="sm"
+      variant="ghost"
+      color="primary"
+      size="compact-xs"
       aria-label={detailsLabel}
       title={detailsLabel}
       aria-expanded={isDetailsExpanded}

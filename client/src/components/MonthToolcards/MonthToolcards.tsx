@@ -1,4 +1,5 @@
-import { ActionIcon, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { useElementSize } from "@mantine/hooks";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import React from "react";
@@ -61,13 +62,14 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
   return (
     <Group wrap="nowrap" gap="0.5rem" ref={ref}>
       <ActionIcon
-        h="62px"
-        w="32px"
-        flex="0 0"
         variant="outline"
+        color="primary"
+        h={62}
+        w={32}
+        flex="0 0"
         onClick={() => setIndex(index + 1)}
       >
-        <ChevronLeftIcon />
+        <ChevronLeftIcon size={24} />
       </ActionIcon>
       <Group
         style={{ flexDirection: "row-reverse", flexGrow: 1 }}
@@ -91,14 +93,15 @@ const MonthToolcards = (props: MonthToolcardsProps): React.ReactNode => {
         ))}
       </Group>
       <ActionIcon
-        h="62px"
-        w="32px"
-        flex="0 0"
         variant="outline"
+        color="primary"
+        h={62}
+        w={32}
+        flex="0 0"
         disabled={index <= 0 && !props.allowFutureMonths}
         onClick={() => setIndex(index - 1)}
       >
-        <ChevronRightIcon />
+        <ChevronRightIcon size={24} />
       </ActionIcon>
     </Group>
   );

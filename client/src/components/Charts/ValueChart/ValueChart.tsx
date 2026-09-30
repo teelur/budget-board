@@ -4,7 +4,7 @@ import { Group, Skeleton } from "@mantine/core";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
 import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -42,11 +42,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const chartSeries = buildValueChartSeries(props.items);
 
   const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(
-      value,
-      false,
-      SignDisplay.Auto,
-    );
+    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
   };
 
   const sortedChartValues = React.useMemo(() => {

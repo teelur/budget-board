@@ -1,4 +1,5 @@
-import { Button, Group, Stack, Popover as MantinePopover } from "@mantine/core";
+import { Group, Stack, Popover as MantinePopover } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { PlusIcon, RotateCcwIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -38,8 +39,10 @@ const DashboardEditor = ({
     <Group justify="flex-end" gap="0.5rem">
       {editTarget === "sm" && (
         <Button
+          variant="filled"
+          color="warning"
           size="xs"
-          variant="subtle"
+          leftSection={<RotateCcwIcon size={16} />}
           loading={resetSmallScreenLayoutMutation.isPending}
           onClick={() => resetSmallScreenLayoutMutation.mutate()}
         >
@@ -47,8 +50,9 @@ const DashboardEditor = ({
         </Button>
       )}
       <Button
+        variant="filled"
+        color="info"
         size="xs"
-        variant="subtle"
         leftSection={<PlusIcon size={16} />}
         onClick={onAddWidget}
       >
@@ -62,8 +66,9 @@ const DashboardEditor = ({
       >
         <MantinePopover.Target>
           <Button
+            variant="filled"
+            color="warning"
             size="xs"
-            variant="subtle"
             leftSection={<RotateCcwIcon size={16} />}
             onClick={() => setIsResetPopoverOpen((opened) => !opened)}
             loading={resetToDefaultMutation.isPending}
@@ -76,15 +81,17 @@ const DashboardEditor = ({
             <PrimaryText size="xs">{t("reset_dashboard_warning")}</PrimaryText>
             <Group gap="xs" justify="flex-end">
               <Button
+                variant="filled"
+                color="primary"
                 size="xs"
-                variant="subtle"
                 onClick={() => setIsResetPopoverOpen(false)}
               >
                 {t("cancel")}
               </Button>
               <Button
+                variant="filled"
+                color="error"
                 size="xs"
-                color="var(--button-color-destructive)"
                 loading={resetToDefaultMutation.isPending}
                 disabled={widgetSettingsQuery.isPending}
                 onClick={handleConfirmReset}
@@ -103,8 +110,9 @@ const DashboardEditor = ({
       >
         <MantinePopover.Target>
           <Button
+            variant="filled"
+            color="error"
             size="xs"
-            variant="subtle"
             leftSection={<TrashIcon size={16} />}
             onClick={() => setIsClearPopoverOpen((opened) => !opened)}
             loading={deleteWidgetSettingsMutation.isPending}
@@ -117,15 +125,17 @@ const DashboardEditor = ({
             <PrimaryText size="xs">{t("clear_dashboard_warning")}</PrimaryText>
             <Group gap="xs" justify="flex-end">
               <Button
+                variant="filled"
+                color="neutral"
                 size="xs"
-                variant="subtle"
                 onClick={() => setIsClearPopoverOpen(false)}
               >
                 {t("cancel")}
               </Button>
               <Button
+                variant="filled"
+                color="error"
                 size="xs"
-                color="var(--button-color-destructive)"
                 loading={deleteWidgetSettingsMutation.isPending}
                 disabled={widgetSettingsQuery.isPending}
                 onClick={() =>
@@ -140,7 +150,7 @@ const DashboardEditor = ({
           </Stack>
         </MantinePopover.Dropdown>
       </Popover>
-      <Button size="xs" onClick={onDone}>
+      <Button variant="filled" color="primary" size="xs" onClick={onDone}>
         {t("done_editing")}
       </Button>
     </Group>

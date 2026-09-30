@@ -4,6 +4,7 @@ import { useUserSettingsQuery } from "~/hooks/queries/useUserSettingsQuery";
 
 export interface UserSettingsContextValue {
   preferredCurrency: string;
+  decimalPlaces: number;
   preferredLanguage: string;
   preferredDateFormat: string;
   budgetWarningThreshold: number;
@@ -22,6 +23,7 @@ export interface UserSettingsContextValue {
 export const UserSettingsContext =
   React.createContext<UserSettingsContextValue>({
     preferredCurrency: "USD",
+    decimalPlaces: 2,
     preferredLanguage: "default",
     preferredDateFormat: "default",
     budgetWarningThreshold: 80,
@@ -60,6 +62,7 @@ export const UserSettingsProvider = ({
 
   const userSettingsValue: UserSettingsContextValue = {
     preferredCurrency: userSettingsQuery.data?.currency ?? "USD",
+    decimalPlaces: userSettingsQuery.data?.decimalPlaces ?? 2,
     preferredLanguage: userSettingsQuery.data?.language ?? "default",
     preferredDateFormat: userSettingsQuery.data?.dateFormat ?? "default",
     budgetWarningThreshold:

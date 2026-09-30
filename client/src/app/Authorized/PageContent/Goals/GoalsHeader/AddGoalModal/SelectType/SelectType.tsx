@@ -1,4 +1,5 @@
-import { Button, Flex, Group, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { MoveRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Select from "~/components/core/Select/Select/Select";
@@ -33,6 +34,9 @@ const SelectType = (props: SelectTypeProps): React.ReactNode => {
       <Group w="100%">
         <Flex flex={"1 1 auto"} />
         <Button
+          variant="filled"
+          color="primary"
+          size="sm"
           flex="1 1 auto"
           onClick={() => props.launchNextDialog()}
           disabled={props.selectedGoalType === null}

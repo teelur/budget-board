@@ -1,4 +1,5 @@
-import { Button, Group, LoadingOverlay, Stack, Switch } from "@mantine/core";
+import { Group, Stack, Switch } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import Papa from "papaparse";
@@ -124,7 +125,6 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem" w={600} maw="100%" mx="auto">
-      <LoadingOverlay visible={isPending} />
       <FileInput
         {...fileField.getInputProps()}
         accept="text/csv"
@@ -153,6 +153,16 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
         )}
       </Group>
       <Button
+        variant="filled"
+        color="primary"
+        size="compact-sm"
+        disabled={
+          !fileField.getValue() ||
+          !!fileField.error ||
+          !!delimiterField.error ||
+          isPending
+        }
+        loading={isPending}
         onClick={async () => {
           startTransition(async () => {
             const file = fileField.getValue();
@@ -184,12 +194,6 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
             }
           });
         }}
-        disabled={
-          !fileField.getValue() ||
-          !!fileField.error ||
-          !!delimiterField.error ||
-          isPending
-        }
       >
         {t("load_csv")}
       </Button>

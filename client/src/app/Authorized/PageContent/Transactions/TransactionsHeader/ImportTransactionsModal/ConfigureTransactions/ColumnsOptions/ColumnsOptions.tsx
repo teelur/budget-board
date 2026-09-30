@@ -1,4 +1,5 @@
-import { Button, Divider, Group, Stack } from "@mantine/core";
+import { Divider, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -130,12 +131,12 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             elevation={0}
           />
           <Button
-            mb="0.25rem"
-            size="compact-xs"
             variant="outline"
+            color="primary"
+            size="compact-xs"
             onClick={() =>
               window.open(
-                "https://budgetboard.net/features/importing-data/csv-import#date-format",
+                "https://budgetboard.net/docs/features/importing-data/csv-import#date-format",
                 "_blank",
                 "noopener,noreferrer",
               )

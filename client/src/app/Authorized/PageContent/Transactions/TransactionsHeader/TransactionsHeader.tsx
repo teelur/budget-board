@@ -1,8 +1,9 @@
 import classes from "./TransactionsHeader.module.css";
 
-import { Button, Collapse, Flex, Group, Stack } from "@mantine/core";
+import { Collapse, Flex, Group, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
-import { FilterIcon } from "lucide-react";
+import { FilterIcon, ListChecksIcon } from "lucide-react";
 import React from "react";
 import SortMenu from "./SortMenu/SortMenu";
 import { SortDirection } from "~/components/SortButton";
@@ -125,8 +126,10 @@ const TransactionsHeader = (
           <ImportTransactionsModal />
           <ExportTransactionsModal />
           <Button
-            variant={isFiltersPanelOpen ? "outline" : "primary"}
-            size="sm"
+            variant="filled"
+            color="primary"
+            size="xs"
+            selected={isFiltersPanelOpen}
             rightSection={<FilterIcon size="1rem" />}
             onClick={toggleFiltersPanel}
           >
@@ -155,17 +158,21 @@ const TransactionsHeader = (
         />
         <Group gap="0.5rem">
           <Button
+            variant="filled"
+            color="primary"
             size="compact-sm"
+            selected={canSelectMultiple}
+            rightSection={<ListChecksIcon size="1rem" />}
             onClick={toggleSelectMultiple}
-            variant="outline"
-            color={canSelectMultiple ? "var(--button-color-confirm)" : ""}
           >
             {t("select_multiple")}
           </Button>
           <SelectLastNMonths
             monthButtons={[3, 6, 12]}
+            selectedMonths={props.selectedMonths}
             setSelectedMonths={props.setSelectedMonths}
             onSelectMonths={open}
+            size="compact-sm"
           />
         </Group>
       </Group>

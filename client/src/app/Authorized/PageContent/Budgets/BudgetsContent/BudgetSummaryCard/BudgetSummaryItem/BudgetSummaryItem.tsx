@@ -3,14 +3,15 @@ import { SignDisplay } from "~/helpers/currency";
 import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
-import StatusText from "~/components/core/Text/StatusText/StatusText";
-import Progress from "~/components/core/Progress/Progress";
-import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { roundAwayFromZero } from "~/helpers/utils";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { AmountText, Progress } from "@teelur/budget-board-ui";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -23,10 +24,13 @@ interface BudgetSummaryItemProps {
 }
 
 const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
-  const { budgetWarningThreshold } = useUserSettings();
+  const { t } = useTranslation();
+  const { intlLocale } = useLocale();
+  const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const formatAmount = useSensitiveAmountFormatter();
   const formatSensitiveAmount = (amount: number): string =>
-    formatAmount(amount, false, SignDisplay.Auto);
+    formatAmount(amount, SignDisplay.Auto, undefined, 0);
 
   const percentComplete = Math.round(
     ((props.amount *
@@ -35,66 +39,111 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
       100,
   );
 
-  const signedAmount =
-    props.amount * (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
+  const invertBudgetSign = props.budgetValueType === StatusColorType.Expense;
   const hasProjection =
     props.projectedAmount !== undefined &&
     roundAwayFromZero(props.projectedAmount - props.amount) !== 0;
-  const signedProjectedAmount =
-    (props.projectedAmount ?? 0) *
-    (props.budgetValueType === StatusColorType.Expense ? -1 : 1);
-
-  const formattedAmount = formatSensitiveAmount(signedAmount);
-  const formattedProjectedAmount = formatSensitiveAmount(signedProjectedAmount);
   const formattedTotal = formatSensitiveAmount(props.total ?? 0);
+  const actualProgressValue = Math.min(100, Math.max(0, percentComplete));
+  const projectedPercentComplete =
+    props.projectedAmount === undefined || (props.total ?? 0) <= 0
+      ? actualProgressValue
+      : Math.min(
+          100,
+          Math.max(
+            0,
+            roundAwayFromZero(
+              ((props.projectedAmount * (invertBudgetSign ? -1 : 1)) /
+                (props.total ?? 0)) *
+                100,
+            ),
+          ),
+        );
+  const projectedProgressValue = Math.max(
+    0,
+    projectedPercentComplete - actualProgressValue,
+  );
 
-  const statusTextProps = {
+  const amountTextProps = {
     amount: props.amount,
     total: props.total ?? 0,
     type: props.budgetValueType,
     warningThreshold: budgetWarningThreshold,
     size: "md" as const,
+    isSensitive: isPrivacyModeEnabled,
+    locale: intlLocale,
+    currency: preferredCurrency,
+    decimalPlaces: 0,
+    signDisplay: SignDisplay.Auto,
+    invertSign: invertBudgetSign,
   };
-  const projectedStatusTextProps = {
+  const projectedAmountTextProps = {
     amount: props.projectedAmount ?? 0,
     total: props.total ?? 0,
     type: props.budgetValueType,
     warningThreshold: budgetWarningThreshold,
     size: "sm" as const,
+    isSensitive: isPrivacyModeEnabled,
+    locale: intlLocale,
+    currency: preferredCurrency,
+    decimalPlaces: 0,
+    signDisplay: SignDisplay.Auto,
+    invertSign: invertBudgetSign,
   };
 
-  const i18nKey = props.total
-    ? "budget_amount_fraction_styled"
-    : "budget_amount_fraction_no_total_styled";
+  const getAmountText = () => {
+    if (props.total) {
+      return (
+        <Trans
+          i18nKey="x_of_y"
+          values={{ total: formattedTotal }}
+          components={[
+            <AmountText {...amountTextProps} key="amount" />,
+            <DimmedText size="sm" key="of" />,
+            <AmountText
+              amount={props.total ?? 0}
+              disableStatusColor
+              size="md"
+              isSensitive={isPrivacyModeEnabled}
+              locale={intlLocale}
+              currency={preferredCurrency}
+              decimalPlaces={0}
+              signDisplay={SignDisplay.Auto}
+              key="total"
+            />,
+          ]}
+        />
+      );
+    }
 
-  const transValues = props.total
-    ? { amount: formattedAmount, total: formattedTotal }
-    : { amount: formattedAmount };
+    return <AmountText {...amountTextProps} key="amount" />;
+  };
 
-  const transComponents = props.total
-    ? [
-        <StatusText {...statusTextProps} key="amount" />,
-        <DimmedText size="sm" key="of" />,
-        <PrimaryText size="md" key="total" />,
-      ]
-    : [<StatusText {...statusTextProps} key="amount" />];
-  const projectedI18nKey = props.total
-    ? "budget_projected_fraction_styled"
-    : "budget_projected_styled";
-  const projectedTransValues = props.total
-    ? { amount: formattedProjectedAmount, total: formattedTotal }
-    : { amount: formattedProjectedAmount };
-  const projectedTransComponents = props.total
-    ? [
-        <DimmedText size="xs" key="label" />,
-        <StatusText {...projectedStatusTextProps} key="amount" />,
-        <DimmedText size="xs" key="of" />,
-        <PrimaryText size="sm" key="total" />,
-      ]
-    : [
-        <DimmedText size="xs" key="label" />,
-        <StatusText {...projectedStatusTextProps} key="amount" />,
-      ];
+  const getProjectedAmountText = () => {
+    if (props.total) {
+      return (
+        <Trans
+          i18nKey="budget_projected_fraction_styled"
+          values={{ total: formattedTotal }}
+          components={[
+            <DimmedText size="xs" key="label" />,
+            <AmountText {...projectedAmountTextProps} key="amount" />,
+            <DimmedText size="xs" key="of" />,
+            <PrimaryText size="sm" key="total" />,
+          ]}
+        />
+      );
+    }
+
+    return (
+      <>
+        <DimmedText size="xs" key="label">
+          {t("projected_colon")}
+        </DimmedText>
+        <AmountText {...projectedAmountTextProps} key="amount" />
+      </>
+    );
+  };
 
   return (
     <Stack gap={0}>
@@ -108,50 +157,37 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
           style={{ minWidth: 0, maxWidth: "100%" }}
         >
           <Flex gap="0.25rem" align="baseline">
-            <Trans
-              i18nKey={i18nKey}
-              values={transValues}
-              components={transComponents}
-            />
+            {getAmountText()}
           </Flex>
           {hasProjection && (
-            <Flex gap="0.25rem" align="baseline" style={{ maxWidth: "100%" }}>
-              <Trans
-                i18nKey={projectedI18nKey}
-                values={projectedTransValues}
-                components={projectedTransComponents}
-              />
-            </Flex>
+            <Group gap="0.25rem" align="baseline" style={{ maxWidth: "100%" }}>
+              {getProjectedAmountText()}
+            </Group>
           )}
         </Stack>
       </Group>
       {!props.hideProgress && (props.total ?? 0) > 0 && (
-        <Group gap="0.5rem" align="center">
-          <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
-            <Progress
-              size={8}
-              percentComplete={percentComplete}
-              amount={props.amount}
-              limit={props.total ?? 0}
-              projectedAmount={props.projectedAmount}
-              type={
-                props.budgetValueType === StatusColorType.Income
-                  ? ProgressType.Income
-                  : ProgressType.Expense
-              }
-              warningThreshold={budgetWarningThreshold}
-              elevation={1}
-              showPercentLabel={false}
-            />
-          </Flex>
-          <PrimaryText
-            size="sm"
-            elevation={1}
-            style={{ flexShrink: 0, lineHeight: 1 }}
-          >
-            {percentComplete.toFixed(0)}%
-          </PrimaryText>
-        </Group>
+        <Progress
+          amount={props.amount}
+          limit={props.total ?? 0}
+          label
+          type={invertBudgetSign ? "expense" : "income"}
+          size="xs"
+          sections={
+            projectedProgressValue > 0
+              ? [
+                  {
+                    ariaLabel: t("recurring_transactions"),
+                    color: "muted",
+                    striped: true,
+                    value: projectedProgressValue,
+                  },
+                ]
+              : []
+          }
+          warningThreshold={budgetWarningThreshold}
+          ariaLabel={props.label}
+        />
       )}
     </Stack>
   );

@@ -1,4 +1,5 @@
-import { Button, LoadingOverlay, SegmentedControl, Stack } from "@mantine/core";
+import { LoadingOverlay, Stack } from "@mantine/core";
+import { Button, SegmentedControl } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CategoryTypes, ICategoryCreateRequest } from "~/models/category";
 import React from "react";
@@ -55,9 +56,14 @@ const AddCategory = (): React.ReactNode => {
         <Stack gap="0.25rem" justify="center">
           <PrimaryText size="sm">{t("category_level")}</PrimaryText>
           <SegmentedControl
-            color="var(--mantine-primary-color-filled)"
-            radius="md"
+            color="secondary"
+            size="compact-sm"
+            fullWidth
             value={isChildCategory ? "child" : "parent"}
+            data={[
+              { label: t("parent"), value: "parent" },
+              { label: t("child"), value: "child" },
+            ]}
             onChange={(val) => {
               const child = val === "child";
               setIsChildCategory(child);
@@ -65,10 +71,7 @@ const AddCategory = (): React.ReactNode => {
                 parentField.reset();
               }
             }}
-            data={[
-              { label: t("parent"), value: "parent" },
-              { label: t("child"), value: "child" },
-            ]}
+            aria-label={t("category_level")}
           />
         </Stack>
         {isChildCategory ? (
@@ -87,19 +90,24 @@ const AddCategory = (): React.ReactNode => {
           <Stack gap="0.25rem">
             <PrimaryText size="sm">{t("category_type")}</PrimaryText>
             <SegmentedControl
-              color="var(--mantine-primary-color-filled)"
-              radius="md"
+              color="secondary"
+              size="compact-sm"
+              fullWidth
               value={categoryTypeField.getValue()}
-              onChange={(val) => categoryTypeField.setValue(val)}
               data={[
                 { label: t("expense"), value: CategoryTypes.Expense },
                 { label: t("income"), value: CategoryTypes.Income },
               ]}
+              onChange={(val) => categoryTypeField.setValue(val)}
+              aria-label={t("category_type")}
             />
           </Stack>
         )}
         <Button
-          w="100%"
+          variant="filled"
+          color="primary"
+          size="xs"
+          fullWidth
           onClick={() =>
             createTransactionCategoryMutation.mutate(
               {

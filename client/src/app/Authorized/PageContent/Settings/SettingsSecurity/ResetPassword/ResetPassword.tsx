@@ -1,5 +1,6 @@
 import { hasLength, useField } from "@mantine/form";
-import { Button, LoadingOverlay, Stack } from "@mantine/core";
+import { LoadingOverlay, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -64,6 +65,9 @@ const ResetPassword = (): React.ReactNode => {
           elevation={1}
         />
         <Button
+          variant="filled"
+          color="primary"
+          size="xs"
           onClick={() => {
             oldPasswordField.validate();
             newPasswordField.validate();

@@ -1,13 +1,15 @@
 import classes from "./UnbudgetedChildCard.module.css";
-
-import { ActionIcon, Group, LoadingOverlay } from "@mantine/core";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { Group, LoadingOverlay } from "@mantine/core";
+import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { CornerDownRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 import { roundAwayFromZero } from "~/helpers/utils";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { SignDisplay } from "~/helpers/currency";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 
 interface UnbudgetedChildCardProps {
@@ -21,7 +23,9 @@ interface UnbudgetedChildCardProps {
 const UnbudgetedChildCard = (
   props: UnbudgetedChildCardProps,
 ): React.ReactNode => {
-  const { dayjs } = useLocale();
+  const { dayjs, intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const createBudgetMutation = useCreateBudgetMutation();
 
   if (roundAwayFromZero(props.amount) === 0) {
@@ -49,12 +53,21 @@ const UnbudgetedChildCard = (
             {props.category}
           </PrimaryText>
           <Group gap="sm">
-            <PrimaryText className={classes.text}>
-              <SensitiveAmount amount={props.amount} includeCents={false} />
-            </PrimaryText>
+            <AmountText
+              amount={props.amount}
+              disableStatusColor
+              size="sm"
+              isSensitive={isPrivacyModeEnabled}
+              currency={preferredCurrency}
+              decimalPlaces={0}
+              locale={intlLocale}
+              signDisplay={SignDisplay.Auto}
+            />
             {props.selectedDate && (
               <ActionIcon
-                size="sm"
+                variant="filled"
+                color="primary"
+                size="compact-xs"
                 onClick={(e) => {
                   e.stopPropagation();
                   createBudgetMutation.mutate([
@@ -66,7 +79,7 @@ const UnbudgetedChildCard = (
                   ]);
                 }}
               >
-                <PlusIcon />
+                <PlusIcon size={20} />
               </ActionIcon>
             )}
           </Group>

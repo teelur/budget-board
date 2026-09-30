@@ -1,13 +1,10 @@
+import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
   Button,
-  Flex,
-  Group,
-  LoadingOverlay,
   SegmentedControl,
-  Stack,
-} from "@mantine/core";
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -82,9 +79,14 @@ const CustomAssetTypeCard = (
             <Stack gap="0.25rem" justify="center">
               <PrimaryText size="sm">{t("category_level")}</PrimaryText>
               <SegmentedControl
-                color="var(--mantine-primary-color-filled)"
-                radius="md"
+                color="secondary"
+                size="compact-sm"
+                fullWidth
                 value={isChildType ? "child" : "parent"}
+                data={[
+                  { label: t("parent"), value: "parent" },
+                  { label: t("child"), value: "child" },
+                ]}
                 onChange={(val) => {
                   const child = val === "child";
                   setIsChildType(child);
@@ -92,10 +94,7 @@ const CustomAssetTypeCard = (
                     parentField.reset();
                   }
                 }}
-                data={[
-                  { label: t("parent"), value: "parent" },
-                  { label: t("child"), value: "child" },
-                ]}
+                aria-label={t("category_level")}
               />
             </Stack>
             {isChildType && (
@@ -112,11 +111,20 @@ const CustomAssetTypeCard = (
               </Stack>
             )}
             <Group justify="flex-end" gap="0.5rem">
-              <Button variant="default" size="xs" onClick={handleCancel}>
+              <Button
+                variant="filled"
+                color="neutral"
+                size="xs"
+                flex="1 1 auto"
+                onClick={handleCancel}
+              >
                 {t("cancel")}
               </Button>
               <Button
+                variant="filled"
+                color="primary"
                 size="xs"
+                flex="1 1 auto"
                 onClick={() =>
                   updateAssetTypeMutation.mutate(
                     {
@@ -152,24 +160,30 @@ const CustomAssetTypeCard = (
             ) : (
               <PrimaryText size="sm">{props.assetType.value}</PrimaryText>
             )}
-            {props.isBuiltIn && <Badge size="xs">{t("built_in")}</Badge>}
+            {props.isBuiltIn && (
+              <Badge variant="filled" color="primary" size="xs">
+                {t("built_in")}
+              </Badge>
+            )}
           </Group>
           <Flex justify="flex-end" flex="1 1 auto" gap="0.25rem">
             {!props.isBuiltIn && (
               <>
                 <ActionIcon
-                  size="sm"
-                  variant="subtle"
+                  variant="ghost"
+                  color="primary"
+                  size="compact-sm"
                   onClick={() => setIsEditing(true)}
                 >
                   <PencilIcon size="1rem" />
                 </ActionIcon>
                 <ActionIcon
-                  size="sm"
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   onClick={() =>
                     deleteAssetTypeMutation.mutateAsync(props.assetType.id)
                   }
-                  bg="var(--button-color-destructive)"
                 >
                   <TrashIcon size="1rem" />
                 </ActionIcon>

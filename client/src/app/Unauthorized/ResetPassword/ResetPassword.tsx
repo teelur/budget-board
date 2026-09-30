@@ -1,4 +1,5 @@
-import { Stack, Button, LoadingOverlay } from "@mantine/core";
+import { Stack, Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { hasLength, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -40,11 +41,6 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
 
   return (
     <Stack gap="0.75rem" align="center" p="1rem">
-      <LoadingOverlay
-        visible={resetPasswordMutation.isPending}
-        zIndex={1000}
-        overlayProps={{ radius: "sm", blur: 2 }}
-      />
       <Stack align="center" gap="0.5rem" w="100%">
         <TextInput
           label={<PrimaryText size="sm">{t("reset_code")}</PrimaryText>}
@@ -64,46 +60,53 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
           {...confirmPasswordField.getInputProps()}
           elevation={1}
         />
-        <Button
-          variant="filled"
-          fullWidth
-          onClick={() => {
-            resetCodeField.validate();
-            passwordField.validate();
-            confirmPasswordField.validate();
+        <Group wrap="nowrap" gap="0.5rem" w="100%">
+          <Button
+            variant="filled"
+            color="neutral"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={() => props.setLoginCardState(LoginCardState.Login)}
+          >
+            {t("return_to_login")}
+          </Button>
+          <Button
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            flex="1 1 0"
+            loading={resetPasswordMutation.isPending}
+            onClick={() => {
+              resetCodeField.validate();
+              passwordField.validate();
+              confirmPasswordField.validate();
 
-            if (
-              resetCodeField.error ||
-              passwordField.error ||
-              confirmPasswordField.error
-            ) {
-              return;
-            }
+              if (
+                resetCodeField.error ||
+                passwordField.error ||
+                confirmPasswordField.error
+              ) {
+                return;
+              }
 
-            resetPasswordMutation.mutate(
-              {
-                email: props.email,
-                resetCode: resetCodeField.getValue(),
-                newPassword: passwordField.getValue(),
-              },
-              {
-                onSuccess: () => {
-                  props.setLoginCardState(LoginCardState.Login);
+              resetPasswordMutation.mutate(
+                {
+                  email: props.email,
+                  resetCode: resetCodeField.getValue(),
+                  newPassword: passwordField.getValue(),
                 },
-              },
-            );
-          }}
-        >
-          {t("reset_password")}
-        </Button>
+                {
+                  onSuccess: () => {
+                    props.setLoginCardState(LoginCardState.Login);
+                  },
+                },
+              );
+            }}
+          >
+            {t("reset_password")}
+          </Button>
+        </Group>
       </Stack>
-      <Button
-        variant="default"
-        fullWidth
-        onClick={() => props.setLoginCardState(LoginCardState.Login)}
-      >
-        {t("return_to_login")}
-      </Button>
     </Stack>
   );
 };

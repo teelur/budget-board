@@ -8,7 +8,7 @@ import {
 import { SignDisplay } from "~/helpers/currency";
 import { Group, Skeleton } from "@mantine/core";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -47,11 +47,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   );
 
   const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(
-      value,
-      false,
-      SignDisplay.Auto,
-    );
+    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
   };
 
   if (props.isPending) {

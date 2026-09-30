@@ -1,10 +1,10 @@
 import {
-  Button,
   Group,
   Popover as MantinePopover,
   Skeleton,
   Stack,
 } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -72,8 +72,8 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
 
   const toggleButton = (
     <Button
-      bg={disableBuiltInAccountTypes ? "var(--button-color-destructive)" : ""}
-      variant="primary"
+      variant="filled"
+      color={disableBuiltInAccountTypes ? "error" : "primary"}
       size="xs"
       loading={updateUserSettingsMutation.isPending}
       onClick={
@@ -116,15 +116,19 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
               ))}
               <Group justify="flex-end" gap="0.5rem">
                 <Button
-                  variant="subtle"
+                  variant="filled"
+                  color="neutral"
                   size="xs"
+                  flex="1 1 auto"
                   onClick={() => setIsConfirmationOpen(false)}
                 >
                   {t("cancel")}
                 </Button>
                 <Button
-                  color="var(--button-color-destructive)"
+                  variant="filled"
+                  color="error"
                   size="xs"
+                  flex="1 1 auto"
                   loading={updateUserSettingsMutation.isPending}
                   onClick={() => {
                     setIsConfirmationOpen(false);

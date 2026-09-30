@@ -214,7 +214,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--base-color-text-dimmed": textEggshellDimmed[6],
     "--base-color-input-background": backgroundEggshell[2],
     "--base-color-input-border": backgroundEggshell[5],
-    "--base-color-progress": backgroundEggshell[4],
     // Sidebar and Header colors
     "--background-color-sidebar": backgroundEggshell[2],
     "--background-color-header": backgroundEggshell[1],
@@ -226,7 +225,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--surface-color-text-dimmed": textEggshellDimmed[6],
     "--surface-color-input-background": backgroundEggshell[5],
     "--surface-color-input-border": backgroundEggshell[8],
-    "--surface-color-progress": backgroundEggshell[5],
     // Elevated colors
     "--background-color-elevated": backgroundEggshell[6],
     "--elevated-color-border": borderEggshell[4],
@@ -235,7 +233,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--elevated-color-text-dimmed": textEggshellDimmed[7],
     "--elevated-color-input-background": backgroundEggshell[7],
     "--elevated-color-input-border": backgroundEggshell[9],
-    "--elevated-color-progress": backgroundEggshell[8],
     // Text Status colors
     "--text-color-status-good": green[9],
     "--text-color-status-neutral": blue[7],
@@ -263,7 +260,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--base-color-text-dimmed": textGray[8],
     "--base-color-input-background": backgroundGray[7],
     "--base-color-input-border": backgroundGray[4],
-    "--base-color-progress": backgroundGray[6],
     // Sidebar and Header colors
     "--background-color-sidebar": backgroundGray[7],
     "--background-color-header": backgroundGray[8],
@@ -275,7 +271,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--surface-color-text-dimmed": textGray[9],
     "--surface-color-input-background": backgroundGray[5],
     "--surface-color-input-border": backgroundGray[3],
-    "--surface-color-progress": backgroundGray[4],
     // Elevated colors
     "--background-color-elevated": backgroundGray[5],
     "--elevated-color-border": backgroundGray[0],
@@ -284,7 +279,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--elevated-color-text-dimmed": textGray[9],
     "--elevated-color-input-background": backgroundGray[3],
     "--elevated-color-input-border": backgroundGray[0],
-    "--elevated-color-progress": backgroundGray[2],
     // Text Status colors
     "--text-color-status-good": green[8],
     "--text-color-status-neutral": blue[5],

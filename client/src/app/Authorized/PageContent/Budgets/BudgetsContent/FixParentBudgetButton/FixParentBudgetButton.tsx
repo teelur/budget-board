@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { areStringsEqual } from "~/helpers/utils";
 import { IBudget } from "~/models/budget";
 import { ICategoryNode } from "~/models/category";
@@ -65,7 +65,12 @@ const FixParentBudgetButton = (props: FixParentBudgetButtonProps) => {
   }
 
   return (
-    <Button size="compact-sm" onClick={generateParentCateogories}>
+    <Button
+      variant="filled"
+      color="primary"
+      size="compact-sm"
+      onClick={generateParentCateogories}
+    >
       {t("fix_parent_budgets")}
     </Button>
   );

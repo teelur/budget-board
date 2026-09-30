@@ -1,11 +1,5 @@
-import {
-  Button,
-  Code,
-  Group,
-  ScrollArea,
-  Stack,
-  TextInput,
-} from "@mantine/core";
+import { Code, Group, ScrollArea, Stack, TextInput } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
 import React from "react";
@@ -226,12 +220,21 @@ const MetricWidgetSettings = ({
           </Accordion.Item>
         </Accordion>
 
-        <Group w="100%" justify="flex-end" mt="xs" gap="0.5rem">
-          <Button flex={1} variant="default" onClick={handleClose}>
+        <Group gap="0.5rem">
+          <Button
+            variant="filled"
+            color="neutral"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={handleClose}
+          >
             {t("cancel")}
           </Button>
           <Button
-            flex={1}
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            flex="1 1 0"
             onClick={() => {
               updateWidgetSettingsMutation.mutate([
                 {

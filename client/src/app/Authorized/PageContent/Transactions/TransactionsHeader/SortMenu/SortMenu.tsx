@@ -58,10 +58,11 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
       <Group gap="0.5rem">
         {SortOptions.map((sortOption: SortOption) => (
           <SortButton
+            variant="filled"
+            color="muted"
+            size="compact-sm"
             key={sortOption.value}
             label={sortOption.label}
-            size="compact-sm"
-            variant="light"
             sortDirection={
               sortOption.value === props.currentSort
                 ? props.sortDirection

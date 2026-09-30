@@ -250,6 +250,9 @@
     <data name="InvalidCurrencyCodeLog" xml:space="preserve">
         <value>Attempted to update user settings with an invalid currency code.</value>
     </data>
+    <data name="InvalidDecimalPlacesLog" xml:space="preserve">
+        <value>Attempted to update user settings with an invalid decimal places value.</value>
+    </data>
     <data name="InvalidDateFormatLog" xml:space="preserve">
         <value>Attempted to update user settings with an invalid date format.</value>
     </data>

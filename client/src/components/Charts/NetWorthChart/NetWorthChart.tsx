@@ -9,7 +9,7 @@ import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -97,11 +97,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   ];
 
   const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(
-      value,
-      false,
-      SignDisplay.Auto,
-    );
+    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
   };
 
   const liabilityAccountTypes = allAccountTypes

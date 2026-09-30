@@ -1,4 +1,5 @@
-import { Stack, Button, LoadingOverlay } from "@mantine/core";
+import { Stack, Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -39,11 +40,6 @@ const Register = (props: RegisterProps): React.ReactNode => {
 
   return (
     <Stack gap="0.75rem" align="center" p="1rem">
-      <LoadingOverlay
-        visible={registerMutation.isPending}
-        zIndex={1000}
-        overlayProps={{ blur: 2 }}
-      />
       <Stack align="center" gap="0.5rem" w="100%">
         <TextInput
           label={<PrimaryText size="sm">{t("email_address")}</PrimaryText>}
@@ -63,45 +59,52 @@ const Register = (props: RegisterProps): React.ReactNode => {
           {...confirmPasswordField.getInputProps()}
           elevation={1}
         />
-        <Button
-          variant="filled"
-          fullWidth
-          onClick={() => {
-            emailField.validate();
-            passwordField.validate();
-            confirmPasswordField.validate();
+        <Group gap="0.5rem" w="100%">
+          <Button
+            variant="filled"
+            color="neutral"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={() => props.setLoginCardState(LoginCardState.Login)}
+          >
+            {t("back_to_login")}
+          </Button>
+          <Button
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            flex="1 1 0"
+            loading={registerMutation.isPending}
+            onClick={() => {
+              emailField.validate();
+              passwordField.validate();
+              confirmPasswordField.validate();
 
-            if (
-              emailField.error ||
-              passwordField.error ||
-              confirmPasswordField.error
-            ) {
-              return;
-            }
+              if (
+                emailField.error ||
+                passwordField.error ||
+                confirmPasswordField.error
+              ) {
+                return;
+              }
 
-            registerMutation.mutate(
-              {
-                email: emailField.getValue(),
-                password: passwordField.getValue(),
-              },
-              {
-                onSuccess: () => {
-                  props.setLoginCardState(LoginCardState.Login);
+              registerMutation.mutate(
+                {
+                  email: emailField.getValue(),
+                  password: passwordField.getValue(),
                 },
-              },
-            );
-          }}
-        >
-          {t("register")}
-        </Button>
+                {
+                  onSuccess: () => {
+                    props.setLoginCardState(LoginCardState.Login);
+                  },
+                },
+              );
+            }}
+          >
+            {t("register")}
+          </Button>
+        </Group>
       </Stack>
-      <Button
-        variant="default"
-        fullWidth
-        onClick={() => props.setLoginCardState(LoginCardState.Login)}
-      >
-        {t("back_to_login")}
-      </Button>
     </Stack>
   );
 };

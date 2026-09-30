@@ -1,4 +1,5 @@
-import { Button, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
@@ -23,7 +24,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
     thousandsSeparator,
     decimalSeparator,
   } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const createValueMutation = useCreateValueMutation({
     assetId: props.assetId,
   });
@@ -49,12 +50,15 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
         {...amountField.getInputProps()}
         label={<PrimaryText size="xs">{t("amount")}</PrimaryText>}
         prefix={getCurrencySymbol(preferredCurrency)}
-        decimalScale={2}
+        decimalScale={decimalPlaces}
         thousandSeparator={thousandsSeparator}
         decimalSeparator={decimalSeparator}
         elevation={0}
       />
       <Button
+        variant="filled"
+        color="primary"
+        size="compact-sm"
         loading={createValueMutation.isPending}
         onClick={() =>
           createValueMutation.mutate(

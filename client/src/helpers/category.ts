@@ -72,7 +72,14 @@ export const getFormattedCategoryValue = (
     areStringsEqual(c.value, categoryString),
   );
 
-  return foundCategory?.value ?? uncategorizedTransactionCategory;
+  if (foundCategory?.value == null) {
+    return (
+      uncategorizedTransactionCategory.charAt(0).toUpperCase() +
+      uncategorizedTransactionCategory.slice(1)
+    );
+  }
+
+  return foundCategory?.value;
 };
 
 /**

@@ -1,4 +1,5 @@
-import { Button, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -11,7 +12,9 @@ const ConnectOidcContent = (): React.ReactNode => {
   return (
     <Stack>
       <Button
-        color="var(--button-color-primary)"
+        variant="filled"
+        color="primary"
+        size="xs"
         onClick={() =>
           startOidcLogin && startOidcLogin(false, OidcAuthFlows.Connect)
         }

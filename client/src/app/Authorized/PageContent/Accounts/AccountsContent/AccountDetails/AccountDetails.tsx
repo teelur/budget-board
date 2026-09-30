@@ -1,4 +1,5 @@
-import { Button, Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
@@ -90,24 +91,30 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                 <PrimaryHeading order={5}>{t("account_trends")}</PrimaryHeading>
               }
             >
-              <Group>
+              <Group gap="0.5rem">
                 <Button
-                  variant={chartLookbackMonths === 3 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  selected={chartLookbackMonths === 3}
+                  size="compact-xs"
                   onClick={() => setChartLookbackMonths(3)}
                 >
                   {t("3_months")}
                 </Button>
                 <Button
-                  variant={chartLookbackMonths === 6 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  selected={chartLookbackMonths === 6}
+                  size="compact-xs"
                   onClick={() => setChartLookbackMonths(6)}
                 >
                   {t("6_months")}
                 </Button>
                 <Button
-                  variant={chartLookbackMonths === 12 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  selected={chartLookbackMonths === 12}
+                  size="compact-xs"
                   onClick={() => setChartLookbackMonths(12)}
                 >
                   {t("12_months")}

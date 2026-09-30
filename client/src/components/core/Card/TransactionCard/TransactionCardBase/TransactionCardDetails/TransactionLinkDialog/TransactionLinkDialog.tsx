@@ -1,9 +1,10 @@
-import { Alert, Button, Group, Paper, Skeleton, Stack } from "@mantine/core";
+import { Alert, Group, Paper, Skeleton, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { getCurrencySymbol } from "~/helpers/currency";
+import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { useLinkTransactionsMutation } from "~/hooks/mutations/transactions/useLinkTransactionsMutation";
 import { useUnlinkTransactionMutation } from "~/hooks/mutations/transactions/useUnlinkTransactionMutation";
 import { useTransactionLinkCandidatesQuery } from "~/hooks/queries/useTransactionLinkCandidatesQuery";
@@ -24,8 +25,8 @@ const TransactionLinkDialog = ({
   transaction,
 }: TransactionLinkDialogProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
-  const { preferredCurrency } = useUserSettings();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
   const [linkOpened, { open: openLink, close: closeLink }] =
     useDisclosure(false);
   const [unlinkOpened, { open: openUnlink, close: closeUnlink }] =
@@ -48,9 +49,6 @@ const TransactionLinkDialog = ({
   );
   const linkMutation = useLinkTransactionsMutation();
   const unlinkMutation = useUnlinkTransactionMutation();
-
-  const formatAmount = (amount: number) =>
-    `${getCurrencySymbol(preferredCurrency)}${amount.toFixed(2)}`;
   const formatDate = (date: string) => dayjs(date).format(longDateFormat);
 
   const onOpenLink = () => {
@@ -83,9 +81,10 @@ const TransactionLinkDialog = ({
 
   const linkAction = transaction.linkedTransactionID ? (
     <Button
-      variant="subtle"
+      variant="ghost"
+      color="error"
       size="compact-sm"
-      leftSection={<Unlink size="0.85rem" />}
+      rightSection={<Unlink size="0.85rem" />}
       onClick={(event) => {
         event.stopPropagation();
         openUnlink();
@@ -96,9 +95,10 @@ const TransactionLinkDialog = ({
     </Button>
   ) : (
     <Button
-      variant="subtle"
+      variant="ghost"
+      color="primary"
       size="compact-sm"
-      leftSection={<ArrowRightLeft size="0.85rem" />}
+      rightSection={<ArrowRightLeft size="0.85rem" />}
       onClick={(event) => {
         event.stopPropagation();
         onOpenLink();
@@ -120,7 +120,13 @@ const TransactionLinkDialog = ({
           <DimmedText size="sm">
             {t("link_transfer_source", {
               account: transaction.accountName,
-              amount: formatAmount(transaction.amount),
+              amount: convertNumberToCurrency(
+                transaction.amount,
+                decimalPlaces,
+                preferredCurrency,
+                SignDisplay.Auto,
+                intlLocale,
+              ),
               date: formatDate(transaction.date),
             })}
           </DimmedText>
@@ -169,14 +175,17 @@ const TransactionLinkDialog = ({
             <DimmedText size="sm">{t("no_transfer_candidates")}</DimmedText>
           )}
           <Button
-            leftSection={<Link2 size="1rem" />}
-            onClick={onLink}
+            variant="filled"
+            color="primary"
+            size="compact-sm"
             disabled={
               !hasSelectedCandidate ||
               candidatesQuery.isPending ||
               candidatesQuery.isError
             }
             loading={linkMutation.isPending}
+            rightSection={<Link2 size="1rem" />}
+            onClick={onLink}
           >
             {t("confirm_link")}
           </Button>
@@ -191,15 +200,24 @@ const TransactionLinkDialog = ({
       >
         <Stack gap="sm">
           <DimmedText size="sm">{t("unlink_transfer_message")}</DimmedText>
-          <Group justify="flex-end">
-            <Button variant="default" onClick={closeUnlink}>
+          <Group gap="0.5rem">
+            <Button
+              variant="filled"
+              color="neutral"
+              size="compact-sm"
+              flex="1 1 0"
+              onClick={closeUnlink}
+            >
               {t("cancel")}
             </Button>
             <Button
-              color="red"
-              leftSection={<Unlink size="1rem" />}
-              onClick={onUnlink}
+              variant="filled"
+              color="error"
+              size="compact-sm"
+              rightSection={<Unlink size="1rem" />}
+              flex="1 1 0"
               loading={unlinkMutation.isPending}
+              onClick={onUnlink}
             >
               {t("unlink_transactions")}
             </Button>

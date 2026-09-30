@@ -1,4 +1,5 @@
-import { Button, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { useTranslation } from "react-i18next";
 import { mantineDateFormat } from "~/helpers/datetime";
@@ -17,8 +18,9 @@ const SelectLastNMonthsRange = (props: SelectLastNMonthsRangeProps) => {
     <Group w="100%" justify="end">
       {props.monthButtons.map((months) => (
         <Button
+          variant="outline"
+          color="primary"
           size="compact-sm"
-          variant="light"
           key={months}
           onClick={() => {
             props.setDateRange([

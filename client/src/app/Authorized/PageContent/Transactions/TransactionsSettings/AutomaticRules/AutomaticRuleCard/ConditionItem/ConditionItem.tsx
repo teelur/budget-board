@@ -1,4 +1,5 @@
-import { Badge, Group } from "@mantine/core";
+import { Group } from "@mantine/core";
+import { Badge } from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -11,6 +12,7 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 interface ConditionItemProps {
   condition: IRuleParameterResponse;
@@ -22,6 +24,7 @@ interface ConditionItemProps {
 const ConditionItem = (props: ConditionItemProps) => {
   const { t } = useTranslation();
   const { dayjs, dateFormat, intlLocale } = useLocale();
+  const { decimalPlaces } = useUserSettings();
 
   const fieldLabelKey = ConditionTransactionFields.find(
     (field) => field.value === props.condition.field,
@@ -37,17 +40,18 @@ const ConditionItem = (props: ConditionItemProps) => {
   return (
     <Card p="0.25rem" shadow="xs" elevation={2}>
       <Group gap="0.3rem">
-        <Badge bg="var(--accent-color-purple)" size="sm">
+        <Badge variant="outline" color="secondary" size="xs">
           {fieldLabelKey ? t(fieldLabelKey) : props.condition.field}
         </Badge>
         <PrimaryText size="sm">
           {operatorLabelKey ? t(operatorLabelKey) : props.condition.operator}
         </PrimaryText>
-        <Badge size="sm">
+        <Badge variant="filled" color="accent" size="xs">
           {getFormattedValue(
             props.condition.field,
             props.condition.value,
             props.currency,
+            decimalPlaces,
             props.categories,
             formatDate,
             intlLocale,

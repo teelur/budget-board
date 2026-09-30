@@ -27,10 +27,10 @@ const AutoCategorizerMinimumProbability = (): React.ReactNode => {
   return (
     <Stack gap="0.25rem">
       <LoadingOverlay visible={updateUserSettingsMutation.isPending} />
-      <PrimaryText size="sm">
+      <PrimaryText size="md">
         {t("auto_categorizer_minimum_probability")}
       </PrimaryText>
-      <DimmedText size="xs">
+      <DimmedText size="sm">
         {t("auto_categorizer_minimum_probability_description")}
       </DimmedText>
       <NumberInput

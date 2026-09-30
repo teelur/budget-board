@@ -1,4 +1,5 @@
-import { ActionIcon, Flex, Group } from "@mantine/core";
+import { Flex, Group } from "@mantine/core";
+import { ActionIcon } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -47,7 +48,12 @@ const NetWorthLineCategoryContent = (
         ) : (
           <DimmedText size="sm">{t("no_subtype")}</DimmedText>
         )}
-        <ActionIcon variant="transparent" size="sm" onClick={props.enableEdit}>
+        <ActionIcon
+          variant="ghost"
+          color="primary"
+          size="compact-xs"
+          onClick={props.enableEdit}
+        >
           <PencilIcon size={14} />
         </ActionIcon>
       </Group>

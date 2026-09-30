@@ -1,4 +1,5 @@
-import { Button, Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
@@ -68,24 +69,30 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
             }
           >
             <Stack>
-              <Group>
+              <Group gap="0.5rem">
                 <Button
-                  variant={chartLookbackMonths === 3 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  size="compact-xs"
+                  selected={chartLookbackMonths === 3}
                   onClick={() => setChartLookbackMonths(3)}
                 >
                   {t("3_months")}
                 </Button>
                 <Button
-                  variant={chartLookbackMonths === 6 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  size="compact-xs"
+                  selected={chartLookbackMonths === 6}
                   onClick={() => setChartLookbackMonths(6)}
                 >
                   {t("6_months")}
                 </Button>
                 <Button
-                  variant={chartLookbackMonths === 12 ? "filled" : "outline"}
-                  size="xs"
+                  variant="filled"
+                  color="primary"
+                  size="compact-xs"
+                  selected={chartLookbackMonths === 12}
                   onClick={() => setChartLookbackMonths(12)}
                 >
                   {t("12_months")}

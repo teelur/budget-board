@@ -1,12 +1,6 @@
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  Group,
-  Skeleton,
-  Stack,
-  Tooltip,
-} from "@mantine/core";
+import { Group, Skeleton, Stack, Tooltip } from "@mantine/core";
+import { ActionIcon, AmountText, Badge, Button } from "@teelur/budget-board-ui";
+import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -16,7 +10,6 @@ import Modal from "~/components/core/Modal/Modal";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import SensitiveAmount from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import RecurringRuleForm from "~/components/RecurringRuleForm/RecurringRuleForm";
 import { useDeleteRecurringRuleMutation } from "~/hooks/mutations/recurringRules/useDeleteRecurringRuleMutation";
 import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
@@ -26,6 +19,7 @@ import {
 } from "~/models/recurringRule";
 import { getRecurringCadenceLabel } from "~/helpers/recurringRules";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 
 interface RecurringRuleCardProps {
   rule: IRecurringRuleResponse;
@@ -34,7 +28,9 @@ interface RecurringRuleCardProps {
 
 const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, longDateFormat } = useLocale();
+  const { dayjs, longDateFormat, intlLocale } = useLocale();
+  const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
   const deleteMutation = useDeleteRecurringRuleMutation();
   const category =
     props.rule.subcategory ?? props.rule.category ?? t("any_category");
@@ -48,11 +44,13 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
             <PrimaryText>
               {props.rule.merchantName || t("any_merchant")}
             </PrimaryText>
-            <Badge variant="light">
+            <Badge variant="outline" color="primary" size="xs">
               {getRecurringCadenceLabel(props.rule.cadence, t)}
             </Badge>
             {!props.rule.isActive && (
-              <Badge color="gray">{t("inactive")}</Badge>
+              <Badge variant="filled" color="error" size="xs">
+                {t("inactive")}
+              </Badge>
             )}
           </Group>
           <DimmedText size="sm">
@@ -65,9 +63,15 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
                 : t("fixed_amount")}
               :
             </DimmedText>
-            <PrimaryText size="sm">
-              <SensitiveAmount amount={props.rule.amount} />
-            </PrimaryText>
+            <AmountText
+              amount={props.rule.amount}
+              size="sm"
+              disableStatusColor
+              isSensitive={isPrivacyModeEnabled}
+              locale={intlLocale}
+              currency={preferredCurrency}
+              decimalPlaces={decimalPlaces}
+            />
             <DimmedText size="sm">
               {t("recurring_matched_transactions", {
                 count: props.rule.matchedTransactionCount,
@@ -84,7 +88,7 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
             </DimmedText>
           )}
         </Stack>
-        <Group gap="0.25rem" wrap="nowrap">
+        <Group gap="0.25rem" wrap="nowrap" style={{ alignSelf: "stretch" }}>
           <Tooltip
             label={
               hasUnsupportedCadence
@@ -93,8 +97,12 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
             }
           >
             <ActionIcon
-              aria-label={t("edit")}
+              variant="outline"
+              color="primary"
+              size="compact-sm"
               disabled={hasUnsupportedCadence}
+              h="100%"
+              aria-label={t("edit")}
               onClick={() => props.onEdit(props.rule)}
             >
               <PencilIcon size="1rem" />
@@ -102,9 +110,12 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
           </Tooltip>
           <Tooltip label={t("delete")}>
             <ActionIcon
-              aria-label={t("delete")}
-              color="var(--button-color-destructive)"
+              variant="filled"
+              color="error"
+              size="compact-sm"
               loading={deleteMutation.isPending}
+              h="100%"
+              aria-label={t("delete")}
               onClick={() => deleteMutation.mutate(props.rule.id)}
             >
               <TrashIcon size="1rem" />
@@ -135,8 +146,16 @@ const RecurringRules = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
+      <PrimaryText size="md">{t("recurring_rules")}</PrimaryText>
       <DimmedText size="sm">{t("recurring_rules_description")}</DimmedText>
-      <Button leftSection={<PlusIcon size="1rem" />} onClick={openCreate}>
+      <Button
+        variant="filled"
+        color="primary"
+        size="compact-sm"
+        fullWidth
+        rightSection={<PlusIcon size="1rem" />}
+        onClick={openCreate}
+      >
         {t("add_recurring_rule")}
       </Button>
       {rulesQuery.isPending ? (

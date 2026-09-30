@@ -1,4 +1,5 @@
-import { Button, Group, Progress, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { Button, Progress } from "@teelur/budget-board-ui";
 import { BanIcon } from "lucide-react";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -24,6 +25,16 @@ const ImportProgress = (props: ImportProgressProps) => {
     !isFailed &&
     !isCancelled &&
     !isCancellationRequested;
+  const statusMessage = isFailed
+    ? t("import_failed")
+    : isCancelled
+      ? t("import_stopped")
+      : isCancellationRequested
+        ? t("import_stop_requested")
+        : props.job?.status === "Pending"
+          ? t("import_queued")
+          : t("import_in_progress");
+  const animated = !isFailed && !isCancelled && !isCancellationRequested;
 
   const confirmCancel = async () => {
     setIsConfirmingCancel(false);
@@ -39,25 +50,17 @@ const ImportProgress = (props: ImportProgressProps) => {
       mx="auto"
       py="1rem"
     >
-      <PrimaryText size="md">
-        {isFailed
-          ? t("import_failed")
-          : isCancelled
-            ? t("import_cancelled")
-            : isCancellationRequested
-              ? t("import_cancellation_requested")
-              : props.job?.status === "Pending"
-                ? t("import_queued")
-                : t("import_in_progress")}
-      </PrimaryText>
+      <PrimaryText size="md">{statusMessage}</PrimaryText>
       {props.isLoading && !props.job ? (
-        <Progress value={0} animated />
+        <Progress value={0} animated striped ariaLabel={statusMessage} />
       ) : (
         <>
           <Progress
             value={props.job?.progressPercentage ?? 0}
-            color={isFailed ? "red" : isCancelled ? "yellow" : undefined}
-            animated={!isFailed && !isCancelled && !isCancellationRequested}
+            color={isFailed ? "error" : isCancelled ? "warning" : undefined}
+            animated={animated}
+            striped={animated}
+            ariaLabel={statusMessage}
           />
           <PrimaryText size="sm">
             {t("import_progress", {
@@ -72,33 +75,38 @@ const ImportProgress = (props: ImportProgressProps) => {
           ) : null}
           {canCancel && !isConfirmingCancel ? (
             <Button
-              color="red"
-              variant="outline"
+              variant="filled"
+              color="error"
+              size="compact-sm"
               leftSection={<BanIcon size={16} />}
               loading={props.isCancelling}
               onClick={() => setIsConfirmingCancel(true)}
             >
-              {t("cancel")}
+              {t("stop")}
             </Button>
           ) : null}
           {canCancel && isConfirmingCancel ? (
             <Stack gap="xs">
               <PrimaryText size="sm">
-                {t("confirm_cancel_import_message")}
+                {t("confirm_stop_import_message")}
               </PrimaryText>
               <Group grow>
                 <Button
-                  variant="default"
+                  variant="filled"
+                  color="neutral"
+                  size="compact-sm"
                   onClick={() => setIsConfirmingCancel(false)}
                 >
                   {t("cancel")}
                 </Button>
                 <Button
-                  color="red"
+                  variant="filled"
+                  color="error"
+                  size="compact-sm"
                   onClick={() => void confirmCancel()}
                   loading={props.isCancelling}
                 >
-                  {t("confirm_cancel_import")}
+                  {t("confirm_stop")}
                 </Button>
               </Group>
             </Stack>

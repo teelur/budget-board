@@ -6,7 +6,6 @@ import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 
 interface ValueItemProps {
   value: IValueResponse;
-  userCurrency: string;
 }
 
 const ValueItem = (props: ValueItemProps) => {
@@ -14,17 +13,9 @@ const ValueItem = (props: ValueItemProps) => {
   return (
     <ElevatedCard radius="md">
       {isSelected ? (
-        <EditableValueItemContent
-          value={props.value}
-          userCurrency={props.userCurrency}
-          doUnSelect={close}
-        />
+        <EditableValueItemContent value={props.value} doUnSelect={close} />
       ) : (
-        <ValueItemContent
-          value={props.value}
-          userCurrency={props.userCurrency}
-          doSelect={open}
-        />
+        <ValueItemContent value={props.value} doSelect={open} />
       )}
     </ElevatedCard>
   );

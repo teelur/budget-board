@@ -1,5 +1,6 @@
 export interface IUserSettingsResponse {
   currency: string;
+  decimalPlaces: number;
   language: string;
   dateFormat: string;
   budgetWarningThreshold: number;
@@ -17,6 +18,7 @@ export interface IUserSettingsResponse {
 
 export interface IUserSettingsUpdateRequest {
   currency?: string;
+  decimalPlaces?: number;
   language?: string;
   dateFormat?: string;
   budgetWarningThreshold?: number;

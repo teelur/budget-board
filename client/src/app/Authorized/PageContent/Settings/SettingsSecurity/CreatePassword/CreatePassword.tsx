@@ -1,4 +1,5 @@
-import { Button, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { Button } from "@teelur/budget-board-ui";
 import { hasLength, useField } from "@mantine/form";
 import React from "react";
 import Card from "~/components/core/Card/Card";
@@ -41,6 +42,9 @@ const CreatePassword = (): React.ReactNode => {
           w="100%"
         />
         <Button
+          variant="filled"
+          color="primary"
+          size="xs"
           onClick={() => {
             newPasswordField.validate();
             confirmNewPasswordField.validate();

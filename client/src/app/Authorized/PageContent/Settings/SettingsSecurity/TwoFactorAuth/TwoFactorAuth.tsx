@@ -1,12 +1,11 @@
 import {
-  Badge,
   Group,
   LoadingOverlay,
-  Button,
   Stack,
   CopyButton,
   Skeleton,
 } from "@mantine/core";
+import { Badge, Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTwoFactorAuthenticationQuery } from "~/hooks/queries/useTwoFactorAuthenticationQuery";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -77,10 +76,11 @@ const TwoFactorAuth = (): React.ReactNode => {
                 ))}
               </Group>
               <CopyButton value={recoveryCodes.join("\n")}>
-                {({ copied, copy }) => (
+                {({ copy }) => (
                   <Button
-                    size="compact-sm"
-                    color={copied ? "teal" : "blue"}
+                    variant="filled"
+                    color="primary"
+                    size="xs"
                     onClick={() => {
                       copy();
                       showNotification({
@@ -95,10 +95,12 @@ const TwoFactorAuth = (): React.ReactNode => {
               </CopyButton>
             </Stack>
           )}
-          <Stack gap="0.5rem">
+          <Group gap="0.5rem">
             <Button
               variant="filled"
-              bg="var(--button-color-destructive)"
+              color="error"
+              size="xs"
+              flex="1 1 0"
               onClick={() =>
                 setTwoFactorAuth({
                   enable: false,
@@ -111,7 +113,10 @@ const TwoFactorAuth = (): React.ReactNode => {
               {t("disable")}
             </Button>
             <Button
-              variant="outline"
+              variant="filled"
+              color="primary"
+              size="xs"
+              flex="1 1 0"
               onClick={() =>
                 setTwoFactorAuth({
                   resetSharedKey: false,
@@ -122,7 +127,7 @@ const TwoFactorAuth = (): React.ReactNode => {
             >
               {t("generate_new_recovery_codes")}
             </Button>
-          </Stack>
+          </Group>
         </Stack>
       );
     }
@@ -148,10 +153,11 @@ const TwoFactorAuth = (): React.ReactNode => {
               <CopyButton
                 value={formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
               >
-                {({ copied, copy }) => (
+                {({ copy }) => (
                   <Button
-                    size="compact-sm"
-                    color={copied ? "teal" : "blue"}
+                    variant="filled"
+                    color="primary"
+                    size="xs"
                     onClick={() => {
                       copy();
                       showNotification({
@@ -180,6 +186,9 @@ const TwoFactorAuth = (): React.ReactNode => {
             />
           </Stack>
           <Button
+            variant="filled"
+            color="primary"
+            size="xs"
             onClick={() =>
               setTwoFactorAuth({
                 enable: true,
@@ -196,7 +205,11 @@ const TwoFactorAuth = (): React.ReactNode => {
       );
     }
 
-    return <Button onClick={toggle}>{t("setup_2fa")}</Button>;
+    return (
+      <Button variant="filled" color="primary" size="xs" onClick={toggle}>
+        {t("setup_2fa")}
+      </Button>
+    );
   };
 
   if (twoFactorAuthQuery.isPending) {
@@ -210,9 +223,11 @@ const TwoFactorAuth = (): React.ReactNode => {
         <Group gap="1rem">
           <PrimaryText size="lg">{t("two_factor_authentication")}</PrimaryText>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
-            <Badge color="var(--button-color-confirm)">{t("enabled")}</Badge>
+            <Badge variant="light" color="success" size="xs">
+              {t("enabled")}
+            </Badge>
           ) : (
-            <Badge color="var(--button-color-destructive)">
+            <Badge variant="light" color="error" size="xs">
               {t("disabled")}
             </Badge>
           )}

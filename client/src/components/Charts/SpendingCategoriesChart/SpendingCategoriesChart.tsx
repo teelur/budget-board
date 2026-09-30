@@ -4,7 +4,7 @@ import {
   uncategorizedTransactionCategory,
 } from "~/models/transaction";
 import React from "react";
-import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
+import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import {
   buildSpendingCategoryChartData,
   buildSpendingSubcategoryChartData,
@@ -120,7 +120,9 @@ const SpendingCategoriesChart = (
 
   const { innerChartData, outerChartData } = React.useMemo(() => {
     const translateName = (name: string) =>
-      name === uncategorizedTransactionCategory ? t("uncategorized") : name;
+      name.toLowerCase() === uncategorizedTransactionCategory
+        ? t("uncategorized")
+        : name;
 
     const rawInner = buildSpendingCategoryChartData(
       filteredTransactions,
@@ -264,7 +266,7 @@ const SpendingCategoriesChart = (
   const outerRadius = showSubcategories ? (isNarrow ? 75 : 93) : undefined;
 
   const formatValue = (value: number) =>
-    formatSensitiveAmount(value, true, SignDisplay.Auto);
+    formatSensitiveAmount(value, SignDisplay.Auto);
 
   return (
     <Stack w="100%" gap="xs">

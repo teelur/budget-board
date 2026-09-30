@@ -1574,6 +1574,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@teelur/budget-board-ui@npm:^0.2.0-canary.33.cbce394":
+  version: 0.2.0-canary.33.cbce394
+  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.33.cbce394"
+  peerDependencies:
+    "@mantine/core": ^9.6.1
+    "@mantine/hooks": ^9.6.1
+    react: ^19.3.0
+    react-dom: ^19.3.0
+  checksum: 10c0/15133a6c8a1e2026a3790c011294bb0cabca2f13ad7af7881f577372f6cce28533ac584d5249a1d72ceae92fe15afca4b45cf05d1c78bf307a02d592f9d90b79
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7.20.5":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -2526,6 +2538,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.103.1"
     "@tanstack/react-query-devtools": "npm:^5.103.1"
     "@tanstack/react-virtual": "npm:^3.14.13"
+    "@teelur/budget-board-ui": "npm:^0.2.0-canary.33.cbce394"
     "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^26.6.1"
     "@types/papaparse": "npm:^5.5.2"
@@ -2555,6 +2568,8 @@ __metadata:
     postcss: "npm:^8.5.28"
     postcss-preset-mantine: "npm:^1.18.0"
     postcss-simple-vars: "npm:^7.0.1"
+    prettier: "npm:^3.9.9"
+    prettier-plugin-sort-json: "npm:^4.2.0"
     qrcode.react: "npm:^4.2.0"
     react: "npm:^19.3.0"
     react-dom: "npm:^19.3.0"
@@ -5149,6 +5164,24 @@ __metadata:
   version: 1.2.1
   resolution: "prelude-ls@npm:1.2.1"
   checksum: 10c0/b00d617431e7886c520a6f498a2e14c75ec58f6d93ba48c3b639cf241b54232d90daa05d83a9e9b9fef6baa63cb7e1e4602c2372fea5bc169668401eb127d0cd
+  languageName: node
+  linkType: hard
+
+"prettier-plugin-sort-json@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "prettier-plugin-sort-json@npm:4.2.0"
+  peerDependencies:
+    prettier: ^3.0.0
+  checksum: 10c0/e1eea20998bd32da682d226c0eeb39f8a33548299f7092aa89c28caf1c171524a408d6b06773ef953b688f48577edaa3bfd7965e4b39a7e64c78dd9796216be3
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^3.9.9":
+  version: 3.9.9
+  resolution: "prettier@npm:3.9.9"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10c0/d50ea2537b2ff7dbd5088a214f4d936484e55c665cea2185b477a55b0770be55f3b156a71f63a9a639def6b334667bb327139dc85f2a1041c0a34752cdc74647
   languageName: node
   linkType: hard
 
