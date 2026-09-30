@@ -20,6 +20,24 @@
   margin-left: auto;
 }
 
+.hasBreakdown {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.25em;
+}
+
+.breakdownTooltip {
+  background-color: var(--background-color-surface);
+  border: 1px solid var(--surface-color-input-border);
+  color: var(--base-color-text-primary);
+}
+
+.breakdownTotal {
+  border-top: 1px solid var(--surface-color-input-border);
+  padding-top: 2px;
+  font-weight: 600;
+}
+
 .inlineText {
   display: inline;
   margin: 0;

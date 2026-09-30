@@ -52,7 +52,7 @@ const FixParentBudgetButton = (props: FixParentBudgetButtonProps) => {
       updateBudgetMutation.mutate({
         id: childBudget.id,
         limit: childBudget.limit,
-        isRollover: childBudget.isRollover,
+        rolloverStartMonth: childBudget.rolloverStartMonth,
       });
     });
   };

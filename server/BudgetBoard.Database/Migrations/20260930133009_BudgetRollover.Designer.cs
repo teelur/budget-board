@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BudgetBoard.Database.Migrations
 {
     [DbContext(typeof(UserDataContext))]
-    [Migration("20260918024829_BudgetRollover")]
+    [Migration("20260930133009_BudgetRollover")]
     partial class BudgetRollover
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace BudgetBoard.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.11")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -309,13 +309,13 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsRollover")
-                        .HasColumnType("boolean");
-
                     b.Property<decimal>("Limit")
                         .HasColumnType("numeric");
 
                     b.Property<DateOnly>("Month")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("RolloverStartMonth")
                         .HasColumnType("date");
 
                     b.Property<Guid>("UserID")

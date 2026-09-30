@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -10,19 +11,18 @@ namespace BudgetBoard.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "IsRollover",
+            migrationBuilder.AddColumn<DateOnly>(
+                name: "RolloverStartMonth",
                 table: "Budget",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
+                type: "date",
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "IsRollover",
+                name: "RolloverStartMonth",
                 table: "Budget");
         }
     }

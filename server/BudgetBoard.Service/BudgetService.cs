@@ -121,29 +121,70 @@ public class BudgetService(
             .Budgets.Where(b => b.Month.Month == month.Month && b.Month.Year == month.Year)
             .ToList();
 
-        if (!budgets.Any(b => b.IsRollover))
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+
+        // Only child categories roll over; a parent's rollover is the sum of its children's.
+        var rolloverBudgets = budgets
+            .Where(b =>
+                b.RolloverStartMonth.HasValue
+                && !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)
+            )
+            .ToList();
+
+        if (rolloverBudgets.Count == 0)
         {
-            return budgets.Select(b => new BudgetResponse(b)).ToList();
+            return budgets
+                .Select(b => new BudgetResponse(b) { RolloverStartMonth = null })
+                .ToList();
         }
 
-        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
         var budgetsByCategoryMonth = userData
             .Budgets.GroupBy(b => GetCategoryMonthKey(b.Category, b.Month))
             .ToDictionary(g => g.Key, g => g.First());
 
-        // A rollover chain can only reach back as far as the user's earliest budget.
+        // Rollover can only accumulate from months that have budgets, starting no earlier than the
+        // earliest start month, and only from months before the one being read.
         var earliestBudgetMonth = userData.Budgets.Min(b => b.Month);
-        var categorySpendMap = await BuildCategorySpendMapAsync(
-            userData.Id,
-            earliestBudgetMonth,
-            month
+        var earliestStartMonth = rolloverBudgets.Min(b => b.RolloverStartMonth!.Value);
+        var spendFrom = StartOfMonth(
+            earliestStartMonth > earliestBudgetMonth ? earliestStartMonth : earliestBudgetMonth
+        );
+        var spendTo = StartOfMonth(month).AddMonths(-1);
+        var categorySpendMap =
+            spendFrom <= spendTo
+                ? await BuildCategorySpendMapAsync(userData.Id, spendFrom, spendTo)
+                : [];
+
+        var childRollovers = rolloverBudgets.ToDictionary(
+            b => b.ID,
+            b =>
+                CalculateRollover(
+                    b,
+                    earliestBudgetMonth,
+                    budgetsByCategoryMonth,
+                    categorySpendMap,
+                    allCategories
+                )
         );
 
         return budgets
-            .Select(b => new BudgetResponse(
-                b,
-                CalculateRollover(b, budgetsByCategoryMonth, categorySpendMap, allCategories)
-            ))
+            .Select(b =>
+            {
+                if (!TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories))
+                {
+                    return new BudgetResponse(b, childRollovers.GetValueOrDefault(b.ID));
+                }
+
+                var childrenRollover = rolloverBudgets
+                    .Where(child =>
+                        TransactionCategoriesHelpers
+                            .GetParentCategory(child.Category, allCategories)
+                            .Equals(b.Category, StringComparison.InvariantCultureIgnoreCase)
+                    )
+                    .Sum(child => childRollovers[child.ID]);
+
+                return new BudgetResponse(b, childrenRollover) { RolloverStartMonth = null };
+            })
             .ToList();
     }
 
@@ -154,11 +195,32 @@ public class BudgetService(
         var budget = GetBudgetById(userData, request.ID);
 
         budget.Limit = request.Limit;
-        budget.IsRollover = request.IsRollover;
 
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+        var isParent = TransactionCategoriesHelpers.GetIsParentCategory(
+            budget.Category,
+            allCategories
+        );
+
+        // Only child categories roll over.
+        var rolloverStartMonth = isParent ? null : NormalizeToMonth(request.RolloverStartMonth);
+        if (rolloverStartMonth != budget.RolloverStartMonth)
+        {
+            // Rollover is a standing setting for the category, so it carries forward to later months.
+            var budgetMonth = NormalizeToMonth(budget.Month);
+            foreach (
+                var categoryBudget in userData.Budgets.Where(b =>
+                    b.Category.Equals(budget.Category, StringComparison.InvariantCultureIgnoreCase)
+                    && NormalizeToMonth(b.Month) >= budgetMonth
+                )
+            )
+            {
+                categoryBudget.RolloverStartMonth = rolloverStartMonth;
+            }
+        }
+
         // If the budget being updated is a parent category, ensure that the sum of its children does not exceed the new limit.
-        if (TransactionCategoriesHelpers.GetIsParentCategory(budget.Category, allCategories))
+        if (isParent)
         {
             var childBudgetsLimitTotal = GetBudgetChildrenLimit(
                 budget.Category,
@@ -328,7 +390,14 @@ public class BudgetService(
             Month = request.Month,
             Category = request.Category,
             Limit = request.Limit,
-            IsRollover = request.IsRollover,
+            // Only child categories roll over.
+            RolloverStartMonth = TransactionCategoriesHelpers.GetIsParentCategory(
+                request.Category,
+                allCategories
+            )
+                ? null
+                : NormalizeToMonth(request.RolloverStartMonth)
+                    ?? GetInheritedRolloverStartMonth(userData, request.Category, request.Month),
             UserID = userData.Id,
         };
 
@@ -373,6 +442,29 @@ public class BudgetService(
         string category,
         DateOnly month
     ) => (category.ToLowerInvariant(), month.Year, month.Month);
+
+    private static DateOnly? NormalizeToMonth(DateOnly? date) =>
+        date.HasValue ? StartOfMonth(date.Value) : null;
+
+    private static DateOnly StartOfMonth(DateOnly date) => new(date.Year, date.Month, 1);
+
+    /// <summary>
+    /// A new budget keeps the rollover setting of the most recent earlier budget for its category,
+    /// so enabling rollover once applies to every month after it until it is disabled.
+    /// </summary>
+    private static DateOnly? GetInheritedRolloverStartMonth(
+        ApplicationUser userData,
+        string category,
+        DateOnly month
+    ) =>
+        userData
+            .Budgets.Where(b =>
+                b.Category.Equals(category, StringComparison.InvariantCultureIgnoreCase)
+                && NormalizeToMonth(b.Month) < NormalizeToMonth(month)
+            )
+            .OrderByDescending(b => b.Month)
+            .FirstOrDefault()
+            ?.RolloverStartMonth;
 
     /// <summary>
     /// Totals transaction amounts per category and month, mirroring how the budgets page
@@ -438,18 +530,20 @@ public class BudgetService(
     }
 
     /// <summary>
-    /// Sums the unspent remainder of every consecutive preceding month that also had rollover
-    /// enabled for this category. Overspent months contribute a negative amount, so a deficit
-    /// carries forward until it is paid back.
+    /// Sums the unspent remainder of every month from the budget's rollover start month up to
+    /// (but excluding) its own month. Overspent months contribute a negative amount, so a deficit
+    /// carries forward until it is paid back. Months with no budget for the category are skipped,
+    /// so spending in an unbudgeted month does not count against the balance.
     /// </summary>
     private static decimal CalculateRollover(
         Budget budget,
+        DateOnly earliestBudgetMonth,
         IReadOnlyDictionary<(string, int, int), Budget> budgetsByCategoryMonth,
         IReadOnlyDictionary<(string, int, int), decimal> categorySpendMap,
         IEnumerable<ITransactionCategoryResponse> allCategories
     )
     {
-        if (!budget.IsRollover)
+        if (budget.RolloverStartMonth is not DateOnly startMonth)
         {
             return 0;
         }
@@ -457,21 +551,21 @@ public class BudgetService(
         // Expense amounts are stored negative, so they need flipping to count against a limit.
         var sign = IsIncomeCategory(budget.Category, allCategories) ? 1 : -1;
 
-        var rollover = 0m;
-        var month = budget.Month.AddMonths(-1);
+        // Nothing exists before the first budget, so starting earlier just adds empty months.
+        var effectiveStart = startMonth > earliestBudgetMonth ? startMonth : earliestBudgetMonth;
+        var month = new DateOnly(effectiveStart.Year, effectiveStart.Month, 1);
 
-        while (
-            budgetsByCategoryMonth.TryGetValue(
-                GetCategoryMonthKey(budget.Category, month),
-                out var priorBudget
-            ) && priorBudget.IsRollover
-        )
+        var rollover = 0m;
+
+        while (month < budget.Month)
         {
-            var spend = categorySpendMap.GetValueOrDefault(
-                GetCategoryMonthKey(budget.Category, month)
-            );
-            rollover += priorBudget.Limit - (spend * sign);
-            month = month.AddMonths(-1);
+            var key = GetCategoryMonthKey(budget.Category, month);
+            if (budgetsByCategoryMonth.TryGetValue(key, out var priorBudget))
+            {
+                rollover += priorBudget.Limit - (categorySpendMap.GetValueOrDefault(key) * sign);
+            }
+
+            month = month.AddMonths(1);
         }
 
         return rollover;

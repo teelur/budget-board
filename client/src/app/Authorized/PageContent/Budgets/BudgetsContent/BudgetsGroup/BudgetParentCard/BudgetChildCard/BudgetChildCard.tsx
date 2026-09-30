@@ -19,7 +19,7 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/components/core/Text/SensitiveAmount/SensitiveAmount";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import Checkbox from "~/components/core/Checkbox/Checkbox";
+import RolloverControl from "../RolloverControl/RolloverControl";
 import Progress from "~/components/core/Progress/Progress";
 import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import BudgetMetrics from "../BudgetMetrics/BudgetMetrics";
@@ -37,7 +37,7 @@ interface BudgetChildCardProps {
   projectedAmount?: number;
   limit: number;
   rollover: number;
-  isRollover: boolean;
+  rolloverStartMonth: string | null;
   isIncome: boolean;
   icon: string;
   selectedDate: Date;
@@ -63,7 +63,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     validate: (value) => (value !== "" ? null : t("invalid_limit")),
   });
 
-  const handleEdit = (newLimit?: number | string, newIsRollover?: boolean) => {
+  const handleEdit = (
+    newLimit?: number | string,
+    newRolloverStartMonth?: string | null,
+  ) => {
     if (newLimit === "") {
       return;
     }
@@ -73,7 +76,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     updateBudgetMutation.mutate({
       id: props.id,
       limit: Number(newLimit),
-      isRollover: newIsRollover ?? props.isRollover,
+      rolloverStartMonth:
+        newRolloverStartMonth === undefined
+          ? props.rolloverStartMonth
+          : newRolloverStartMonth,
     });
   };
 
@@ -177,15 +183,15 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                       elevation={1}
                     />
                   </Flex>
-                  <Checkbox
-                    checked={props.isRollover}
-                    onChange={(e) =>
-                      handleEdit(newLimitField.getValue(), e.target.checked)
-                    }
-                    label={t("roll_over_unspent")}
-                    size="xs"
-                    elevation={1}
-                  />
+                  <Flex onClick={(e) => e.stopPropagation()}>
+                    <RolloverControl
+                      rolloverStartMonth={props.rolloverStartMonth}
+                      budgetMonth={props.selectedDate}
+                      onChange={(newStartMonth) =>
+                        handleEdit(newLimitField.getValue(), newStartMonth)
+                      }
+                    />
+                  </Flex>
                 </>
               ) : (
                 <Trans
@@ -245,7 +251,9 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
             amount={props.amount}
             projectedAmount={projectedAmount}
             limit={availableLimit}
-            rollover={props.isRollover ? props.rollover : undefined}
+            rollover={
+              props.rolloverStartMonth !== null ? props.rollover : undefined
+            }
             isIncome={props.isIncome}
             budgetWarningThreshold={budgetWarningThreshold}
             formatAmount={formatSensitiveAmount}

@@ -2,13 +2,13 @@ export interface IBudgetCreateRequest {
   month: string;
   category: string;
   limit: number;
-  isRollover?: boolean;
+  rolloverStartMonth?: string | null;
 }
 
 export interface IBudgetUpdateRequest {
   id: string;
   limit: number;
-  isRollover: boolean;
+  rolloverStartMonth: string | null;
 }
 
 export interface IBudget {
@@ -16,8 +16,9 @@ export interface IBudget {
   month: string;
   category: string;
   limit: number;
-  isRollover: boolean;
-  /** Balance carried in from prior months. Negative when earlier months were overspent. */
+  /** Month the rollover balance starts accumulating from. Null disables rollover. */
+  rolloverStartMonth: string | null;
+  /** Balance accumulated since the start month. Negative when earlier months were overspent. */
   rollover: number;
   userId: string;
 }

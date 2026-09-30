@@ -8,7 +8,7 @@ public interface IBudgetCreateRequest
     DateOnly Month { get; }
     string Category { get; }
     decimal Limit { get; }
-    bool IsRollover { get; }
+    DateOnly? RolloverStartMonth { get; }
 }
 
 public class BudgetCreateRequest : IBudgetCreateRequest
@@ -16,28 +16,28 @@ public class BudgetCreateRequest : IBudgetCreateRequest
     public DateOnly Month { get; set; } = DateOnly.MinValue;
     public string Category { get; set; } = string.Empty;
     public decimal Limit { get; set; } = 0;
-    public bool IsRollover { get; set; } = false;
+    public DateOnly? RolloverStartMonth { get; set; } = null;
 }
 
 public interface IBudgetUpdateRequest
 {
     Guid ID { get; }
     decimal Limit { get; }
-    bool IsRollover { get; }
+    DateOnly? RolloverStartMonth { get; }
 }
 
 public class BudgetUpdateRequest : IBudgetUpdateRequest
 {
     public Guid ID { get; set; }
     public decimal Limit { get; set; }
-    public bool IsRollover { get; set; }
+    public DateOnly? RolloverStartMonth { get; set; }
 
     [JsonConstructor]
     public BudgetUpdateRequest()
     {
         ID = Guid.NewGuid();
         Limit = 0;
-        IsRollover = false;
+        RolloverStartMonth = null;
     }
 }
 
@@ -47,7 +47,7 @@ public interface IBudgetResponse
     DateOnly Month { get; }
     string Category { get; }
     decimal Limit { get; }
-    bool IsRollover { get; }
+    DateOnly? RolloverStartMonth { get; }
     decimal Rollover { get; }
     Guid UserID { get; }
 }
@@ -58,10 +58,11 @@ public class BudgetResponse : IBudgetResponse
     public DateOnly Month { get; set; } = DateOnly.MinValue;
     public string Category { get; set; } = string.Empty;
     public decimal Limit { get; set; } = 0;
-    public bool IsRollover { get; set; } = false;
+    public DateOnly? RolloverStartMonth { get; set; } = null;
 
     /// <summary>
-    /// The balance carried in from prior months. Negative when earlier months were overspent.
+    /// The balance accumulated from the rollover start month up to this budget's month.
+    /// Negative when earlier months were overspent.
     /// </summary>
     public decimal Rollover { get; set; } = 0;
     public Guid UserID { get; set; } = Guid.NewGuid();
@@ -72,7 +73,7 @@ public class BudgetResponse : IBudgetResponse
         Month = budget.Month;
         Category = budget.Category;
         Limit = budget.Limit;
-        IsRollover = budget.IsRollover;
+        RolloverStartMonth = budget.RolloverStartMonth;
         Rollover = rollover;
         UserID = budget.UserID;
     }
