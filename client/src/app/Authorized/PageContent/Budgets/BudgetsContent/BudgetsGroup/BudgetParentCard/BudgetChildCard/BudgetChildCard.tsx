@@ -12,10 +12,8 @@ import { useDisclosure } from "@mantine/hooks";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import RolloverControl from "../RolloverControl/RolloverControl";
-import Progress from "~/components/core/Progress/Progress";
-import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import BudgetMetrics from "../BudgetMetrics/BudgetMetrics";
+import RolloverControl from "../RolloverControl/RolloverControl";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
@@ -80,16 +78,17 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   );
 
   const actualProgressValue =
-    props.limit <= 0 ? 0 : Math.min(100, Math.max(0, percentComplete));
+    availableLimit <= 0 ? 0 : Math.min(100, Math.max(0, percentComplete));
   const projectedPercentComplete =
-    props.limit <= 0
+    availableLimit <= 0
       ? actualProgressValue
       : Math.min(
           100,
           Math.max(
             0,
             roundAwayFromZero(
-              ((projectedAmount * (props.isIncome ? 1 : -1)) / props.limit) *
+              ((projectedAmount * (props.isIncome ? 1 : -1)) /
+                availableLimit) *
                 100,
             ),
           ),
@@ -132,7 +131,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     }
     return (
       <AmountText
-        amount={props.limit}
+        amount={availableLimit}
         disableStatusColor
         size="md"
         isSensitive={isPrivacyModeEnabled}
@@ -202,110 +201,42 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
               </ActionIcon>
             </Group>
             <Group gap="0.25rem" justify="flex-end" align="center">
-              {isSelected ? (
-                <>
-                  <Trans
-                    i18nKey="budget_amount_fraction_editable_total_styled"
-                    values={{
-                      amount: formatSensitiveAmount(
-                        props.amount * (props.isIncome ? 1 : -1),
-                      ),
-                      total: formatSensitiveAmount(props.limit),
-                    }}
-                    components={[
-                      <PrimaryText
-                        className={classes.text}
-                        key="amount"
-                        elevation={1}
-                      />,
-                      <DimmedText size="sm" key="of" elevation={1} />,
-                    ]}
-                  />
-                  <Flex onClick={(e) => e.stopPropagation()}>
-                    <NumberInput
-                      {...newLimitField.getInputProps()}
-                      onBlur={() => handleEdit(newLimitField.getValue())}
-                      thousandSeparator={thousandsSeparator}
-                      decimalSeparator={decimalSeparator}
-                      min={0}
-                      max={999999}
-                      step={1}
-                      prefix={getCurrencySymbol(preferredCurrency)}
-                      placeholder={t("enter_limit")}
-                      size="xs"
-                      styles={{
-                        root: {
-                          maxWidth: "100px",
-                        },
-                        input: {
-                          padding: "0 10px",
-                          fontSize: "16px",
-                        },
-                      }}
-                      key="total-edit"
-                      elevation={1}
-                    />
-                  </Flex>
-                  <Flex onClick={(e) => e.stopPropagation()}>
-                    <RolloverControl
-                      rolloverStartMonth={props.rolloverStartMonth}
-                      budgetMonth={props.selectedDate}
-                      onChange={(newStartMonth) =>
-                        handleEdit(newLimitField.getValue(), newStartMonth)
-                      }
-                    />
-                  </Flex>
-                </>
-              ) : (
-                <Trans
-                  i18nKey="budget_amount_fraction_styled"
-                  values={{
-                    amount: formatSensitiveAmount(
-                      props.amount * (props.isIncome ? 1 : -1),
-                    ),
-                    total: formatSensitiveAmount(availableLimit),
-                  }}
-                  components={[
-                    <PrimaryText
-                      className={classes.text}
-                      key="amount"
-                      elevation={1}
-                    />,
-                    <DimmedText size="sm" key="of" elevation={1} />,
-                    <PrimaryText
-                      className={classes.text}
-                      key="total"
-                      elevation={1}
-                    />,
-                  ]}
-                />
-              )}
-            </Group>
-          </Group>
-          <Group
-            gap="0.5rem"
-            align="center"
-            style={{ containerType: "inline-size" }}
-          >
-            <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
-              <Progress
-                size={10}
-                percentComplete={percentComplete}
-                amount={props.amount}
-                limit={availableLimit}
-                projectedAmount={projectedAmount}
-                type={
-                  props.isIncome ? ProgressType.Income : ProgressType.Expense
-                }
-                warningThreshold={budgetWarningThreshold}
-                elevation={1}
-                showPercentLabel={false}
+              <Trans
+                i18nKey="x_of_y"
+                components={[
+                  <AmountText
+                    amount={props.amount}
+                    disableStatusColor
+                    size="md"
+                    isSensitive={isPrivacyModeEnabled}
+                    locale={intlLocale}
+                    currency={preferredCurrency}
+                    decimalPlaces={0}
+                    signDisplay={SignDisplay.Auto}
+                    invertSign={!props.isIncome}
+                    className={classes.text}
+                    key="amount"
+                  />,
+                  <DimmedText size="sm" key="of" elevation={1} />,
+                  getElementForLimit(),
+                ]}
               />
+              {isSelected && (
+                <Flex onClick={(e) => e.stopPropagation()}>
+                  <RolloverControl
+                    rolloverStartMonth={props.rolloverStartMonth}
+                    budgetMonth={props.selectedDate}
+                    onChange={(newStartMonth) =>
+                      handleEdit(newLimitField.getValue(), newStartMonth)
+                    }
+                  />
+                </Flex>
+              )}
             </Group>
           </Group>
           <Progress
             amount={props.amount}
-            limit={props.limit}
+            limit={availableLimit}
             label
             sections={
               projectedProgressValue > 0

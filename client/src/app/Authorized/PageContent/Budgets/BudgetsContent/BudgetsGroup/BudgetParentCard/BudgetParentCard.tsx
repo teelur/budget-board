@@ -119,16 +119,16 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
       100,
   );
   const actualProgressValue =
-    limit <= 0 ? 0 : Math.min(100, Math.max(0, percentComplete));
+    availableLimit <= 0 ? 0 : Math.min(100, Math.max(0, percentComplete));
   const projectedPercentComplete =
-    limit <= 0
+    availableLimit <= 0
       ? actualProgressValue
       : Math.min(
           100,
           Math.max(
             0,
             roundAwayFromZero(
-              ((projectedAmount * (isIncome ? 1 : -1)) / limit) * 100,
+              ((projectedAmount * (isIncome ? 1 : -1)) / availableLimit) * 100,
             ),
           ),
         );
@@ -275,7 +275,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
 
     return (
       <AmountText
-        amount={limit}
+        amount={availableLimit}
         disableStatusColor
         size="md"
         isSensitive={isPrivacyModeEnabled}
@@ -367,98 +367,32 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   <PencilIcon size={16} />
                 </ActionIcon>
               </Group>
-              <Group gap="0.5rem" justify="flex-end" align="center">
-                {isSelected ? (
-                  <>
-                    <Trans
-                      i18nKey="budget_amount_fraction_editable_total_styled"
-                      values={{
-                        amount: formatSensitiveAmount(
-                          amount * (isIncome ? 1 : -1),
-                        ),
-                      }}
-                      components={[
-                        <PrimaryText
-                          className={classes.text}
-                          key="amount"
-                          elevation={1}
-                        />,
-                        <DimmedText size="sm" key="of" elevation={1} />,
-                      ]}
-                    />
-                    <Flex onClick={(e) => e.stopPropagation()}>
-                      <NumberInput
-                        {...newLimitField.getInputProps()}
-                        onBlur={() => handleEdit(newLimitField.getValue())}
-                        thousandSeparator={thousandsSeparator}
-                        decimalSeparator={decimalSeparator}
-                        min={childLimitsTotal}
-                        max={999999}
-                        step={1}
-                        prefix={getCurrencySymbol(preferredCurrency)}
-                        placeholder={t("enter_limit")}
-                        size="xs"
-                        styles={{
-                          root: {
-                            maxWidth: "100px",
-                          },
-                          input: {
-                            padding: "0 10px",
-                            fontSize: "16px",
-                          },
-                        }}
-                        elevation={1}
-                      />
-                    </Flex>
-                  </>
-                ) : (
-                  <Trans
-                    i18nKey="budget_amount_fraction_styled"
-                    values={{
-                      amount: formatSensitiveAmount(
-                        amount * (isIncome ? 1 : -1),
-                      ),
-                      total: formatSensitiveAmount(availableLimit),
-                    }}
-                    components={[
-                      <PrimaryText
-                        className={classes.text}
-                        key="amount"
-                        elevation={1}
-                      />,
-                      <DimmedText size="sm" key="of" elevation={1} />,
-                      <PrimaryText
-                        className={classes.text}
-                        key="total"
-                        elevation={1}
-                      />,
-                    ]}
-                  />
-                )}
-              </Group>
-            </Group>
-            <Group
-              gap="0.5rem"
-              align="center"
-              style={{ containerType: "inline-size" }}
-            >
-              <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
-                <Progress
-                  size={12}
-                  percentComplete={percentComplete}
-                  amount={amount}
-                  limit={availableLimit}
-                  projectedAmount={projectedAmount}
-                  type={isIncome ? ProgressType.Income : ProgressType.Expense}
-                  warningThreshold={budgetWarningThreshold}
-                  elevation={1}
-                  showPercentLabel={false}
+              <Group gap="0.25rem" justify="flex-end" align="center">
+                <Trans
+                  i18nKey="x_of_y"
+                  components={[
+                    <AmountText
+                      amount={amount}
+                      disableStatusColor
+                      size="md"
+                      isSensitive={isPrivacyModeEnabled}
+                      locale={intlLocale}
+                      currency={preferredCurrency}
+                      decimalPlaces={0}
+                      signDisplay={SignDisplay.Auto}
+                      invertSign={!isIncome}
+                      className={classes.text}
+                      key="amount"
+                    />,
+                    <DimmedText size="sm" key="of" elevation={1} />,
+                    getElementForLimit(),
+                  ]}
                 />
               </Group>
             </Group>
             <Progress
               amount={amount}
-              limit={limit}
+              limit={availableLimit}
               label
               sections={
                 projectedProgressValue > 0

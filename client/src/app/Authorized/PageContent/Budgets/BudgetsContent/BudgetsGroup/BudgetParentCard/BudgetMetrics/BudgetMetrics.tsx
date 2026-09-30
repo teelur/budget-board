@@ -1,10 +1,11 @@
 import classes from "./BudgetMetrics.module.css";
+import { useTranslation } from "react-i18next";
 import { Box, Group, Stack, Tooltip } from "@mantine/core";
-import React from "react";
-import { Trans, useTranslation } from "react-i18next";
 import { AmountText } from "@teelur/budget-board-ui";
+import React from "react";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { Trans } from "react-i18next";
 import { StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -16,6 +17,7 @@ interface BudgetMetricsProps {
   projectedAmount: number;
   /** Already includes any rollover carried in from prior months. */
   limit: number;
+  /** Undefined when rollover is disabled. */
   rollover?: number;
   isIncome: boolean;
 }
@@ -32,37 +34,27 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
   const actualRemaining = roundAwayFromZero(
     props.limit - props.amount * budgetSign,
   );
-  const projectedRemaining = roundAwayFromZero(
-    props.limit - props.projectedAmount * budgetSign,
-  );
-  const statusType = props.isIncome
-    ? StatusColorType.Income
-    : StatusColorType.Expense;
   const rollover = roundAwayFromZero(props.rollover ?? 0);
+  const hasRollover = props.rollover !== undefined;
 
   return (
     <Group className={classes.metrics} gap={0} align="baseline" wrap="wrap">
       {rollover !== 0 && (
-        <Box className={classes.metric}>
-          <Trans
-            i18nKey="budget_rolled_over_styled"
-            values={{ amount: props.formatAmount(rollover) }}
-            components={[
-              <DimmedText
-                className={classes.inlineText}
-                size="sm"
-                key="label"
-                elevation={1}
-              />,
-              <PrimaryText
-                className={classes.inlineText}
-                size="sm"
-                key="amount"
-                elevation={1}
-              />,
-            ]}
+        <Group gap="0.25rem" className={classes.metric}>
+          <DimmedText className={classes.inlineText} size="sm" elevation={1}>
+            {t("rolled_over_colon")}
+          </DimmedText>
+          <AmountText
+            amount={rollover}
+            size="sm"
+            disableStatusColor
+            isSensitive={isPrivacyModeEnabled}
+            locale={intlLocale}
+            currency={preferredCurrency}
+            decimalPlaces={0}
+            className={classes.inlineText}
           />
-        </Box>
+        </Group>
       )}
       {hasProjection && (
         <Group
@@ -136,36 +128,51 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
         label={
           <RolloverBreakdown
             limit={props.limit - (props.rollover ?? 0)}
-            rollover={props.rollover ?? 0}
+            rollover={rollover}
             used={props.amount * budgetSign}
             remaining={actualRemaining}
             isIncome={props.isIncome}
-            formatAmount={props.formatAmount}
           />
         }
-        disabled={props.rollover === undefined}
+        disabled={!hasRollover}
         events={{ hover: true, focus: true, touch: true }}
         position="bottom-end"
         classNames={{ tooltip: classes.breakdownTooltip }}
       >
         <Box
           className={`${classes.metric} ${classes.currentMetric} ${
-            props.rollover !== undefined ? classes.hasBreakdown : ""
+            hasRollover ? classes.hasBreakdown : ""
           }`}
-          tabIndex={props.rollover !== undefined ? 0 : undefined}
+          tabIndex={hasRollover ? 0 : undefined}
         >
           <Trans
             i18nKey="budget_left_styled"
-            values={{ amount: props.formatAmount(actualRemaining) }}
             components={[
-              <StatusText
+              <AmountText
                 amount={props.amount}
+                size="md"
                 total={props.limit}
-                type={statusType}
-                warningThreshold={props.budgetWarningThreshold}
-                className={`${classes.heroAmount} ${classes.inlineText}`}
+                type={
+                  props.isIncome
+                    ? StatusColorType.Income
+                    : StatusColorType.Expense
+                }
+                isSensitive={isPrivacyModeEnabled}
+                locale={intlLocale}
+                currency={preferredCurrency}
+                decimalPlaces={0}
+                warningThreshold={budgetWarningThreshold}
+                className={classes.inlineText}
                 key="amount"
-              />,
+              >
+                {convertNumberToCurrency(
+                  actualRemaining,
+                  0,
+                  preferredCurrency,
+                  SignDisplay.Auto,
+                  intlLocale,
+                )}
+              </AmountText>,
               <DimmedText
                 className={classes.inlineText}
                 size="sm"
@@ -186,15 +193,17 @@ interface RolloverBreakdownProps {
   used: number;
   remaining: number;
   isIncome: boolean;
-  formatAmount: (amount: number) => string;
 }
 
 const RolloverBreakdown = (props: RolloverBreakdownProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { intlLocale } = useLocale();
+  const { preferredCurrency } = useUserSettings();
+  const { isPrivacyModeEnabled } = usePrivacyMode();
 
   const rows: [string, number][] = [
     [t("budget_breakdown_this_month"), props.limit],
-    [t("budget_breakdown_rolled_over"), roundAwayFromZero(props.rollover)],
+    [t("budget_breakdown_rolled_over"), props.rollover],
     [
       props.isIncome
         ? t("budget_breakdown_received")
@@ -204,13 +213,16 @@ const RolloverBreakdown = (props: RolloverBreakdownProps): React.ReactNode => {
   ];
 
   const renderAmount = (amount: number): React.ReactNode => (
-    <StatusText
-      size="sm"
+    <AmountText
       amount={amount}
+      size="sm"
       type={StatusColorType.Total}
-    >
-      {props.formatAmount(amount)}
-    </StatusText>
+      isSensitive={isPrivacyModeEnabled}
+      locale={intlLocale}
+      currency={preferredCurrency}
+      decimalPlaces={0}
+      signDisplay={SignDisplay.Auto}
+    />
   );
 
   return (
