@@ -1,12 +1,5 @@
-import {
-  Affix,
-  FloatingWindow,
-  Group,
-  Progress,
-  Stack,
-  Transition,
-} from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Affix, FloatingWindow, Group, Stack, Transition } from "@mantine/core";
+import { Button, Progress } from "@teelur/budget-board-ui";
 import type { SetFloatingWindowPosition } from "@mantine/hooks";
 import {
   BanIcon,
@@ -89,9 +82,9 @@ const TransactionImportJobPanel = () => {
                 : t("import_in_progress");
   const progressColor =
     status === "Failed"
-      ? "red"
+      ? "error"
       : status === "Cancelled" || isCancellationRequested
-        ? "yellow"
+        ? "warning"
         : undefined;
 
   const handleCancel = () => {
@@ -192,13 +185,20 @@ const TransactionImportJobPanel = () => {
                 </Group>
               </Group>
               {isLoading && !job ? (
-                <Progress value={0} animated />
+                <Progress
+                  value={0}
+                  animated
+                  striped
+                  ariaLabel={statusMessage}
+                />
               ) : (
                 <>
                   <Progress
                     value={job?.progressPercentage ?? 0}
                     color={progressColor}
                     animated={!isTerminal && !isCancellationRequested}
+                    striped={!isTerminal && !isCancellationRequested}
+                    ariaLabel={statusMessage}
                   />
                   <PrimaryText size="sm">
                     {t("import_progress", {

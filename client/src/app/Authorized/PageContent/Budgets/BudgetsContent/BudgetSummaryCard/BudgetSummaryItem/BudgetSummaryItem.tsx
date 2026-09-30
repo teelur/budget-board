@@ -4,8 +4,6 @@ import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
-import Progress from "~/components/core/Progress/Progress";
-import { ProgressType } from "~/components/core/Progress/ProgressBase/ProgressBase";
 import { Trans } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -13,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
-import { AmountText } from "@teelur/budget-board-ui";
+import { AmountText, Progress } from "@teelur/budget-board-ui";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -46,6 +44,25 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     props.projectedAmount !== undefined &&
     roundAwayFromZero(props.projectedAmount - props.amount) !== 0;
   const formattedTotal = formatSensitiveAmount(props.total ?? 0);
+  const actualProgressValue = Math.min(100, Math.max(0, percentComplete));
+  const projectedPercentComplete =
+    props.projectedAmount === undefined || (props.total ?? 0) <= 0
+      ? actualProgressValue
+      : Math.min(
+          100,
+          Math.max(
+            0,
+            roundAwayFromZero(
+              ((props.projectedAmount * (invertBudgetSign ? -1 : 1)) /
+                (props.total ?? 0)) *
+                100,
+            ),
+          ),
+        );
+  const projectedProgressValue = Math.max(
+    0,
+    projectedPercentComplete - actualProgressValue,
+  );
 
   const amountTextProps = {
     amount: props.amount,
@@ -150,32 +167,27 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
         </Stack>
       </Group>
       {!props.hideProgress && (props.total ?? 0) > 0 && (
-        <Group gap="0.5rem" align="center">
-          <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
-            <Progress
-              size={8}
-              percentComplete={percentComplete}
-              amount={props.amount}
-              limit={props.total ?? 0}
-              projectedAmount={props.projectedAmount}
-              type={
-                props.budgetValueType === StatusColorType.Income
-                  ? ProgressType.Income
-                  : ProgressType.Expense
-              }
-              warningThreshold={budgetWarningThreshold}
-              elevation={1}
-              showPercentLabel={false}
-            />
-          </Flex>
-          <PrimaryText
-            size="sm"
-            elevation={1}
-            style={{ flexShrink: 0, lineHeight: 1 }}
-          >
-            {percentComplete.toFixed(0)}%
-          </PrimaryText>
-        </Group>
+        <Progress
+          amount={props.amount}
+          limit={props.total ?? 0}
+          label
+          type={invertBudgetSign ? "expense" : "income"}
+          size="xs"
+          sections={
+            projectedProgressValue > 0
+              ? [
+                  {
+                    ariaLabel: t("recurring_transactions"),
+                    color: "muted",
+                    striped: true,
+                    value: projectedProgressValue,
+                  },
+                ]
+              : []
+          }
+          warningThreshold={budgetWarningThreshold}
+          ariaLabel={props.label}
+        />
       )}
     </Stack>
   );
