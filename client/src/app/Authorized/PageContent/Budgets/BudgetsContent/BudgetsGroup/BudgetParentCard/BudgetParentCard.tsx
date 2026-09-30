@@ -382,7 +382,6 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                         ariaLabel: t("recurring_transactions"),
                         color: "muted",
                         striped: true,
-                        animated: true,
                         value: projectedProgressValue,
                       },
                     ]
