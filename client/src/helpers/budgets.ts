@@ -300,12 +300,36 @@ export const buildCategoryToLimitsMap = (
 ): Map<string, number> =>
   buildCategoryToBudgetValueMap(budgets, categories, (budget) => budget.limit);
 
+/**
+ * A budget's rollover is a running balance, so a later month's value already includes the
+ * unspent amounts of earlier months. Across several selected months, only the balance entering
+ * the earliest month counts; summing every month's rollover would count the same money twice.
+ * Returns the IDs of the budgets whose rollover counts towards the selected range.
+ */
+export const getRangeRolloverBudgetIds = (budgets: IBudget[]): Set<string> => {
+  const earliestBudgetByCategory = new Map<string, IBudget>();
+
+  budgets.forEach((budget) => {
+    const category = budget.category.toLocaleLowerCase();
+    const earliest = earliestBudgetByCategory.get(category);
+    // Months are ISO dates (YYYY-MM-DD), so they compare correctly as strings.
+    if (!earliest || budget.month < earliest.month) {
+      earliestBudgetByCategory.set(category, budget);
+    }
+  });
+
+  return new Set(
+    [...earliestBudgetByCategory.values()].map((budget) => budget.id),
+  );
+};
+
 export const buildCategoryToRolloverMap = (
   budgets: IBudget[],
   categories: ICategoryNode[],
-): Map<string, number> =>
-  buildCategoryToBudgetValueMap(
-    budgets,
-    categories,
-    (budget) => budget.rollover,
+): Map<string, number> => {
+  const rangeRolloverBudgetIds = getRangeRolloverBudgetIds(budgets);
+
+  return buildCategoryToBudgetValueMap(budgets, categories, (budget) =>
+    rangeRolloverBudgetIds.has(budget.id) ? budget.rollover : 0,
   );
+};

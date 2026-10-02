@@ -4,7 +4,10 @@ import BudgetSummaryItem from "./BudgetSummaryItem/BudgetSummaryItem";
 import { IBudget } from "~/models/budget";
 import { ICategory } from "~/models/category";
 import { areStringsEqual } from "~/helpers/utils";
-import { StatusColorType } from "~/helpers/budgets";
+import {
+  getRangeRolloverBudgetIds,
+  StatusColorType,
+} from "~/helpers/budgets";
 import { useTranslation } from "react-i18next";
 import SplitCard, {
   BorderThickness,
@@ -30,11 +33,16 @@ interface BudgetSummaryCardProps {
 const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
   const { t } = useTranslation();
 
+  const rangeRolloverBudgetIds = getRangeRolloverBudgetIds(props.budgets);
+  const getAvailableLimit = (budget: IBudget): number =>
+    budget.limit +
+    (rangeRolloverBudgetIds.has(budget.id) ? budget.rollover : 0);
+
   const incomeBudgetsTotal = props.budgets
     .filter((b) =>
       props.incomeCategories.some((c) => areStringsEqual(b.category, c.value)),
     )
-    .reduce((acc, b) => acc + b.limit + b.rollover, 0);
+    .reduce((acc, b) => acc + getAvailableLimit(b), 0);
   const incomeTransactionsTotal = props.incomeCategories.reduce(
     (acc, category) => {
       const transactionsTotal = props.categoryToTransactionsTotalMap.get(
@@ -49,7 +57,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
     .filter((b) =>
       props.expenseCategories.some((c) => areStringsEqual(b.category, c.value)),
     )
-    .reduce((acc, b) => acc + b.limit + b.rollover, 0);
+    .reduce((acc, b) => acc + getAvailableLimit(b), 0);
   const expenseTransactionsTotal = props.expenseCategories.reduce(
     (acc, category) => {
       const transactionsTotal = props.categoryToTransactionsTotalMap.get(
