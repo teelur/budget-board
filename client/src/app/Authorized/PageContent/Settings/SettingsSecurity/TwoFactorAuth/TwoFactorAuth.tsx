@@ -5,7 +5,7 @@ import {
   CopyButton,
   Skeleton,
 } from "@mantine/core";
-import { Badge, Button } from "@teelur/budget-board-ui";
+import { Badge, Button, PinInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTwoFactorAuthenticationQuery } from "~/hooks/queries/useTwoFactorAuthenticationQuery";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -14,7 +14,6 @@ import { QRCodeSVG } from "qrcode.react";
 import { useDisclosure } from "@mantine/hooks";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import PinInput from "~/components/core/Input/PinInput/PinInput";
 import Code from "~/components/core/Code/Code";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
@@ -179,10 +178,17 @@ const TwoFactorAuth = (): React.ReactNode => {
             <PinInput
               length={6}
               type="number"
+              inputMode="numeric"
+              oneTimeCode
+              ariaLabel={t(
+                "enter_the_verification_code_from_your_authenticator_app",
+              )}
+              getInputProps={(index) =>
+                index === 0 ? { name: "two-factor-code" } : {}
+              }
               autoFocus
               value={validationCodeField.getValue()}
               onChange={(value) => validationCodeField.setValue(value)}
-              elevation={1}
             />
           </Stack>
           <Button

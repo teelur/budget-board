@@ -1,5 +1,5 @@
 import { Stack, Group } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, PinInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -9,7 +9,6 @@ import { translateAxiosError } from "~/helpers/requests";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PinInput from "~/components/core/Input/PinInput/PinInput";
 import { useTranslation } from "react-i18next";
 import { LoginCardState } from "../Welcome";
 import { useLoginMutation } from "~/hooks/mutations/auth/useLoginMutation";
@@ -89,11 +88,21 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
       <PinInput
         length={6}
         type="number"
+        inputMode="numeric"
         oneTimeCode
+        ariaLabel={t("enter_security_code_message")}
+        getInputProps={(index) =>
+          index === 0 ? { name: "two-factor-code" } : {}
+        }
         autoFocus
         value={authenticationCodeField.getValue()}
         onChange={(value) => authenticationCodeField.setValue(value)}
-        elevation={1}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            submitUserLogin();
+          }
+        }}
       />
       <Button
         variant="filled"
