@@ -3,7 +3,6 @@ import { Button, PasswordInput, TextInput } from "@teelur/budget-board-ui";
 import { hasLength, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useResetPasswordMutation } from "~/hooks/mutations/auth/useResetPasswordMutation";
 

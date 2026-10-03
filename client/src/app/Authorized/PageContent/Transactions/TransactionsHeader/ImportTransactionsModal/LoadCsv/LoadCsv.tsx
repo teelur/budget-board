@@ -5,7 +5,6 @@ import { NotificationType, showNotification } from "~/helpers/notifications";
 import Papa from "papaparse";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export type CsvRow = Record<string, unknown> & { uid: number };

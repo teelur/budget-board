@@ -6,7 +6,6 @@ import { PlusIcon } from "lucide-react";
 import React from "react";
 import { IAssetCreateRequest } from "~/models/asset";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateAssetMutation } from "~/hooks/mutations/assets/useCreateAssetMutation";
