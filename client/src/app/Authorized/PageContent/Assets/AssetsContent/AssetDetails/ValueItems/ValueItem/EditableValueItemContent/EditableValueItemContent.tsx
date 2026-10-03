@@ -1,12 +1,11 @@
 import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, DateInput } from "@teelur/budget-board-ui";
+import { ActionIcon, DateInput, NumberInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IValueResponse } from "~/models/value";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUpdateValueMutation } from "~/hooks/mutations/values/useUpdateValueMutation";
 import { useDeleteValueMutation } from "~/hooks/mutations/values/useDeleteValueMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -87,7 +86,6 @@ const EditableValueItemContent = (
               });
             }
           }}
-          elevation={2}
         />
       </Stack>
       <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">

@@ -2,7 +2,7 @@ import { Flex } from "@mantine/core";
 import { UseFieldReturnType } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { NumberInput } from "@teelur/budget-board-ui";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -47,7 +47,6 @@ const BudgetLimitInput = (props: BudgetLimitInputProps): React.ReactNode => {
             fontSize: "16px",
           },
         }}
-        elevation={1}
       />
     </Flex>
   );

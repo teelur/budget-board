@@ -7,6 +7,7 @@ import {
   Button,
   AmountText,
   Progress,
+  NumberInput,
   TextInput,
   DateInput,
 } from "@teelur/budget-board-ui";
@@ -21,7 +22,6 @@ import { DateValue } from "@mantine/dates";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { StatusColorType } from "~/helpers/budgets";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -96,7 +96,6 @@ const EditableGoalCardContent = (
                 });
               }
             }}
-            elevation={1}
           />
         </Flex>
       );
@@ -186,7 +185,6 @@ const EditableGoalCardContent = (
                 });
               }
             }}
-            elevation={1}
           />
         </Flex>
       );

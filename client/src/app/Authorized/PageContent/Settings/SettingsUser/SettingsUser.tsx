@@ -18,10 +18,9 @@ import {
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
-import { TextInput } from "@teelur/budget-board-ui";
+import { NumberInput, TextInput } from "@teelur/budget-board-ui";
 
 const SettingsUser = (): React.ReactNode => {
   const currencyField = useField({
@@ -111,10 +110,8 @@ const SettingsUser = (): React.ReactNode => {
           elevation={0}
         />
         <NumberInput
-          label={<PrimaryText size="sm">{t("decimal_places")}</PrimaryText>}
-          description={
-            <DimmedText size="xs">{t("decimal_places_description")}</DimmedText>
-          }
+          label={t("decimal_places")}
+          description={t("decimal_places_description")}
           min={0}
           max={3}
           step={1}
@@ -127,7 +124,6 @@ const SettingsUser = (): React.ReactNode => {
               updateUserSettingsMutation.mutate({ decimalPlaces: value });
             }
           }}
-          elevation={0}
         />
         <Select
           label={

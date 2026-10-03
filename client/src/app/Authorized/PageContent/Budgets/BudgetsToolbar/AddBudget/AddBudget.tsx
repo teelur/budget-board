@@ -4,14 +4,13 @@ import {
   Popover as MantinePopover,
   Group,
 } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, NumberInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import Popover from "~/components/core/Popover/Popover";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
@@ -61,7 +60,6 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
               decimalScale={decimalPlaces}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
-              elevation={1}
             />
           </Stack>
           <Stack

@@ -11,6 +11,7 @@ import {
   Badge,
   Button,
   DateInput,
+  NumberInput,
   Textarea,
   TextInput,
 } from "@teelur/budget-board-ui";
@@ -19,7 +20,6 @@ import { TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { getTagChanges, getUniqueTags } from "~/helpers/tags";
@@ -348,7 +348,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 elevation={1}
               />
               <NumberInput
-                label={<PrimaryText size="xs">{t("amount")}</PrimaryText>}
+                label={t("amount")}
                 value={amountValue}
                 onChange={(val) => {
                   setAmountValue(val);
@@ -368,7 +368,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 decimalScale={decimalPlaces}
                 fixedDecimalScale
                 w={140}
-                elevation={1}
               />
               <Textarea
                 label={t("notes")}

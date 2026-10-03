@@ -4,7 +4,7 @@ import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { NumberInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
@@ -45,7 +45,6 @@ const AutoCategorizerMinimumProbability = (): React.ReactNode => {
         min={0}
         max={100}
         suffix="%"
-        elevation={0}
       />
     </Stack>
   );

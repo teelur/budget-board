@@ -3,6 +3,7 @@ import {
   Button,
   ActionIcon,
   AmountText,
+  NumberInput,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -16,7 +17,6 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -134,7 +134,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             </Flex>
             <NumberInput
               {...interestRateField.getInputProps()}
-              label={<PrimaryText size="xs">{t("interest_rate")}</PrimaryText>}
+              label={t("interest_rate")}
               decimalScale={2}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
@@ -154,7 +154,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                   },
                 )
               }
-              elevation={1}
             />
             <Group gap="0.5rem">
               <Button

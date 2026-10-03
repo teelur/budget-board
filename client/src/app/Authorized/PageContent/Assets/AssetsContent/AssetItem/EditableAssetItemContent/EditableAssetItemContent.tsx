@@ -3,6 +3,7 @@ import {
   ActionIcon,
   AmountText,
   DateInput,
+  NumberInput,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { Button } from "@teelur/budget-board-ui";
@@ -12,8 +13,6 @@ import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
@@ -191,10 +190,7 @@ const EditableAssetItemContent = (
                         : Number(purchasePrice.getValue()),
                   } as IAssetUpdateRequest)
                 }
-                label={
-                  <PrimaryText size="xs">{t("purchase_price")}</PrimaryText>
-                }
-                elevation={1}
+                label={t("purchase_price")}
               />
             </Group>
             <Group gap="0.5rem">
@@ -235,8 +231,7 @@ const EditableAssetItemContent = (
                         : Number(sellPrice.getValue()),
                   } as IAssetUpdateRequest);
                 }}
-                label={<PrimaryText size="xs">{t("sell_price")}</PrimaryText>}
-                elevation={1}
+                label={t("sell_price")}
               />
             </Group>
           </Group>

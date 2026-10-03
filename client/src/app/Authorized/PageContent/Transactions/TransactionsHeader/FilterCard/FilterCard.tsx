@@ -1,7 +1,7 @@
 import classes from "./FilterCard.module.css";
 
 import { Flex, Stack } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Button, NumberInput, TextInput } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -143,7 +142,7 @@ const FilterCard = (): React.ReactNode => {
           <NumberInput
             className={classes.amountInput}
             miw={100}
-            label={<PrimaryText size="sm">{t("amount_min")}</PrimaryText>}
+            label={t("amount_min")}
             placeholder="0"
             value={transactionFilters.amountRange[0] ?? ""}
             onChange={(val) => {
@@ -163,12 +162,11 @@ const FilterCard = (): React.ReactNode => {
             decimalScale={decimalPlaces}
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
-            elevation={1}
           />
           <NumberInput
             className={classes.amountInput}
             miw={100}
-            label={<PrimaryText size="sm">{t("amount_max")}</PrimaryText>}
+            label={t("amount_max")}
             placeholder="0"
             value={transactionFilters.amountRange[1] ?? ""}
             onChange={(val) => {
@@ -188,7 +186,6 @@ const FilterCard = (): React.ReactNode => {
             decimalScale={decimalPlaces}
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
-            elevation={1}
           />
           <TransactionTagsInput
             className={classes.tagsInput}

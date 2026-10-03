@@ -1,5 +1,10 @@
 import { Stack } from "@mantine/core";
-import { Button, DateInput, TextInput } from "@teelur/budget-board-ui";
+import {
+  Button,
+  DateInput,
+  NumberInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
@@ -12,7 +17,6 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -122,14 +126,13 @@ const CreateTransactionModal = (): React.ReactNode => {
               elevation={0}
             />
             <NumberInput
-              label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+              label={t("amount")}
               placeholder={t("enter_amount")}
               prefix={getCurrencySymbol(preferredCurrency)}
               decimalScale={decimalPlaces}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
               {...amountField.getInputProps()}
-              elevation={0}
             />
             <AccountMultiSelect
               label={<PrimaryText size="sm">{t("account")}</PrimaryText>}

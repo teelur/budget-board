@@ -1,5 +1,10 @@
 import { ComboboxItem, Group } from "@mantine/core";
-import { ActionIcon, DateInput, TextInput } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  DateInput,
+  NumberInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { getDefaultValue } from "~/helpers/automaticRules";
@@ -13,7 +18,6 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import Card from "~/components/core/Card/Card";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
@@ -67,7 +71,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           decimalScale={decimalPlaces}
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
-          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "date") {

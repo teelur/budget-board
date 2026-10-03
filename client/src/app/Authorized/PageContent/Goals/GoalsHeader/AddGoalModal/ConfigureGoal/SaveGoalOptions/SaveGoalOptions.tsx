@@ -2,9 +2,8 @@ import { Stack, Switch } from "@mantine/core";
 import { UseFieldReturnType } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
+import { NumberInput } from "@teelur/budget-board-ui";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
@@ -21,7 +20,7 @@ const SaveGoalOptions = (props: SaveGoalOptionsProps): React.ReactNode => {
   return (
     <Stack gap={"0.5rem"}>
       <NumberInput
-        label={<PrimaryText size="sm">{t("target_amount")}</PrimaryText>}
+        label={t("target_amount")}
         placeholder={t("enter_target_amount")}
         prefix={currencySymbol}
         min={0}
@@ -29,7 +28,6 @@ const SaveGoalOptions = (props: SaveGoalOptionsProps): React.ReactNode => {
         thousandSeparator={thousandsSeparator}
         decimalSeparator={decimalSeparator}
         {...props.targetAmountField.getInputProps()}
-        elevation={1}
       />
       <Switch
         label={
