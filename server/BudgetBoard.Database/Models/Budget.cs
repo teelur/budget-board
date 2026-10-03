@@ -26,6 +26,12 @@ public class Budget
     public required decimal Limit { get; set; }
 
     /// <summary>
+    /// The month from which unspent (or overspent) remainders start accumulating into this budget.
+    /// Null disables rollover.
+    /// </summary>
+    public DateOnly? RolloverStartMonth { get; set; } = null;
+
+    /// <summary>
     /// Identifier for the user who owns the budget.
     /// </summary>
     public required Guid UserID { get; set; }

@@ -1,8 +1,8 @@
 import classes from "./BudgetChildCard.module.css";
 import hoverClasses from "~/styles/Hoverable.module.css";
 
-import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
-import { Box, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { SignDisplay } from "~/helpers/currency";
+import { Box, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { ActionIcon, AmountText, Progress } from "@teelur/budget-board-ui";
 import React from "react";
 import { useField } from "@mantine/form";
@@ -11,8 +11,9 @@ import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import BudgetMetrics from "../BudgetMetrics/BudgetMetrics";
+import RolloverButton from "../RolloverButton/RolloverButton";
+import BudgetLimitInput from "../BudgetLimitInput/BudgetLimitInput";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
@@ -27,6 +28,10 @@ interface BudgetChildCardProps {
   amount: number;
   projectedAmount?: number;
   limit: number;
+  rollover: number;
+  rolloverStartMonth: string | null;
+  /** Set when the parent category rolls over, which rules out rollover here. */
+  rolloverDisabledReason?: string;
   isIncome: boolean;
   icon: string;
   selectedDate: Date;
@@ -37,19 +42,23 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { thousandsSeparator, decimalSeparator, intlLocale } = useLocale();
+  const { intlLocale } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
   const projectedAmount = props.projectedAmount ?? props.amount;
+  const availableLimit = props.limit + props.rollover;
 
   const newLimitField = useField<number | string>({
     initialValue: props.limit ?? 0,
     validate: (value) => (value !== "" ? null : t("invalid_limit")),
   });
 
-  const handleEdit = (newLimit?: number | string) => {
+  const handleEdit = (
+    newLimit?: number | string,
+    newRolloverStartMonth?: string | null,
+  ) => {
     if (newLimit === "") {
       return;
     }
@@ -59,24 +68,29 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
     updateBudgetMutation.mutate({
       id: props.id,
       limit: Number(newLimit),
+      rolloverStartMonth:
+        newRolloverStartMonth === undefined
+          ? props.rolloverStartMonth
+          : newRolloverStartMonth,
     });
   };
 
   const percentComplete = roundAwayFromZero(
-    ((props.amount * (props.isIncome ? 1 : -1)) / props.limit) * 100,
+    ((props.amount * (props.isIncome ? 1 : -1)) / availableLimit) * 100,
   );
 
   const actualProgressValue =
-    props.limit <= 0 ? 0 : Math.min(100, Math.max(0, percentComplete));
+    availableLimit <= 0 ? 0 : Math.min(100, Math.max(0, percentComplete));
   const projectedPercentComplete =
-    props.limit <= 0
+    availableLimit <= 0
       ? actualProgressValue
       : Math.min(
           100,
           Math.max(
             0,
             roundAwayFromZero(
-              ((projectedAmount * (props.isIncome ? 1 : -1)) / props.limit) *
+              ((projectedAmount * (props.isIncome ? 1 : -1)) /
+                availableLimit) *
                 100,
             ),
           ),
@@ -89,37 +103,17 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const getElementForLimit = () => {
     if (isSelected) {
       return (
-        <Flex onClick={(e) => e.stopPropagation()}>
-          <NumberInput
-            {...newLimitField.getInputProps()}
-            onBlur={() => handleEdit(newLimitField.getValue())}
-            thousandSeparator={thousandsSeparator}
-            decimalSeparator={decimalSeparator}
-            decimalScale={0}
-            min={0}
-            max={999999}
-            step={1}
-            prefix={getCurrencySymbol(preferredCurrency)}
-            placeholder={t("enter_limit")}
-            size="xs"
-            styles={{
-              root: {
-                maxWidth: "100px",
-              },
-              input: {
-                padding: "0 10px",
-                fontSize: "16px",
-              },
-            }}
-            key="total-edit"
-            elevation={1}
-          />
-        </Flex>
+        <BudgetLimitInput
+          field={newLimitField}
+          onSave={(newLimit) => handleEdit(newLimit)}
+          min={0}
+          key="total-edit"
+        />
       );
     }
     return (
       <AmountText
-        amount={props.limit}
+        amount={availableLimit}
         disableStatusColor
         size="md"
         isSensitive={isPrivacyModeEnabled}
@@ -213,7 +207,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
           </Group>
           <Progress
             amount={props.amount}
-            limit={props.limit}
+            limit={availableLimit}
             label
             sections={
               projectedProgressValue > 0
@@ -235,12 +229,24 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
           <BudgetMetrics
             amount={props.amount}
             projectedAmount={projectedAmount}
-            limit={props.limit}
+            limit={availableLimit}
+            rollover={
+              props.rolloverStartMonth !== null ? props.rollover : undefined
+            }
             isIncome={props.isIncome}
           />
         </Stack>
         {isSelected && (
-          <Group style={{ alignSelf: "stretch" }}>
+          <Group style={{ alignSelf: "stretch" }} gap="0.25rem" wrap="nowrap">
+            <RolloverButton
+              category={props.categoryValue}
+              rolloverStartMonth={props.rolloverStartMonth}
+              budgetMonth={props.selectedDate}
+              onChange={(newStartMonth) =>
+                handleEdit(newLimitField.getValue(), newStartMonth)
+              }
+              disabledReason={props.rolloverDisabledReason}
+            />
             <ActionIcon
               variant="filled"
               color="error"

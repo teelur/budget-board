@@ -1,6 +1,6 @@
 import { Button } from "@teelur/budget-board-ui";
 import { areStringsEqual } from "~/helpers/utils";
-import { IBudget, IBudgetUpdateRequest } from "~/models/budget";
+import { IBudget } from "~/models/budget";
 import { ICategoryNode } from "~/models/category";
 import { useTranslation } from "react-i18next";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
@@ -52,7 +52,8 @@ const FixParentBudgetButton = (props: FixParentBudgetButtonProps) => {
       updateBudgetMutation.mutate({
         id: childBudget.id,
         limit: childBudget.limit,
-      } as IBudgetUpdateRequest);
+        rolloverStartMonth: childBudget.rolloverStartMonth,
+      });
     });
   };
 

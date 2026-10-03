@@ -5,6 +5,7 @@ import { ICategoryNode } from "~/models/category";
 import {
   buildCategoryToBudgetsMap,
   buildCategoryToLimitsMap,
+  buildCategoryToRolloverMap,
 } from "~/helpers/budgets";
 import BudgetParentCard from "./BudgetParentCard/BudgetParentCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -28,6 +29,10 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
 
   const categoryToBudgetsMap = buildCategoryToBudgetsMap(props.budgets);
   const categoryToLimitsMap = buildCategoryToLimitsMap(
+    props.budgets,
+    props.categoryTree,
+  );
+  const categoryToRolloverMap = buildCategoryToRolloverMap(
     props.budgets,
     props.categoryTree,
   );
@@ -56,6 +61,7 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
                 categoryTree={category}
                 categoryToBudgetsMap={categoryToBudgetsMap}
                 categoryToLimitsMap={categoryToLimitsMap}
+                categoryToRolloverMap={categoryToRolloverMap}
                 categoryToTransactionsTotalMap={
                   props.categoryToTransactionsTotalMap
                 }

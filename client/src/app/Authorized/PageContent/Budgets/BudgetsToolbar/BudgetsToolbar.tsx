@@ -59,7 +59,8 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         month: dayjs(props.selectedDates[0]!).format("YYYY-MM-DD"),
         category: budget.category,
         limit: budget.limit,
-      } as IBudgetCreateRequest;
+        rolloverStartMonth: budget.rolloverStartMonth,
+      };
     });
 
     createBudgetMutation.mutate(newBudgets);
