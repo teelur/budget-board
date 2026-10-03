@@ -1,6 +1,11 @@
 import React from "react";
 import { Group, Stack } from "@mantine/core";
-import { Button, NumberInput, SegmentedControl } from "@teelur/budget-board-ui";
+import {
+  Button,
+  DateInput,
+  NumberInput,
+  SegmentedControl,
+} from "@teelur/budget-board-ui";
 import { MoveLeftIcon } from "lucide-react";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTranslation } from "react-i18next";
@@ -8,7 +13,6 @@ import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { mantineDateFormat } from "~/helpers/datetime";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { DateInput } from "@mantine/dates";
 
 interface SetTargetProps {
   goBackToPreviousDialog: () => void;
