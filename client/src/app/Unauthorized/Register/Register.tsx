@@ -1,10 +1,9 @@
 import { Stack, Group } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Button, PasswordInput, TextInput } from "@teelur/budget-board-ui";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
 import { useRegisterMutation } from "~/hooks/mutations/auth/useRegisterMutation";
 
@@ -46,16 +45,14 @@ const Register = (props: RegisterProps): React.ReactNode => {
           {...emailField.getInputProps()}
         />
         <PasswordInput
-          label={<PrimaryText size="sm">{t("password")}</PrimaryText>}
+          label={t("password")}
           w="100%"
           {...passwordField.getInputProps()}
-          elevation={1}
         />
         <PasswordInput
-          label={<PrimaryText size="sm">{t("confirm_password")}</PrimaryText>}
+          label={t("confirm_password")}
           w="100%"
           {...confirmPasswordField.getInputProps()}
-          elevation={1}
         />
         <Group gap="0.5rem" w="100%">
           <Button

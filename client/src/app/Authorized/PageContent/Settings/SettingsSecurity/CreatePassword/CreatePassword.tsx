@@ -1,10 +1,9 @@
 import { Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, PasswordInput } from "@teelur/budget-board-ui";
 import { hasLength, useField } from "@mantine/form";
 import React from "react";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
 import { useUpdatePasswordMutation } from "~/hooks/mutations/auth/useUpdatePasswordMutation";
 
@@ -33,12 +32,12 @@ const CreatePassword = (): React.ReactNode => {
         <PrimaryText size="lg">{t("create_password")}</PrimaryText>
         <PasswordInput
           {...newPasswordField.getInputProps()}
-          label={<PrimaryText size="sm">{t("new_password")}</PrimaryText>}
+          label={t("new_password")}
           w="100%"
         />
         <PasswordInput
           {...confirmNewPasswordField.getInputProps()}
-          label={<PrimaryText size="sm">{t("confirm_password")}</PrimaryText>}
+          label={t("confirm_password")}
           w="100%"
         />
         <Button
