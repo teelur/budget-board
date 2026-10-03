@@ -8,6 +8,7 @@ import {
   AmountText,
   Progress,
   TextInput,
+  DateInput,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
@@ -22,7 +23,6 @@ import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { StatusColorType } from "~/helpers/budgets";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCompleteGoalMutation } from "~/hooks/mutations/goals/useCompleteGoalMutation";

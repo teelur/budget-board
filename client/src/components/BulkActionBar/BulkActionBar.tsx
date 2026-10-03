@@ -10,6 +10,7 @@ import {
   ActionIcon,
   Badge,
   Button,
+  DateInput,
   Textarea,
   TextInput,
 } from "@teelur/budget-board-ui";
@@ -19,7 +20,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { getTagChanges, getUniqueTags } from "~/helpers/tags";
@@ -316,14 +316,13 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
             {/* Fields + actions row */}
             <Flex gap="0.5rem" wrap="wrap" align="flex-end">
               <DateInput
-                label={<PrimaryText size="xs">{t("date")}</PrimaryText>}
+                label={t("date")}
                 value={dateValue}
                 valueFormat={longDateFormat}
                 locale={dayjsLocale}
                 onChange={handleDateChange}
                 clearable
                 w={190}
-                elevation={1}
               />
               <TextInput
                 label={t("merchant_name")}

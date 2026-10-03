@@ -1,5 +1,5 @@
 import { Group, Stack, Switch } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Button, DateInput, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -21,7 +21,6 @@ import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -347,21 +346,19 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
       </Group>
       <Group grow>
         <DateInput
-          label={<PrimaryText size="sm">{t("start_date")}</PrimaryText>}
+          label={t("start_date")}
           placeholder={t("select_a_date")}
           {...startDateField.getInputProps()}
           locale={dayjsLocale}
           valueFormat={longDateFormat}
-          elevation={0}
         />
         <DateInput
-          label={<PrimaryText size="sm">{t("end_date")}</PrimaryText>}
+          label={t("end_date")}
           placeholder={t("select_a_date")}
           {...endDateField.getInputProps()}
           locale={dayjsLocale}
           valueFormat={longDateFormat}
           clearable
-          elevation={0}
         />
       </Group>
       <NumberInput

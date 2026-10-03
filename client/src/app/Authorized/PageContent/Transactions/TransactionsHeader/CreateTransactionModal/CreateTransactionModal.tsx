@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Button, DateInput, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
@@ -13,7 +13,6 @@ import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -104,12 +103,11 @@ const CreateTransactionModal = (): React.ReactNode => {
         <Stack gap="1rem">
           <Stack gap="0.25rem">
             <DateInput
-              label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
+              label={t("date")}
               placeholder={t("select_a_date")}
               {...dateField.getInputProps()}
               locale={dayjsLocale}
               valueFormat={longDateFormat}
-              elevation={0}
             />
             <TextInput
               label={t("merchant_name")}

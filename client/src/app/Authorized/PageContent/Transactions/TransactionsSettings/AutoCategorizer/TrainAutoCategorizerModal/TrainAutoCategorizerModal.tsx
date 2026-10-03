@@ -1,12 +1,11 @@
 import { Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, DateInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -86,17 +85,15 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
               {t("train_auto_categorizer_date_range_description")}
             </DimmedText>
             <DateInput
-              label={<PrimaryText size="sm">{t("start_date")}</PrimaryText>}
+              label={t("start_date")}
               placeholder={t("select_a_date")}
               {...startDateField.getInputProps()}
-              elevation={0}
               clearable
             />
             <DateInput
-              label={<PrimaryText size="sm">{t("end_date")}</PrimaryText>}
+              label={t("end_date")}
               placeholder={t("select_a_date")}
               {...endDateField.getInputProps()}
-              elevation={0}
               clearable
             />
           </Stack>

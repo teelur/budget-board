@@ -1,12 +1,11 @@
 import { Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, DateInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useCreateValueMutation } from "~/hooks/mutations/values/useCreateValueMutation";
@@ -42,9 +41,8 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
         {...dateField.getInputProps()}
         locale={dayjsLocale}
         valueFormat={longDateFormat}
-        label={<PrimaryText size="xs">{t("date")}</PrimaryText>}
+        label={t("date")}
         maw={400}
-        elevation={0}
       />
       <NumberInput
         {...amountField.getInputProps()}

@@ -1,12 +1,11 @@
 import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, DateInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IValueResponse } from "~/models/value";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUpdateValueMutation } from "~/hooks/mutations/values/useUpdateValueMutation";
 import { useDeleteValueMutation } from "~/hooks/mutations/values/useDeleteValueMutation";
@@ -69,7 +68,6 @@ const EditableValueItemContent = (
             });
             valueDateField.getInputProps().onChange(date);
           }}
-          elevation={2}
         />
         <NumberInput
           {...valueAmountField.getInputProps()}

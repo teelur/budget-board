@@ -2,7 +2,6 @@ import React from "react";
 import { Group, Stack } from "@mantine/core";
 import { Button, SegmentedControl } from "@teelur/budget-board-ui";
 import { MoveLeftIcon } from "lucide-react";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
@@ -11,6 +10,7 @@ import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { mantineDateFormat } from "~/helpers/datetime";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { DateInput } from "@mantine/dates";
 
 interface SetTargetProps {
   goBackToPreviousDialog: () => void;
@@ -68,14 +68,13 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
       />
       {targetType === "completeDate" && (
         <DateInput
-          label={<PrimaryText size="sm">{t("complete_date")}</PrimaryText>}
+          label={t("complete_date")}
           placeholder={t("select_a_completion_date")}
           clearable
           {...goalCompleteDateField.getInputProps()}
           locale={dayjsLocale}
           valueFormat={longDateFormat}
           minDate={dayjs().format(mantineDateFormat)}
-          elevation={1}
         />
       )}
       {targetType === "monthlyContribution" && (
