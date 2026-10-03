@@ -1,8 +1,7 @@
 import { Group } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, DatePickerInput } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import React from "react";
-import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import AssetSelect from "../core/Select/AssetSelect/AssetSelect";
 import { useTranslation } from "react-i18next";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
@@ -30,7 +29,6 @@ const AssetsSelectHeader = (
           value={props.dateRange}
           onChange={props.setDateRange}
           miw={200}
-          elevation={1}
         />
         <AssetSelect
           selectedAssetIds={props.selectedAssetIds}

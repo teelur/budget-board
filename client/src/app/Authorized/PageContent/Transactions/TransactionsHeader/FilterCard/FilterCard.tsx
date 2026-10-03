@@ -1,7 +1,12 @@
 import classes from "./FilterCard.module.css";
 
 import { Flex, Stack } from "@mantine/core";
-import { Button, NumberInput, TextInput } from "@teelur/budget-board-ui";
+import {
+  Button,
+  DatePickerInput,
+  NumberInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
@@ -9,7 +14,6 @@ import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/Tr
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -32,6 +36,21 @@ const FilterCard = (): React.ReactNode => {
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
+
+  const onDatePickerChange = (dateRange: DatesRangeValue<string>) => {
+    const parsedDateRange: [Date | null, Date | null] = [
+      dateRange[0] ? dayjs(dateRange[0]).toDate() : null,
+      dateRange[1] ? dayjs(dateRange[1]).toDate() : null,
+    ];
+    const newFilters = new Filters();
+    newFilters.accounts = transactionFilters.accounts;
+    newFilters.category = transactionFilters.category;
+    newFilters.dateRange = parsedDateRange;
+    newFilters.merchantName = transactionFilters.merchantName;
+    newFilters.amountRange = transactionFilters.amountRange;
+    newFilters.tags = transactionFilters.tags;
+    setTransactionFilters(newFilters);
+  };
 
   return (
     <Card elevation={1}>
@@ -60,27 +79,13 @@ const FilterCard = (): React.ReactNode => {
             className={classes.datePickerInput}
             miw={165}
             type="range"
-            label={<PrimaryText size="sm">{t("date_range")}</PrimaryText>}
+            label={t("date_range")}
             placeholder={t("select_a_date_range")}
             value={transactionFilters.dateRange}
             locale={dayjsLocale}
             valueFormat={longDateFormat}
-            onChange={(dateRange: DatesRangeValue<string>) => {
-              const parsedDateRange: [Date | null, Date | null] = [
-                dateRange[0] ? dayjs(dateRange[0]).toDate() : null,
-                dateRange[1] ? dayjs(dateRange[1]).toDate() : null,
-              ];
-              const newFilters = new Filters();
-              newFilters.accounts = transactionFilters.accounts;
-              newFilters.category = transactionFilters.category;
-              newFilters.dateRange = parsedDateRange;
-              newFilters.merchantName = transactionFilters.merchantName;
-              newFilters.amountRange = transactionFilters.amountRange;
-              newFilters.tags = transactionFilters.tags;
-              setTransactionFilters(newFilters);
-            }}
+            onChange={onDatePickerChange}
             clearable
-            elevation={1}
           />
           <AccountMultiSelect
             className={classes.accountMultiSelect}
