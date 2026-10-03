@@ -1,5 +1,5 @@
 import { Alert, Group, Paper, Skeleton, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, NumberInput } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
@@ -11,7 +11,6 @@ import { useTransactionLinkCandidatesQuery } from "~/hooks/queries/useTransactio
 import { ITransaction } from "~/models/transaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";

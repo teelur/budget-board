@@ -1,18 +1,21 @@
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import {
+  Button,
+  ActionIcon,
+  AmountText,
+  NumberInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
-import { Button, ActionIcon, AmountText } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
 import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useUpdateAccountMutation } from "~/hooks/mutations/accounts/useUpdateAccountMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -101,7 +104,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
           <Group gap="0.5rem" align="flex-end">
             <TextInput
               {...accountNameField.getInputProps()}
-              label={<PrimaryText size="xs">{t("name")}</PrimaryText>}
+              label={t("name")}
               onBlur={() =>
                 updateAccountMutation.mutate(
                   {
@@ -113,7 +116,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                   },
                 )
               }
-              elevation={1}
             />
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon
@@ -131,7 +133,7 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             </Flex>
             <NumberInput
               {...interestRateField.getInputProps()}
-              label={<PrimaryText size="xs">{t("interest_rate")}</PrimaryText>}
+              label={t("interest_rate")}
               decimalScale={2}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
@@ -151,7 +153,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
                   },
                 )
               }
-              elevation={1}
             />
             <Group gap="0.5rem">
               <Button

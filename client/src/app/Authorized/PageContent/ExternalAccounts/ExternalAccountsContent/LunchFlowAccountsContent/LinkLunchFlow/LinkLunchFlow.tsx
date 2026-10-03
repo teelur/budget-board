@@ -1,12 +1,10 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { isNotEmpty, useField } from "@mantine/form";
 import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useUpdateApiKeyMutation } from "~/hooks/mutations/lunchFlow/useUpdateApiKeyMutation";
 
 const LinkLunchFlow = (): React.ReactNode => {
@@ -26,10 +24,7 @@ const LinkLunchFlow = (): React.ReactNode => {
         <Stack gap="0.5rem">
           <TextInput
             {...lunchFlowKeyField.getInputProps()}
-            label={
-              <PrimaryText size="sm">{t("lunchflow_api_key")}</PrimaryText>
-            }
-            elevation={1}
+            label={t("lunchflow_api_key")}
           />
           <Button
             variant="filled"

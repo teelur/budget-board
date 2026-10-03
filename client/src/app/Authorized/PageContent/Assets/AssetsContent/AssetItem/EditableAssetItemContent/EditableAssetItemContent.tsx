@@ -1,5 +1,11 @@
 import { Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  AmountText,
+  DateInput,
+  NumberInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -7,11 +13,7 @@ import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -88,7 +90,6 @@ const EditableAssetItemContent = (
                   name: assetNameField.getValue(),
                 } as IAssetUpdateRequest)
               }
-              elevation={1}
             />
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon
@@ -159,9 +160,7 @@ const EditableAssetItemContent = (
                 placeholder={t("enter_date")}
                 maw={400}
                 clearable
-                label={
-                  <PrimaryText size="xs">{t("purchase_date")}</PrimaryText>
-                }
+                label={t("purchase_date")}
                 onChange={(date) => {
                   updateAssetMutation.mutate({
                     id: props.asset.id,
@@ -171,7 +170,6 @@ const EditableAssetItemContent = (
                   } as IAssetUpdateRequest);
                   purchaseDate.getInputProps().onChange(date);
                 }}
-                elevation={1}
               />
               <NumberInput
                 {...purchasePrice.getInputProps()}
@@ -192,10 +190,7 @@ const EditableAssetItemContent = (
                         : Number(purchasePrice.getValue()),
                   } as IAssetUpdateRequest)
                 }
-                label={
-                  <PrimaryText size="xs">{t("purchase_price")}</PrimaryText>
-                }
-                elevation={1}
+                label={t("purchase_price")}
               />
             </Group>
             <Group gap="0.5rem">
@@ -206,7 +201,7 @@ const EditableAssetItemContent = (
                 placeholder={t("enter_date")}
                 maw={400}
                 clearable
-                label={<PrimaryText size="xs">{t("sell_date")}</PrimaryText>}
+                label={t("sell_date")}
                 onChange={(date) => {
                   updateAssetMutation.mutate({
                     id: props.asset.id,
@@ -216,7 +211,6 @@ const EditableAssetItemContent = (
                   } as IAssetUpdateRequest);
                   sellDate.getInputProps().onChange(date);
                 }}
-                elevation={1}
               />
               <NumberInput
                 {...sellPrice.getInputProps()}
@@ -237,8 +231,7 @@ const EditableAssetItemContent = (
                         : Number(sellPrice.getValue()),
                   } as IAssetUpdateRequest);
                 }}
-                label={<PrimaryText size="xs">{t("sell_price")}</PrimaryText>}
-                elevation={1}
+                label={t("sell_price")}
               />
             </Group>
           </Group>

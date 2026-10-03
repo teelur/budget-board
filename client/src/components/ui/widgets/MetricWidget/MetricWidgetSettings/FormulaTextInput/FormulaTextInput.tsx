@@ -1,4 +1,4 @@
-import { Combobox, TextInput, useCombobox } from "@mantine/core";
+import { Combobox, useCombobox } from "@mantine/core";
 import React from "react";
 import {
   METRIC_RANGE_ENDPOINTS,
@@ -7,6 +7,7 @@ import {
 } from "~/helpers/metricWidget";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import dropdownClasses from "~/styles/Dropdown.module.css";
+import { TextInput } from "@teelur/budget-board-ui";
 
 const SOURCE_METRICS: Record<string, string[]> = {
   transactions: ["sum", "count", "avg"],

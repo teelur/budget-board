@@ -1,11 +1,10 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
-import { Button, SegmentedControl } from "@teelur/budget-board-ui";
+import { Button, SegmentedControl, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CategoryTypes, ICategoryCreateRequest } from "~/models/category";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Card from "~/components/core/Card/Card";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
@@ -48,11 +47,7 @@ const AddCategory = (): React.ReactNode => {
     <Card elevation={1}>
       <LoadingOverlay visible={createTransactionCategoryMutation.isPending} />
       <Stack>
-        <TextInput
-          {...nameField.getInputProps()}
-          label={<PrimaryText size="sm">{t("category_name")}</PrimaryText>}
-          elevation={1}
-        />
+        <TextInput {...nameField.getInputProps()} label={t("category_name")} />
         <Stack gap="0.25rem" justify="center">
           <PrimaryText size="sm">{t("category_level")}</PrimaryText>
           <SegmentedControl

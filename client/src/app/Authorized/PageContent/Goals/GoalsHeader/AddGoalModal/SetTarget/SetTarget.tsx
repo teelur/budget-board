@@ -1,12 +1,14 @@
 import React from "react";
 import { Group, Stack } from "@mantine/core";
-import { Button, SegmentedControl } from "@teelur/budget-board-ui";
+import {
+  Button,
+  DateInput,
+  NumberInput,
+  SegmentedControl,
+} from "@teelur/budget-board-ui";
 import { MoveLeftIcon } from "lucide-react";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { mantineDateFormat } from "~/helpers/datetime";
@@ -68,21 +70,18 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
       />
       {targetType === "completeDate" && (
         <DateInput
-          label={<PrimaryText size="sm">{t("complete_date")}</PrimaryText>}
+          label={t("complete_date")}
           placeholder={t("select_a_completion_date")}
           clearable
           {...goalCompleteDateField.getInputProps()}
           locale={dayjsLocale}
           valueFormat={longDateFormat}
           minDate={dayjs().format(mantineDateFormat)}
-          elevation={1}
         />
       )}
       {targetType === "monthlyContribution" && (
         <NumberInput
-          label={
-            <PrimaryText size="sm">{t("monthly_contribution")}</PrimaryText>
-          }
+          label={t("monthly_contribution")}
           placeholder={t("enter_monthly_contribution")}
           prefix={currencySymbol}
           min={0}
@@ -90,7 +89,6 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
           thousandSeparator={thousandsSeparator}
           decimalSeparator={decimalSeparator}
           {...goalMonthlyContributionField.getInputProps()}
-          elevation={1}
         />
       )}
       <Group w="100%">

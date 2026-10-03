@@ -1,9 +1,8 @@
 import React from "react";
 import { GoalType } from "~/models/goal";
 import { Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { MoveLeftIcon, MoveRightIcon } from "lucide-react";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
@@ -90,7 +89,6 @@ const ConfigureGoal = (props: ConfigureGoalProps): React.ReactNode => {
           label={<PrimaryText size="sm">{t("goal_name")}</PrimaryText>}
           placeholder={t("enter_goal_name")}
           {...goalNameField.getInputProps()}
-          elevation={1}
         />
         <AccountMultiSelect
           label={<PrimaryText size="sm">{t("accounts")}</PrimaryText>}

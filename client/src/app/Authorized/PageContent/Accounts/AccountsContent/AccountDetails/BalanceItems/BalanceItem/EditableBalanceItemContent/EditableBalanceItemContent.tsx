@@ -1,13 +1,11 @@
 import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, DateInput, NumberInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IBalanceResponse } from "~/models/balance";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUpdateBalanceMutation } from "~/hooks/mutations/balances/useUpdateBalanceMutation";
 import { useDeleteBalanceMutation } from "~/hooks/mutations/balances/useDeleteBalanceMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -69,7 +67,6 @@ const EditableBalanceItemContent = (
             });
             balanceDateField.getInputProps().onChange(date);
           }}
-          elevation={2}
         />
         <NumberInput
           {...balanceAmountField.getInputProps()}
@@ -87,7 +84,6 @@ const EditableBalanceItemContent = (
               amount: Number(balanceAmountField.getValue()),
             });
           }}
-          elevation={2}
         />
       </Stack>
       <Group style={{ alignSelf: "stretch" }} gap="0.5rem" wrap="nowrap">

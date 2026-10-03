@@ -1,12 +1,10 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { isNotEmpty, useField } from "@mantine/form";
 import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useUpdateAccessTokenMutation } from "~/hooks/mutations/simpleFin/useUpdateAccessTokenMutation";
 
 const LinkSimpleFin = (): React.ReactNode => {
@@ -29,10 +27,7 @@ const LinkSimpleFin = (): React.ReactNode => {
         <Stack gap="0.5rem">
           <TextInput
             {...simpleFinKeyField.getInputProps()}
-            label={
-              <PrimaryText size="sm">{t("simplefin_access_token")}</PrimaryText>
-            }
-            elevation={1}
+            label={t("simplefin_access_token")}
           />
           <Button
             variant="filled"

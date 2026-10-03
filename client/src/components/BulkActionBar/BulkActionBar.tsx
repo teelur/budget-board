@@ -6,16 +6,20 @@ import {
   Stack,
   Transition,
 } from "@mantine/core";
-import { ActionIcon, Badge, Button } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  DateInput,
+  NumberInput,
+  Textarea,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
-import Textarea from "~/components/core/Input/Textarea/Textarea";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { getTagChanges, getUniqueTags } from "~/helpers/tags";
@@ -312,19 +316,16 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
             {/* Fields + actions row */}
             <Flex gap="0.5rem" wrap="wrap" align="flex-end">
               <DateInput
-                label={<PrimaryText size="xs">{t("date")}</PrimaryText>}
+                label={t("date")}
                 value={dateValue}
                 valueFormat={longDateFormat}
                 locale={dayjsLocale}
                 onChange={handleDateChange}
                 clearable
                 w={190}
-                elevation={1}
               />
               <TextInput
-                label={
-                  <PrimaryText size="xs">{t("merchant_name")}</PrimaryText>
-                }
+                label={t("merchant_name")}
                 value={merchantValue}
                 onChange={(e) => {
                   setMerchantValue(e.currentTarget.value);
@@ -333,7 +334,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 placeholder={t("enter_merchant_name")}
                 miw={180}
                 style={{ flex: "1 1 180px" }}
-                elevation={1}
               />
               <CategorySelect
                 label={<PrimaryText size="xs">{t("category")}</PrimaryText>}
@@ -348,7 +348,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 elevation={1}
               />
               <NumberInput
-                label={<PrimaryText size="xs">{t("amount")}</PrimaryText>}
+                label={t("amount")}
                 value={amountValue}
                 onChange={(val) => {
                   setAmountValue(val);
@@ -368,10 +368,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 decimalScale={decimalPlaces}
                 fixedDecimalScale
                 w={140}
-                elevation={1}
               />
               <Textarea
-                label={<PrimaryText size="xs">{t("notes")}</PrimaryText>}
+                label={t("notes")}
                 value={notesValue}
                 onChange={(e) => {
                   setNotesValue(e.currentTarget.value);
@@ -383,7 +382,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 maxRows={3}
                 miw={220}
                 style={{ flex: "1 1 220px" }}
-                elevation={1}
               />
               <TransactionTagsInput
                 label={<PrimaryText size="xs">{t("tags")}</PrimaryText>}

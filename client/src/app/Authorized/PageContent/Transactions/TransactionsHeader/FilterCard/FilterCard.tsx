@@ -1,7 +1,12 @@
 import classes from "./FilterCard.module.css";
 
 import { Flex, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import {
+  Button,
+  DatePickerInput,
+  NumberInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
@@ -9,13 +14,10 @@ import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/Tr
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import DatePickerInput from "~/components/core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -34,6 +36,21 @@ const FilterCard = (): React.ReactNode => {
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
+
+  const onDatePickerChange = (dateRange: DatesRangeValue<string>) => {
+    const parsedDateRange: [Date | null, Date | null] = [
+      dateRange[0] ? dayjs(dateRange[0]).toDate() : null,
+      dateRange[1] ? dayjs(dateRange[1]).toDate() : null,
+    ];
+    const newFilters = new Filters();
+    newFilters.accounts = transactionFilters.accounts;
+    newFilters.category = transactionFilters.category;
+    newFilters.dateRange = parsedDateRange;
+    newFilters.merchantName = transactionFilters.merchantName;
+    newFilters.amountRange = transactionFilters.amountRange;
+    newFilters.tags = transactionFilters.tags;
+    setTransactionFilters(newFilters);
+  };
 
   return (
     <Card elevation={1}>
@@ -62,27 +79,13 @@ const FilterCard = (): React.ReactNode => {
             className={classes.datePickerInput}
             miw={165}
             type="range"
-            label={<PrimaryText size="sm">{t("date_range")}</PrimaryText>}
+            label={t("date_range")}
             placeholder={t("select_a_date_range")}
             value={transactionFilters.dateRange}
             locale={dayjsLocale}
             valueFormat={longDateFormat}
-            onChange={(dateRange: DatesRangeValue<string>) => {
-              const parsedDateRange: [Date | null, Date | null] = [
-                dateRange[0] ? dayjs(dateRange[0]).toDate() : null,
-                dateRange[1] ? dayjs(dateRange[1]).toDate() : null,
-              ];
-              const newFilters = new Filters();
-              newFilters.accounts = transactionFilters.accounts;
-              newFilters.category = transactionFilters.category;
-              newFilters.dateRange = parsedDateRange;
-              newFilters.merchantName = transactionFilters.merchantName;
-              newFilters.amountRange = transactionFilters.amountRange;
-              newFilters.tags = transactionFilters.tags;
-              setTransactionFilters(newFilters);
-            }}
+            onChange={onDatePickerChange}
             clearable
-            elevation={1}
           />
           <AccountMultiSelect
             className={classes.accountMultiSelect}
@@ -127,7 +130,7 @@ const FilterCard = (): React.ReactNode => {
           <TextInput
             className={classes.merchantInput}
             miw={140}
-            label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+            label={t("merchant_name")}
             placeholder={t("enter_merchant_name")}
             value={transactionFilters.merchantName}
             onChange={(e) => {
@@ -140,12 +143,11 @@ const FilterCard = (): React.ReactNode => {
               newFilters.tags = transactionFilters.tags;
               setTransactionFilters(newFilters);
             }}
-            elevation={1}
           />
           <NumberInput
             className={classes.amountInput}
             miw={100}
-            label={<PrimaryText size="sm">{t("amount_min")}</PrimaryText>}
+            label={t("amount_min")}
             placeholder="0"
             value={transactionFilters.amountRange[0] ?? ""}
             onChange={(val) => {
@@ -165,12 +167,11 @@ const FilterCard = (): React.ReactNode => {
             decimalScale={decimalPlaces}
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
-            elevation={1}
           />
           <NumberInput
             className={classes.amountInput}
             miw={100}
-            label={<PrimaryText size="sm">{t("amount_max")}</PrimaryText>}
+            label={t("amount_max")}
             placeholder="0"
             value={transactionFilters.amountRange[1] ?? ""}
             onChange={(val) => {
@@ -190,7 +191,6 @@ const FilterCard = (): React.ReactNode => {
             decimalScale={decimalPlaces}
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
-            elevation={1}
           />
           <TransactionTagsInput
             className={classes.tagsInput}

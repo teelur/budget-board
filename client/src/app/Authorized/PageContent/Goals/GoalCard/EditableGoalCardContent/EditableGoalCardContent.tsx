@@ -7,6 +7,9 @@ import {
   Button,
   AmountText,
   Progress,
+  NumberInput,
+  TextInput,
+  DateInput,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
@@ -17,12 +20,9 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
 import { getGoalTargetAmount } from "~/helpers/goals";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { StatusColorType } from "~/helpers/budgets";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCompleteGoalMutation } from "~/hooks/mutations/goals/useCompleteGoalMutation";
@@ -96,7 +96,6 @@ const EditableGoalCardContent = (
                 });
               }
             }}
-            elevation={1}
           />
         </Flex>
       );
@@ -186,7 +185,6 @@ const EditableGoalCardContent = (
                 });
               }
             }}
-            elevation={1}
           />
         </Flex>
       );
@@ -241,7 +239,6 @@ const EditableGoalCardContent = (
                   }
                 }}
                 onClick={(e) => e.stopPropagation()}
-                elevation={1}
               />
               {props.includeInterest && props.goal.interestRate && (
                 <Badge variant="light" color="primary" size="xs">

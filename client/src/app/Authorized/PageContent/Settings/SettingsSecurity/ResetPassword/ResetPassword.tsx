@@ -1,10 +1,9 @@
 import { hasLength, useField } from "@mantine/form";
 import { LoadingOverlay, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, PasswordInput } from "@teelur/budget-board-ui";
 import React from "react";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
 import { useUpdatePasswordMutation } from "~/hooks/mutations/auth/useUpdatePasswordMutation";
 
@@ -46,23 +45,18 @@ const ResetPassword = (): React.ReactNode => {
         <PrimaryText size="lg">{t("reset_password")}</PrimaryText>
         <PasswordInput
           {...oldPasswordField.getInputProps()}
-          label={<PrimaryText size="sm">{t("current_password")}</PrimaryText>}
+          label={t("current_password")}
           w="100%"
-          elevation={1}
         />
         <PasswordInput
           {...newPasswordField.getInputProps()}
-          label={<PrimaryText size="sm">{t("new_password")}</PrimaryText>}
+          label={t("new_password")}
           w="100%"
-          elevation={1}
         />
         <PasswordInput
           {...confirmNewPasswordField.getInputProps()}
-          label={
-            <PrimaryText size="sm">{t("confirm_new_password")}</PrimaryText>
-          }
+          label={t("confirm_new_password")}
           w="100%"
-          elevation={1}
         />
         <Button
           variant="filled"

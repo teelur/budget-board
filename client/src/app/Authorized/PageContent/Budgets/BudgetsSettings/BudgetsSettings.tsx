@@ -1,13 +1,10 @@
 import { Box, Flex, Group, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, NumberInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { SendIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import SettingsHeading from "~/components/SettingsHeading/SettingsHeading";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
@@ -50,16 +47,8 @@ const BudgetsSettings = (): React.ReactNode => {
         <Group gap="0.5rem" wrap="nowrap">
           <NumberInput
             flex="1 1 auto"
-            label={
-              <PrimaryText size="sm">
-                {t("budget_warning_threshold")}
-              </PrimaryText>
-            }
-            description={
-              <DimmedText size="xs">
-                {t("budget_warning_threshold_description")}
-              </DimmedText>
-            }
+            label={t("budget_warning_threshold")}
+            description={t("budget_warning_threshold_description")}
             min={0}
             max={100}
             suffix="%"

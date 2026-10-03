@@ -1,5 +1,5 @@
 import { Alert, Stack, Divider, Group } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, PasswordInput, TextInput } from "@teelur/budget-board-ui";
 import { Info } from "lucide-react";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
@@ -10,8 +10,6 @@ import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
-import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
@@ -148,18 +146,27 @@ const Login = (props: LoginProps): React.ReactNode => {
         </Alert>
       )}
       {envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-        <Stack w="100%" align="center" gap="0.75rem" pb="0.5rem" p="1rem">
+        <Stack
+          component="form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            doLogin();
+          }}
+          w="100%"
+          align="center"
+          gap="0.75rem"
+          pb="0.5rem"
+          p="1rem"
+        >
           <TextInput
             {...emailField.getInputProps()}
-            label={<PrimaryText size="sm">{t("email_address")}</PrimaryText>}
+            label={t("email_address")}
             w="100%"
-            elevation={1}
           />
           <PasswordInput
             {...passwordField.getInputProps()}
-            label={<PrimaryText size="sm">{t("password")}</PrimaryText>}
+            label={t("password")}
             w="100%"
-            elevation={1}
           />
           <Button
             variant="filled"
@@ -167,7 +174,7 @@ const Login = (props: LoginProps): React.ReactNode => {
             size="compact-md"
             fullWidth
             loading={loginMutation.isPending}
-            onClick={doLogin}
+            type="submit"
           >
             {t("login")}
           </Button>

@@ -1,10 +1,9 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
-import { Button, SegmentedControl } from "@teelur/budget-board-ui";
+import { Button, SegmentedControl, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -35,8 +34,7 @@ const AddAssetType = (): React.ReactNode => {
       <Stack>
         <TextInput
           {...nameField.getInputProps()}
-          label={<PrimaryText size="sm">{t("asset_type_name")}</PrimaryText>}
-          elevation={1}
+          label={t("asset_type_name")}
         />
         <Stack gap="0.25rem" justify="center">
           <PrimaryText size="sm">{t("category_level")}</PrimaryText>

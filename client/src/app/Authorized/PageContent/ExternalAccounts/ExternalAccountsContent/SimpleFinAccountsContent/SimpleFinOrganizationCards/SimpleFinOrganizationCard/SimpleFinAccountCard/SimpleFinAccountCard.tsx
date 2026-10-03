@@ -1,5 +1,10 @@
 import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  Badge,
+  AmountText,
+  DateInput,
+} from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -7,7 +12,6 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -251,7 +255,6 @@ const SimpleFinAccountCard = (
                     placeholder={t("auto")}
                     valueFormat={dateFormat}
                     locale={dayjsLocale}
-                    elevation={2}
                   />
                 </Group>
               ) : (

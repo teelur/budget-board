@@ -18,10 +18,9 @@ import {
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
+import { NumberInput, TextInput } from "@teelur/budget-board-ui";
 
 const SettingsUser = (): React.ReactNode => {
   const currencyField = useField({
@@ -111,10 +110,8 @@ const SettingsUser = (): React.ReactNode => {
           elevation={0}
         />
         <NumberInput
-          label={<PrimaryText size="sm">{t("decimal_places")}</PrimaryText>}
-          description={
-            <DimmedText size="xs">{t("decimal_places_description")}</DimmedText>
-          }
+          label={t("decimal_places")}
+          description={t("decimal_places_description")}
           min={0}
           max={3}
           step={1}
@@ -127,7 +124,6 @@ const SettingsUser = (): React.ReactNode => {
               updateUserSettingsMutation.mutate({ decimalPlaces: value });
             }
           }}
-          elevation={0}
         />
         <Select
           label={
@@ -201,7 +197,7 @@ const SettingsUser = (): React.ReactNode => {
           />
           {dateFormatField.getValue() !== DateFormats.at(0)?.value && (
             <TextInput
-              label={<PrimaryText size="sm">{t("separator")}</PrimaryText>}
+              label={t("separator")}
               maw={100}
               {...dateSeparatorField.getInputProps()}
               onChange={(event) => {
@@ -222,7 +218,6 @@ const SettingsUser = (): React.ReactNode => {
                 })
               }
               maxLength={1}
-              elevation={0}
             />
           )}
         </Group>

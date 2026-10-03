@@ -1,5 +1,10 @@
 import { Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import {
+  Button,
+  DateInput,
+  NumberInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
@@ -10,11 +15,8 @@ import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Modal from "~/components/core/Modal/Modal";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import DateInput from "~/components/core/Input/DateInput/DateInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -105,18 +107,16 @@ const CreateTransactionModal = (): React.ReactNode => {
         <Stack gap="1rem">
           <Stack gap="0.25rem">
             <DateInput
-              label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
+              label={t("date")}
               placeholder={t("select_a_date")}
               {...dateField.getInputProps()}
               locale={dayjsLocale}
               valueFormat={longDateFormat}
-              elevation={0}
             />
             <TextInput
-              label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+              label={t("merchant_name")}
               placeholder={t("enter_merchant_name")}
               {...merchantNameField.getInputProps()}
-              elevation={0}
             />
             <CategorySelect
               label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
@@ -126,14 +126,13 @@ const CreateTransactionModal = (): React.ReactNode => {
               elevation={0}
             />
             <NumberInput
-              label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+              label={t("amount")}
               placeholder={t("enter_amount")}
               prefix={getCurrencySymbol(preferredCurrency)}
               decimalScale={decimalPlaces}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
               {...amountField.getInputProps()}
-              elevation={0}
             />
             <AccountMultiSelect
               label={<PrimaryText size="sm">{t("account")}</PrimaryText>}

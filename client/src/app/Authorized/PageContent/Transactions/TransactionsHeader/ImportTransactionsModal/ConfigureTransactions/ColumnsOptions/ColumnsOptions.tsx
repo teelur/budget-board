@@ -1,12 +1,11 @@
 import { Divider, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import Card from "~/components/core/Card/Card";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -149,21 +148,17 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
           <PrimaryText size="sm">{t("amount_format")}</PrimaryText>
           <Stack gap="0.25rem">
             <TextInput
-              label={
-                <DimmedText size="xs">{t("thousands_separator")}</DimmedText>
-              }
+              label={t("thousands_separator")}
               {...thousandsSeparatorField.getInputProps()}
               maxLength={1}
-              elevation={0}
+              size="xs"
             />
             <TextInput
-              label={
-                <DimmedText size="xs">{t("decimal_separator")}</DimmedText>
-              }
+              label={t("decimal_separator")}
               {...decimalSeparatorField.getInputProps()}
               maxLength={1}
               minLength={1}
-              elevation={0}
+              size="xs"
             />
           </Stack>
         </Stack>

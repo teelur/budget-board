@@ -1,13 +1,10 @@
 import { Group, Stack, Switch } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, FileInput, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import Papa from "papaparse";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import FileInput from "~/components/core/Input/FileInput/FileInput";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export type CsvRow = Record<string, unknown> & { uid: number };
@@ -128,8 +125,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
       <FileInput
         {...fileField.getInputProps()}
         accept="text/csv"
-        placeholder={<DimmedText size="sm">{t("select_csv_file")}</DimmedText>}
-        elevation={0}
+        placeholder={t("select_csv_file")}
       />
       <Group align="center" w="100%" wrap="wrap" gap="0.5rem">
         <Switch
@@ -148,7 +144,7 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
             {...delimiterField.getInputProps()}
             maxLength={1}
             minLength={1}
-            elevation={0}
+            size="xs"
           />
         )}
       </Group>

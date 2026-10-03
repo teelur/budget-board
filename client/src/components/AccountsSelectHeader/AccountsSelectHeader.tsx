@@ -1,9 +1,8 @@
 import { Group } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, DatePickerInput } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { IAccountResponse } from "~/models/account";
 import React from "react";
-import DatePickerInput from "../core/Input/DatePickerInput/DatePickerInput";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "../core/Select/AccountMultiSelect/AccountMultiSelect";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
@@ -32,7 +31,6 @@ const AccountsSelectHeader = (
           value={props.dateRange}
           onChange={props.setDateRange}
           miw={200}
-          elevation={1}
         />
         <AccountMultiSelect
           value={props.selectedAccountIds}
