@@ -193,6 +193,9 @@
     <data name="BudgetNotFoundError" xml:space="preserve">
         <value>The budget you are trying to access does not exist.</value>
     </data>
+    <data name="BudgetRolloverConflictError" xml:space="preserve">
+        <value>Rollover can be turned on for a category or its subcategories, but not both.</value>
+    </data>
     <data name="BudgetUpdateParentLimitError" xml:space="preserve">
         <value>The parent budget cannot be less than the sum of its children.</value>
     </data>

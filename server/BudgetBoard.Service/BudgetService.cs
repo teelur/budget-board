@@ -123,19 +123,11 @@ public class BudgetService(
 
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
 
-        // Only child categories roll over; a parent's rollover is the sum of its children's.
-        var rolloverBudgets = budgets
-            .Where(b =>
-                b.RolloverStartMonth.HasValue
-                && !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)
-            )
-            .ToList();
+        var rolloverBudgets = budgets.Where(b => b.RolloverStartMonth.HasValue).ToList();
 
         if (rolloverBudgets.Count == 0)
         {
-            return budgets
-                .Select(b => new BudgetResponse(b) { RolloverStartMonth = null })
-                .ToList();
+            return budgets.Select(b => new BudgetResponse(b)).ToList();
         }
 
         var budgetsByCategoryMonth = userData
@@ -155,7 +147,7 @@ public class BudgetService(
                 ? await BuildCategorySpendMapAsync(userData.Id, spendFrom, spendTo)
                 : [];
 
-        var childRollovers = rolloverBudgets.ToDictionary(
+        var rollovers = rolloverBudgets.ToDictionary(
             b => b.ID,
             b =>
                 CalculateRollover(
@@ -167,12 +159,17 @@ public class BudgetService(
                 )
         );
 
+        // Rollover is on for either a parent or its children, never both. A parent without its own
+        // rollover shows the sum of its children's.
         return budgets
             .Select(b =>
             {
-                if (!TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories))
+                if (
+                    b.RolloverStartMonth.HasValue
+                    || !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)
+                )
                 {
-                    return new BudgetResponse(b, childRollovers.GetValueOrDefault(b.ID));
+                    return new BudgetResponse(b, rollovers.GetValueOrDefault(b.ID));
                 }
 
                 var childrenRollover = rolloverBudgets
@@ -181,9 +178,9 @@ public class BudgetService(
                             .GetParentCategory(child.Category, allCategories)
                             .Equals(b.Category, StringComparison.InvariantCultureIgnoreCase)
                     )
-                    .Sum(child => childRollovers[child.ID]);
+                    .Sum(child => rollovers[child.ID]);
 
-                return new BudgetResponse(b, childrenRollover) { RolloverStartMonth = null };
+                return new BudgetResponse(b, childrenRollover);
             })
             .ToList();
     }
@@ -202,10 +199,20 @@ public class BudgetService(
             allCategories
         );
 
-        // Only child categories roll over.
-        var rolloverStartMonth = isParent ? null : NormalizeToMonth(request.RolloverStartMonth);
+        var rolloverStartMonth = NormalizeToMonth(request.RolloverStartMonth);
         if (rolloverStartMonth != budget.RolloverStartMonth)
         {
+            if (
+                rolloverStartMonth.HasValue
+                && HasRolloverConflict(userData, budget.Category, budget.Month, allCategories)
+            )
+            {
+                logger.LogError("{LogMessage}", logLocalizer["BudgetRolloverConflictLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["BudgetRolloverConflictError"]
+                );
+            }
+
             // Rollover is a standing setting for the category, so it carries forward to later months.
             var budgetMonth = NormalizeToMonth(budget.Month);
             foreach (
@@ -390,9 +397,11 @@ public class BudgetService(
             Month = request.Month,
             Category = request.Category,
             Limit = request.Limit,
-            // Only child categories roll over.
-            RolloverStartMonth = TransactionCategoriesHelpers.GetIsParentCategory(
+            // Rollover can't be on for both a parent and its children, so it's dropped on conflict.
+            RolloverStartMonth = HasRolloverConflict(
+                userData,
                 request.Category,
+                request.Month,
                 allCategories
             )
                 ? null
@@ -447,6 +456,39 @@ public class BudgetService(
         date.HasValue ? StartOfMonth(date.Value) : null;
 
     private static DateOnly StartOfMonth(DateOnly date) => new(date.Year, date.Month, 1);
+
+    /// <summary>
+    /// Rollover can be on for a parent category or for its children, but not both, because the
+    /// parent's spending already includes its children's and the balance would be counted twice.
+    /// Checks the budget's month and every later month, since rollover settings carry forward.
+    /// </summary>
+    private static bool HasRolloverConflict(
+        ApplicationUser userData,
+        string category,
+        DateOnly month,
+        IEnumerable<ITransactionCategoryResponse> allCategories
+    )
+    {
+        var fromMonth = StartOfMonth(month);
+        var isParent = TransactionCategoriesHelpers.GetIsParentCategory(category, allCategories);
+        var parentCategory = TransactionCategoriesHelpers.GetParentCategory(
+            category,
+            allCategories
+        );
+
+        return userData.Budgets.Any(b =>
+            b.RolloverStartMonth.HasValue
+            && StartOfMonth(b.Month) >= fromMonth
+            && (
+                isParent
+                    ? !TransactionCategoriesHelpers.GetIsParentCategory(b.Category, allCategories)
+                        && TransactionCategoriesHelpers
+                            .GetParentCategory(b.Category, allCategories)
+                            .Equals(category, StringComparison.InvariantCultureIgnoreCase)
+                    : b.Category.Equals(parentCategory, StringComparison.InvariantCultureIgnoreCase)
+            )
+        );
+    }
 
     /// <summary>
     /// A new budget keeps the rollover setting of the most recent earlier budget for its category,

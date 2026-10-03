@@ -654,7 +654,9 @@ public class BudgetServiceTests
         Guid accountId,
         DateOnly month,
         decimal spend,
-        bool isDeleted = false
+        bool isDeleted = false,
+        string category = RolloverCategory,
+        string? subcategory = null
     )
     {
         helper.UserDataContext.Transactions.Add(
@@ -664,7 +666,8 @@ public class BudgetServiceTests
                 // Expenses are stored as negative amounts.
                 Amount = -spend,
                 Date = month,
-                Category = RolloverCategory,
+                Category = category,
+                Subcategory = subcategory,
                 Source = "Manual",
                 AccountID = accountId,
                 Deleted = isDeleted ? DateTime.UtcNow : null,
@@ -1097,7 +1100,7 @@ public class BudgetServiceTests
     }
 
     [Fact]
-    public async Task ReadBudgetsAsync_WhenParentBudget_ShouldSumChildRolloversAndIgnoreOwnSetting()
+    public async Task ReadBudgetsAsync_WhenOnlyChildrenRollOver_ParentShouldSumChildRollovers()
     {
         // Arrange
         var helper = new TestHelper();
@@ -1108,7 +1111,7 @@ public class BudgetServiceTests
         var february = new DateOnly(2026, 2, 1);
 
         AddParentBudget(helper, january, 1000);
-        AddParentBudget(helper, february, 1000, rolloverStartMonth: january);
+        AddParentBudget(helper, february, 1000);
         AddRolloverBudget(helper, january, 400);
         AddRolloverBudget(helper, february, 400, rolloverStartMonth: january);
         AddSpend(helper, accountId, january.AddDays(9), 250);
@@ -1124,7 +1127,52 @@ public class BudgetServiceTests
     }
 
     [Fact]
-    public async Task UpdateBudgetAsync_WhenParentBudget_ShouldNotEnableRollover()
+    public async Task ReadBudgetsAsync_WhenParentRollsOver_ShouldCarryParentRemainderAcrossChildren()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+        var accountId = AddAccount(helper);
+
+        var january = new DateOnly(2026, 1, 1);
+        var february = new DateOnly(2026, 2, 1);
+
+        AddParentBudget(helper, january, 1000);
+        AddParentBudget(helper, february, 1000, rolloverStartMonth: january);
+        AddRolloverBudget(helper, january, 400);
+        AddRolloverBudget(helper, february, 400);
+        // Spending is recorded under the parent category with a subcategory, which counts towards
+        // the parent whether or not that subcategory has its own budget.
+        AddSpend(
+            helper,
+            accountId,
+            january.AddDays(9),
+            250,
+            category: RolloverParentCategory,
+            subcategory: RolloverCategory
+        );
+        AddSpend(
+            helper,
+            accountId,
+            january.AddDays(12),
+            300,
+            category: RolloverParentCategory,
+            subcategory: "Restaurants"
+        );
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var readBudgets = await budgetService.ReadBudgetsAsync(helper.demoUser.Id, february);
+
+        // Assert
+        var parent = readBudgets.Single(b => b.Category == RolloverParentCategory);
+        parent.Rollover.Should().Be(450);
+        parent.RolloverStartMonth.Should().Be(january);
+        readBudgets.Single(b => b.Category == RolloverCategory).Rollover.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task UpdateBudgetAsync_WhenParentHasNoRolloverChildren_ShouldEnableRollover()
     {
         // Arrange
         var helper = new TestHelper();
@@ -1133,6 +1181,102 @@ public class BudgetServiceTests
         var january = new DateOnly(2026, 1, 1);
         var february = new DateOnly(2026, 2, 1);
 
+        var parentBudget = AddParentBudget(helper, february, 1000);
+        AddRolloverBudget(helper, february, 400);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await budgetService.UpdateBudgetAsync(
+            helper.demoUser.Id,
+            new BudgetUpdateRequest
+            {
+                ID = parentBudget.ID,
+                Limit = 1000,
+                RolloverStartMonth = january,
+            }
+        );
+
+        // Assert
+        parentBudget.RolloverStartMonth.Should().Be(january);
+    }
+
+    [Fact]
+    public async Task UpdateBudgetAsync_WhenChildRollsOver_ShouldRejectParentRollover()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var january = new DateOnly(2026, 1, 1);
+        var february = new DateOnly(2026, 2, 1);
+
+        var parentBudget = AddParentBudget(helper, february, 1000);
+        AddRolloverBudget(helper, february, 400, rolloverStartMonth: january);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.UpdateBudgetAsync(
+                helper.demoUser.Id,
+                new BudgetUpdateRequest
+                {
+                    ID = parentBudget.ID,
+                    Limit = 1000,
+                    RolloverStartMonth = january,
+                }
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("BudgetRolloverConflictError");
+    }
+
+    [Fact]
+    public async Task UpdateBudgetAsync_WhenParentRollsOver_ShouldRejectChildRollover()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var january = new DateOnly(2026, 1, 1);
+        var february = new DateOnly(2026, 2, 1);
+
+        AddParentBudget(helper, february, 1000, rolloverStartMonth: january);
+        var childBudget = AddRolloverBudget(helper, february, 400);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        Func<Task> act = async () =>
+            await budgetService.UpdateBudgetAsync(
+                helper.demoUser.Id,
+                new BudgetUpdateRequest
+                {
+                    ID = childBudget.ID,
+                    Limit = 400,
+                    RolloverStartMonth = january,
+                }
+            );
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("BudgetRolloverConflictError");
+    }
+
+    [Fact]
+    public async Task UpdateBudgetAsync_WhenChildRolloverOnlyInEarlierMonths_ShouldAllowParentRollover()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var january = new DateOnly(2026, 1, 1);
+        var february = new DateOnly(2026, 2, 1);
+
+        // Switching levels starts fresh: the child rolled over in January, but not from February.
+        AddRolloverBudget(helper, january, 400, rolloverStartMonth: january);
+        AddRolloverBudget(helper, february, 400);
         var parentBudget = AddParentBudget(helper, february, 1000);
         helper.UserDataContext.SaveChanges();
 
@@ -1148,7 +1292,7 @@ public class BudgetServiceTests
         );
 
         // Assert
-        parentBudget.RolloverStartMonth.Should().BeNull();
+        parentBudget.RolloverStartMonth.Should().Be(january);
     }
     #endregion
 

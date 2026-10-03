@@ -1,7 +1,7 @@
 import classes from "./BudgetParentCard.module.css";
 import hoverClasses from "~/styles/Hoverable.module.css";
 
-import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
+import { SignDisplay } from "~/helpers/currency";
 import {
   Box,
   Flex,
@@ -29,9 +29,10 @@ import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import Popover from "~/components/core/Popover/Popover";
 import BudgetMetrics from "./BudgetMetrics/BudgetMetrics";
+import RolloverButton from "./RolloverButton/RolloverButton";
+import BudgetLimitInput from "./BudgetLimitInput/BudgetLimitInput";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
@@ -61,8 +62,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const childrenId = React.useId();
 
   const { t } = useTranslation();
-  const { dayjs, thousandsSeparator, decimalSeparator, intlLocale } =
-    useLocale();
+  const { dayjs, intlLocale } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const { allTransactionCategories } = useTransactionCategories();
@@ -93,7 +93,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     [];
   const id =
     budgets.length === 1 && props.selectedDate ? (budgets[0]?.id ?? "") : "";
-  // Only children roll over; the parent's rollover is the sum of theirs.
+  // Rollover is on for either the parent or its children, never both. When only children roll
+  // over, the parent's rollover is the sum of theirs.
+  const rolloverStartMonth = budgets[0]?.rolloverStartMonth ?? null;
+  const parentRollsOver = budgets.some(
+    (budget) => budget.rolloverStartMonth !== null,
+  );
   const hasRolloverChildren = props.categoryTree.subCategories.some(
     (subCategory) =>
       (
@@ -136,7 +141,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     0,
     projectedPercentComplete - actualProgressValue,
   );
-  const handleEdit = (newLimit?: number | string) => {
+  const handleEdit = (
+    newLimit?: number | string,
+    newRolloverStartMonth?: string | null,
+  ) => {
     if (newLimit === "") {
       return;
     }
@@ -146,7 +154,10 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
     updateBudgetMutation.mutate({
       id,
       limit: Number(newLimit),
-      rolloverStartMonth: null,
+      rolloverStartMonth:
+        newRolloverStartMonth === undefined
+          ? rolloverStartMonth
+          : newRolloverStartMonth,
     });
   };
 
@@ -203,6 +214,13 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               ) ?? 0
             }
             rolloverStartMonth={budgets[0]?.rolloverStartMonth ?? null}
+            rolloverDisabledReason={
+              parentRollsOver
+                ? t("rollover_on_for_category", {
+                    category: props.categoryTree.value,
+                  })
+                : undefined
+            }
             isIncome={isIncome}
             icon={getCategoryIcon(subCategory.value, allTransactionCategories)}
             selectedDate={props.selectedDate ?? dayjs().toDate()}
@@ -245,31 +263,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   const getElementForLimit = () => {
     if (isSelected) {
       return (
-        <Flex onClick={(e) => e.stopPropagation()}>
-          <NumberInput
-            {...newLimitField.getInputProps()}
-            onBlur={() => handleEdit(newLimitField.getValue())}
-            thousandSeparator={thousandsSeparator}
-            decimalSeparator={decimalSeparator}
-            decimalScale={0}
-            min={childLimitsTotal}
-            max={999999}
-            step={1}
-            prefix={getCurrencySymbol(preferredCurrency)}
-            placeholder={t("enter_limit")}
-            size="xs"
-            styles={{
-              root: {
-                maxWidth: "100px",
-              },
-              input: {
-                padding: "0 10px",
-                fontSize: "16px",
-              },
-            }}
-            elevation={1}
-          />
-        </Flex>
+        <BudgetLimitInput
+          field={newLimitField}
+          onSave={(newLimit) => handleEdit(newLimit)}
+          min={childLimitsTotal}
+          key="total-edit"
+        />
       );
     }
 
@@ -415,15 +414,31 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
               amount={amount}
               projectedAmount={projectedAmount}
               limit={availableLimit}
-              rollover={hasRolloverChildren ? rollover : undefined}
+              rollover={
+                parentRollsOver || hasRolloverChildren ? rollover : undefined
+              }
               isIncome={isIncome}
             />
           </Stack>
           {isSelected && (
             <Flex
               style={{ alignSelf: "stretch" }}
+              gap="0.25rem"
               onClick={(e) => e.stopPropagation()}
             >
+              <RolloverButton
+                category={props.categoryTree.value}
+                rolloverStartMonth={rolloverStartMonth}
+                budgetMonth={props.selectedDate ?? dayjs().toDate()}
+                onChange={(newStartMonth) =>
+                  handleEdit(newLimitField.getValue(), newStartMonth)
+                }
+                disabledReason={
+                  hasRolloverChildren
+                    ? t("rollover_on_for_subcategories")
+                    : undefined
+                }
+              />
               <Popover>
                 <MantinePopover.Target>
                   <ActionIcon

@@ -160,6 +160,9 @@
     <data name="DatabaseMigrationStartingLog" xml:space="preserve">
         <value>Updating database with the latest migrations.</value>
     </data>
+    <data name="BudgetRolloverConflictLog" xml:space="preserve">
+        <value>Attempted to enable rollover on a budget whose parent or child categories already roll over.</value>
+    </data>
     <data name="BudgetUpdateParentLimitErrorLog" xml:space="preserve">
         <value>Attempted to update parent budget to a value less than the sum of its children.</value>
     </data>

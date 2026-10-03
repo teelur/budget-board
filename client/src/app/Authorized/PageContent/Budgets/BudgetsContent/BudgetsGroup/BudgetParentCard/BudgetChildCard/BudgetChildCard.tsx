@@ -1,8 +1,8 @@
 import classes from "./BudgetChildCard.module.css";
 import hoverClasses from "~/styles/Hoverable.module.css";
 
-import { getCurrencySymbol, SignDisplay } from "~/helpers/currency";
-import { Box, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { SignDisplay } from "~/helpers/currency";
+import { Box, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { ActionIcon, AmountText, Progress } from "@teelur/budget-board-ui";
 import React from "react";
 import { useField } from "@mantine/form";
@@ -11,9 +11,9 @@ import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import BudgetMetrics from "../BudgetMetrics/BudgetMetrics";
-import RolloverControl from "../RolloverControl/RolloverControl";
+import RolloverButton from "../RolloverButton/RolloverButton";
+import BudgetLimitInput from "../BudgetLimitInput/BudgetLimitInput";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
@@ -30,6 +30,8 @@ interface BudgetChildCardProps {
   limit: number;
   rollover: number;
   rolloverStartMonth: string | null;
+  /** Set when the parent category rolls over, which rules out rollover here. */
+  rolloverDisabledReason?: string;
   isIncome: boolean;
   icon: string;
   selectedDate: Date;
@@ -40,7 +42,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const [isSelected, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { thousandsSeparator, decimalSeparator, intlLocale } = useLocale();
+  const { intlLocale } = useLocale();
   const { preferredCurrency, budgetWarningThreshold } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const updateBudgetMutation = useUpdateBudgetMutation();
@@ -101,32 +103,12 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
   const getElementForLimit = () => {
     if (isSelected) {
       return (
-        <Flex onClick={(e) => e.stopPropagation()}>
-          <NumberInput
-            {...newLimitField.getInputProps()}
-            onBlur={() => handleEdit(newLimitField.getValue())}
-            thousandSeparator={thousandsSeparator}
-            decimalSeparator={decimalSeparator}
-            decimalScale={0}
-            min={0}
-            max={999999}
-            step={1}
-            prefix={getCurrencySymbol(preferredCurrency)}
-            placeholder={t("enter_limit")}
-            size="xs"
-            styles={{
-              root: {
-                maxWidth: "100px",
-              },
-              input: {
-                padding: "0 10px",
-                fontSize: "16px",
-              },
-            }}
-            key="total-edit"
-            elevation={1}
-          />
-        </Flex>
+        <BudgetLimitInput
+          field={newLimitField}
+          onSave={(newLimit) => handleEdit(newLimit)}
+          min={0}
+          key="total-edit"
+        />
       );
     }
     return (
@@ -221,17 +203,6 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   getElementForLimit(),
                 ]}
               />
-              {isSelected && (
-                <Flex onClick={(e) => e.stopPropagation()}>
-                  <RolloverControl
-                    rolloverStartMonth={props.rolloverStartMonth}
-                    budgetMonth={props.selectedDate}
-                    onChange={(newStartMonth) =>
-                      handleEdit(newLimitField.getValue(), newStartMonth)
-                    }
-                  />
-                </Flex>
-              )}
             </Group>
           </Group>
           <Progress
@@ -266,7 +237,16 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
           />
         </Stack>
         {isSelected && (
-          <Group style={{ alignSelf: "stretch" }}>
+          <Group style={{ alignSelf: "stretch" }} gap="0.25rem" wrap="nowrap">
+            <RolloverButton
+              category={props.categoryValue}
+              rolloverStartMonth={props.rolloverStartMonth}
+              budgetMonth={props.selectedDate}
+              onChange={(newStartMonth) =>
+                handleEdit(newLimitField.getValue(), newStartMonth)
+              }
+              disabledReason={props.rolloverDisabledReason}
+            />
             <ActionIcon
               variant="filled"
               color="error"
