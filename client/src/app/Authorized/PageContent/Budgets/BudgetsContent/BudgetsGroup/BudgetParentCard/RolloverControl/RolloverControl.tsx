@@ -1,10 +1,9 @@
-import { Group, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import Checkbox from "~/components/core/Checkbox/Checkbox";
-import MonthPickerInput from "~/components/core/Input/MonthPickerInput/MonthPickerInput";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { MonthPickerInput } from "@teelur/budget-board-ui";
 
 interface RolloverControlProps {
   rolloverStartMonth: string | null;
@@ -47,23 +46,16 @@ const RolloverControl = (props: RolloverControlProps): React.ReactNode => {
         elevation={1}
       />
       {props.rolloverStartMonth !== null && (
-        <Group gap="0.5rem" align="center" wrap="nowrap">
-          <PrimaryText size="sm">
-            {t("roll_over_money_since")}
-          </PrimaryText>
-          <MonthPickerInput
-            value={props.rolloverStartMonth}
-            onChange={(month) => props.onChange(month)}
-            maxDate={latestStartMonth.format("YYYY-MM-DD")}
-            locale={dayjsLocale}
-            valueFormat="MMM YYYY"
-            placeholder={t("rollover_start_month")}
-            aria-label={t("roll_over_money_since")}
-            size="xs"
-            styles={{ root: { maxWidth: "130px" } }}
-            elevation={1}
-          />
-        </Group>
+        <MonthPickerInput
+          value={props.rolloverStartMonth}
+          onChange={(month) => props.onChange(month)}
+          maxDate={latestStartMonth.format("YYYY-MM-DD")}
+          label={t("roll_over_money_since")}
+          locale={dayjsLocale}
+          valueFormat="MMM YYYY"
+          placeholder={t("rollover_start_month")}
+          aria-label={t("roll_over_money_since")}
+        />
       )}
     </Stack>
   );

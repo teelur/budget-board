@@ -77,10 +77,22 @@ const RolloverButton = (props: RolloverButtonProps): React.ReactNode => {
             size="sm"
           />
           <Group justify="flex-end" gap="0.5rem">
-            <Button variant="outline" color="primary" onClick={close}>
+            <Button
+              variant="outline"
+              color="primary"
+              size="compact-sm"
+              flex="1"
+              onClick={close}
+            >
               {t("cancel")}
             </Button>
-            <Button variant="filled" color="primary" onClick={save}>
+            <Button
+              variant="filled"
+              color="primary"
+              size="compact-sm"
+              flex="1"
+              onClick={save}
+            >
               {t("save")}
             </Button>
           </Group>
