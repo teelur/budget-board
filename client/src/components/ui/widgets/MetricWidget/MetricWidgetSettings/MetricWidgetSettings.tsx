@@ -1,5 +1,5 @@
-import { Code, Group, ScrollArea, Stack, TextInput } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Code, Group, ScrollArea, Stack } from "@mantine/core";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
 import React from "react";
@@ -146,11 +146,7 @@ const MetricWidgetSettings = ({
         <DimmedText size="sm">{t("metric_widget_settings_message")}</DimmedText>
         <Stack gap="0.75rem">
           <TextInput
-            label={
-              <PrimaryText size="sm">
-                {t("metric_widget_title_label")}
-              </PrimaryText>
-            }
+            label={t("metric_widget_title_label")}
             placeholder={t("metric_widget_title_placeholder")}
             {...titleField.getInputProps()}
           />

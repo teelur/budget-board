@@ -1,5 +1,5 @@
 import { Group, Stack, Switch } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,6 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Select from "../core/Select/Select/Select";
@@ -238,10 +237,9 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         elevation={0}
       />
       <TextInput
-        label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+        label={t("merchant_name")}
         placeholder={t("enter_merchant_name")}
         {...merchantNameField.getInputProps()}
-        elevation={0}
       />
       <CategorySelect
         label={<PrimaryText size="sm">{t("category")}</PrimaryText>}

@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
@@ -10,7 +10,6 @@ import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Modal from "~/components/core/Modal/Modal";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
@@ -113,10 +112,9 @@ const CreateTransactionModal = (): React.ReactNode => {
               elevation={0}
             />
             <TextInput
-              label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+              label={t("merchant_name")}
               placeholder={t("enter_merchant_name")}
               {...merchantNameField.getInputProps()}
-              elevation={0}
             />
             <CategorySelect
               label={<PrimaryText size="sm">{t("category")}</PrimaryText>}

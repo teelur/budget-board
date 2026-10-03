@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -9,7 +9,6 @@ import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateAccountMutation } from "~/hooks/mutations/accounts/useCreateAccountMutation";
@@ -105,8 +104,7 @@ const CreateAccount = () => {
         <Stack gap="0.5rem">
           <TextInput
             {...accountNameField.getInputProps()}
-            label={<PrimaryText size="sm">{t("account_name")}</PrimaryText>}
-            elevation={0}
+            label={t("account_name")}
           />
           <Autocomplete
             {...institutionField.getInputProps()}

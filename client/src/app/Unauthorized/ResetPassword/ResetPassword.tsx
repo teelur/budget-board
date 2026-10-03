@@ -1,9 +1,8 @@
 import { Stack, Group } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { hasLength, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import PasswordInput from "~/components/core/Input/PasswordInput/PasswordInput";
 import { useTranslation } from "react-i18next";
@@ -43,10 +42,9 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
     <Stack gap="0.75rem" align="center" p="1rem">
       <Stack align="center" gap="0.5rem" w="100%">
         <TextInput
-          label={<PrimaryText size="sm">{t("reset_code")}</PrimaryText>}
+          label={t("reset_code")}
           w="100%"
           {...resetCodeField.getInputProps()}
-          elevation={1}
         />
         <PasswordInput
           label={<PrimaryText size="sm">{t("new_password")}</PrimaryText>}

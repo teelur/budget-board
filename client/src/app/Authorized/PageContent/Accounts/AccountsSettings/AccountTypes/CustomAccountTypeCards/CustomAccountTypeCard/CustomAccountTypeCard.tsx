@@ -4,13 +4,13 @@ import {
   Badge,
   Button,
   SegmentedControl,
+  TextInput,
 } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -87,10 +87,7 @@ const CustomAccountTypeCard = (
           <Stack gap="0.5rem">
             <TextInput
               {...nameField.getInputProps()}
-              label={
-                <PrimaryText size="sm">{t("account_type_name")}</PrimaryText>
-              }
-              elevation={1}
+              label={t("account_type_name")}
             />
             <Stack gap="0.25rem" justify="center">
               <PrimaryText size="sm">{t("category_level")}</PrimaryText>

@@ -1,5 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -10,7 +10,6 @@ import { translateAxiosError } from "~/helpers/requests";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useTranslation } from "react-i18next";
 import { useLoginMutation } from "~/hooks/mutations/auth/useLoginMutation";
 
@@ -86,11 +85,7 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
           {t("enter_recovery_code_subheading")}
         </DimmedText>
       </Stack>
-      <TextInput
-        {...recoveryCodeField.getInputProps()}
-        w="100%"
-        elevation={1}
-      />
+      <TextInput {...recoveryCodeField.getInputProps()} w="100%" />
       <Group gap="0.5rem" w="100%">
         <Button
           variant="filled"

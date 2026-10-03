@@ -6,13 +6,12 @@ import {
   Stack,
   Transition,
 } from "@mantine/core";
-import { ActionIcon, Badge, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Badge, Button, TextInput } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import Textarea from "~/components/core/Input/Textarea/Textarea";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
@@ -322,9 +321,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 elevation={1}
               />
               <TextInput
-                label={
-                  <PrimaryText size="xs">{t("merchant_name")}</PrimaryText>
-                }
+                label={t("merchant_name")}
                 value={merchantValue}
                 onChange={(e) => {
                   setMerchantValue(e.currentTarget.value);
@@ -333,7 +330,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 placeholder={t("enter_merchant_name")}
                 miw={180}
                 style={{ flex: "1 1 180px" }}
-                elevation={1}
               />
               <CategorySelect
                 label={<PrimaryText size="xs">{t("category")}</PrimaryText>}

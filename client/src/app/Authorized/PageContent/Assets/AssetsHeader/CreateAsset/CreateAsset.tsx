@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
@@ -8,7 +8,6 @@ import { IAssetCreateRequest } from "~/models/asset";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateAssetMutation } from "~/hooks/mutations/assets/useCreateAssetMutation";
 
@@ -40,9 +39,8 @@ const CreateAsset = (): React.ReactNode => {
         <Stack gap="0.5rem">
           <TextInput
             {...assetNameField.getInputProps()}
-            label={<PrimaryText size="sm">{t("name")}</PrimaryText>}
+            label={t("name")}
             placeholder={t("enter_asset_name")}
-            elevation={0}
           />
           <Button
             variant="filled"

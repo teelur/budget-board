@@ -1,10 +1,9 @@
 import { Group, LoadingOverlay } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, TextInput } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useField } from "@mantine/form";
 import { PencilIcon } from "lucide-react";
 import { IInstitution, IInstitutionUpdateRequest } from "~/models/institution";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useUpdateInstitutionMutation } from "~/hooks/mutations/institutions/useUpdateInstitutionMutation";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -41,7 +40,6 @@ const EditableInstitutionItemContent = (
               name: institutionNameField.getValue(),
             } as IInstitutionUpdateRequest)
           }
-          elevation={1}
         />
         <ActionIcon
           variant="outline"

@@ -1,12 +1,11 @@
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Button, TextInput } from "@teelur/budget-board-ui";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { INetWorthWidgetLine } from "~/models/widgetSettings";
 import NetWorthLineCategory from "./NetWorthLineCategory/NetWorthLineCategory";
 import { GripVertical, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useField } from "@mantine/form";
 import { INetWorthWidgetCategoryCreateRequest } from "~/models/netWorthWidgetConfiguration";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -84,7 +83,6 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                       });
                     }
                   }}
-                  elevation={1}
                 />
               ) : props.line.name.length > 0 ? (
                 <PrimaryText size="sm">{props.line.name}</PrimaryText>

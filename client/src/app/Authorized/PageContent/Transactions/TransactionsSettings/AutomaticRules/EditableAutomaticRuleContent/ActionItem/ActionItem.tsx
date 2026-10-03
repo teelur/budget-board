@@ -1,5 +1,5 @@
 import { Group } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, TextInput } from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import {
@@ -13,7 +13,6 @@ import {
   IRuleParameterEdit,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import DateInput from "~/components/core/Input/DateInput/DateInput";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -51,7 +50,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           placeholder={t("enter_merchant_name")}
           value={props.ruleParameter.value}
           onChange={(event) => setValue(event.currentTarget.value)}
-          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "amount") {
@@ -66,7 +64,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
               ? t("invalid_amount_expression")
               : undefined
           }
-          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "note") {
@@ -76,7 +73,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           placeholder={t("enter_note")}
           value={props.ruleParameter.value}
           onChange={(event) => setValue(event.currentTarget.value)}
-          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "date") {

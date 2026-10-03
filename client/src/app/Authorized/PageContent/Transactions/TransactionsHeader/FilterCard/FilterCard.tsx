@@ -1,7 +1,7 @@
 import classes from "./FilterCard.module.css";
 
 import { Flex, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, TextInput } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
@@ -127,7 +126,7 @@ const FilterCard = (): React.ReactNode => {
           <TextInput
             className={classes.merchantInput}
             miw={140}
-            label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+            label={t("merchant_name")}
             placeholder={t("enter_merchant_name")}
             value={transactionFilters.merchantName}
             onChange={(e) => {
@@ -140,7 +139,6 @@ const FilterCard = (): React.ReactNode => {
               newFilters.tags = transactionFilters.tags;
               setTransactionFilters(newFilters);
             }}
-            elevation={1}
           />
           <NumberInput
             className={classes.amountInput}

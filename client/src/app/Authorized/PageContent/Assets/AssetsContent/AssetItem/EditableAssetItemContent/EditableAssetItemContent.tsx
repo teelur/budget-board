@@ -1,5 +1,5 @@
 import { Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, TextInput } from "@teelur/budget-board-ui";
 import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -11,7 +11,6 @@ import DateInput from "~/components/core/Input/DateInput/DateInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
 import { useTranslation } from "react-i18next";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -88,7 +87,6 @@ const EditableAssetItemContent = (
                   name: assetNameField.getValue(),
                 } as IAssetUpdateRequest)
               }
-              elevation={1}
             />
             <Flex style={{ alignSelf: "stretch" }}>
               <ActionIcon

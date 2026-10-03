@@ -8,12 +8,11 @@ import {
   Stack,
   UnstyledButton,
 } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Button, TextInput } from "@teelur/budget-board-ui";
 import { SmilePlusIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import {
   filterCategoryIconGroups,
@@ -120,7 +119,6 @@ const CategoryIconPicker = (
             onChange={(e) => setSearch(e.currentTarget.value)}
             placeholder={t("search_icons")}
             size="xs"
-            elevation={1}
           />
           {groups.length === 0 ? (
             <DimmedText size="xs" elevation={1}>

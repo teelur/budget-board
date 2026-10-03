@@ -7,6 +7,7 @@ import {
   Button,
   AmountText,
   Progress,
+  TextInput,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
@@ -17,7 +18,6 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
 import { getGoalTargetAmount } from "~/helpers/goals";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import NumberInput from "~/components/core/Input/NumberInput/NumberInput";
@@ -241,7 +241,6 @@ const EditableGoalCardContent = (
                   }
                 }}
                 onClick={(e) => e.stopPropagation()}
-                elevation={1}
               />
               {props.includeInterest && props.goal.interestRate && (
                 <Badge variant="light" color="primary" size="xs">

@@ -1,8 +1,8 @@
 import { Divider, SimpleGrid, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
+import { TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import TextInput from "~/components/core/Input/TextInput/TextInput";
 import Select from "~/components/core/Select/Select/Select";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
@@ -143,11 +143,10 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
           )}
           {props.isSingleAccount ? (
             <TextInput
-              label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+              label={t("account")}
               placeholder={t("account_name")}
               {...accountColumnField.getInputProps()}
               value={accountColumnField.getValue() ?? ""}
-              elevation={0}
             />
           ) : (
             <Select
