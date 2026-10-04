@@ -1,11 +1,15 @@
-import { Group, Stack, Switch } from "@mantine/core";
-import { Button, FileInput, TextInput } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import {
+  Button,
+  Checkbox,
+  FileInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import Papa from "papaparse";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export type CsvRow = Record<string, unknown> & { uid: number };
 
@@ -128,12 +132,8 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
         placeholder={t("select_csv_file")}
       />
       <Group align="center" w="100%" wrap="wrap" gap="0.5rem">
-        <Switch
-          label={
-            <PrimaryText size="sm" style={{ whiteSpace: "nowrap" }}>
-              {t("use_custom_delimiter")}
-            </PrimaryText>
-          }
+        <Checkbox
+          label={t("use_custom_delimiter")}
           checked={useDelimiter.getValue()}
           onChange={(event) =>
             useDelimiter.setValue(event.currentTarget.checked)

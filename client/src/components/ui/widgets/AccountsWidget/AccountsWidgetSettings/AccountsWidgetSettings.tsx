@@ -1,5 +1,5 @@
-import { Checkbox, Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Button, Checkbox } from "@teelur/budget-board-ui";
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
@@ -126,9 +126,7 @@ const AccountsWidgetSettings = ({
                     {inst.accounts.map((account) => (
                       <Checkbox
                         key={account.id}
-                        label={
-                          <DimmedText size="sm">{account.name}</DimmedText>
-                        }
+                        label={account.name}
                         checked={selectedIds.has(account.id)}
                         onChange={() => {
                           setShowAll(false);

@@ -1,5 +1,5 @@
-import { Alert, Checkbox, Divider, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Alert, Divider, Group, Stack } from "@mantine/core";
+import { Button, Checkbox } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import {
@@ -217,9 +217,7 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
             onChange={(event) =>
               filterDuplicatesField.setValue(event.currentTarget.checked)
             }
-            label={
-              <PrimaryText size="sm">{t("filter_duplicates")}</PrimaryText>
-            }
+            label={t("filter_duplicates")}
           />
           <DimmedText size="xs">
             {t("filter_duplicates_description")}
@@ -236,7 +234,7 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
                     onChange={(event) =>
                       field.setValue(event.currentTarget.checked)
                     }
-                    label={<PrimaryText size="sm">{label}</PrimaryText>}
+                    label={t(label)}
                   />
                 ))}
               </Group>

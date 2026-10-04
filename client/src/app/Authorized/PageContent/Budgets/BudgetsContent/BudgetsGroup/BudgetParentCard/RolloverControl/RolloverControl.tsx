@@ -2,8 +2,7 @@ import { Stack } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import Checkbox from "~/components/core/Checkbox/Checkbox";
-import { MonthPickerInput } from "@teelur/budget-board-ui";
+import { Checkbox, MonthPickerInput } from "@teelur/budget-board-ui";
 
 interface RolloverControlProps {
   rolloverStartMonth: string | null;
@@ -40,10 +39,9 @@ const RolloverControl = (props: RolloverControlProps): React.ReactNode => {
           props.rolloverStartMonth === null ? props.disabledReason : undefined
         }
         styles={{
-          description: { color: "var(--text-color-status-warning)" },
+          description: { color: "var(--bb-color-warning)" },
         }}
         size={props.size ?? "xs"}
-        elevation={1}
       />
       {props.rolloverStartMonth !== null && (
         <MonthPickerInput

@@ -1,11 +1,10 @@
 import { Divider, Group, Stack } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Button, Checkbox, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import Card from "~/components/core/Card/Card";
-import Checkbox from "~/components/core/Checkbox/Checkbox";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -170,22 +169,14 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
               onChange={(event) => {
                 invertAmountField.setValue(event.currentTarget.checked);
               }}
-              label={
-                <PrimaryText size="sm">{t("invert_amount_values")}</PrimaryText>
-              }
-              elevation={0}
+              label={t("invert_amount_values")}
             />
             <Checkbox
               checked={splitAmountField.getValue()}
               onChange={(event) => {
                 splitAmountField.setValue(event.currentTarget.checked);
               }}
-              label={
-                <PrimaryText size="sm">
-                  {t("split_income_expenses_into_separate_columns")}
-                </PrimaryText>
-              }
-              elevation={0}
+              label={t("split_income_expenses_into_separate_columns")}
             />
             {!splitAmountField.getValue() && (
               <Checkbox
@@ -195,12 +186,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                     event.currentTarget.checked,
                   );
                 }}
-                label={
-                  <PrimaryText size="sm">
-                    {t("include_income_expenses_columns")}
-                  </PrimaryText>
-                }
-                elevation={0}
+                label={t("include_income_expenses_columns")}
               />
             )}
             <Checkbox
@@ -208,10 +194,7 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
               onChange={(event) => {
                 useSingleAccountField.setValue(event.currentTarget.checked);
               }}
-              label={
-                <PrimaryText size="sm">{t("use_single_account")}</PrimaryText>
-              }
-              elevation={0}
+              label={t("use_single_account")}
             />
           </Stack>
         </Stack>

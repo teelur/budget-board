@@ -23,6 +23,7 @@ import {
   Notifications,
   type NotificationData,
 } from "@mantine/notifications";
+import { budgetBoardColors } from "@teelur/budget-board-ui";
 import {
   AlertCircle,
   CircleCheckIcon,
@@ -237,6 +238,7 @@ const resolver: CSSVariablesResolver = () => ({
     "--text-color-status-neutral": blue[7],
     "--text-color-status-warning": orange[6],
     "--text-color-status-bad": red[5],
+    "--bb-color-warning": budgetBoardColors.light.warning,
     // Button colors
     "--button-color-confirm": green[9],
     "--button-color-warning": orange[6],
@@ -277,6 +279,7 @@ const resolver: CSSVariablesResolver = () => ({
     "--text-color-status-neutral": blue[5],
     "--text-color-status-warning": orange[5],
     "--text-color-status-bad": red[4],
+    "--bb-color-warning": budgetBoardColors.dark.warning,
     // Button colors
     "--button-color-confirm": green[9],
     "--button-color-warning": orange[5],
