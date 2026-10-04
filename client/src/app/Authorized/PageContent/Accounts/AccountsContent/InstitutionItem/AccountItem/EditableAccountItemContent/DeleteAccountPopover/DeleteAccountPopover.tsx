@@ -1,10 +1,9 @@
-import { Checkbox, Popover, Stack } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { Popover, Stack } from "@mantine/core";
+import { ActionIcon, Button, Checkbox } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteAccountMutation } from "~/hooks/mutations/accounts/useDeleteAccountMutation";
 
 interface DeleteAccountPopoverProps {
@@ -32,9 +31,7 @@ const DeleteAccountPopover = (
           <Checkbox
             checked={deleteTransactions}
             onChange={toggle}
-            label={
-              <PrimaryText size="sm">{t("delete_transactions")}</PrimaryText>
-            }
+            label={t("delete_transactions")}
           />
           <Button
             variant="filled"

@@ -1,6 +1,7 @@
-import { Group, Stack, Switch } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   Button,
+  Checkbox,
   DateInput,
   NumberInput,
   TextInput,
@@ -372,10 +373,8 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         decimalSeparator={decimalSeparator}
         {...amountField.getInputProps()}
       />
-      <Switch
-        label={
-          <PrimaryText size="sm">{t("recurring_rule_active")}</PrimaryText>
-        }
+      <Checkbox
+        label={t("recurring_rule_active")}
         checked={isActiveField.getValue()}
         onChange={(event) =>
           isActiveField.setValue(event.currentTarget.checked)

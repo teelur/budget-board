@@ -1,5 +1,10 @@
 import { Alert, Stack, Divider, Group } from "@mantine/core";
-import { Button, PasswordInput, TextInput } from "@teelur/budget-board-ui";
+import {
+  Button,
+  Checkbox,
+  PasswordInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { Info } from "lucide-react";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
@@ -10,9 +15,7 @@ import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import Checkbox from "~/components/core/Checkbox/Checkbox";
 import { OidcAuthFlows } from "~/models/oidc";
 import { useLoginMutation } from "~/hooks/mutations/auth/useLoginMutation";
 import { useResendConfirmationEmailMutation } from "~/hooks/mutations/auth/useResendConfirmationEmailMutation";
@@ -229,10 +232,9 @@ const Login = (props: LoginProps): React.ReactNode => {
       <Divider w="100%" />
       <Stack w="100%" p="1rem">
         <Checkbox
-          label={<PrimaryText size="sm">{t("remember_device")}</PrimaryText>}
+          label={t("remember_device")}
           checked={props.rememberMe}
           onChange={(event) => props.setRememberMe(event.currentTarget.checked)}
-          elevation={1}
         />
       </Stack>
     </Stack>

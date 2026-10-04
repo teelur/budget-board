@@ -1,9 +1,8 @@
-import { Stack, Switch } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { UseFieldReturnType } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { NumberInput } from "@teelur/budget-board-ui";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { Checkbox, NumberInput } from "@teelur/budget-board-ui";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
@@ -29,12 +28,8 @@ const SaveGoalOptions = (props: SaveGoalOptionsProps): React.ReactNode => {
         decimalSeparator={decimalSeparator}
         {...props.targetAmountField.getInputProps()}
       />
-      <Switch
-        label={
-          <DimmedText size="sm">
-            {t("apply_existing_account_amount_to_goal")}
-          </DimmedText>
-        }
+      <Checkbox
+        label={t("apply_existing_account_amount_to_goal")}
         checked={props.applyAccountAmountField.getValue()}
         onChange={(event) =>
           props.applyAccountAmountField.setValue(event.currentTarget.checked)

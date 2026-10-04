@@ -1,14 +1,13 @@
 import classes from "./TransactionCardBase.module.css";
 
 import { Collapse, Group } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, Checkbox } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import TransactionCardContent from "./TransactionCardContent/TransactionCardContent";
 import TransactionCardDetails from "./TransactionCardDetails/TransactionCardDetails";
 import Card, { CardProps } from "../../Card";
-import Checkbox from "~/components/core/Checkbox/Checkbox";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -142,7 +141,6 @@ const TransactionCardBase = ({
                   checked={isSelected ?? false}
                   onChange={() => onToggleSelect!(transaction.id)}
                   onClick={(event) => event.stopPropagation()}
-                  elevation={elevation ?? 0}
                 />
               </div>
               {transactionContent}

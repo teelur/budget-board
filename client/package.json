@@ -30,7 +30,7 @@
     "@mantine/spotlight": "^9.6.1",
     "@tanstack/react-query": "^5.103.1",
     "@tanstack/react-virtual": "^3.14.13",
-    "@teelur/budget-board-ui": "^0.2.0-canary.35.8813ead",
+    "@teelur/budget-board-ui": "^0.2.0-canary.36.5b355ff",
     "@types/papaparse": "^5.5.2",
     "axios": "^1.20.0",
     "dayjs": "^1.11.23",
