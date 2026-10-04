@@ -1,5 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import { Button, SegmentedControl } from "@teelur/budget-board-ui";
+import { Button, SegmentedControl, Select } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { Link2OffIcon, Repeat2Icon } from "lucide-react";
 import React from "react";
@@ -11,7 +11,6 @@ import { useUnassignRecurringTransactionMutation } from "~/hooks/mutations/recur
 import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
 import { ITransaction } from "~/models/transaction";
 import Modal from "../core/Modal/Modal";
-import Select from "../core/Select/Select/Select";
 
 interface RecurringRuleActionProps {
   transaction: ITransaction;
@@ -132,7 +131,6 @@ const RecurringRuleAction = (
                 onChange={setSelectedRuleID}
                 searchable
                 clearable
-                elevation={0}
               />
               <Group>
                 <Button

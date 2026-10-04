@@ -1,12 +1,11 @@
 import { Flex, Group } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, Select } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDidUpdate } from "@mantine/hooks";
 import { ChevronRightIcon, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import Select from "~/components/core/Select/Select/Select";
 import { areStringsEqual } from "~/helpers/utils";
 import { getSubtypeOptions, NET_WORTH_CATEGORY_TYPES } from "~/helpers/widgets";
 import { useDeleteNetWorthWidgetCategoryMutation } from "~/hooks/mutations/netWorthWidgetCategory/useDeleteNetWorthWidgetCategoryMutation";
@@ -193,7 +192,6 @@ const EditableNetWorthLineCategoryContent = (
             size="xs"
             data={validLineNames.map((n) => ({ value: n, label: n }))}
             {...valueField.getInputProps()}
-            elevation={2}
           />
         );
       }
@@ -213,7 +211,6 @@ const EditableNetWorthLineCategoryContent = (
             label: t(i.label),
           }))}
           {...typeField.getInputProps()}
-          elevation={2}
         />
         <ChevronRightIcon size={14} />
         <Select
@@ -224,7 +221,6 @@ const EditableNetWorthLineCategoryContent = (
             label: t(i.label),
           }))}
           {...subtypeField.getInputProps()}
-          elevation={2}
         />
         <ActionIcon
           variant="outline"

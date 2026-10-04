@@ -3,6 +3,7 @@ import {
   ActionIcon,
   DateInput,
   NumberInput,
+  Select,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
@@ -19,7 +20,6 @@ import {
 import { ICategory } from "~/models/category";
 import Card from "~/components/core/Card/Card";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
@@ -163,7 +163,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             } as IRuleParameterEdit);
           }}
           allowDeselect={false}
-          elevation={1}
         />
         <Select
           data={Operators.filter((op) =>
@@ -195,7 +194,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             });
           }}
           allowDeselect={false}
-          elevation={1}
         />
         {getValueInput()}
         {props.allowDelete && (

@@ -1,5 +1,5 @@
-import { Group, Select, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { Button, Select } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -64,15 +64,12 @@ const FlowsWidgetSettings = ({
       size="sm"
     >
       <Stack gap="0.75rem">
-        <Stack gap={0}>
-          <PrimaryText size="sm" fw={600}>
-            {t("flows_widget_month_count_label")}
-          </PrimaryText>
-          <DimmedText size="xs">
-            {t("flows_widget_settings_message")}
-          </DimmedText>
-          <Select data={monthOptions} {...monthCountField.getInputProps()} />
-        </Stack>
+        <Select
+          data={monthOptions}
+          label={t("flows_widget_month_count_label")}
+          description={t("flows_widget_settings_message")}
+          {...monthCountField.getInputProps()}
+        />
         <Group gap="0.5rem">
           <Button
             variant="filled"

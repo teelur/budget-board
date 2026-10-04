@@ -3,10 +3,10 @@ import { useField } from "@mantine/form";
 import React from "react";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
+import { Select } from "@teelur/budget-board-ui";
 
 const ForceSyncLookbackPeriod = (): React.ReactNode => {
   interface IForceSyncOverrideOption {
@@ -45,13 +45,6 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
   return (
     <Stack gap="0.25rem">
       <LoadingOverlay visible={updateUserSettingsMutation.isPending} />
-      <PrimaryText size="sm">{t("force_sync_lookback_period")}</PrimaryText>
-      <DimmedText size="xs">
-        {t("force_sync_lookback_period_description")}
-      </DimmedText>
-      <DimmedText size="xs">
-        {t("force_sync_lookback_period_warning")}
-      </DimmedText>
       <Select
         data={ForceSyncOverrideOptions.map((option) => ({
           value: option.value.toString(),
@@ -64,7 +57,8 @@ const ForceSyncLookbackPeriod = (): React.ReactNode => {
             forceSyncLookbackMonths: intValue,
           });
         }}
-        elevation={0}
+        label={t("force_sync_lookback_period")}
+        description={t("force_sync_lookback_period_description")}
       />
     </Stack>
   );

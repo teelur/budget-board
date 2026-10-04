@@ -4,6 +4,7 @@ import {
   Badge,
   AmountText,
   DateInput,
+  Select,
 } from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
@@ -12,7 +13,6 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteLunchFlowAccountMutation } from "~/hooks/mutations/lunchFlowAccount/useDeleteLunchFlowAccountMutation";
@@ -162,7 +162,7 @@ const LunchFlowAccountCard = (
         }
       />
       <Group w={"100%"} gap={"0.5rem"}>
-        <Stack gap={0} flex={1}>
+        <Stack gap="0.25rem" flex={1}>
           <Group justify="space-between" align="center">
             <Group gap="0.5rem">
               <PrimaryText size="sm">{props.lunchFlowAccount.name}</PrimaryText>
@@ -207,7 +207,6 @@ const LunchFlowAccountCard = (
                       });
                     }}
                     nothingFoundMessage={t("no_valid_accounts_found")}
-                    elevation={2}
                   />
                 </Group>
               ) : (

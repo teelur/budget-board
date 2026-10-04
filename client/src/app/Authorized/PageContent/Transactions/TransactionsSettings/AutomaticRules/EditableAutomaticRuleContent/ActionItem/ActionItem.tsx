@@ -1,5 +1,10 @@
 import { Group } from "@mantine/core";
-import { ActionIcon, DateInput, TextInput } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  DateInput,
+  Select,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import {
@@ -15,7 +20,6 @@ import {
 import { ICategory } from "~/models/category";
 import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import Select from "~/components/core/Select/Select/Select";
 import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -143,7 +147,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           value: getDefaultValue(foundField.value),
         });
       }}
-      elevation={1}
     />
   );
 
@@ -190,7 +193,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
                   : props.ruleParameter.value,
         });
       }}
-      elevation={1}
     />
   );
 

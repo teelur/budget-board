@@ -278,7 +278,6 @@
   "flows_widget_settings": "Pengaturan Aliran",
   "flows_widget_settings_message": "Pilih data berapa bulan untuk ditampilkan, mulai dari bulan ini.",
   "force_sync_lookback_period_description": "Pengaturan ini dapat digunakan untuk mengatur jumlah bulan yang diminta dari SimpleFIN saat sinkronisasi. Pilih \"Otomatis\" untuk membiarkan sistem mengatur.",
-  "force_sync_lookback_period_warning": "Catatan: Gunakan mode otomatis untuk performa terbaik.",
   "french": "Prancis",
   "from": "dari",
   "generate_new_recovery_codes": "Buat Kode Pemulihan Baru",

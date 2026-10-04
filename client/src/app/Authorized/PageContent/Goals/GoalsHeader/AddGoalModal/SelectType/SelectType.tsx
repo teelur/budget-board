@@ -1,9 +1,7 @@
 import { Flex, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, Select } from "@teelur/budget-board-ui";
 import { MoveRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import Select from "~/components/core/Select/Select/Select";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { GoalType } from "~/models/goal";
 
 interface SelectTypeProps {
@@ -24,12 +22,9 @@ const SelectType = (props: SelectTypeProps): React.ReactNode => {
     <Stack>
       <Select
         data={goalTypes}
-        label={
-          <PrimaryText size="sm">{t("i_want_to_set_a_goal_to")}</PrimaryText>
-        }
+        label={t("i_want_to_set_a_goal_to")}
         value={props.selectedGoalType}
         onChange={(value) => props.setSelectedGoalType(value)}
-        elevation={1}
       />
       <Group w="100%">
         <Flex flex={"1 1 auto"} />
