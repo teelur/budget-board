@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Autocomplete, Button, TextInput } from "@teelur/budget-board-ui";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -7,9 +7,7 @@ import { PlusIcon } from "lucide-react";
 import { areStringsEqual } from "~/helpers/utils";
 import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateAccountMutation } from "~/hooks/mutations/accounts/useCreateAccountMutation";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
@@ -108,14 +106,13 @@ const CreateAccount = () => {
           />
           <Autocomplete
             {...institutionField.getInputProps()}
-            label={<PrimaryText size="sm">{t("institution")}</PrimaryText>}
+            label={t("institution")}
             data={
               institutionQuery.data
                 ? institutionQuery.data.map((i) => i.name)
                 : []
             }
             clearable
-            elevation={0}
           />
           <Button
             variant="filled"

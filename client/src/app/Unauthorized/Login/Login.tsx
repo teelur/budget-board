@@ -15,7 +15,6 @@ import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { OidcAuthFlows } from "~/models/oidc";
 import { useLoginMutation } from "~/hooks/mutations/auth/useLoginMutation";

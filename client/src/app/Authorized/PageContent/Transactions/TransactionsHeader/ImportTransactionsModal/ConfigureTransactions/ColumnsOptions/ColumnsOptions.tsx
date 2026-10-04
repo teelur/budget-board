@@ -1,9 +1,13 @@
 import { Divider, Group, Stack } from "@mantine/core";
-import { Button, Checkbox, TextInput } from "@teelur/budget-board-ui";
+import {
+  Autocomplete,
+  Button,
+  Checkbox,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Autocomplete from "~/components/core/Autocomplete/Autocomplete";
 import Card from "~/components/core/Card/Card";
 import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -119,14 +123,11 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
         <Stack gap="0.5rem">
           <PrimaryText size="sm">{t("date_format")}</PrimaryText>
           <Autocomplete
-            label={
-              <DimmedText size="xs">{t("date_format_description")}</DimmedText>
-            }
+            label={t("date_format_description")}
             data={dateFormatOptions}
             {...dateFormatField.getInputProps()}
             clearable
             maw="250px"
-            elevation={0}
           />
           <Button
             variant="outline"

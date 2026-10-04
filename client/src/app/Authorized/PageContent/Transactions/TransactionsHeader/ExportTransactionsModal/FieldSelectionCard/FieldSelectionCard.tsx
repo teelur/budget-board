@@ -1,7 +1,6 @@
 import React from "react";
 import { SimpleGrid, Stack } from "@mantine/core";
 import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { EXPORT_FIELDS } from "../ExportTransactionsModal";
 import { useElementSize } from "@mantine/hooks";
