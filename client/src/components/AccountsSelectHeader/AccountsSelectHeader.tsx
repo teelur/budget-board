@@ -39,7 +39,6 @@ const AccountsSelectHeader = (
           filterTypes={props.filters}
           flex={1}
           miw="230px"
-          elevation={1}
         />
         <Button
           variant="filled"

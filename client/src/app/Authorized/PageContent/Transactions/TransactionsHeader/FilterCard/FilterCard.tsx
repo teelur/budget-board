@@ -89,6 +89,7 @@ const FilterCard = (): React.ReactNode => {
           />
           <AccountMultiSelect
             className={classes.accountMultiSelect}
+            label={t("accounts")}
             miw={150}
             value={transactionFilters.accounts}
             onChange={(newAccountIds: string[]) => {
@@ -102,8 +103,6 @@ const FilterCard = (): React.ReactNode => {
               setTransactionFilters(newFilters);
             }}
             hideHidden
-            label={<PrimaryText size="sm">{t("accounts")}</PrimaryText>}
-            elevation={1}
           />
           <CategorySelect
             className={classes.categorySelect}

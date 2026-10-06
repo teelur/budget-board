@@ -91,9 +91,8 @@ const ConfigureGoal = (props: ConfigureGoalProps): React.ReactNode => {
           {...goalNameField.getInputProps()}
         />
         <AccountMultiSelect
-          label={<PrimaryText size="sm">{t("accounts")}</PrimaryText>}
+          label={t("accounts")}
           {...goalAccountsField.getInputProps()}
-          elevation={1}
         />
         {props.selectedGoalType === GoalType.SaveGoal && (
           <SaveGoalOptions

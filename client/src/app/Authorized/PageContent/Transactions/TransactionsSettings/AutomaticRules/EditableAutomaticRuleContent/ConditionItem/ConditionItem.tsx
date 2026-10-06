@@ -107,6 +107,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
     } else if (props.ruleParameter.field === "account") {
       return (
         <AccountMultiSelect
+          flex="1 1 auto"
           value={
             props.ruleParameter.value
               ? props.ruleParameter.value.split(",").map((id) => id.trim())
@@ -118,7 +119,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               value: Array.isArray(selectedIds) ? selectedIds.join(",") : "",
             })
           }
-          elevation={1}
         />
       );
     }
