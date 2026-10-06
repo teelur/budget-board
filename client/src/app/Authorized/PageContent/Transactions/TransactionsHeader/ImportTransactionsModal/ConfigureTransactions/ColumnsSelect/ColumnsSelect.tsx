@@ -1,10 +1,8 @@
 import { Divider, SimpleGrid, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { TextInput } from "@teelur/budget-board-ui";
+import { Select, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Select from "~/components/core/Select/Select/Select";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export interface ISelectedColumns {
   date: string | null;
@@ -91,54 +89,44 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
         <Divider label={t("core_fields")} labelPosition="left" />
         <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
           <Select
-            label={<PrimaryText size="sm">{t("date")}</PrimaryText>}
+            label={t("date")}
             data={props.csvHeaders}
             clearable
             {...dateColumnField.getInputProps()}
-            elevation={0}
           />
           <Select
-            label={<PrimaryText size="sm">{t("merchant_name")}</PrimaryText>}
+            label={t("merchant_name")}
             data={props.csvHeaders}
             clearable
             {...merchantNameColumnField.getInputProps()}
-            elevation={0}
           />
           <Select
-            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+            label={t("category")}
             data={props.csvHeaders}
             clearable
             {...categoryColumnField.getInputProps()}
-            elevation={0}
           />
           {props.isAmountSplit ? (
             <>
               <Select
-                label={
-                  <PrimaryText size="sm">{t("income_amount")}</PrimaryText>
-                }
+                label={t("income_amount")}
                 data={props.csvHeaders}
                 clearable
                 {...incomeAmountColumnField.getInputProps()}
-                elevation={0}
               />
               <Select
-                label={
-                  <PrimaryText size="sm">{t("expense_amount")}</PrimaryText>
-                }
+                label={t("expense_amount")}
                 data={props.csvHeaders}
                 clearable
                 {...expenseAmountColumnField.getInputProps()}
-                elevation={0}
               />
             </>
           ) : (
             <Select
-              label={<PrimaryText size="sm">{t("amount")}</PrimaryText>}
+              label={t("amount")}
               data={props.csvHeaders}
               clearable
               {...amountColumnField.getInputProps()}
-              elevation={0}
             />
           )}
           {props.isSingleAccount ? (
@@ -150,11 +138,10 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
             />
           ) : (
             <Select
-              label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+              label={t("account")}
               data={props.csvHeaders}
               clearable
               {...accountColumnField.getInputProps()}
-              elevation={0}
             />
           )}
         </SimpleGrid>
@@ -163,11 +150,10 @@ const ColumnsSelect = (props: ColumnsSelectProps): React.ReactNode => {
         <Divider label={t("additional_fields")} labelPosition="left" />
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
           <Select
-            label={<PrimaryText size="sm">{t("notes")}</PrimaryText>}
+            label={t("notes")}
             data={props.csvHeaders}
             clearable
             {...notesColumnField.getInputProps()}
-            elevation={0}
           />
         </SimpleGrid>
       </Stack>

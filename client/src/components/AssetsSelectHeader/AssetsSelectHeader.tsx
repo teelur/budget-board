@@ -2,7 +2,7 @@ import { Group } from "@mantine/core";
 import { Button, DatePickerInput } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
 import React from "react";
-import AssetSelect from "../core/Select/AssetSelect/AssetSelect";
+import AssetSelect from "../core/Select/AssetMultiSelect/AssetMultiSelect";
 import { useTranslation } from "react-i18next";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
 import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
@@ -36,7 +36,6 @@ const AssetsSelectHeader = (
           hideHidden
           flex={1}
           miw="230px"
-          elevation={1}
         />
         <Button
           variant="filled"

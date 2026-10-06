@@ -228,7 +228,6 @@
   "fix_parent_budgets": "Corrigir orçamentos pai",
   "force_sync_lookback_period": "Período retroativo de sincronização forçada",
   "force_sync_lookback_period_description": "Esta configuração pode ser usada para substituir o número de meses solicitado ao SimpleFIN durante a sincronização. Deixe como \"Automático\" para permitir que o sistema decida.",
-  "force_sync_lookback_period_warning": "Observação: deixe em automático para melhor desempenho.",
   "french": "Francês",
   "generate_new_recovery_codes": "Gerar novos códigos de recuperação",
   "german": "Alemão",

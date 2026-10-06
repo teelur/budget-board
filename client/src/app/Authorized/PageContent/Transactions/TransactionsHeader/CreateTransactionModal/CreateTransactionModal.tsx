@@ -1,10 +1,13 @@
 import { Stack } from "@mantine/core";
 import {
   Button,
+  CategorySelect,
   DateInput,
   NumberInput,
+  Select,
   TextInput,
 } from "@teelur/budget-board-ui";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
@@ -15,10 +18,7 @@ import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
-import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateTransactionMutation } from "~/hooks/mutations/transactions/useCreateTransactionMutation";
@@ -38,6 +38,7 @@ const CreateTransactionModal = (): React.ReactNode => {
   const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
+  const accountsQuery = useAccountsQuery();
   const createTransactionMutation = useCreateTransactionMutation();
 
   const dateField = useField<Date | null>({
@@ -53,21 +54,21 @@ const CreateTransactionModal = (): React.ReactNode => {
   const amountField = useField<number | string>({
     initialValue: 0,
   });
-  const accountIdsField = useField<string[]>({
-    initialValue: [],
-    validate: (value) =>
-      value && value.length > 0 ? null : t("account_is_required"),
+  const accountIdField = useField<string | null>({
+    initialValue: null,
+    validate: (value) => (value ? null : t("account_is_required")),
   });
+
+  const selectableAccounts =
+    accountsQuery.data
+      ?.filter((account) => !account.deleted && !account.hideAccount)
+      .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
 
   const onSubmit = () => {
     dateField.validate();
-    accountIdsField.validate();
+    accountIdField.validate();
 
-    if (
-      !dateField.getValue() ||
-      !accountIdsField.getValue() ||
-      accountIdsField.getValue().length === 0
-    ) {
+    if (!dateField.getValue() || !accountIdField.getValue()) {
       return;
     }
 
@@ -86,7 +87,7 @@ const CreateTransactionModal = (): React.ReactNode => {
         : categoryField.getValue(),
       amount:
         amountField.getValue() === "" ? 0 : (amountField.getValue() as number),
-      accountID: accountIdsField.getValue()[0]!,
+      accountID: accountIdField.getValue(),
       source: AccountSource.Manual,
       syncID: null,
     } as ITransactionCreateRequest);
@@ -119,11 +120,10 @@ const CreateTransactionModal = (): React.ReactNode => {
               {...merchantNameField.getInputProps()}
             />
             <CategorySelect
-              label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+              label={t("category")}
               categories={transactionCategories}
               {...categoryField.getInputProps()}
               withinPortal
-              elevation={0}
             />
             <NumberInput
               label={t("amount")}
@@ -134,11 +134,16 @@ const CreateTransactionModal = (): React.ReactNode => {
               decimalSeparator={decimalSeparator}
               {...amountField.getInputProps()}
             />
-            <AccountMultiSelect
-              label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
-              {...accountIdsField.getInputProps()}
-              maxSelectedValues={1}
-              elevation={0}
+            <Select
+              label={t("account")}
+              placeholder={t("select_an_account")}
+              data={
+                selectableAccounts.map((a) => ({
+                  value: a.id,
+                  label: a.name,
+                })) ?? []
+              }
+              {...accountIdField.getInputProps()}
             />
           </Stack>
           <Button

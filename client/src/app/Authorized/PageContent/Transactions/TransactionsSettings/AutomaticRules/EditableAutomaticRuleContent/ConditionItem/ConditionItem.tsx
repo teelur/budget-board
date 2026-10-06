@@ -1,8 +1,10 @@
 import { ComboboxItem, Group } from "@mantine/core";
 import {
   ActionIcon,
+  CategorySelect,
   DateInput,
   NumberInput,
+  Select,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
@@ -18,8 +20,6 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import Card from "~/components/core/Card/Card";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
@@ -102,12 +102,12 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           }
           categories={props.categories}
           withinPortal
-          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "account") {
       return (
         <AccountMultiSelect
+          flex="1 1 auto"
           value={
             props.ruleParameter.value
               ? props.ruleParameter.value.split(",").map((id) => id.trim())
@@ -119,7 +119,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
               value: Array.isArray(selectedIds) ? selectedIds.join(",") : "",
             })
           }
-          elevation={1}
         />
       );
     }
@@ -163,7 +162,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             } as IRuleParameterEdit);
           }}
           allowDeselect={false}
-          elevation={1}
         />
         <Select
           data={Operators.filter((op) =>
@@ -195,7 +193,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
             });
           }}
           allowDeselect={false}
-          elevation={1}
         />
         {getValueInput()}
         {props.allowDelete && (

@@ -2,6 +2,7 @@ import { Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
+  CategorySelect,
   DateInput,
   NumberInput,
   TextInput,
@@ -15,7 +16,6 @@ import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { useUpdateAssetMutation } from "~/hooks/mutations/assets/useUpdateAssetMutation";
 import { useDeleteAssetsMutation } from "~/hooks/mutations/assets/useDeleteAssetsMutation";
@@ -150,7 +150,6 @@ const EditableAssetItemContent = (
                 typeField.setValue(val);
               }}
               withinPortal
-              elevation={1}
             />
             <Group gap="0.5rem">
               <DateInput

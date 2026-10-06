@@ -262,7 +262,6 @@
   "fix_parent_budgets": "Übergeordnete Budgets festlegen",
   "force_sync_lookback_period": "Synchronisierung für Rückblickzeitraum erzwingen",
   "force_sync_lookback_period_description": "Mit dieser Einstellung kann die Anzahl der Monate überschrieben werden, die während der Synchronisierung von SimpleFIN angefordert werden sollen. Lassen Sie die Einstellung auf „Auto“, entscheidet das System.",
-  "force_sync_lookback_period_warning": "Hinweis: Lassen Sie diese Option für eine optimale Leistung auf „Auto” eingestellt.",
   "french": "Französisch",
   "generate_new_recovery_codes": "Neue Wiederherstellungscodes generieren",
   "german": "Deutsch",

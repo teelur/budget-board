@@ -1,5 +1,12 @@
 import { Group } from "@mantine/core";
-import { ActionIcon, DateInput, TextInput } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  CategorySelect,
+  DateInput,
+  Select,
+  TagsInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { Trash2Icon } from "lucide-react";
 import React from "react";
 import {
@@ -13,14 +20,12 @@ import {
   IRuleParameterEdit,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import Select from "~/components/core/Select/Select/Select";
 import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
 import { isValidAmountExpression } from "~/helpers/automaticRuleExpressions";
+import { useTagSuggestionsQuery } from "~/hooks/queries/useTagSuggestionsQuery";
 
 export interface ActionItemProps {
   ruleParameter: IRuleParameterEdit;
@@ -34,6 +39,7 @@ export interface ActionItemProps {
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjsLocale, longDateFormat } = useLocale();
+  const tagSuggestionsQuery = useTagSuggestionsQuery();
 
   const setValue = (value: string) =>
     props.setRuleParameter({
@@ -93,22 +99,22 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           onChange={setValue}
           categories={props.categories}
           withinPortal
-          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "tags") {
       return (
-        <TransactionTagsInput
-          flex="1 1 auto"
-          placeholder={t("select_tags")}
+        <TagsInput
           value={deserializeActionTags(props.ruleParameter.value)}
           onChange={(tags) => setValue(serializeActionTags(tags))}
+          data={tagSuggestionsQuery.data ?? []}
           error={
             deserializeActionTags(props.ruleParameter.value).length === 0
               ? t("at_least_one_tag_required")
               : undefined
           }
-          elevation={1}
+          placeholder={t("select_tags")}
+          flex="1 1 auto"
+          loading={tagSuggestionsQuery.isPending}
         />
       );
     }
@@ -143,7 +149,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           value: getDefaultValue(foundField.value),
         });
       }}
-      elevation={1}
     />
   );
 
@@ -190,7 +195,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
                   : props.ruleParameter.value,
         });
       }}
-      elevation={1}
     />
   );
 

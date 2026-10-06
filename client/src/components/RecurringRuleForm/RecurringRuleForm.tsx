@@ -1,9 +1,11 @@
 import { Group, Stack } from "@mantine/core";
 import {
   Button,
+  CategorySelect,
   Checkbox,
   DateInput,
   NumberInput,
+  Select,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
@@ -27,9 +29,6 @@ import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import Select from "../core/Select/Select/Select";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import {
   createRecurringCadence,
@@ -230,7 +229,7 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
   return (
     <Stack gap="0.5rem">
       <Select
-        label={<PrimaryText size="sm">{t("account")}</PrimaryText>}
+        label={t("account")}
         placeholder={t("select_account")}
         data={accountOptions}
         searchable
@@ -238,7 +237,6 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         value={accountField.getValue()}
         onChange={(value) => accountField.setValue(value ?? "")}
         error={accountField.error}
-        elevation={0}
       />
       <TextInput
         label={t("merchant_name")}
@@ -246,17 +244,14 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         {...merchantNameField.getInputProps()}
       />
       <CategorySelect
-        label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+        label={t("category")}
         categories={allTransactionCategories}
         value={categoryField.getValue() || null}
         onChange={(value) => categoryField.setValue(value)}
         withinPortal
-        elevation={0}
       />
       <Select
-        label={
-          <PrimaryText size="sm">{t("recurring_cadence_mode")}</PrimaryText>
-        }
+        label={t("recurring_cadence_mode")}
         data={[
           {
             value: RecurringCadenceModes.Interval,
@@ -274,11 +269,10 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
             cadenceIntervalField.validate();
           }
         }}
-        elevation={0}
       />
       <Group grow align="flex-start">
         <Select
-          label={<PrimaryText size="sm">{t("recurring_cadence")}</PrimaryText>}
+          label={t("recurring_cadence")}
           data={[
             {
               value: RecurringCadenceUnits.Day,
@@ -304,7 +298,6 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
               cadenceIntervalField.validate();
             }
           }}
-          elevation={0}
         />
         <NumberInput
           label={t(
@@ -330,9 +323,7 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
       )}
       <Group grow>
         <Select
-          label={
-            <PrimaryText size="sm">{t("recurring_amount_mode")}</PrimaryText>
-          }
+          label={t("recurring_amount_mode")}
           data={[
             { value: RecurringAmountModes.Fixed, label: t("fixed_amount") },
             {
@@ -341,7 +332,6 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
             },
           ]}
           {...amountModeField.getInputProps()}
-          elevation={0}
         />
       </Group>
       <Group grow>

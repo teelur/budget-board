@@ -282,7 +282,6 @@
   "flows_widget_settings_message": "A compter du moins en cours, sélectionnez le nombre de mois de données à afficher.",
   "force_sync_lookback_period": "Forcer la synchronisation de la période de référence",
   "force_sync_lookback_period_description": "Ce paramètre permet de modifier le nombre de mois à demander à SimpleFIN lors de la synchronisation. Laissez la valeur « Automatique » pour laisser le système décider.",
-  "force_sync_lookback_period_warning": "Information : Laissez ce paramètre en mode automatique pour des performances optimales.",
   "french": "Français",
   "from": "depuis",
   "generate_new_recovery_codes": "Générer de nouveaux codes de récupération",

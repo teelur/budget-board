@@ -11,7 +11,7 @@ export interface UseTagSuggestionsQueryProps {
 
 export const useTagSuggestionsQuery = ({
   prefix = "",
-  limit = 20,
+  limit = 100,
   enabled = true,
 }: UseTagSuggestionsQueryProps = {}) => {
   const { request } = useAuth();

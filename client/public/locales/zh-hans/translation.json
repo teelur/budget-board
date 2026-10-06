@@ -155,7 +155,6 @@
   "external_accounts": "外部账户",
   "file_must_be_csv_message": "文件类型必须为 CSV 。收到的文件 {{fileName}} 类型为 {{fileType}} 。",
   "filters": "筛选器",
-  "force_sync_lookback_period_warning": "提示：将此项设置为自动以获得更好的性能表现。",
   "french": "法语",
   "generate_new_recovery_codes": "生成新的恢复代码",
   "german": "德语",

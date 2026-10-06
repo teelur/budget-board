@@ -15,12 +15,9 @@ import {
   LanguageItem,
   Languages,
 } from "~/models/userSettings";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import Select from "~/components/core/Select/Select/Select";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
-import { NumberInput, TextInput } from "@teelur/budget-board-ui";
+import { NumberInput, Select, TextInput } from "@teelur/budget-board-ui";
 
 const SettingsUser = (): React.ReactNode => {
   const currencyField = useField({
@@ -88,13 +85,12 @@ const SettingsUser = (): React.ReactNode => {
       <Stack gap="0.25rem">
         <Select
           data={darkModeOptions}
-          label={<PrimaryText size="sm">{t("appearance_mode")}</PrimaryText>}
+          label={t("appearance_mode")}
           value={colorScheme}
           onChange={(value) => setColorScheme(value as MantineColorScheme)}
-          elevation={0}
         />
         <Select
-          label={<PrimaryText size="sm">{t("preferred_currency")}</PrimaryText>}
+          label={t("preferred_currency")}
           placeholder={t("select_currency")}
           searchable
           nothingFoundMessage={t("no_currencies_found")}
@@ -107,7 +103,6 @@ const SettingsUser = (): React.ReactNode => {
               });
             }
           }}
-          elevation={0}
         />
         <NumberInput
           label={t("decimal_places")}
@@ -126,27 +121,23 @@ const SettingsUser = (): React.ReactNode => {
           }}
         />
         <Select
-          label={
-            <Stack gap="0">
-              <PrimaryText size="sm">{t("preferred_language")}</PrimaryText>
-              <DimmedText size="xs">
-                <Trans
-                  i18nKey="preferred_language_description"
-                  components={[
-                    <a
-                      key="link"
-                      href="https://hosted.weblate.org/engage/budget-board/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: "inherit",
-                        textDecoration: "underline",
-                      }}
-                    />,
-                  ]}
-                />
-              </DimmedText>
-            </Stack>
+          label={t("preferred_language")}
+          description={
+            <Trans
+              i18nKey="preferred_language_description"
+              components={[
+                <a
+                  key="link"
+                  href="https://hosted.weblate.org/engage/budget-board/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "inherit",
+                    textDecoration: "underline",
+                  }}
+                />,
+              ]}
+            />
           }
           placeholder={t("select_your_preferred_language")}
           data={Languages.map((lang: LanguageItem) => ({
@@ -161,14 +152,11 @@ const SettingsUser = (): React.ReactNode => {
               });
             }
           }}
-          elevation={0}
         />
         <Group gap="0.5rem" wrap="nowrap">
           <Select
             w="100%"
-            label={
-              <PrimaryText size="sm">{t("preferred_date_format")}</PrimaryText>
-            }
+            label={t("preferred_date_format")}
             placeholder={t("select_your_preferred_date_format")}
             data={DateFormats.map((dateFormatItem: DateFormatItem) => ({
               value: dateFormatItem.value,
@@ -193,7 +181,6 @@ const SettingsUser = (): React.ReactNode => {
                 });
               }
             }}
-            elevation={0}
           />
           {dateFormatField.getValue() !== DateFormats.at(0)?.value && (
             <TextInput

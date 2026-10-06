@@ -3,13 +3,13 @@ import {
   Autocomplete,
   Button,
   Checkbox,
+  Select,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
@@ -216,25 +216,16 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                 <Group gap="0.5rem">
                   {includeExpensesColumnField.getValue() && (
                     <Select
-                      label={
-                        <PrimaryText size="sm">
-                          {t("expenses_column")}
-                        </PrimaryText>
-                      }
+                      label={t("expenses_column")}
                       data={props.columns}
                       clearable
                       {...expensesColumnField.getInputProps()}
-                      elevation={0}
                     />
                   )}
                   {includeExpensesColumnField.getValue() &&
                     expensesColumnField.getValue() && (
                       <Select
-                        label={
-                          <PrimaryText size="sm">
-                            {t("expenses_value")}
-                          </PrimaryText>
-                        }
+                        label={t("expenses_value")}
                         data={
                           props.getExpensesColumnValues(
                             expensesColumnField.getValue() ?? "",
@@ -242,7 +233,6 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
                         }
                         clearable
                         {...expensesColumnValueField.getInputProps()}
-                        elevation={0}
                       />
                     )}
                 </Group>

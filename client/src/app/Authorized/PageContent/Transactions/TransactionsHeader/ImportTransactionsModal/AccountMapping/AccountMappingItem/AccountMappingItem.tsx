@@ -4,8 +4,8 @@ import React from "react";
 import { IAccountItem } from "../AccountMapping";
 import { useField } from "@mantine/form";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import Select from "~/components/core/Select/Select/Select";
 import { useTranslation } from "react-i18next";
+import { Select } from "@teelur/budget-board-ui";
 
 interface AccountMappingItemProps {
   accountName: string;
@@ -15,7 +15,7 @@ interface AccountMappingItemProps {
 }
 
 const AccountMappingItem = (
-  props: AccountMappingItemProps
+  props: AccountMappingItemProps,
 ): React.ReactNode => {
   const accountMappingField = useField<string | null>({
     initialValue:
@@ -27,7 +27,7 @@ const AccountMappingItem = (
   React.useEffect(() => {
     props.onAccountChange(
       props.accountName,
-      accountMappingField.getValue() ?? ""
+      accountMappingField.getValue() ?? "",
     );
   }, [accountMappingField.getValue()]);
 
@@ -47,7 +47,6 @@ const AccountMappingItem = (
           {...accountMappingField.getInputProps()}
           clearable
           placeholder={t("select_an_account")}
-          elevation={0}
         />
       </Grid.Col>
     </Grid>

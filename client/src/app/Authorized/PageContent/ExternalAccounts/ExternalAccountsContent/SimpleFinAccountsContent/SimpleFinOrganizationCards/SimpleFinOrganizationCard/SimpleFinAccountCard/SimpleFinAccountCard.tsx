@@ -4,6 +4,7 @@ import {
   Badge,
   AmountText,
   DateInput,
+  Select,
 } from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
@@ -12,7 +13,6 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import Select from "~/components/core/Select/Select/Select";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteSimpleFinAccountMutation } from "~/hooks/mutations/simpleFinAccounts/useDeleteSimpleFinAccountMutation";
@@ -207,7 +207,6 @@ const SimpleFinAccountCard = (
                       });
                     }}
                     nothingFoundMessage={t("no_valid_accounts_found")}
-                    elevation={2}
                   />
                 </Group>
               ) : (

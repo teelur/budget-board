@@ -5,6 +5,7 @@ import {
   AmountText,
   NumberInput,
   TextInput,
+  CategorySelect,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useField } from "@mantine/form";
@@ -13,7 +14,6 @@ import { PencilIcon } from "lucide-react";
 import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
@@ -199,7 +199,6 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
               accountTypeField.setValue(val);
             }}
             withinPortal
-            elevation={1}
           />
           <DimmedText size="sm">
             {t("last_updated", {
