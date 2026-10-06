@@ -13,6 +13,7 @@ import {
   CategorySelect,
   DateInput,
   NumberInput,
+  TagsInput,
   Textarea,
   TextInput,
 } from "@teelur/budget-board-ui";
@@ -27,7 +28,6 @@ import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
 import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
 import TransactionLinkDialog from "~/components/core/Card/TransactionCard/TransactionCardBase/TransactionCardDetails/TransactionLinkDialog/TransactionLinkDialog";
-import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
 import RecurringRuleAction from "~/components/RecurringRuleAction/RecurringRuleAction";
 import BulkRecurringRuleAction from "~/components/BulkRecurringRuleAction/BulkRecurringRuleAction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -38,6 +38,7 @@ import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useUpdateTransactionsMutation } from "~/hooks/mutations/transactions/useUpdateTransactionsMutation";
 import { useDeleteTransactionsMutation } from "~/hooks/mutations/transactions/useDeleteTransactionsMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useTagSuggestionsQuery } from "~/hooks/queries/useTagSuggestionsQuery";
 
 interface BulkActionBarProps {
   selectedIds: Set<string>;
@@ -69,6 +70,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
   const { preferredCurrency, decimalPlaces } = useUserSettings();
   const isMobile = useIsMobile();
   const accountsQuery = useAccountsQuery();
+  const tagSuggestionsQuery = useTagSuggestionsQuery();
   const updateTransactionsMutation = useUpdateTransactionsMutation();
   const deleteTransactionsMutation = useDeleteTransactionsMutation();
 
@@ -382,13 +384,11 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 miw={220}
                 style={{ flex: "1 1 220px" }}
               />
-              <TransactionTagsInput
-                label={<PrimaryText size="xs">{t("tags")}</PrimaryText>}
+              <TagsInput
+                label={t("tags")}
                 placeholder={t("add_or_select_tags")}
                 value={tagsValue}
-                existingTags={selectedTransactions.flatMap(
-                  (transaction) => transaction.tags ?? [],
-                )}
+                data={tagSuggestionsQuery.data ?? []}
                 onChange={(value) => {
                   setTagsValue(value);
                   touch(FIELDS.tags);
@@ -398,8 +398,8 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                   deleteTransactionsMutation.isPending
                 }
                 miw={220}
-                style={{ flex: "1 1 220px" }}
-                elevation={1}
+                flex="1 1 220px"
+                loading={tagSuggestionsQuery.isPending}
               />
 
               <Group

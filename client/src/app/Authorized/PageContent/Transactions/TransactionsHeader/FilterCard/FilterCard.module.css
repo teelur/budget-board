@@ -81,6 +81,7 @@
 
 .tagsInput {
   flex: 3;
+  min-width: 180px;
   max-width: 380px;
 
   @container (max-width: 660px) {

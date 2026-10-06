@@ -6,6 +6,7 @@ import {
   CategorySelect,
   DatePickerInput,
   NumberInput,
+  TagsInput,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { DatesRangeValue } from "@mantine/dates";
@@ -13,14 +14,13 @@ import { Filters } from "~/models/transaction";
 import React from "react";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import TransactionTagsInput from "~/components/TransactionTagsInput/TransactionTagsInput";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useTagSuggestionsQuery } from "~/hooks/queries/useTagSuggestionsQuery";
 
 const FilterCard = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -36,6 +36,7 @@ const FilterCard = (): React.ReactNode => {
   const { transactionFilters, setTransactionFilters } = useTransactionFilters();
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
+  const suggestionsQuery = useTagSuggestionsQuery();
 
   const onDatePickerChange = (dateRange: DatesRangeValue<string>) => {
     const parsedDateRange: [Date | null, Date | null] = [
@@ -190,11 +191,11 @@ const FilterCard = (): React.ReactNode => {
             decimalSeparator={decimalSeparator}
             thousandSeparator={thousandsSeparator}
           />
-          <TransactionTagsInput
+          <TagsInput
             className={classes.tagsInput}
-            miw={180}
-            label={<PrimaryText size="sm">{t("tags")}</PrimaryText>}
+            label={t("tags")}
             placeholder={t("add_or_select_tags")}
+            data={suggestionsQuery.data ?? []}
             value={transactionFilters.tags}
             onChange={(tags) => {
               const newFilters = new Filters();
@@ -206,7 +207,6 @@ const FilterCard = (): React.ReactNode => {
               newFilters.tags = tags;
               setTransactionFilters(newFilters);
             }}
-            elevation={1}
           />
         </Flex>
       </Stack>
