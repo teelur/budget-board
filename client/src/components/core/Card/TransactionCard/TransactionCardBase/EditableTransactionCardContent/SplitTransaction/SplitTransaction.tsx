@@ -1,13 +1,16 @@
 import React from "react";
 import { Stack, Popover as MantinePopover } from "@mantine/core";
-import { ActionIcon, Button, NumberInput } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  Button,
+  CategorySelect,
+  NumberInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { SplitIcon } from "lucide-react";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { ICategory } from "~/models/category";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -54,10 +57,9 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
             maw={200}
           />
           <CategorySelect
-            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+            label={t("category")}
             {...categoryField.getInputProps()}
             categories={props.categories}
-            elevation={props.elevation}
           />
           <Button
             variant="filled"

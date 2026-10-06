@@ -3,6 +3,7 @@ import classes from "./FilterCard.module.css";
 import { Flex, Stack } from "@mantine/core";
 import {
   Button,
+  CategorySelect,
   DatePickerInput,
   NumberInput,
   TextInput,
@@ -13,7 +14,6 @@ import React from "react";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import Card from "~/components/core/Card/Card";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -107,6 +107,7 @@ const FilterCard = (): React.ReactNode => {
           />
           <CategorySelect
             className={classes.categorySelect}
+            label={t("category")}
             miw={170}
             categories={transactionCategories}
             value={transactionFilters.category}
@@ -122,8 +123,6 @@ const FilterCard = (): React.ReactNode => {
             }}
             withinPortal
             includeUncategorized
-            label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
-            elevation={1}
           />
         </Flex>
         <Flex className={classes.row} justify="space-between" wrap="nowrap">

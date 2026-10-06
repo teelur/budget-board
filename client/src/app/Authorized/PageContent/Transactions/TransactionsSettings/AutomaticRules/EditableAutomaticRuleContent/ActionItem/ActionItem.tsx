@@ -1,6 +1,7 @@
 import { Group } from "@mantine/core";
 import {
   ActionIcon,
+  CategorySelect,
   DateInput,
   Select,
   TextInput,
@@ -18,7 +19,6 @@ import {
   IRuleParameterEdit,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
@@ -97,7 +97,6 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           onChange={setValue}
           categories={props.categories}
           withinPortal
-          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "tags") {

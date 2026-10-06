@@ -1,6 +1,7 @@
 import { Group, Stack } from "@mantine/core";
 import {
   Button,
+  CategorySelect,
   Checkbox,
   DateInput,
   NumberInput,
@@ -28,7 +29,6 @@ import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import {
@@ -245,12 +245,11 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
         {...merchantNameField.getInputProps()}
       />
       <CategorySelect
-        label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+        label={t("category")}
         categories={allTransactionCategories}
         value={categoryField.getValue() || null}
         onChange={(value) => categoryField.setValue(value)}
         withinPortal
-        elevation={0}
       />
       <Select
         label={t("recurring_cadence_mode")}

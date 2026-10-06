@@ -10,6 +10,7 @@ import {
   ActionIcon,
   Badge,
   Button,
+  CategorySelect,
   DateInput,
   NumberInput,
   Textarea,
@@ -19,7 +20,6 @@ import { NotificationType, showNotification } from "~/helpers/notifications";
 import { TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { getTagChanges, getUniqueTags } from "~/helpers/tags";
@@ -336,7 +336,8 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                 style={{ flex: "1 1 180px" }}
               />
               <CategorySelect
-                label={<PrimaryText size="xs">{t("category")}</PrimaryText>}
+                w={220}
+                label={t("category")}
                 categories={props.categories}
                 value={categoryValue || null}
                 onChange={(val) => {
@@ -344,8 +345,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
                   touch(FIELDS.category);
                 }}
                 withinPortal
-                w={220}
-                elevation={1}
               />
               <NumberInput
                 label={t("amount")}

@@ -1,6 +1,7 @@
 import { ComboboxItem, Group } from "@mantine/core";
 import {
   ActionIcon,
+  CategorySelect,
   DateInput,
   NumberInput,
   Select,
@@ -19,7 +20,6 @@ import {
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
 import Card from "~/components/core/Card/Card";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
@@ -102,7 +102,6 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
           }
           categories={props.categories}
           withinPortal
-          elevation={1}
         />
       );
     } else if (props.ruleParameter.field === "account") {

@@ -1,6 +1,7 @@
 import { Stack } from "@mantine/core";
 import {
   Button,
+  CategorySelect,
   DateInput,
   NumberInput,
   TextInput,
@@ -16,7 +17,6 @@ import { ITransactionCreateRequest } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Modal from "~/components/core/Modal/Modal";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -119,11 +119,10 @@ const CreateTransactionModal = (): React.ReactNode => {
               {...merchantNameField.getInputProps()}
             />
             <CategorySelect
-              label={<PrimaryText size="sm">{t("category")}</PrimaryText>}
+              label={t("category")}
               categories={transactionCategories}
               {...categoryField.getInputProps()}
               withinPortal
-              elevation={0}
             />
             <NumberInput
               label={t("amount")}

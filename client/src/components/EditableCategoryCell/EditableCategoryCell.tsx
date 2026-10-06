@@ -1,14 +1,14 @@
-import { Group, Stack } from "@mantine/core";
+import { Flex, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import { getTransactionCategory } from "~/helpers/transactions";
-import CategorySelect from "../core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import {
   getFormattedCategoryValue,
   getIsParentCategory,
 } from "~/helpers/category";
+import { CategorySelect } from "@teelur/budget-board-ui";
 
 interface EditableCategoryCellProps {
   transaction: ITransaction;
@@ -19,13 +19,13 @@ interface EditableCategoryCellProps {
 }
 
 const EditableCategoryCell = (
-  props: EditableCategoryCellProps
+  props: EditableCategoryCellProps,
 ): React.ReactNode => {
   const [categoryDisplayValue, setCategoryDisplayValue] = React.useState(
     getTransactionCategory(
       props.transaction.category ?? "",
-      props.transaction.subcategory ?? ""
-    )
+      props.transaction.subcategory ?? "",
+    ),
   );
 
   const onCategoryPick = (newValue: string | null): void => {
@@ -59,16 +59,15 @@ const EditableCategoryCell = (
   return (
     <Stack w={{ base: "100%", xs: "180px" }}>
       {props.isSelected ? (
-        <Group onClick={(e) => e.stopPropagation()} w="100%">
+        <Flex onClick={(e) => e.stopPropagation()} w="100%">
           <CategorySelect
             w="100%"
             categories={props.categories}
             value={categoryDisplayValue}
             onChange={onCategoryPick}
             withinPortal
-            elevation={1}
           />
-        </Group>
+        </Flex>
       ) : (
         <PrimaryText size="md">
           {getFormattedCategoryValue(categoryDisplayValue, props.categories)}

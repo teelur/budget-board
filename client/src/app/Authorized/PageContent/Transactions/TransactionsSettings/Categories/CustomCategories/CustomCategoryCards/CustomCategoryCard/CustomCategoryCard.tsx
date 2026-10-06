@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Badge,
   Button,
+  CategorySelect,
   SegmentedControl,
   TextInput,
 } from "@teelur/budget-board-ui";
@@ -11,7 +12,6 @@ import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useDeleteTransactionCategoryMutation";
@@ -126,17 +126,14 @@ const CustomCategoryCard = (
               />
             </Stack>
             {isChildCategory ? (
-              <Stack gap="0.25rem">
-                <PrimaryText size="sm">{t("parent_category")}</PrimaryText>
-                <CategorySelect
-                  w="100%"
-                  categories={parentCategories}
-                  value={parentField.getValue()}
-                  onChange={(val: string) => parentField.setValue(val)}
-                  withinPortal
-                  elevation={1}
-                />
-              </Stack>
+              <CategorySelect
+                w="100%"
+                label={t("parent_category")}
+                categories={parentCategories}
+                value={parentField.getValue()}
+                onChange={(val: string) => parentField.setValue(val)}
+                withinPortal
+              />
             ) : (
               <Stack gap="0.25rem">
                 <PrimaryText size="sm">{t("classification")}</PrimaryText>

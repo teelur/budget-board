@@ -1,10 +1,14 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
-import { Button, SegmentedControl, TextInput } from "@teelur/budget-board-ui";
+import {
+  Button,
+  CategorySelect,
+  SegmentedControl,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Card from "~/components/core/Card/Card";
-import CategorySelect from "~/components/core/Select/CategorySelect/CategorySelect";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { AccountTypeClassification } from "~/models/account";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
@@ -74,17 +78,14 @@ const AddAccountType = (): React.ReactNode => {
           />
         </Stack>
         {isChildType ? (
-          <Stack gap="0.25rem">
-            <PrimaryText size="sm">{t("parent_account_type")}</PrimaryText>
-            <CategorySelect
-              w="100%"
-              categories={parentTypes}
-              value={parentField.getValue()}
-              onChange={(val: string) => parentField.setValue(val)}
-              withinPortal
-              elevation={1}
-            />
-          </Stack>
+          <CategorySelect
+            w="100%"
+            label={t("parent_account_type")}
+            categories={parentTypes}
+            value={parentField.getValue()}
+            onChange={(val: string) => parentField.setValue(val)}
+            withinPortal
+          />
         ) : (
           <Stack gap="0.25rem">
             <PrimaryText size="sm">{t("classification")}</PrimaryText>
