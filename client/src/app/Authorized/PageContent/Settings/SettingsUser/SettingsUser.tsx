@@ -15,8 +15,6 @@ import {
   LanguageItem,
   Languages,
 } from "~/models/userSettings";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
 import { NumberInput, Select, TextInput } from "@teelur/budget-board-ui";

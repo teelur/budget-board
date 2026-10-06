@@ -29,7 +29,6 @@ import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "../core/Text/DimmedText/DimmedText";
 import {
   createRecurringCadence,

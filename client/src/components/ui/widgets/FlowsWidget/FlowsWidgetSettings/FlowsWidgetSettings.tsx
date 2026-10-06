@@ -5,11 +5,9 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import Modal from "~/components/core/Modal/Modal";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { parseFlowsConfiguration } from "~/helpers/widgets";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface FlowsWidgetSettingsProps {
   widget: IWidgetSettingsResponse;

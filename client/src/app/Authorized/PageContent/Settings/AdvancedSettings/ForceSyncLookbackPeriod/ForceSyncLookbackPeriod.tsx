@@ -1,8 +1,6 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";

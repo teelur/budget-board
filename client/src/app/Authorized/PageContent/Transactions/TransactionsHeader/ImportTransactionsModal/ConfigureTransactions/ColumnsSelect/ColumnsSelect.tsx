@@ -3,7 +3,6 @@ import { useField } from "@mantine/form";
 import { Select, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export interface ISelectedColumns {
   date: string | null;
