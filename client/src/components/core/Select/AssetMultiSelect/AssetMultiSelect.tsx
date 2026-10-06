@@ -1,23 +1,23 @@
-import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import React from "react";
+import { MultiSelect, MultiSelectProps } from "@teelur/budget-board-ui";
 import { IAssetResponse } from "~/models/asset";
 import { useTranslation } from "react-i18next";
 import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
 
-export interface AssetSelectInputBaseProps extends MultiSelectProps {
+export interface AssetMultiSelectProps extends MultiSelectProps {
   selectedAssetIds?: string[];
   setSelectedAssetIds?: (assetIds: string[]) => void;
   hideHidden?: boolean;
   maxSelectedValues?: number;
 }
 
-const AssetSelectInputBase = ({
+const AssetMultiSelect = ({
   selectedAssetIds,
   setSelectedAssetIds,
   hideHidden = false,
   maxSelectedValues = undefined,
   ...props
-}: AssetSelectInputBaseProps): React.ReactNode => {
+}: AssetMultiSelectProps): React.ReactNode => {
   const { t } = useTranslation();
   const assetsQuery = useAssetsQuery();
 
@@ -48,4 +48,4 @@ const AssetSelectInputBase = ({
   );
 };
 
-export default AssetSelectInputBase;
+export default AssetMultiSelect;
