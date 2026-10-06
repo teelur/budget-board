@@ -59,6 +59,11 @@ const CreateTransactionModal = (): React.ReactNode => {
     validate: (value) => (value ? null : t("account_is_required")),
   });
 
+  const selectableAccounts =
+    accountsQuery.data
+      ?.filter((account) => !account.deleted && !account.hideAccount)
+      .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
+
   const onSubmit = () => {
     dateField.validate();
     accountIdField.validate();
@@ -133,7 +138,7 @@ const CreateTransactionModal = (): React.ReactNode => {
               label={t("account")}
               placeholder={t("select_an_account")}
               data={
-                accountsQuery.data?.map((a) => ({
+                selectableAccounts.map((a) => ({
                   value: a.id,
                   label: a.name,
                 })) ?? []

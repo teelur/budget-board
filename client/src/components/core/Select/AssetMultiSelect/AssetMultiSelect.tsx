@@ -22,9 +22,11 @@ const AssetMultiSelect = ({
   const assetsQuery = useAssetsQuery();
 
   const getFilteredAssets = (): IAssetResponse[] => {
-    let filteredAssets = (assetsQuery.data ?? []).filter(
-      (a) => a.deleted === null,
+    const sortedAssets = (assetsQuery.data ?? []).sort((a, b) =>
+      a.name.localeCompare(b.name),
     );
+
+    let filteredAssets = sortedAssets.filter((a) => a.deleted === null);
 
     if (hideHidden) {
       filteredAssets = filteredAssets.filter((a) => !a.hide);
