@@ -1,11 +1,11 @@
+import React from "react";
 import {
   AppShell,
   AppShellHeader,
   AppShellMain,
   AppShellNavbar,
-} from "@mantine/core";
+} from "@teelur/budget-board-ui";
 import Navbar from "./Navbar/Navbar";
-import React from "react";
 import PageContent from "./PageContent/PageContent";
 import Header from "./Header/Header";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
