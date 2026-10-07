@@ -1,13 +1,6 @@
 import classes from "./Navbar.module.css";
 
-import {
-  Burger,
-  Collapse,
-  Group,
-  ScrollArea,
-  Stack,
-  Tooltip,
-} from "@mantine/core";
+import { Burger, Flex, ScrollArea, Stack, Tooltip } from "@mantine/core";
 import { ActionIcon, NavbarLink } from "@teelur/budget-board-ui";
 import {
   ArrowLeftFromLineIcon,
@@ -16,7 +9,6 @@ import {
   BanknoteIcon,
   CalculatorIcon,
   ChartNoAxesColumnIncreasingIcon,
-  ChevronDownIcon,
   GoalIcon,
   HouseIcon,
   LandmarkIcon,
@@ -154,15 +146,12 @@ const Navbar = (props: NavbarProps) => {
     props.closeNavbar();
   };
 
-  const toggleGroup = (path: string) => {
+  const setGroupExpanded = (path: string, expanded: boolean) => {
     setExpandedGroups((groups) => {
       const nextGroups = new Set(groups);
 
-      if (nextGroups.has(path)) {
-        nextGroups.delete(path);
-      } else {
-        nextGroups.add(path);
-      }
+      if (expanded) nextGroups.add(path);
+      else nextGroups.delete(path);
 
       return nextGroups;
     });
@@ -172,69 +161,27 @@ const Navbar = (props: NavbarProps) => {
     const isActive = isPathActive(location.pathname, item.path);
     const hasSettings = Boolean(item.settings?.length);
     const isGroupExpanded = showExpandedNav && expandedGroups.has(item.path);
-    const panelId = `navbar-settings-${item.path.replaceAll("/", "-")}`;
 
     return (
-      <Stack key={item.path} gap={0} className={classes.itemGroup}>
-        <Group gap="0.25rem" wrap="nowrap" className={classes.itemHeader}>
-          <NavbarLink
-            icon={item.icon}
-            label={item.label}
-            active={isActive}
-            showLabel={showExpandedNav}
-            className={hasSettings ? classes.groupLink : undefined}
-            onClick={() => navigateTo(item.path)}
-          />
-          {hasSettings && showExpandedNav && (
-            <Tooltip
-              label={
-                isGroupExpanded
-                  ? t("collapse_sidebar_group")
-                  : t("expand_sidebar_group")
-              }
-              position="right"
-              transitionProps={{ duration: 0 }}
-            >
-              <ActionIcon
-                variant="ghost"
-                color="muted"
-                size="sm"
-                aria-label={
-                  isGroupExpanded
-                    ? t("collapse_sidebar_group")
-                    : t("expand_sidebar_group")
-                }
-                aria-expanded={isGroupExpanded}
-                aria-controls={panelId}
-                onClick={() => toggleGroup(item.path)}
-              >
-                <ChevronDownIcon
-                  size="1rem"
-                  className={isGroupExpanded ? classes.chevronOpen : undefined}
-                />
-              </ActionIcon>
-            </Tooltip>
-          )}
-        </Group>
-        {hasSettings && (
-          <Collapse expanded={isGroupExpanded} id={panelId}>
-            <Stack gap="0.125rem" className={classes.settingsGroup}>
-              {item.settings?.map((setting) => (
-                <NavbarLink
-                  key={setting.path}
-                  icon={null}
-                  label={setting.label}
-                  active={isPathActive(location.pathname, setting.path)}
-                  showLabel
-                  labelSize="xs"
-                  compact
-                  onClick={() => navigateTo(setting.path)}
-                />
-              ))}
-            </Stack>
-          </Collapse>
-        )}
-      </Stack>
+      <Flex key={item.path} gap={0} className={classes.itemGroup}>
+        <NavbarLink
+          icon={item.icon}
+          label={item.label}
+          active={isActive}
+          showLabel={showExpandedNav}
+          items={item.settings?.map((setting) => ({
+            id: setting.path,
+            label: setting.label,
+            active: isPathActive(location.pathname, setting.path),
+            onClick: () => navigateTo(setting.path),
+          }))}
+          expanded={isGroupExpanded}
+          onExpandedChange={(expanded) => setGroupExpanded(item.path, expanded)}
+          expandLabel={hasSettings ? t("expand_sidebar_group") : undefined}
+          collapseLabel={hasSettings ? t("collapse_sidebar_group") : undefined}
+          onClick={() => navigateTo(item.path)}
+        />
+      </Flex>
     );
   };
 
@@ -279,9 +226,11 @@ const Navbar = (props: NavbarProps) => {
               )}
             </ActionIcon>
           </Tooltip>
-          {sidebarItems.map(renderNavbarItem)}
+          <Stack w="100%" gap="0.25rem">
+            {sidebarItems.map(renderNavbarItem)}
+          </Stack>
         </Stack>
-        <Stack justify="center" align="center" gap="0.0625rem" w="100%">
+        <Stack justify="center" align="center" gap="0.25rem" w="100%">
           <NavbarLink
             icon={<BanknoteArrowDownIcon color="currentColor" />}
             label={t("external_accounts")}
