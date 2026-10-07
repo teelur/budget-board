@@ -214,9 +214,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--base-color-text-dimmed": textEggshellDimmed[6],
     "--base-color-input-background": backgroundEggshell[2],
     "--base-color-input-border": backgroundEggshell[5],
-    // Sidebar and Header colors
-    "--background-color-sidebar": backgroundEggshell[2],
-    "--background-color-header": backgroundEggshell[1],
     // Surface colors
     "--background-color-surface": backgroundEggshell[3],
     "--surface-color-border": borderEggshell[3],
@@ -255,9 +252,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--base-color-text-dimmed": textGray[8],
     "--base-color-input-background": backgroundGray[7],
     "--base-color-input-border": backgroundGray[4],
-    // Sidebar and Header colors
-    "--background-color-sidebar": backgroundGray[7],
-    "--background-color-header": backgroundGray[8],
     // Surface colors
     "--background-color-surface": backgroundGray[7],
     "--surface-color-border": backgroundGray[3],
