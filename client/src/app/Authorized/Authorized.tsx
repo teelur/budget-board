@@ -53,25 +53,12 @@ const Authorized = (): React.ReactNode => {
       header={{
         height: 60,
       }}
-      bg="var(--background-color-base)"
       p={0}
     >
-      <AppShellHeader
-        bg="var(--background-color-header)"
-        style={{
-          borderWidth: "1px",
-          borderColor: "var(--base-color-border)",
-        }}
-      >
+      <AppShellHeader>
         <Header isNavbarOpen={isNavbarOpen} toggleNavbar={toggle} />
       </AppShellHeader>
-      <AppShellNavbar
-        bg="var(--background-color-sidebar)"
-        style={{
-          borderWidth: "1px",
-          borderColor: "var(--base-color-border)",
-        }}
-      >
+      <AppShellNavbar>
         <Navbar
           isNavbarOpen={isNavbarOpen}
           toggleNavbar={toggle}
@@ -83,11 +70,7 @@ const Authorized = (): React.ReactNode => {
           }
         />
       </AppShellNavbar>
-      <AppShellMain
-        bg="var(--background-color-base)"
-        h="100dvh"
-        flex={{ direction: "column" }}
-      >
+      <AppShellMain h="100dvh" flex={{ direction: "column" }}>
         <AccountTypeProvider>
           <AssetTypeProvider>
             <TransactionCategoryProvider>
