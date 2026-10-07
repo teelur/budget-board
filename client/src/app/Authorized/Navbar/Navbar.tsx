@@ -8,7 +8,7 @@ import {
   Stack,
   Tooltip,
 } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, NavbarLink } from "@teelur/budget-board-ui";
 import {
   ArrowLeftFromLineIcon,
   ArrowRightFromLineIcon,
@@ -24,7 +24,6 @@ import {
   LogOutIcon,
   SettingsIcon,
 } from "lucide-react";
-import NavbarLink from "./NavbarLink/NavbarLink";
 import NavbarFooter from "./NavbarFooter/NavbarFooter";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router";
