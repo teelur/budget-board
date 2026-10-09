@@ -1,5 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Button, Card, TextInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -76,38 +76,40 @@ const LoginWithRecovery = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center" p="1rem">
-      <Stack align="center" gap={5} w="100%">
-        <PrimaryText size="md" ta="center">
-          {t("use_a_recovery_code")}
-        </PrimaryText>
-        <DimmedText size="sm" ta="center">
-          {t("enter_recovery_code_subheading")}
-        </DimmedText>
+    <Card.Section>
+      <Stack gap="1rem" align="center">
+        <Stack align="center" gap={5} w="100%">
+          <PrimaryText size="md" ta="center">
+            {t("use_a_recovery_code")}
+          </PrimaryText>
+          <DimmedText size="sm" ta="center">
+            {t("enter_recovery_code_subheading")}
+          </DimmedText>
+        </Stack>
+        <TextInput {...recoveryCodeField.getInputProps()} w="100%" />
+        <Group gap="0.5rem" w="100%">
+          <Button
+            variant="filled"
+            color="neutral"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={() => props.setLoginCardState(LoginCardState.Login)}
+          >
+            {t("return_to_login")}
+          </Button>
+          <Button
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={submitUserLogin}
+            loading={loginMutation.isPending}
+          >
+            {t("submit")}
+          </Button>
+        </Group>
       </Stack>
-      <TextInput {...recoveryCodeField.getInputProps()} w="100%" />
-      <Group gap="0.5rem" w="100%">
-        <Button
-          variant="filled"
-          color="neutral"
-          size="compact-sm"
-          flex="1 1 0"
-          onClick={() => props.setLoginCardState(LoginCardState.Login)}
-        >
-          {t("return_to_login")}
-        </Button>
-        <Button
-          variant="filled"
-          color="primary"
-          size="compact-sm"
-          flex="1 1 0"
-          onClick={submitUserLogin}
-          loading={loginMutation.isPending}
-        >
-          {t("submit")}
-        </Button>
-      </Group>
-    </Stack>
+    </Card.Section>
   );
 };
 

@@ -1,6 +1,7 @@
-import { Alert, Stack, Divider, Group } from "@mantine/core";
+import { Alert, Stack, Group } from "@mantine/core";
 import {
   Button,
+  Card,
   Checkbox,
   PasswordInput,
   TextInput,
@@ -40,6 +41,10 @@ const Login = (props: LoginProps): React.ReactNode => {
   const { envVariables } = getProjectEnvVariables();
 
   const isDemoMode = envVariables.VITE_DEMO_MODE?.toLowerCase() === "true";
+  const isLocalAuthEnabled =
+    envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true";
+  const isOidcEnabled =
+    envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true";
 
   const emailField = useField<string>({
     initialValue: isDemoMode ? "demo@example.com" : "",
@@ -135,85 +140,82 @@ const Login = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap={0} align="center" w="100%">
-      {envVariables.VITE_DEMO_MODE?.toLowerCase() === "true" && (
-        <Alert
-          icon={<Info size={16} />}
-          color="blue"
-          title={t("demo_mode")}
-          w="100%"
-          p="1rem"
-          radius={0}
-        >
-          {t("demo_mode_login_hint")}
-        </Alert>
-      )}
-      {envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-        <Stack
-          component="form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            doLogin();
-          }}
-          w="100%"
-          align="center"
-          gap="0.75rem"
-          pb="0.5rem"
-          p="1rem"
-        >
-          <TextInput
-            {...emailField.getInputProps()}
-            label={t("email_address")}
+    <>
+      {isDemoMode && (
+        <Card.Section p={0} withBorder={false}>
+          <Alert
+            icon={<Info size={16} />}
+            color="blue"
+            title={t("demo_mode")}
             w="100%"
-          />
-          <PasswordInput
-            {...passwordField.getInputProps()}
-            label={t("password")}
-            w="100%"
-          />
-          <Button
-            variant="filled"
-            color="primary"
-            size="compact-md"
-            fullWidth
-            loading={loginMutation.isPending}
-            type="submit"
+            radius={0}
           >
-            {t("login")}
-          </Button>
-          <Group justify="center" w="100%">
-            <Button
-              variant="ghost"
-              color="primary"
-              size="compact-sm"
-              loading={forgotPasswordMutation.isPending}
-              onClick={() => {
-                if (emailField.getValue()) {
-                  forgotPasswordMutation.mutate(emailField.getValue(), {
-                    onSuccess: () => {
-                      props.setLoginCardState(LoginCardState.ResetPassword);
-                      props.setUserEmail(emailField.getValue());
-                    },
-                  });
-                } else {
-                  showNotification({
-                    type: NotificationType.Error,
-                    message: t("reset_password_missing_email_message"),
-                  });
-                }
-              }}
-            >
-              {t("reset_password")}
-            </Button>
-          </Group>
-        </Stack>
+            {t("demo_mode_login_hint")}
+          </Alert>
+        </Card.Section>
       )}
-      {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" &&
-        envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-          <Divider w="100%" label={t("or")} />
-        )}
-      {envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true" && (
-        <Stack w="100%" pt="0.5rem" p="1rem">
+      {isLocalAuthEnabled && (
+        <Card.Section withBorder label={t("or")}>
+          <Stack
+            component="form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              doLogin();
+            }}
+            w="100%"
+            align="center"
+            gap="0.75rem"
+          >
+            <TextInput
+              {...emailField.getInputProps()}
+              label={t("email_address")}
+              w="100%"
+            />
+            <PasswordInput
+              {...passwordField.getInputProps()}
+              label={t("password")}
+              w="100%"
+            />
+            <Button
+              variant="filled"
+              color="primary"
+              size="compact-md"
+              fullWidth
+              loading={loginMutation.isPending}
+              type="submit"
+            >
+              {t("login")}
+            </Button>
+            <Group justify="center" w="100%">
+              <Button
+                variant="ghost"
+                color="primary"
+                size="compact-sm"
+                loading={forgotPasswordMutation.isPending}
+                onClick={() => {
+                  if (emailField.getValue()) {
+                    forgotPasswordMutation.mutate(emailField.getValue(), {
+                      onSuccess: () => {
+                        props.setLoginCardState(LoginCardState.ResetPassword);
+                        props.setUserEmail(emailField.getValue());
+                      },
+                    });
+                  } else {
+                    showNotification({
+                      type: NotificationType.Error,
+                      message: t("reset_password_missing_email_message"),
+                    });
+                  }
+                }}
+              >
+                {t("reset_password")}
+              </Button>
+            </Group>
+          </Stack>
+        </Card.Section>
+      )}
+      {isOidcEnabled && (
+        <Card.Section>
           <Button
             variant="filled"
             color="secondary"
@@ -227,17 +229,16 @@ const Login = (props: LoginProps): React.ReactNode => {
           >
             {t("login_with_oidc")}
           </Button>
-        </Stack>
+        </Card.Section>
       )}
-      <Divider w="100%" />
-      <Stack w="100%" p="1rem">
+      <Card.Section>
         <Checkbox
           label={t("remember_device")}
           checked={props.rememberMe}
           onChange={(event) => props.setRememberMe(event.currentTarget.checked)}
         />
-      </Stack>
-    </Stack>
+      </Card.Section>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 import React from "react";
 import BudgetBoardLogo from "~/assets/budget-board-logo";
-import { Stack, Group, Anchor, useComputedColorScheme } from "@mantine/core";
+import { Stack, Group, useComputedColorScheme } from "@mantine/core";
 import Register from "./Register/Register";
 import Login from "./Login/Login";
 import ResetPassword from "./ResetPassword/ResetPassword";
@@ -9,9 +9,8 @@ import LoginWithRecovery from "./LoginWithRecovery/LoginWithRecovery";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
-import { AppShell, AppShellMain } from "@teelur/budget-board-ui";
+import { AppShell, AppShellMain, Button, Card } from "@teelur/budget-board-ui";
 
 export enum LoginCardState {
   Login,
@@ -94,12 +93,7 @@ const Welcome = (): React.ReactNode => {
                 {t("a_simple_app_for_managing_monthly_budgets")}
               </DimmedText>
             </Stack>
-            <Card
-              p={0}
-              w="100%"
-              maw={{ base: "95%", sm: "500px" }}
-              elevation={1}
-            >
+            <Card w="100%" maw={{ base: "95%", sm: "500px" }}>
               {getCardState()}
             </Card>
             {loginCardState !== LoginCardState.Register &&
@@ -108,13 +102,14 @@ const Welcome = (): React.ReactNode => {
                 "true" && (
                 <Group mt="xl" justify="center">
                   <DimmedText size="sm">{t("dont_have_an_account")}</DimmedText>
-                  <Anchor
-                    size="sm"
+                  <Button
+                    variant="ghost"
+                    size="compact-sm"
                     fw={600}
                     onClick={() => setLoginCardState(LoginCardState.Register)}
                   >
                     {t("register_here")}
-                  </Anchor>
+                  </Button>
                 </Group>
               )}
           </Stack>
