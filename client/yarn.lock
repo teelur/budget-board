@@ -2564,7 +2564,7 @@ __metadata:
     react-grid-layout: "npm:^2.3.0"
     react-i18next: "npm:^17.0.16"
     react-router: "npm:^8.4.0"
-    recharts: "npm:3.10.1"
+    recharts: "npm:^3.10.1"
     typescript: "npm:7.0.2"
     typescript-eslint: "npm:^8.71.1"
     vite: "npm:^8.3.4"
@@ -5211,7 +5211,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"recharts@npm:3.10.1":
+"recharts@npm:^3.10.1":
   version: 3.10.1
   resolution: "recharts@npm:3.10.1"
   dependencies:
