@@ -6,16 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Budget Board</title>
     <style>
+      :root {
+        --bb-color-page: __BBUI_PAGE_DARK__;
+        background-color: var(--bb-color-page);
+      }
+      :root[data-mantine-color-scheme="light"] {
+        --bb-color-page: __BBUI_PAGE_LIGHT__;
+      }
       body {
         margin: 0;
-        background-color: #fffffe;
-      }
-      @media (prefers-color-scheme: dark) {
-        body {
-          background-color: #121212;
-        }
+        background-color: var(--bb-color-page);
       }
     </style>
+    <script>
+      try {
+        var storedColorScheme = window.localStorage.getItem(
+          "mantine-color-scheme-value",
+        );
+        var colorScheme =
+          storedColorScheme === "light" ||
+          storedColorScheme === "dark" ||
+          storedColorScheme === "auto"
+            ? storedColorScheme
+            : "dark";
+        var computedColorScheme =
+          colorScheme !== "auto"
+            ? colorScheme
+            : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        document.documentElement.setAttribute(
+          "data-mantine-color-scheme",
+          computedColorScheme,
+        );
+      } catch (error) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

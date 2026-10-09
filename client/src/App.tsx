@@ -206,6 +206,7 @@ const theme = createTheme({
 const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {
+    "--bb-color-page": budgetBoardColors.light.page,
     // Base colors
     "--background-color-base": backgroundEggshell[0],
     "--base-color-border": backgroundEggshell[4],
@@ -244,6 +245,7 @@ const resolver: CSSVariablesResolver = () => ({
     "--light-color-off": backgroundEggshell[8],
   },
   dark: {
+    "--bb-color-page": budgetBoardColors.dark.page,
     // Base colors
     "--background-color-base": backgroundGray[9],
     "--base-color-border": backgroundGray[4],

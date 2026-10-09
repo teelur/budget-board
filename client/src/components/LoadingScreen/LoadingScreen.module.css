@@ -10,7 +10,7 @@
 .loadingContainerFullscreen {
   position: fixed;
   inset: 0;
-  background-color: #fffffe;
+  background-color: var(--bb-color-page);
 }
 
 .loadingSpinner {
@@ -33,10 +33,6 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .loadingContainerFullscreen {
-    background-color: #121212;
-  }
-
   .loadingSpinner {
     border-color: #343434;
     border-top-color: #5c7cfa;

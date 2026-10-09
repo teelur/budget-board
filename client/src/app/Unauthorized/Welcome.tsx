@@ -11,6 +11,7 @@ import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
+import { AppShell, AppShellMain } from "@teelur/budget-board-ui";
 
 export enum LoginCardState {
   Login,
@@ -79,42 +80,47 @@ const Welcome = (): React.ReactNode => {
   };
 
   return (
-    <Group
-      bg="var(--background-color-base)"
-      w="100%"
-      h="100vh"
-      justify="center"
-    >
-      <Stack w="500px" maw="100%" align="center">
-        <Stack align="center" gap="0.25rem">
-          <PrimaryText size="lg">{t("welcome_to")}</PrimaryText>
-          <BudgetBoardLogo
-            width={340}
-            darkMode={computedColorScheme === "dark"}
-          />
-          <DimmedText size="md">
-            {t("a_simple_app_for_managing_monthly_budgets")}
-          </DimmedText>
-        </Stack>
-        <Card p={0} w="100%" maw={{ base: "95%", sm: "500px" }} elevation={1}>
-          {getCardState()}
-        </Card>
-        {loginCardState !== LoginCardState.Register &&
-          envVariables.VITE_DISABLE_NEW_USERS?.toLowerCase() !== "true" &&
-          envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !== "true" && (
-            <Group mt="xl" justify="center">
-              <DimmedText size="sm">{t("dont_have_an_account")}</DimmedText>
-              <Anchor
-                size="sm"
-                fw={600}
-                onClick={() => setLoginCardState(LoginCardState.Register)}
-              >
-                {t("register_here")}
-              </Anchor>
-            </Group>
-          )}
-      </Stack>
-    </Group>
+    <AppShell>
+      <AppShellMain>
+        <Group w="100%" h="100vh" justify="center">
+          <Stack w="500px" maw="100%" align="center">
+            <Stack align="center" gap="0.25rem">
+              <PrimaryText size="lg">{t("welcome_to")}</PrimaryText>
+              <BudgetBoardLogo
+                width={340}
+                darkMode={computedColorScheme === "dark"}
+              />
+              <DimmedText size="md">
+                {t("a_simple_app_for_managing_monthly_budgets")}
+              </DimmedText>
+            </Stack>
+            <Card
+              p={0}
+              w="100%"
+              maw={{ base: "95%", sm: "500px" }}
+              elevation={1}
+            >
+              {getCardState()}
+            </Card>
+            {loginCardState !== LoginCardState.Register &&
+              envVariables.VITE_DISABLE_NEW_USERS?.toLowerCase() !== "true" &&
+              envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !==
+                "true" && (
+                <Group mt="xl" justify="center">
+                  <DimmedText size="sm">{t("dont_have_an_account")}</DimmedText>
+                  <Anchor
+                    size="sm"
+                    fw={600}
+                    onClick={() => setLoginCardState(LoginCardState.Register)}
+                  >
+                    {t("register_here")}
+                  </Anchor>
+                </Group>
+              )}
+          </Stack>
+        </Group>
+      </AppShellMain>
+    </AppShell>
   );
 };
 
