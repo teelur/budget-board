@@ -1,12 +1,91 @@
-import mantine from "eslint-config-mantine";
-import tseslint from "typescript-eslint";
+import eslintReact from "@eslint-react/eslint-plugin";
+import eslint from "@eslint/js";
+import { defineConfig } from "eslint/config";
 import jsonc from "eslint-plugin-jsonc";
+import jsxA11y from "eslint-plugin-jsx-a11y";
+import tseslint from "typescript-eslint";
 
-export default [
-  ...tseslint.config(...mantine).map((config) => ({
-    ...config,
-    files: config.files ?? ["**/*.{ts,tsx}"],
-  })),
+export default defineConfig([
+  {
+    files: ["**/*.{ts,tsx}"],
+    extends: [
+      eslint.configs.recommended,
+      tseslint.configs.recommended,
+      jsxA11y.flatConfigs.recommended,
+      eslintReact.configs["recommended-typescript"],
+    ],
+    rules: {
+      "array-callback-return": "error",
+      "no-duplicate-imports": "error",
+      "no-var": "error",
+      "no-self-compare": "error",
+      "no-template-curly-in-string": "error",
+      curly: "error",
+      "default-case": "off",
+      "default-case-last": "error",
+      "dot-notation": "error",
+      "no-alert": "error",
+      "no-console": "warn",
+      "no-else-return": "error",
+      "no-eval": "warn",
+      "no-lonely-if": "error",
+      "no-multi-assign": "error",
+      "no-multi-str": "error",
+      "no-param-reassign": "error",
+      "no-return-assign": "error",
+      "no-script-url": "error",
+      "no-sequences": "error",
+      "no-throw-literal": "error",
+      "no-unneeded-ternary": "error",
+      "no-useless-call": "error",
+      "no-useless-constructor": "error",
+      "no-useless-return": "error",
+      "object-shorthand": "error",
+      "operator-assignment": ["error", "always"],
+      "prefer-arrow-callback": "error",
+      "prefer-const": "error",
+      "prefer-exponentiation-operator": "error",
+      "prefer-object-has-own": "error",
+      "prefer-promise-reject-errors": "error",
+      "prefer-object-spread": "error",
+      "prefer-template": "error",
+      yoda: "error",
+      radix: "error",
+      eqeqeq: ["error", "smart"],
+      "no-undef": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/consistent-generic-constructors": "error",
+      "@typescript-eslint/method-signature-style": ["error", "property"],
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/lines-between-class-members": "off",
+      "@typescript-eslint/indent": "off",
+      "@typescript-eslint/naming-convention": "off",
+      "@typescript-eslint/comma-dangle": "off",
+      "@typescript-eslint/no-redeclare": "off",
+      "@typescript-eslint/no-use-before-define": "off",
+      "@typescript-eslint/no-loop-func": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          args: "all",
+          argsIgnorePattern: "^_",
+          caughtErrors: "none",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+      "jsx-a11y/no-autofocus": "off",
+      "jsx-a11y/control-has-associated-label": "off",
+      "jsx-a11y/mouse-events-have-key-events": "off",
+      "jsx-a11y/label-has-for": "off",
+      "jsx-a11y/anchor-is-valid": "off",
+      "jsx-a11y/label-has-associated-control": "off",
+      "jsx-a11y/anchor-has-content": "off",
+    },
+  },
   {
     ignores: ["**/*.{mjs,cjs,js,d.ts,d.mts}", "./.storybook/main.ts"],
   },
@@ -25,4 +104,4 @@ export default [
       ],
     },
   },
-];
+]);
