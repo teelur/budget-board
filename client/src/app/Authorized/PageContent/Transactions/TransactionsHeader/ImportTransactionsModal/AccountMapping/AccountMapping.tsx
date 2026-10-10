@@ -1,4 +1,4 @@
-import { Stack, Divider, Group } from "@mantine/core";
+import { Stack, Group } from "@mantine/core";
 import { Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { filterVisibleAccounts } from "~/helpers/accounts";

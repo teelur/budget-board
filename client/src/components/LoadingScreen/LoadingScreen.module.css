@@ -10,7 +10,7 @@
 .loadingContainerFullscreen {
   position: fixed;
   inset: 0;
-  background-color: var(--bb-color-page);
+  background-color: var(--bbui-color-page);
 }
 
 .loadingSpinner {

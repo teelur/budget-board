@@ -1,4 +1,4 @@
-import { Alert, Divider, Group, Stack } from "@mantine/core";
+import { Alert, Group, Stack } from "@mantine/core";
 import {
   BodyText,
   Button,

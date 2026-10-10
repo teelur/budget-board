@@ -5,6 +5,7 @@ import {
   AmountText,
   DateInput,
   Select,
+  Card,
 } from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
@@ -12,7 +13,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteLunchFlowAccountMutation } from "~/hooks/mutations/lunchFlowAccount/useDeleteLunchFlowAccountMutation";
@@ -153,7 +153,7 @@ const LunchFlowAccountCard = (
   }, [accountsQuery.data, props.lunchFlowAccount.linkedAccountId]);
 
   return (
-    <Card elevation={2}>
+    <Card>
       <LoadingOverlay
         visible={
           updateLinkedAccountMutation.isPending ||

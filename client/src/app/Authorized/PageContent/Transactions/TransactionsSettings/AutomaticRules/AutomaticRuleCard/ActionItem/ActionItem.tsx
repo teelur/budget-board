@@ -1,5 +1,5 @@
 import { Group } from "@mantine/core";
-import { Badge, BodyText, Card } from "@teelur/budget-board-ui";
+import { Badge, BodyText } from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
 import {
   deserializeActionTags,

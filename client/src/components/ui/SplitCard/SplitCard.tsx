@@ -1,7 +1,7 @@
 import React from "react";
-import Card, { CardProps } from "~/components/core/Card/Card";
 import { Flex, Stack } from "@mantine/core";
 import Divider from "~/components/core/Divider/Divider";
+import { Card, CardProps } from "@teelur/budget-board-ui";
 
 export enum BorderThickness {
   Normal,
@@ -34,7 +34,6 @@ const SplitCard = ({
         display: "flex",
         flexDirection: "column",
       }}
-      elevation={elevation}
     >
       <Stack gap={0} style={{ flex: 1, minHeight: 0 }}>
         <Flex w="100%" p="0.5rem" direction="column" align="stretch">

@@ -4,9 +4,9 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
-import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import classes from "./TransactionTransferGroup.module.css";
+import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
 
 interface TransactionTransferGroupProps {
   transactions: [ITransaction, ITransaction];
@@ -63,8 +63,7 @@ const TransactionTransferGroup = ({
           <TransactionCard
             transaction={transaction}
             categories={categories}
-            elevation={1}
-            isSelected={selectedIds.has(transaction.id)}
+            selected={selectedIds.has(transaction.id)}
             onToggleSelect={onToggleSelect}
             p="0.2rem"
           />

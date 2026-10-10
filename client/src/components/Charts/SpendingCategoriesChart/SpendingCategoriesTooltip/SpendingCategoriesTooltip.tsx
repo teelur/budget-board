@@ -1,7 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { BodyText, Card } from "@teelur/budget-board-ui";
 
 interface SpendingCategoriesTooltipProps {
   active?: boolean;
@@ -21,9 +19,13 @@ const SpendingCategoriesTooltip = ({
   const percent = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
   const showParent = parent !== undefined && parent !== name;
   return (
-    <Card elevation={0}>
-      <Stack gap="0.25rem">
-        {showParent && <DimmedText size="xs">{parent}</DimmedText>}
+    <Card>
+      <Stack gap="0.125rem">
+        {showParent && (
+          <BodyText tone="secondary" size="xs">
+            {parent}
+          </BodyText>
+        )}
         <Group gap="0.5rem" wrap="nowrap">
           <div
             style={{
@@ -34,9 +36,15 @@ const SpendingCategoriesTooltip = ({
               flexShrink: 0,
             }}
           />
-          <DimmedText size="sm">{name}</DimmedText>
+          <BodyText tone="primary" size="sm">
+            {name}
+          </BodyText>
         </Group>
-        <PrimaryText size="sm">{`${valueFormatter(value)} (${percent}%)`}</PrimaryText>
+        <BodyText
+          tone="primary"
+          size="sm"
+          fw={500}
+        >{`${valueFormatter(value)} (${percent}%)`}</BodyText>
       </Stack>
     </Card>
   );

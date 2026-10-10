@@ -35,7 +35,11 @@ const NetWorthLineCategoryContent = (
   };
 
   return (
-    <Flex direction={{ base: "column", xs: "row" }} justify="space-between">
+    <Flex
+      direction={{ base: "column", xs: "row" }}
+      align="center"
+      justify="space-between"
+    >
       <Group gap="0.25rem" align="center">
         {props.category.type.length > 0 ? (
           <PrimaryText size="sm">{getTypeDisplayString()}</PrimaryText>
@@ -57,7 +61,6 @@ const NetWorthLineCategoryContent = (
           <PencilIcon size={14} />
         </ActionIcon>
       </Group>
-
       <PrimaryText size="sm">{props.category.value}</PrimaryText>
     </Flex>
   );

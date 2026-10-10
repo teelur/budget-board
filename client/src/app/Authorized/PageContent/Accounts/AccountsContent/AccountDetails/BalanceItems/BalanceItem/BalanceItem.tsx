@@ -2,7 +2,7 @@ import EditableBalanceItemContent from "./EditableBalanceItemContent/EditableBal
 import BalanceItemContent from "./BalanceItemContent/BalanceItemContent";
 import { IBalanceResponse } from "~/models/balance";
 import { useDisclosure } from "@mantine/hooks";
-import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
+import { Card } from "@teelur/budget-board-ui";
 
 interface BalanceItemProps {
   balance: IBalanceResponse;
@@ -11,19 +11,16 @@ interface BalanceItemProps {
 const BalanceItem = (props: BalanceItemProps) => {
   const [isSelected, { open, close }] = useDisclosure(false);
   return (
-    <ElevatedCard>
+    <Card>
       {isSelected ? (
         <EditableBalanceItemContent
           balance={props.balance}
           doUnSelect={close}
         />
       ) : (
-        <BalanceItemContent
-          balance={props.balance}
-          doSelect={open}
-        />
+        <BalanceItemContent balance={props.balance} doSelect={open} />
       )}
-    </ElevatedCard>
+    </Card>
   );
 };
 

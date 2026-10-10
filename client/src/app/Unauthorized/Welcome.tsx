@@ -7,7 +7,6 @@ import ResetPassword from "./ResetPassword/ResetPassword";
 import LoginWith2fa from "./LoginWith2fa/LoginWith2fa";
 import LoginWithRecovery from "./LoginWithRecovery/LoginWithRecovery";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import {
   AppShell,

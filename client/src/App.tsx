@@ -206,8 +206,9 @@ const theme = createTheme({
 const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {
-    "--bb-color-page": budgetBoardColors.light.page,
-    "--bb-color-text-primary": budgetBoardColors.light.textPrimary,
+    "--bbui-color-page": budgetBoardColors.light.page,
+    "--bbui-color-text-primary": budgetBoardColors.light.textPrimary,
+    "--bbui-color-primary": budgetBoardColors.light.primary,
     // Base colors
     "--background-color-base": backgroundEggshell[0],
     "--base-color-border": backgroundEggshell[4],
@@ -246,8 +247,9 @@ const resolver: CSSVariablesResolver = () => ({
     "--light-color-off": backgroundEggshell[8],
   },
   dark: {
-    "--bb-color-page": budgetBoardColors.dark.page,
-    "--bb-color-text-primary": budgetBoardColors.dark.textPrimary,
+    "--bbui-color-page": budgetBoardColors.dark.page,
+    "--bbui-color-text-primary": budgetBoardColors.dark.textPrimary,
+    "--bbui-color-primary": budgetBoardColors.dark.primary,
     // Base colors
     "--background-color-base": backgroundGray[9],
     "--base-color-border": backgroundGray[4],

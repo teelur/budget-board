@@ -6,7 +6,6 @@ import { Group, Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import { useTranslation } from "react-i18next";
 import SplitCard, {
   BorderThickness,
@@ -16,6 +15,7 @@ import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
 
 const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const itemsPerPage = 15;
@@ -89,8 +89,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
               key={transaction.id}
               transaction={transaction}
               categories={transactionCategories}
-              elevation={2}
-              isSelected={selectedIds.has(transaction.id)}
+              selected={selectedIds.has(transaction.id)}
               onToggleSelect={onToggleSelect}
             />
           ))}

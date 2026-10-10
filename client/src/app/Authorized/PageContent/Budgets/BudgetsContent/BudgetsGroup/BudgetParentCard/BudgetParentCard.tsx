@@ -14,6 +14,7 @@ import {
   ActionIcon,
   AmountText,
   Button,
+  Card,
   Progress,
 } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
@@ -25,7 +26,6 @@ import { areStringsEqual, roundAwayFromZero } from "~/helpers/utils";
 import { CategoryTypes, ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
 import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
-import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
@@ -289,7 +289,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
   };
 
   return (
-    <Card p={0} w="100%" elevation={1}>
+    <Card p={0} w="100%">
       <Box
         m="0.25rem"
         p="0.25rem 0.5rem"

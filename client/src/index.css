@@ -4,7 +4,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: var(--bb-color-page);
+  background-color: var(--bbui-color-page);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

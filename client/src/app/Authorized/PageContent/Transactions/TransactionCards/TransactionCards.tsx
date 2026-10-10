@@ -4,7 +4,6 @@ import { ITransaction } from "~/models/transaction";
 import { Group, Skeleton, Stack } from "@mantine/core";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
-import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { InfoIcon } from "lucide-react";
 import classes from "./TransactionCards.module.css";
@@ -13,6 +12,7 @@ import {
   TransactionDisplayItem,
 } from "~/helpers/transactions";
 import TransactionTransferGroup from "./TransactionTransferGroup";
+import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   currentViewTransactions: ITransaction[];
@@ -97,8 +97,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                       <TransactionCard
                         transaction={transaction}
                         categories={allTransactionCategories}
-                        elevation={1}
-                        isSelected={props.selectedIds.has(transaction.id)}
+                        selected={props.selectedIds.has(transaction.id)}
                         onToggleSelect={props.onToggleSelect}
                       />
                     )}

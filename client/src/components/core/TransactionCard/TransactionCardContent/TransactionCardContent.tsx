@@ -1,15 +1,13 @@
 import classes from "./TransactionCardContent.module.css";
 
-import { Flex, Tooltip } from "@mantine/core";
-import { Badge, AmountText } from "@teelur/budget-board-ui";
+import { Flex, Group, Tooltip } from "@mantine/core";
+import { Badge, AmountText, BodyText } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import { getFormattedCategoryValue } from "~/helpers/category";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Repeat2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -17,7 +15,6 @@ import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvi
 interface TransactionCardContentProps {
   transaction: ITransaction;
   categories: ICategory[];
-  elevation: number;
 }
 
 const TransactionCardContent = (
@@ -34,31 +31,24 @@ const TransactionCardContent = (
       : (props.transaction.category ?? "");
 
   return (
-    <Flex className={classes.content} w="100%" gap="0.5rem" align="center">
-      <DimmedText
-        className={classes.dateText}
-        flex="1 0 auto"
-        size="sm"
-        elevation={props.elevation}
-      >
+    <Flex w="100%" gap="0.5rem" align="center" className={classes.content}>
+      <BodyText tone="secondary" flex="1 0 auto" className={classes.dateText}>
         {dayjs(props.transaction.date).format(`${longDateFormat}`)}
-      </DimmedText>
-      <PrimaryText
-        className={classes.merchantNameText}
-        w="100%"
-        elevation={props.elevation}
-      >
-        {props.transaction.merchantName}
-      </PrimaryText>
-      {props.transaction.recurringRuleID && (
-        <Tooltip label={t("recurring")}>
-          <Repeat2
-            size="1.5rem"
-            aria-label={t("recurring")}
-            color="var(--mantine-primary-color-filled)"
-          />
-        </Tooltip>
-      )}
+      </BodyText>
+      <Group w="100%" justify="space-between" align="center" wrap="nowrap">
+        <BodyText className={classes.merchantNameText}>
+          {props.transaction.merchantName}
+        </BodyText>
+        {props.transaction.recurringRuleID && (
+          <Tooltip label={t("recurring")}>
+            <Repeat2
+              size="1.2rem"
+              aria-label={t("recurring")}
+              color="var(--bbui-color-primary)"
+            />
+          </Tooltip>
+        )}
+      </Group>
       <Flex
         className={classes.contentSubcontainer}
         gap="0.5rem"

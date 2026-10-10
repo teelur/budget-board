@@ -1,5 +1,10 @@
 import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  AmountText,
+  BodyText,
+  Card,
+} from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -8,8 +13,6 @@ import { ICategoryNode } from "~/models/category";
 import UnbudgetedChildCard from "./UnbudgetedChildCard/UnbudgetedChildCard";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { uncategorizedTransactionCategory } from "~/models/transaction";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
@@ -92,17 +95,16 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
           }
         }}
         p="0.25rem"
-        hoverEffect
-        elevation={2}
+        hoverable
       >
         <LoadingOverlay visible={createBudgetMutation.isPending} />
         <Group w="100%" justify="space-between">
-          <PrimaryText size="md" fw={600}>
+          <BodyText tone="primary" size="md" fw={500}>
             {categoryIcon.length > 0 ? `${categoryIcon} ` : ""}
             {props.categoryTree.value.length === 0
               ? t(uncategorizedTransactionCategory)
               : props.categoryTree.value}
-          </PrimaryText>
+          </BodyText>
           <Group gap="sm">
             <AmountText
               amount={

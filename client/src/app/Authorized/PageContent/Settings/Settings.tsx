@@ -29,7 +29,7 @@ const Settings = (): React.ReactNode => {
           <>
             <ChevronRightIcon
               size="1rem"
-              color="var(--bb-color-text-primary)"
+              color="var(--bbui-color-text-primary)"
             />
             <HeadingText level={5} tone="secondary">
               {activeItem.label}
