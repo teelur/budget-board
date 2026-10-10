@@ -1,5 +1,11 @@
 import { Stack, Group } from "@mantine/core";
-import { Button, Card, PinInput } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  Card,
+  HeadingText,
+  PinInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -7,8 +13,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { NotificationType, showNotification } from "~/helpers/notifications";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { LoginCardState } from "../Welcome";
 import { useLoginMutation } from "~/hooks/mutations/auth/useLoginMutation";
@@ -79,12 +83,12 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
     <Card.Section>
       <Stack gap="1rem" align="center" w="100%">
         <Stack align="center" gap={5} w="100%">
-          <PrimaryText size="lg" ta="center">
+          <HeadingText level={5} ta="center">
             {t("two_factor_authentication")}
-          </PrimaryText>
-          <DimmedText size="sm" ta="center">
+          </HeadingText>
+          <BodyText component="p" tone="secondary" size="sm">
             {t("enter_security_code_message")}
-          </DimmedText>
+          </BodyText>
         </Stack>
         <PinInput
           length={6}

@@ -8,9 +8,14 @@ import LoginWith2fa from "./LoginWith2fa/LoginWith2fa";
 import LoginWithRecovery from "./LoginWithRecovery/LoginWithRecovery";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import { AppShell, AppShellMain, Button, Card } from "@teelur/budget-board-ui";
+import {
+  AppShell,
+  AppShellMain,
+  BodyText,
+  Button,
+  Card,
+} from "@teelur/budget-board-ui";
 
 export enum LoginCardState {
   Login,
@@ -84,14 +89,14 @@ const Welcome = (): React.ReactNode => {
         <Group w="100%" h="100vh" justify="center">
           <Stack w="500px" maw="100%" align="center">
             <Stack align="center" gap="0.25rem">
-              <PrimaryText size="lg">{t("welcome_to")}</PrimaryText>
+              <BodyText component="h6">{t("welcome_to")}</BodyText>
               <BudgetBoardLogo
                 width={340}
                 darkMode={computedColorScheme === "dark"}
               />
-              <DimmedText size="md">
+              <BodyText component="p" tone="secondary" size="md">
                 {t("a_simple_app_for_managing_monthly_budgets")}
-              </DimmedText>
+              </BodyText>
             </Stack>
             <Card w="100%" maw={{ base: "95%", sm: "500px" }}>
               {getCardState()}
@@ -100,8 +105,10 @@ const Welcome = (): React.ReactNode => {
               envVariables.VITE_DISABLE_NEW_USERS?.toLowerCase() !== "true" &&
               envVariables.VITE_DISABLE_LOCAL_AUTH?.toLowerCase() !==
                 "true" && (
-                <Group mt="xl" justify="center">
-                  <DimmedText size="sm">{t("dont_have_an_account")}</DimmedText>
+                <Group mt="xl" gap="1rem" justify="center">
+                  <BodyText component="p" tone="secondary" size="sm">
+                    {t("dont_have_an_account")}
+                  </BodyText>
                   <Button
                     variant="ghost"
                     size="compact-sm"
