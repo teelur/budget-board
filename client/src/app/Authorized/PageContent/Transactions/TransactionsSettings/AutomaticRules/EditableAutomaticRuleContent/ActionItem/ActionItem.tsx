@@ -34,6 +34,7 @@ export interface ActionItemProps {
   doDelete: (index: number) => void;
   index: number;
   categories: ICategory[];
+  surface?: "sunken" | "default";
 }
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
@@ -199,7 +200,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
   );
 
   return (
-    <Card>
+    <Card surface={props.surface ?? "default"}>
       <Group gap="0.5rem">
         {props.ruleParameter.operator === "delete" ? (
           getOperatorSelect()

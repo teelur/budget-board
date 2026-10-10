@@ -34,7 +34,7 @@ const AddValue = (props: AddValueProps): React.ReactNode => {
   });
 
   return (
-    <Stack gap={10}>
+    <Stack gap={"0.5rem"}>
       <DateInput
         {...dateField.getInputProps()}
         locale={dayjsLocale}

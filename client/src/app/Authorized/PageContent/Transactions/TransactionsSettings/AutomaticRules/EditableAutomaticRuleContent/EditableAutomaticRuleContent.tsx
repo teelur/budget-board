@@ -21,6 +21,7 @@ interface EditableAutomaticRuleContentProps {
   actionItems: IRuleParameterEdit[];
   setConditionItems: React.Dispatch<React.SetStateAction<IRuleParameterEdit[]>>;
   setActionItems: React.Dispatch<React.SetStateAction<IRuleParameterEdit[]>>;
+  surface?: "sunken" | "default";
 }
 
 const EditableAutomaticRuleContent = (
@@ -93,6 +94,7 @@ const EditableAutomaticRuleContent = (
             doDelete={removeCondition}
             index={index}
             categories={transactionCategories}
+            surface={props.surface}
           />
         ))}
       </Stack>
@@ -122,6 +124,7 @@ const EditableAutomaticRuleContent = (
             doDelete={removeAction}
             index={index}
             categories={transactionCategories}
+            surface={props.surface}
           />
         ))}
       </Stack>

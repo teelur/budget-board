@@ -32,6 +32,7 @@ export interface ConditionItemProps {
   doDelete?: (index: number) => void;
   index: number;
   categories: ICategory[];
+  surface?: "sunken" | "default";
 }
 
 const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
@@ -127,7 +128,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   };
 
   return (
-    <Card>
+    <Card surface={props.surface ?? "default"}>
       <Group gap="0.5rem">
         <Select
           data={ConditionTransactionFields.map((i) => ({

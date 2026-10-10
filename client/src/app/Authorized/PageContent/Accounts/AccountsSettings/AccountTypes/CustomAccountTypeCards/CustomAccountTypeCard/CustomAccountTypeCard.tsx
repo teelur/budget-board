@@ -89,7 +89,7 @@ const CustomAccountTypeCard = (
               label={t("account_type_name")}
             />
             <Stack gap="0.25rem" justify="center">
-              <BodyText component="span" tone="primary" size="sm">
+              <BodyText component="span" tone="primary" size="sm" fw={600}>
                 {t("category_level")}
               </BodyText>
               <SegmentedControl

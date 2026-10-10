@@ -20,14 +20,13 @@ const DeletedTransactionsCard = (
   const restoreTransactionMutation = useRestoreTransactionMutation();
 
   return (
-    <Card>
-      <LoadingOverlay visible={restoreTransactionMutation.isPending} />
+    <Card p="0.25rem">
       <Group justify="space-between" wrap="nowrap">
         <Stack gap={0}>
-          <BodyText tone="primary" size="md" fw={500}>
+          <BodyText tone="primary" size="sm" fw={500}>
             {props.deletedTransaction.merchantName}
           </BodyText>
-          <BodyText tone="secondary" size="sm">
+          <BodyText tone="secondary" size="xs">
             {t("days_since_deleted", {
               days: getDaysSinceDate(props.deletedTransaction.deleted!),
             })}
@@ -39,6 +38,7 @@ const DeletedTransactionsCard = (
             color="primary"
             size="compact-sm"
             h="100%"
+            loading={restoreTransactionMutation.isPending}
             onClick={() =>
               restoreTransactionMutation.mutate([props.deletedTransaction.id])
             }

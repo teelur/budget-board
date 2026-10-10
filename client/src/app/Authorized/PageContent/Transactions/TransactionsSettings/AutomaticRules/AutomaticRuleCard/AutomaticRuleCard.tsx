@@ -63,6 +63,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
             actionItems={actionItems}
             setConditionItems={setConditionItems}
             setActionItems={setActionItems}
+            surface="sunken"
           />
           <Group w="100%">
             <Button

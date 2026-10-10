@@ -1,7 +1,6 @@
 import { Group } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, BodyText } from "@teelur/budget-board-ui";
 import { PencilIcon } from "lucide-react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { IBalanceResponse } from "~/models/balance";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -22,9 +21,9 @@ const BalanceItemContent = (
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
-        <PrimaryText size="md">
+        <BodyText tone="primary" size="sm" fw={500}>
           {dayjs(props.balance.date).format(longDateFormat)}
-        </PrimaryText>
+        </BodyText>
         <ActionIcon
           variant="ghost"
           color="primary"

@@ -1,4 +1,4 @@
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { ActionIcon, DateInput, NumberInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -49,11 +49,6 @@ const EditableBalanceItemContent = (
 
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
-      <LoadingOverlay
-        visible={
-          updateBalanceMutation.isPending || deleteBalanceMutation.isPending
-        }
-      />
       <Stack w="100%" gap="0.5rem">
         <DateInput
           {...balanceDateField.getInputProps()}
@@ -92,6 +87,7 @@ const EditableBalanceItemContent = (
           color="primary"
           size="xs"
           h="100%"
+          loading={updateBalanceMutation.isPending}
           onClick={(e) => {
             e.stopPropagation();
             props.doUnSelect();
@@ -104,6 +100,7 @@ const EditableBalanceItemContent = (
           color="error"
           size="xs"
           h="100%"
+          loading={deleteBalanceMutation.isPending}
           onClick={() => deleteBalanceMutation.mutate(props.balance.id)}
         >
           <Trash2Icon size={16} />
