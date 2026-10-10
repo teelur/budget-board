@@ -207,6 +207,7 @@ const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {
     "--bb-color-page": budgetBoardColors.light.page,
+    "--bb-color-text-primary": budgetBoardColors.light.textPrimary,
     // Base colors
     "--background-color-base": backgroundEggshell[0],
     "--base-color-border": backgroundEggshell[4],
@@ -246,6 +247,7 @@ const resolver: CSSVariablesResolver = () => ({
   },
   dark: {
     "--bb-color-page": budgetBoardColors.dark.page,
+    "--bb-color-text-primary": budgetBoardColors.dark.textPrimary,
     // Base colors
     "--background-color-base": backgroundGray[9],
     "--base-color-border": backgroundGray[4],

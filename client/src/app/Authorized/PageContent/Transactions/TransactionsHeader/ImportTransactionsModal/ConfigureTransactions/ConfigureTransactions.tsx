@@ -1,5 +1,5 @@
 import { Alert, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import {
@@ -477,6 +477,9 @@ const ConfigureTransactions = (
 
   return (
     <Stack gap="0.5rem" w="auto" maw="100%" mx="auto">
+      <HeadingText tone="heading" level={5}>
+        {t("configure_transactions")}
+      </HeadingText>
       {alertDetails && (
         <Alert
           variant="outline"

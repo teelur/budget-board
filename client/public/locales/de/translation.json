@@ -257,7 +257,6 @@
   "fields": "Felder",
   "file_must_be_csv_message": "Die Datei muss im CSV-Format vorliegen. {{fileName}} ({{fileType}}) empfangen.",
   "filter_duplicates": "Duplikate filtern",
-  "filter_duplicates_description": "Doppelte Transaktionen anhand der gewählten Spalten entfernen.",
   "filters": "Filter",
   "fix_parent_budgets": "Übergeordnete Budgets festlegen",
   "force_sync_lookback_period": "Synchronisierung für Rückblickzeitraum erzwingen",

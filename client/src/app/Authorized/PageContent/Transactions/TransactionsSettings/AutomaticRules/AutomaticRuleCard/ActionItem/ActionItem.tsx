@@ -1,8 +1,6 @@
 import { Group } from "@mantine/core";
-import { Badge } from "@teelur/budget-board-ui";
+import { Badge, BodyText, Card } from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import {
   deserializeActionTags,
   getFormattedValue,
@@ -46,7 +44,9 @@ const ActionItem = (props: ActionItemProps) => {
               )?.label ?? props.action.field,
             )}
           </Badge>
-          <PrimaryText size="sm">{t("to")}</PrimaryText>
+          <BodyText component="span" tone="primary" size="sm" fw={500}>
+            {t("to")}
+          </BodyText>
           {tagValues.length > 0 ? (
             <Group gap="0.25rem">
               {tagValues.map((tag) => (
@@ -79,14 +79,12 @@ const ActionItem = (props: ActionItemProps) => {
   )?.label;
 
   return (
-    <Card p="0.25rem" shadow="xs" elevation={2}>
-      <Group gap="0.3rem">
-        <PrimaryText size="sm">
-          {operatorLabelKey ? t(operatorLabelKey) : props.action.operator}
-        </PrimaryText>
-        {getCardContent()}
-      </Group>
-    </Card>
+    <Group gap="0.3rem">
+      <BodyText component="span" tone="primary" size="sm" fw={500}>
+        {operatorLabelKey ? t(operatorLabelKey) : props.action.operator}
+      </BodyText>
+      {getCardContent()}
+    </Group>
   );
 };
 

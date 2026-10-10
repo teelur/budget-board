@@ -1,5 +1,11 @@
 import { Alert, Divider, Group, Stack } from "@mantine/core";
-import { Button, Checkbox } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  Card,
+  Checkbox,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import {
@@ -9,9 +15,6 @@ import {
   RefreshCwIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import DuplicateTransactionTable from "../ConfigureTransactions/DuplicateTransactionTable/DuplicateTransactionTable";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -207,63 +210,68 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
   return (
     <Stack gap="0.75rem" w={800} maw="100%" mx="auto">
       <Stack gap="0.25rem">
-        <Divider label={t("duplicate_review")} labelPosition="center" />
-        <PrimaryText size="sm">{t("duplicate_review_description")}</PrimaryText>
+        <HeadingText tone="heading" level={5}>
+          {t("duplicate_review")}
+        </HeadingText>
+        <BodyText tone="secondary" size="sm">
+          {t("duplicate_review_description")}
+        </BodyText>
       </Stack>
-      <Card elevation={1}>
-        <Stack gap="0.75rem">
-          <Checkbox
-            checked={filterDuplicatesField.getValue()}
-            onChange={(event) =>
-              filterDuplicatesField.setValue(event.currentTarget.checked)
-            }
-            label={t("filter_duplicates")}
-          />
-          <DimmedText size="xs">
-            {t("filter_duplicates_description")}
-          </DimmedText>
-          {filterDuplicatesField.getValue() && (
-            <Stack gap="0.5rem">
-              <PrimaryText size="sm">{t("filter_duplicates_by")}</PrimaryText>
-              <Group gap="1rem">
-                {filterFields.map(({ key, label, field }) => (
-                  <Checkbox
-                    key={key}
-                    checked={field.getValue()}
-                    disabled={!props.availableDuplicateFields[key]}
-                    onChange={(event) =>
-                      field.setValue(event.currentTarget.checked)
-                    }
-                    label={t(label)}
-                  />
-                ))}
-              </Group>
-              {filterFields.some(
-                ({ key }) => !props.availableDuplicateFields[key],
-              ) && (
-                <DimmedText size="xs">
-                  {t("duplicate_review_unavailable_fields_message")}
-                </DimmedText>
-              )}
-              {activeFilterFields.length === 0 && (
-                <Alert
-                  variant="outline"
-                  color="var(--text-color-status-warn)"
-                  icon={<InfoIcon />}
-                >
-                  <PrimaryText size="sm">
-                    {t("duplicate_filter_no_criteria_message")}
-                  </PrimaryText>
-                </Alert>
-              )}
-            </Stack>
-          )}
-        </Stack>
-      </Card>
+      <Checkbox
+        checked={filterDuplicatesField.getValue()}
+        onChange={(event) =>
+          filterDuplicatesField.setValue(event.currentTarget.checked)
+        }
+        label={t("filter_duplicates")}
+      />
+      {filterDuplicatesField.getValue() && (
+        <Card>
+          <Stack gap="0.75rem">
+            {filterDuplicatesField.getValue() && (
+              <Stack gap="0.5rem">
+                <BodyText tone="primary" size="sm">
+                  {t("filter_duplicates_by")}
+                </BodyText>
+                <Group gap="1rem">
+                  {filterFields.map(({ key, label, field }) => (
+                    <Checkbox
+                      key={key}
+                      checked={field.getValue()}
+                      disabled={!props.availableDuplicateFields[key]}
+                      onChange={(event) =>
+                        field.setValue(event.currentTarget.checked)
+                      }
+                      label={t(label)}
+                    />
+                  ))}
+                </Group>
+                {filterFields.some(
+                  ({ key }) => !props.availableDuplicateFields[key],
+                ) && (
+                  <BodyText tone="secondary" size="xs">
+                    {t("duplicate_review_unavailable_fields_message")}
+                  </BodyText>
+                )}
+                {activeFilterFields.length === 0 && (
+                  <Alert
+                    variant="outline"
+                    color="var(--text-color-status-warn)"
+                    icon={<InfoIcon />}
+                  >
+                    <BodyText tone="secondary" size="sm">
+                      {t("duplicate_filter_no_criteria_message")}
+                    </BodyText>
+                  </Alert>
+                )}
+              </Stack>
+            )}
+          </Stack>
+        </Card>
+      )}
       {transactionsQuery.isPending ? (
-        <PrimaryText size="sm">
+        <BodyText tone="secondary" size="sm">
           {t("duplicate_review_loading_message")}
-        </PrimaryText>
+        </BodyText>
       ) : transactionsQuery.isError ? (
         <Alert
           variant="outline"
@@ -271,9 +279,9 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
           icon={<InfoIcon />}
         >
           <Stack gap="0.5rem">
-            <PrimaryText size="sm">
+            <BodyText tone="secondary" size="sm">
               {t("duplicate_review_error_message")}
-            </PrimaryText>
+            </BodyText>
             <Button
               variant="filled"
               color="primary"
@@ -289,31 +297,31 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
       ) : (
         <Stack gap="0.5rem">
           <Group justify="space-between" gap="1rem">
-            <PrimaryText size="sm">
+            <BodyText tone="secondary" size="sm">
               {t("duplicate_review_imported_count", {
                 count: props.importedTransactions.length,
               })}
-            </PrimaryText>
-            <PrimaryText size="sm">
+            </BodyText>
+            <BodyText tone="secondary" size="sm">
               {t("duplicate_review_duplicates_count", {
                 count: duplicateTransactions.size,
               })}
-            </PrimaryText>
-            <PrimaryText size="sm">
+            </BodyText>
+            <BodyText tone="secondary" size="sm">
               {t("duplicate_review_ready_count", {
                 count: filteredTransactions.length,
               })}
-            </PrimaryText>
+            </BodyText>
           </Group>
           {filterDuplicatesField.getValue() &&
             activeFilterFields.length > 0 && (
-              <PrimaryText size="xs">
+              <BodyText size="xs">
                 {t("duplicate_review_matching_on", {
                   fields: activeFilterFields
                     .map(({ label }) => label)
                     .join(", "),
                 })}
-              </PrimaryText>
+              </BodyText>
             )}
           {duplicateTransactions.size > 0 && (
             <DuplicateTransactionTable
@@ -328,9 +336,9 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
               color="var(--text-color-status-warn)"
               icon={<InfoIcon />}
             >
-              <PrimaryText size="sm">
+              <BodyText tone="secondary" size="sm">
                 {t("duplicate_review_filter_disabled_message")}
-              </PrimaryText>
+              </BodyText>
             </Alert>
           )}
           {filterDuplicatesField.getValue() &&
@@ -341,9 +349,9 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
                 color="var(--text-color-status-good)"
                 icon={<InfoIcon />}
               >
-                <PrimaryText size="sm">
+                <BodyText tone="secondary" size="sm">
                   {t("duplicate_review_no_duplicates_message")}
-                </PrimaryText>
+                </BodyText>
               </Alert>
             )}
           {filteredTransactions.length === 0 && (
@@ -352,9 +360,9 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
               color="var(--text-color-status-bad)"
               icon={<InfoIcon />}
             >
-              <PrimaryText size="sm">
+              <BodyText tone="secondary" size="sm">
                 {t("duplicate_review_no_transactions_message")}
-              </PrimaryText>
+              </BodyText>
             </Alert>
           )}
         </Stack>

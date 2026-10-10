@@ -1,14 +1,11 @@
 import classes from "./DeletedTransactionsCard.module.css";
 
-import { getDaysSinceDate } from "~/helpers/datetime";
 import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText, Card } from "@teelur/budget-board-ui";
+import { getDaysSinceDate } from "~/helpers/datetime";
 import { ITransaction } from "~/models/transaction";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useRestoreTransactionMutation } from "~/hooks/mutations/transactions/useRestoreTransactionsMutation";
 
@@ -23,18 +20,18 @@ const DeletedTransactionsCard = (
   const restoreTransactionMutation = useRestoreTransactionMutation();
 
   return (
-    <Card elevation={1}>
+    <Card>
       <LoadingOverlay visible={restoreTransactionMutation.isPending} />
       <Group justify="space-between" wrap="nowrap">
         <Stack gap={0}>
-          <PrimaryText size="md">
+          <BodyText tone="primary" size="md" fw={500}>
             {props.deletedTransaction.merchantName}
-          </PrimaryText>
-          <DimmedText size="sm">
+          </BodyText>
+          <BodyText tone="secondary" size="sm">
             {t("days_since_deleted", {
               days: getDaysSinceDate(props.deletedTransaction.deleted!),
             })}
-          </DimmedText>
+          </BodyText>
         </Stack>
         <Group className={classes.buttonGroup}>
           <ActionIcon

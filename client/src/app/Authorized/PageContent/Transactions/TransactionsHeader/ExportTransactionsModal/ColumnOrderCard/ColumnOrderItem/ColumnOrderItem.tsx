@@ -1,13 +1,11 @@
 import React from "react";
 import { Flex, Group } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { BodyText, Button, Card } from "@teelur/budget-board-ui";
 import { GripVertical } from "lucide-react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import { closestCenter } from "@dnd-kit/collision";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface ColumnOrderItemProps {
   fieldKey: string;
@@ -30,14 +28,16 @@ const ColumnOrderItem = (props: ColumnOrderItemProps): React.ReactNode => {
   });
 
   return (
-    <Card ref={ref} elevation={2}>
+    <Card ref={ref}>
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         <Flex ref={handleRef} style={{ alignSelf: "stretch" }}>
           <Button variant="filled" color="primary" h="100%" px={0} w={30}>
             <GripVertical size={20} />
           </Button>
         </Flex>
-        <PrimaryText size="sm">{props.label}</PrimaryText>
+        <BodyText component="span" tone="primary" size="sm" fw={500}>
+          {props.label}
+        </BodyText>
       </Group>
     </Card>
   );

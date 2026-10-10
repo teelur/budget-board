@@ -1,5 +1,5 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, Card, HeadingText } from "@teelur/budget-board-ui";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
@@ -8,11 +8,9 @@ import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { DatesRangeValue } from "@mantine/dates";
 import { IBalanceResponse } from "~/models/balance";
 import Drawer from "~/components/core/Drawer/Drawer";
-import Card from "~/components/core/Card/Card";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useBalancesQuery } from "~/hooks/queries/useBalancesQuery";
 
 interface GoalDetailsProps {
@@ -43,9 +41,9 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       position="right"
       size="md"
       title={
-        <PrimaryHeading component="span" order={4}>
+        <HeadingText component="span" level={4}>
           {t("goal_details")}
-        </PrimaryHeading>
+        </HeadingText>
       }
     >
       {props.goal === null ? (
@@ -53,20 +51,18 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       ) : (
         <Accordion elevation={1}>
           <Accordion.Item
-            title={<PrimaryHeading order={5}>{t("accounts")}</PrimaryHeading>}
+            title={<HeadingText level={5}>{t("accounts")}</HeadingText>}
           >
             <Stack gap="0.5rem">
               {props.goal.accounts.map((account: IAccountResponse) => (
-                <Card key={account.id} elevation={2}>
+                <Card key={account.id}>
                   <AccountItem account={account} />
                 </Card>
               ))}
             </Stack>
           </Accordion.Item>
           <Accordion.Item
-            title={
-              <PrimaryHeading order={5}>{t("goal_trends")}</PrimaryHeading>
-            }
+            title={<HeadingText level={5}>{t("goal_trends")}</HeadingText>}
           >
             <Stack>
               <Group gap="0.5rem">

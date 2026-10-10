@@ -1,9 +1,12 @@
 import { hasLength, useField } from "@mantine/form";
 import { LoadingOverlay, Stack } from "@mantine/core";
-import { Button, PasswordInput } from "@teelur/budget-board-ui";
+import {
+  Button,
+  Card,
+  HeadingText,
+  PasswordInput,
+} from "@teelur/budget-board-ui";
 import React from "react";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useUpdatePasswordMutation } from "~/hooks/mutations/auth/useUpdatePasswordMutation";
 
@@ -39,29 +42,33 @@ const ResetPassword = (): React.ReactNode => {
   };
 
   return (
-    <Card elevation={1}>
-      <LoadingOverlay visible={updatePasswordMutation.isPending} />
+    <Card>
       <Stack gap="1rem">
-        <PrimaryText size="lg">{t("reset_password")}</PrimaryText>
-        <PasswordInput
-          {...oldPasswordField.getInputProps()}
-          label={t("current_password")}
-          w="100%"
-        />
-        <PasswordInput
-          {...newPasswordField.getInputProps()}
-          label={t("new_password")}
-          w="100%"
-        />
-        <PasswordInput
-          {...confirmNewPasswordField.getInputProps()}
-          label={t("confirm_new_password")}
-          w="100%"
-        />
+        <HeadingText tone="heading" level={4}>
+          {t("reset_password")}
+        </HeadingText>
+        <Stack gap="0.5rem">
+          <PasswordInput
+            {...oldPasswordField.getInputProps()}
+            label={t("current_password")}
+            w="100%"
+          />
+          <PasswordInput
+            {...newPasswordField.getInputProps()}
+            label={t("new_password")}
+            w="100%"
+          />
+          <PasswordInput
+            {...confirmNewPasswordField.getInputProps()}
+            label={t("confirm_new_password")}
+            w="100%"
+          />
+        </Stack>
         <Button
           variant="filled"
           color="primary"
           size="xs"
+          loading={updatePasswordMutation.isPending}
           onClick={() => {
             oldPasswordField.validate();
             newPasswordField.validate();

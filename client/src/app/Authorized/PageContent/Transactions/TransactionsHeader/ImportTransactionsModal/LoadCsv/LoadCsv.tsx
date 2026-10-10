@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   FileInput,
+  HeadingText,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
@@ -126,6 +127,9 @@ const LoadCsv = (props: LoadCsvProps): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem" w={600} maw="100%" mx="auto">
+      <HeadingText tone="heading" level={5}>
+        {t("load_csv")}
+      </HeadingText>
       <FileInput
         {...fileField.getInputProps()}
         accept="text/csv"

@@ -6,6 +6,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
+import { NumberInput, Select, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import {
@@ -17,7 +18,6 @@ import {
 } from "~/models/userSettings";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
-import { NumberInput, Select, TextInput } from "@teelur/budget-board-ui";
 
 const SettingsUser = (): React.ReactNode => {
   const currencyField = useField({

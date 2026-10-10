@@ -1,5 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText, Button, Card } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { PencilIcon, PlayIcon, TrashIcon } from "lucide-react";
 import React from "react";
@@ -11,8 +11,6 @@ import ConditionItem from "./ConditionItem/ConditionItem";
 import ActionItem from "./ActionItem/ActionItem";
 import EditableAutomaticRuleContent from "../EditableAutomaticRuleContent/EditableAutomaticRuleContent";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
@@ -58,7 +56,7 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
 
   if (isSelected) {
     return (
-      <Card elevation={0}>
+      <Card>
         <Stack gap="0.5rem">
           <EditableAutomaticRuleContent
             conditionItems={conditionItems}
@@ -120,34 +118,48 @@ const AutomaticRuleCard = (props: AutomaticRuleCardProps) => {
   }
 
   return (
-    <Card elevation={1}>
+    <Card>
       <Group gap={0} justify="space-between" wrap="nowrap">
         <Stack>
           <Group gap="0.25rem">
-            <DimmedText size="sm" pr="0.5rem">
+            <BodyText component="span" tone="secondary" size="sm" pr="0.5rem">
               {t("if")}
-            </DimmedText>
-            {(props.rule.conditions ?? []).map((condition) => (
-              <ConditionItem
-                key={condition.id}
-                condition={condition}
-                categories={transactionCategories}
-                currency={preferredCurrency}
-                accounts={accountsQuery.data ?? []}
-              />
+            </BodyText>
+            {(props.rule.conditions ?? []).map((condition, index) => (
+              <React.Fragment key={index}>
+                <ConditionItem
+                  key={condition.id}
+                  condition={condition}
+                  categories={transactionCategories}
+                  currency={preferredCurrency}
+                  accounts={accountsQuery.data ?? []}
+                />
+                {index < (props.rule.conditions ?? []).length - 1 && (
+                  <BodyText component="span" tone="secondary" size="sm">
+                    {t("and")}
+                  </BodyText>
+                )}
+              </React.Fragment>
             ))}
           </Group>
           <Group gap="0.25rem">
-            <DimmedText size="sm" pr="0.5rem">
+            <BodyText component="span" tone="secondary" size="sm" pr="0.5rem">
               {t("then")}
-            </DimmedText>
-            {(props.rule.actions ?? []).map((action) => (
-              <ActionItem
-                key={action.id}
-                action={action}
-                categories={transactionCategories}
-                currency={preferredCurrency}
-              />
+            </BodyText>
+            {(props.rule.actions ?? []).map((action, index) => (
+              <React.Fragment key={index}>
+                <ActionItem
+                  key={action.id}
+                  action={action}
+                  categories={transactionCategories}
+                  currency={preferredCurrency}
+                />
+                {index < (props.rule.actions ?? []).length - 1 && (
+                  <BodyText component="span" tone="secondary" size="sm">
+                    {t("and")}
+                  </BodyText>
+                )}
+              </React.Fragment>
             ))}
           </Group>
         </Stack>

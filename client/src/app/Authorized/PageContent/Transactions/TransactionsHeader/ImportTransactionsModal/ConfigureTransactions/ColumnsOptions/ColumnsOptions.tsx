@@ -1,17 +1,17 @@
 import { Divider, Group, Stack } from "@mantine/core";
 import {
   Autocomplete,
+  BodyText,
   Button,
+  Card,
   Checkbox,
+  HeadingText,
   Select,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 export const dateFormatOptions = [
   { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
@@ -121,9 +121,13 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
       <Divider label={t("columns_options")} labelPosition="center" />
       <Group gap="1rem" justify="space-between" align="stretch">
         <Stack gap="0.5rem">
-          <PrimaryText size="sm">{t("date_format")}</PrimaryText>
           <Autocomplete
-            label={t("date_format_description")}
+            label={
+              <HeadingText tone="heading" level={6}>
+                {t("date_format")}
+              </HeadingText>
+            }
+            description={t("date_format_description")}
             data={dateFormatOptions}
             {...dateFormatField.getInputProps()}
             clearable
@@ -144,8 +148,10 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
             {t("examples")}
           </Button>
         </Stack>
-        <Stack gap="0.5rem">
-          <PrimaryText size="sm">{t("amount_format")}</PrimaryText>
+        <Stack gap={0}>
+          <HeadingText tone="heading" level={6}>
+            {t("amount_format")}
+          </HeadingText>
           <Stack gap="0.25rem">
             <TextInput
               label={t("thousands_separator")}
@@ -163,7 +169,9 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
           </Stack>
         </Stack>
         <Stack gap="0.5rem">
-          <PrimaryText size="sm">{t("other_options")}</PrimaryText>
+          <HeadingText tone="heading" level={6}>
+            {t("other_options")}
+          </HeadingText>
           <Stack gap="0.5rem">
             <Checkbox
               checked={invertAmountField.getValue()}
@@ -203,15 +211,15 @@ const ColumnsOptions = (props: ColumnsOptionsProps): React.ReactNode => {
       <Group w="100%" justify="flex-end">
         {!splitAmountField.getValue() &&
           includeExpensesColumnField.getValue() && (
-            <Card elevation={1}>
+            <Card>
               <Stack gap="0.5rem">
                 <Stack gap={0}>
-                  <PrimaryText size="sm">
+                  <HeadingText tone="heading" level={6}>
                     {t("expenses_column_options")}
-                  </PrimaryText>
-                  <DimmedText size="xs">
+                  </HeadingText>
+                  <BodyText tone="secondary" size="xs">
                     {t("expenses_column_options_description")}
-                  </DimmedText>
+                  </BodyText>
                 </Stack>
                 <Group gap="0.5rem">
                   {includeExpensesColumnField.getValue() && (

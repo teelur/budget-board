@@ -71,7 +71,7 @@ const CustomCategoryCards = () => {
   return (
     <Stack gap="0.5rem">
       {groups.map((group) => (
-        <Stack key={group.parent.value} align="center" gap="0.5rem">
+        <Stack key={group.parent.value} gap="0.5rem">
           <CustomCategoryCard
             category={group.parent}
             isBuiltIn={group.isBuiltIn}
