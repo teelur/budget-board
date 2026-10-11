@@ -38,7 +38,7 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
       p="0.25rem"
       pl="1.5rem"
       data-hover-effect="true"
-      className={`${hoverClasses.hoverable} ${hoverClasses.outline}`}
+      className={`${classes.row} ${hoverClasses.hoverable} ${hoverClasses.outline}`}
       onClick={() => {
         if (props.selectedDate) {
           props.openDetails(props.category, props.selectedDate);
