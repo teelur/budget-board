@@ -1,6 +1,6 @@
 import { Group, Stack } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { BodyText } from "@teelur/budget-board-ui";
 import { ICategoryResponse } from "~/models/category";
 import CustomCategoryCard from "./CustomCategoryCard/CustomCategoryCard";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -14,7 +14,9 @@ const CustomCategoryCards = () => {
   if (customTransactionCategories.length === 0) {
     return (
       <Group justify="center" p="1rem">
-        <DimmedText size="sm">{t("no_custom_categories")}</DimmedText>
+        <BodyText tone="muted" size="sm">
+          {t("no_custom_categories")}
+        </BodyText>
       </Group>
     );
   }

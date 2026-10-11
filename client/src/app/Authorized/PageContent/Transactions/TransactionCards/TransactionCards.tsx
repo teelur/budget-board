@@ -4,7 +4,6 @@ import { ITransaction } from "~/models/transaction";
 import { Group, Skeleton, Stack } from "@mantine/core";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { InfoIcon } from "lucide-react";
 import classes from "./TransactionCards.module.css";
 import {
@@ -13,6 +12,7 @@ import {
 } from "~/helpers/transactions";
 import TransactionTransferGroup from "./TransactionTransferGroup";
 import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import { BodyText } from "@teelur/budget-board-ui";
 
 interface TransactionCardsProps {
   currentViewTransactions: ITransaction[];
@@ -108,7 +108,9 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
           ) : (
             <Group justify="center" align="center" gap="0.5rem">
               <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
-              <DimmedText size="sm">{t("no_transactions")}</DimmedText>
+              <BodyText tone="muted" size="sm">
+                {t("no_transactions")}
+              </BodyText>
             </Group>
           )}
         </div>

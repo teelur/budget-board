@@ -1,4 +1,5 @@
 import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import React from "react";
 import { IAssetIndexRequest, IAssetResponse } from "~/models/asset";
 import AssetItem from "./AssetItem/AssetItem";
@@ -6,7 +7,6 @@ import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AssetDetails from "./AssetDetails/AssetDetails";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { InfoIcon } from "lucide-react";
 import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
@@ -76,7 +76,9 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
       ) : sortedAssets.length === 0 ? (
         <Group justify="center" align="center" gap="0.5rem">
           <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
-          <DimmedText size="sm">{t("no_assets")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_assets")}
+          </BodyText>
         </Group>
       ) : (
         <DragDropProvider

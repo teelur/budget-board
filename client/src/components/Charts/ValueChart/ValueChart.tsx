@@ -1,3 +1,4 @@
+import { BodyText } from "@teelur/budget-board-ui";
 import { SignDisplay } from "~/helpers/currency";
 import { BarChart } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
@@ -5,7 +6,6 @@ import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
 import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { chartColors } from "~/helpers/charts";
@@ -72,7 +72,9 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   if (props.items?.length === 0 || props.values?.length === 0) {
     return (
       <Group justify="center" p="0.5rem">
-        <DimmedText size="sm">{t("no_data_available")}</DimmedText>
+        <BodyText tone="muted" size="sm">
+          {t("no_data_available")}
+        </BodyText>
       </Group>
     );
   }

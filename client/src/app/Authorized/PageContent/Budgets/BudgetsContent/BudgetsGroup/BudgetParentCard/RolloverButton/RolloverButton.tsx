@@ -1,11 +1,15 @@
 import { Flex, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ActionIcon, Button, HeadingText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  BodyText,
+  Button,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 import { RepeatIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Modal from "~/components/core/Modal/Modal";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import RolloverControl from "../RolloverControl/RolloverControl";
 
 interface RolloverButtonProps {
@@ -65,8 +69,12 @@ const RolloverButton = (props: RolloverButtonProps): React.ReactNode => {
       >
         <Stack gap="1rem">
           <Stack gap="0.5rem">
-            <DimmedText size="sm">{t("rollover_description")}</DimmedText>
-            <DimmedText size="sm">{t("rollover_parent_child_note")}</DimmedText>
+            <BodyText size="sm" tone="secondary">
+              {t("rollover_description")}
+            </BodyText>
+            <BodyText size="sm" tone="secondary">
+              {t("rollover_parent_child_note")}
+            </BodyText>
           </Stack>
           <RolloverControl
             rolloverStartMonth={draftStartMonth}

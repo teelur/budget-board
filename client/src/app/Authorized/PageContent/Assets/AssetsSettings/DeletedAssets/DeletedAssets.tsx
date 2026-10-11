@@ -1,7 +1,7 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedAssetCard from "./DeletedAssetCard";
 import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
 
@@ -21,7 +21,9 @@ const DeletedAssets = (): React.ReactNode => {
     if (deletedAssets.length === 0) {
       return (
         <Group justify="center">
-          <DimmedText size="sm">{t("no_deleted_assets")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_deleted_assets")}
+          </BodyText>
         </Group>
       );
     }
@@ -33,7 +35,9 @@ const DeletedAssets = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
-      <DimmedText size="sm">{t("view_and_restore_deleted_assets")}</DimmedText>
+      <BodyText tone="secondary" size="sm">
+        {t("view_and_restore_deleted_assets")}
+      </BodyText>
       {getDeletedAssetsContent()}
     </Stack>
   );

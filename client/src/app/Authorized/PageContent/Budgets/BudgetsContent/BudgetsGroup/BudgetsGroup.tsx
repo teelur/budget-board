@@ -1,4 +1,5 @@
 import { Group, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
 import React from "react";
 import { ICategoryNode } from "~/models/category";
@@ -8,7 +9,6 @@ import {
   buildCategoryToRolloverMap,
 } from "~/helpers/budgets";
 import BudgetParentCard from "./BudgetParentCard/BudgetParentCard";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { InfoIcon } from "lucide-react";
 
@@ -82,7 +82,9 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
       ) : (
         <Group justify="center" align="center" gap="0.5rem">
           <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
-          <DimmedText size="sm">{t("no_budgets")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_budgets")}
+          </BodyText>
         </Group>
       )}
     </Stack>

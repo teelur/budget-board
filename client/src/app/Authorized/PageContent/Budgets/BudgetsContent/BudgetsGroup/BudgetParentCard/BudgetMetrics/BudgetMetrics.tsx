@@ -1,14 +1,14 @@
 import classes from "./BudgetMetrics.module.css";
-import { useTranslation } from "react-i18next";
+
 import { Box, Group, Stack, Tooltip } from "@mantine/core";
-import { AmountText } from "@teelur/budget-board-ui";
+import { AmountText, BodyText } from "@teelur/budget-board-ui";
+import { useTranslation } from "react-i18next";
 import React from "react";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { Trans } from "react-i18next";
 import { StatusColorType } from "~/helpers/budgets";
 import { roundAwayFromZero } from "~/helpers/utils";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 
@@ -41,9 +41,9 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
     <Group className={classes.metrics} gap={0} align="baseline" wrap="wrap">
       {rollover !== 0 && (
         <Group gap="0.25rem" className={classes.metric}>
-          <DimmedText className={classes.inlineText} size="sm" elevation={1}>
+          <BodyText tone="secondary" size="sm" className={classes.inlineText}>
             {t("rolled_over_colon")}
-          </DimmedText>
+          </BodyText>
           <AmountText
             amount={rollover}
             size="sm"
@@ -64,14 +64,14 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
           wrap="nowrap"
         >
           <Group gap="0.25rem">
-            <DimmedText
-              className={classes.inlineText}
+            <BodyText
+              tone="secondary"
               size="sm"
+              className={classes.inlineText}
               key="label"
-              elevation={1}
             >
               {t("projected_colon")}
-            </DimmedText>
+            </BodyText>
             <AmountText
               amount={props.projectedAmount}
               size="sm"
@@ -113,11 +113,11 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
                     intlLocale,
                   )}
                 </AmountText>,
-                <DimmedText
-                  className={classes.inlineText}
+                <BodyText
+                  tone="secondary"
                   size="sm"
+                  className={classes.inlineText}
                   key="label"
-                  elevation={1}
                 />,
               ]}
             />
@@ -173,11 +173,11 @@ const BudgetMetrics = (props: BudgetMetricsProps): React.ReactNode => {
                   intlLocale,
                 )}
               </AmountText>,
-              <DimmedText
+              <BodyText
+                tone="secondary"
                 className={classes.inlineText}
                 size="sm"
                 key="label"
-                elevation={1}
               />,
             ]}
           />

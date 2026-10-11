@@ -1,6 +1,6 @@
 import { Group, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import SimpleFinOrganizationCard from "./SimpleFinOrganizationCard/SimpleFinOrganizationCard";
 import { useSimpleFinOrganizationsQuery } from "~/hooks/queries/useSimpleFinOrganizationsQuery";
 
@@ -20,7 +20,9 @@ const SimpleFinOrganizationCards = (): React.ReactNode => {
         ))
       ) : (
         <Group justify="center">
-          <DimmedText size="sm">{t("no_simplefin_accounts_found")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_simplefin_accounts_found")}
+          </BodyText>
         </Group>
       )}
     </Stack>

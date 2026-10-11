@@ -1,7 +1,8 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
+
 import React from "react";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DeletedAccountCard from "./DeletedAccountCard";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 
@@ -22,7 +23,9 @@ const DeletedAccounts = (): React.ReactNode => {
     if (deletedAccounts.length === 0) {
       return (
         <Group justify="center">
-          <DimmedText size="sm">{t("no_deleted_accounts")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_deleted_accounts")}
+          </BodyText>
         </Group>
       );
     }
@@ -42,9 +45,9 @@ const DeletedAccounts = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
-      <DimmedText size="sm">
+      <BodyText tone="secondary" size="sm">
         {t("view_and_restore_deleted_accounts")}
-      </DimmedText>
+      </BodyText>
       {getDeletedAccountsContent()}
     </Stack>
   );

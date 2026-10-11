@@ -1,10 +1,10 @@
 import classes from "./SortMenu.module.css";
 
-import SortButton, { SortDirection } from "~/components/SortButton";
 import { Flex, Group } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
+import SortButton, { SortDirection } from "~/components/SortButton";
 import React from "react";
 import { SortOption, Sorts } from "./SortMenuHelpers";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 
 interface SortMenuProps {
@@ -54,7 +54,9 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
       direction={{ base: "column", sm: "row" }}
       align={{ base: "start", sm: "center" }}
     >
-      <DimmedText size="sm">{t("sort_by")}</DimmedText>
+      <BodyText tone="secondary" size="sm" fw={500}>
+        {t("sort_by")}
+      </BodyText>
       <Group gap="0.5rem">
         {SortOptions.map((sortOption: SortOption) => (
           <SortButton

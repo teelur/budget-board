@@ -3,7 +3,6 @@ import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import WidgetErrorMessage from "~/components/ui/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import {
   buildDataRequirements,
   hasCurrencyMetric,

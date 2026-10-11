@@ -3,7 +3,6 @@ import { BodyText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import DisconnectOidcContent from "./DisconnectOidcContent.tsx/DisconnectOidcContent";
 import ConnectOidcContent from "./ConnectOidcContent/ConnectOidcContent";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
