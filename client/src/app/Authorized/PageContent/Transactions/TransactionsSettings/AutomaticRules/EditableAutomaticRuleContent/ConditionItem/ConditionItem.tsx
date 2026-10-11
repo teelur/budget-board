@@ -1,6 +1,7 @@
 import { ComboboxItem, Group } from "@mantine/core";
 import {
   ActionIcon,
+  Card,
   CategorySelect,
   DateInput,
   NumberInput,
@@ -19,7 +20,6 @@ import {
   OperatorTypes,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
-import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
@@ -32,6 +32,7 @@ export interface ConditionItemProps {
   doDelete?: (index: number) => void;
   index: number;
   categories: ICategory[];
+  surface?: "sunken" | "default";
 }
 
 const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
@@ -127,7 +128,7 @@ const ConditionItem = (props: ConditionItemProps): React.ReactNode => {
   };
 
   return (
-    <Card elevation={1}>
+    <Card surface={props.surface ?? "default"}>
       <Group gap="0.5rem">
         <Select
           data={ConditionTransactionFields.map((i) => ({

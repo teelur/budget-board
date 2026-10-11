@@ -2,18 +2,18 @@ import { Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
+  BodyText,
+  Button,
   CategorySelect,
   DateInput,
   NumberInput,
   TextInput,
 } from "@teelur/budget-board-ui";
-import { Button } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { IAssetResponse, IAssetUpdateRequest } from "~/models/asset";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -234,13 +234,13 @@ const EditableAssetItemContent = (
               />
             </Group>
           </Group>
-          <DimmedText size="sm">
+          <BodyText tone="secondary" size="sm">
             {t("last_updated", {
               date: dayjs(props.asset.valueDate).isValid()
                 ? dayjs(props.asset.valueDate).format(`${dateFormat}`)
                 : t("never"),
             })}
-          </DimmedText>
+          </BodyText>
         </Group>
       </Stack>
       <Group style={{ alignSelf: "stretch" }}>

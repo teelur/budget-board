@@ -1,36 +1,6 @@
-.transferGroup {
-  width: 100%;
-  min-width: 0;
-  padding: 0.25rem;
-  border: 1px solid var(--base-color-border);
-  border-radius: var(--mantine-radius-md);
-  background-color: var(--background-color-base);
-}
-
-.summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-width: 0;
-  padding: 0.25rem 0.35rem 0.4rem;
-}
-
-.summaryMain {
-  min-width: 0;
-}
-
 .transferIcon {
   flex-shrink: 0;
-  color: var(--mantine-primary-color-filled);
-}
-
-.summaryContent {
-  min-width: 0;
-}
-
-.accountSummary {
-  min-width: 0;
+  color: var(--bbui-color-primary);
 }
 
 .accountName {

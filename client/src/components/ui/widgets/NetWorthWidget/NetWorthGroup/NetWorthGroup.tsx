@@ -33,7 +33,7 @@ const NetWorthGroup = ({
     );
 
   return (
-    <Stack px="0.5rem" gap={0} justify="center">
+    <Stack gap={0} justify="center">
       {sortedLines.map((line: INetWorthWidgetLine) => (
         <NetWorthItem
           key={line.id}

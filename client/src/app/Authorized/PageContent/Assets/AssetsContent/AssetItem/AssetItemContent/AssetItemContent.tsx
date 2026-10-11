@@ -1,5 +1,10 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  Badge,
+  AmountText,
+  BodyText,
+} from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import React from "react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -7,8 +12,6 @@ import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvi
 import { SignDisplay } from "~/helpers/currency";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { IAssetResponse } from "~/models/asset";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -29,7 +32,11 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
 
   const getAssetTypeDisplay = (): React.ReactNode => {
     if (!props.asset.type || props.asset.type.length === 0) {
-      return <DimmedText size="sm">{t("no_type")}</DimmedText>;
+      return (
+        <BodyText tone="secondary" size="sm">
+          {t("no_type")}
+        </BodyText>
+      );
     }
 
     const isParentAssetType = getIsParentAssetType(
@@ -43,11 +50,15 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
 
     return (
       <Group gap="0.25rem">
-        <DimmedText size="sm">{assetType}</DimmedText>
+        <BodyText tone="primary" size="sm">
+          {assetType}
+        </BodyText>
         {!isParentAssetType && (
           <>
             <ChevronRightIcon size={14} />
-            <DimmedText size="sm">{props.asset.type}</DimmedText>
+            <BodyText tone="secondary" size="sm">
+              {props.asset.type}
+            </BodyText>
           </>
         )}
       </Group>
@@ -58,7 +69,9 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
         <Group gap="0.5rem" align="center">
-          <PrimaryText size="md">{props.asset.name}</PrimaryText>
+          <BodyText tone="primary" size="md" fw={500}>
+            {props.asset.name}
+          </BodyText>
           <ActionIcon
             variant="ghost"
             color="primary"
@@ -93,10 +106,12 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
       <Group justify="space-between" align="center">
         <Group gap="0.5rem">
           {getAssetTypeDisplay()}
-          <DimmedText size="sm">·</DimmedText>
+          <BodyText tone="secondary" size="sm">
+            ·
+          </BodyText>
           {dayjs(props.asset.purchaseDate).isValid() &&
           props.asset.purchasePrice ? (
-            <DimmedText size="sm">
+            <BodyText tone="secondary" size="sm">
               {t("purchased_on_for", {
                 date: dayjs(props.asset.purchaseDate).format(dateFormat),
                 price: formatSensitiveAmount(
@@ -104,18 +119,20 @@ const AssetItemContent = (props: AssetItemContentProps): React.ReactNode => {
                   SignDisplay.Auto,
                 ),
               })}
-            </DimmedText>
+            </BodyText>
           ) : (
-            <DimmedText size="sm">{t("no_purchase_info_available")}</DimmedText>
+            <BodyText tone="muted" size="sm">
+              {t("no_purchase_info_available")}
+            </BodyText>
           )}
         </Group>
-        <DimmedText size="sm">
+        <BodyText tone="secondary" size="sm">
           {t("last_updated", {
             date: dayjs(props.asset.valueDate).isValid()
               ? dayjs(props.asset.valueDate).format(`${dateFormat}`)
               : t("never"),
           })}
-        </DimmedText>
+        </BodyText>
       </Group>
     </Stack>
   );

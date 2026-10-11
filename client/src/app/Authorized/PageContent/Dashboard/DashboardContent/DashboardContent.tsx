@@ -8,7 +8,6 @@ import {
   ResponsiveGridLayout,
   useContainerWidth,
 } from "react-grid-layout";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import AccountsWidget from "~/components/ui/widgets/AccountsWidget/AccountsWidget";
 import NetWorthWidget from "~/components/ui/widgets/NetWorthWidget/NetWorthWidget";
 import WidgetShell from "~/components/ui/widgets/shared/WidgetShell/WidgetShell";
@@ -28,6 +27,7 @@ import FlowsWidget from "~/components/ui/widgets/FlowsWidget/FlowsWidget";
 import { useTranslation } from "react-i18next";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
+import { BodyText } from "@teelur/budget-board-ui";
 
 const SKELETON_COUNT = 4;
 const SM_PREVIEW_WIDTH = 500;
@@ -173,8 +173,10 @@ const DashboardContent = ({
         </Stack>
       ) : showEmptyMessage ? (
         <Group justify="center" align="center" gap="0.5rem" w="100%">
-          <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
-          <DimmedText size="sm">{t("no_widgets")}</DimmedText>
+          <InfoIcon size={20} color="var(--bbui-color-text-muted)" />
+          <BodyText tone="muted" size="sm">
+            {t("no_widgets")}
+          </BodyText>
         </Group>
       ) : (
         <Box w={isEditingSmOnDesktop ? SM_PREVIEW_WIDTH : "100%"}>

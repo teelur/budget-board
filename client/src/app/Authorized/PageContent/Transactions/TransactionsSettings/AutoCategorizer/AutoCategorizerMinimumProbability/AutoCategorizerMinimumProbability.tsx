@@ -1,10 +1,8 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
+import { BodyText, NumberInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import { NumberInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
@@ -25,14 +23,14 @@ const AutoCategorizerMinimumProbability = (): React.ReactNode => {
   }, [autoCategorizerMinimumProbabilityPercentage]);
 
   return (
-    <Stack gap="0.25rem">
+    <Stack gap={0}>
       <LoadingOverlay visible={updateUserSettingsMutation.isPending} />
-      <PrimaryText size="md">
+      <BodyText tone="primary" size="md" fw={500}>
         {t("auto_categorizer_minimum_probability")}
-      </PrimaryText>
-      <DimmedText size="sm">
+      </BodyText>
+      <BodyText tone="secondary" size="sm">
         {t("auto_categorizer_minimum_probability_description")}
-      </DimmedText>
+      </BodyText>
       <NumberInput
         {...minimumProbabilityField.getInputProps()}
         onBlur={() =>

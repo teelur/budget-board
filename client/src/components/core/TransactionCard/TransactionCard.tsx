@@ -1,34 +1,29 @@
-import classes from "./TransactionCardBase.module.css";
+import classes from "./TransactionCard.module.css";
 
 import { Collapse, Group } from "@mantine/core";
-import { ActionIcon, Checkbox } from "@teelur/budget-board-ui";
+import { ActionIcon, Card, CardProps, Checkbox } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";
 import TransactionCardContent from "./TransactionCardContent/TransactionCardContent";
 import TransactionCardDetails from "./TransactionCardDetails/TransactionCardDetails";
-import Card, { CardProps } from "../../Card";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-const hoverOpenDelay = 300;
+const hoverOpenDelay = 400;
 
-export interface TransactionCardBaseProps extends CardProps {
+export interface TransactionCardProps extends CardProps {
   transaction: ITransaction;
   categories: ICategory[];
-  elevation?: number;
-  isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
 }
 
-const TransactionCardBase = ({
+const TransactionCard = ({
   transaction,
   categories,
-  elevation,
-  isSelected,
   onToggleSelect,
   ...cardProps
-}: TransactionCardBaseProps): React.ReactNode => {
+}: TransactionCardProps): React.ReactNode => {
   const { t } = useTranslation();
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);
@@ -36,8 +31,8 @@ const TransactionCardBase = ({
     null,
   );
   const selectionMode = onToggleSelect !== undefined;
-  const hoverEffect = cardProps.hoverEffect ?? selectionMode;
-  const isDetailsExpanded = isDetailsOpen || (hoverEffect && isHovered);
+  const hoverable = cardProps.hoverable ?? selectionMode;
+  const isDetailsExpanded = isDetailsOpen || (hoverable && isHovered);
   const detailsId = React.useId();
 
   React.useEffect(() => {
@@ -58,7 +53,6 @@ const TransactionCardBase = ({
       <TransactionCardContent
         transaction={transaction}
         categories={categories}
-        elevation={elevation ?? 0}
       />
     </div>
   );
@@ -87,7 +81,7 @@ const TransactionCardBase = ({
   return (
     <div
       onMouseEnter={() => {
-        if (!hoverEffect) {
+        if (!hoverable) {
           return;
         }
 
@@ -101,7 +95,7 @@ const TransactionCardBase = ({
         }, hoverOpenDelay);
       }}
       onMouseLeave={() => {
-        if (!hoverEffect) {
+        if (!hoverable) {
           return;
         }
 
@@ -121,16 +115,13 @@ const TransactionCardBase = ({
         onClick={
           selectionMode ? () => onToggleSelect!(transaction.id) : undefined
         }
-        hoverEffect={hoverEffect}
-        elevation={elevation ?? 0}
-        className={cardProps.className}
-        data-selection-mode={selectionMode ? "true" : undefined}
+        hoverable={hoverable}
       >
         {selectionMode ? (
-          <div className={classes.header}>
+          <Group gap="0.5rem" wrap="nowrap">
             <Group
               className={classes.selectionGroup}
-              data-selected={isSelected ? "true" : "false"}
+              data-selected={cardProps.selected ? "true" : "false"}
               wrap="nowrap"
               gap="0.5rem"
               align="center"
@@ -138,7 +129,7 @@ const TransactionCardBase = ({
               <div className={classes.checkboxWrapper}>
                 <Checkbox
                   size="xs"
-                  checked={isSelected ?? false}
+                  checked={cardProps.selected ?? false}
                   onChange={() => onToggleSelect!(transaction.id)}
                   onClick={(event) => event.stopPropagation()}
                 />
@@ -146,22 +137,19 @@ const TransactionCardBase = ({
               {transactionContent}
             </Group>
             {detailsToggle}
-          </div>
+          </Group>
         ) : (
-          <div className={classes.header}>
+          <Group gap="0.5rem">
             {transactionContent}
             {detailsToggle}
-          </div>
+          </Group>
         )}
         <Collapse id={detailsId} expanded={isDetailsExpanded}>
-          <TransactionCardDetails
-            transaction={transaction}
-            elevation={elevation ?? 0}
-          />
+          <TransactionCardDetails transaction={transaction} />
         </Collapse>
       </Card>
     </div>
   );
 };
 
-export default TransactionCardBase;
+export default TransactionCard;

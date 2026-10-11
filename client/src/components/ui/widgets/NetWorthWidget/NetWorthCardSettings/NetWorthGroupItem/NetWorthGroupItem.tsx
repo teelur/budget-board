@@ -1,6 +1,5 @@
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
-import Card from "~/components/core/Card/Card";
+import { ActionIcon, BodyText, Button, Card } from "@teelur/budget-board-ui";
 import {
   INetWorthWidgetGroup,
   INetWorthWidgetLine,
@@ -21,7 +20,6 @@ import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import { closestCorners } from "@dnd-kit/collision";
 import { useCreateNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useCreateNetWorthWidgetLineMutation";
 import { useReorderNetWorthWidgetLineMutation } from "~/hooks/mutations/netWorthWidgetLine/useReorderNetWorthWidgetLineMutation";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 
 export interface NetWorthGroupItemProps {
@@ -80,7 +78,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
   });
 
   return (
-    <Card ref={props.isSortable ? ref : undefined} elevation={0}>
+    <Card ref={props.isSortable ? ref : undefined}>
       <LoadingOverlay visible={reorderNetWorthWidgetLineMutation.isPending} />
       <Group gap="0.5rem">
         {props.isSortable && (
@@ -141,9 +139,9 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
                   />
                 ))
               ) : (
-                <DimmedText size="sm" ta="center">
+                <BodyText tone="secondary" size="sm" ta="center">
                   {t("no_lines_found")}
-                </DimmedText>
+                </BodyText>
               )}
             </Stack>
           </DragDropProvider>

@@ -1,4 +1,4 @@
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { ActionIcon, DateInput, NumberInput } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -49,9 +49,6 @@ const EditableValueItemContent = (
 
   return (
     <Group w="100%" gap="0.5rem" wrap="nowrap" align="flex-start">
-      <LoadingOverlay
-        visible={updateValueMutation.isPending || deleteValueMutation.isPending}
-      />
       <Stack w="100%">
         <DateInput
           {...valueDateField.getInputProps()}
@@ -94,6 +91,7 @@ const EditableValueItemContent = (
           color="primary"
           size="sm"
           h="100%"
+          loading={updateValueMutation.isPending}
           onClick={(e) => {
             e.stopPropagation();
             props.doUnSelect();
@@ -106,6 +104,7 @@ const EditableValueItemContent = (
           color="error"
           size="sm"
           h="100%"
+          loading={deleteValueMutation.isPending}
           onClick={() => deleteValueMutation.mutate(props.value.id)}
         >
           <Trash2Icon size={16} />

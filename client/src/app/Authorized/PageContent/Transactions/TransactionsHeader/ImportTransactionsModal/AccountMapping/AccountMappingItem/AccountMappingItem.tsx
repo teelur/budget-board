@@ -3,9 +3,8 @@ import { ArrowRightIcon } from "lucide-react";
 import React from "react";
 import { IAccountItem } from "../AccountMapping";
 import { useField } from "@mantine/form";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import { Select } from "@teelur/budget-board-ui";
+import { BodyText, Select } from "@teelur/budget-board-ui";
 
 interface AccountMappingItemProps {
   accountName: string;
@@ -34,7 +33,9 @@ const AccountMappingItem = (
   return (
     <Grid w="100%" align="center">
       <Grid.Col span={4}>
-        <PrimaryText size="md">{props.accountName}</PrimaryText>
+        <BodyText tone="primary" size="md" fw={500}>
+          {props.accountName}
+        </BodyText>
       </Grid.Col>
       <Grid.Col span={3}>
         <Flex justify="center" align="center">

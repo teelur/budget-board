@@ -1,30 +1,65 @@
-import { Tabs } from "@mantine/core";
-import ValuesTab from "./ValuesTab/ValuesTab";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import Card from "~/components/core/Card/Card";
-import { useTranslation } from "react-i18next";
+import { Stack } from "@mantine/core";
+import React from "react";
+import { mantineDateFormat } from "~/helpers/datetime";
+import AccountsSelectHeader from "~/components/AccountsSelectHeader/AccountsSelectHeader";
+import ValueChart from "~/components/Charts/ValueChart/ValueChart";
+import { AccountTypeClassification } from "~/models/account";
+import { DatesRangeValue } from "@mantine/dates";
+import { IItem } from "~/components/Charts/ValueChart/helpers/valueChart";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
+import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
+import { useBalancesQuery } from "~/hooks/queries/useBalancesQuery";
 
 const AssetsTab = (): React.ReactNode => {
-  const { t } = useTranslation();
+  const { dayjs } = useLocale();
+  const { allAccountTypes } = useAccountTypes();
+
+  const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>(
+    [],
+  );
+  const [dateRange, setDateRange] = React.useState<DatesRangeValue<string>>([
+    dayjs().subtract(1, "month").format(mantineDateFormat),
+    dayjs().format(mantineDateFormat),
+  ]);
+
+  const balancesQuery = useBalancesQuery({
+    accountIds: selectedAccountIds,
+    enabled: selectedAccountIds.length > 0,
+  });
+  const accountsQuery = useAccountsQuery();
+
+  const assetAccountTypes = allAccountTypes
+    .filter((type) => type.classification === AccountTypeClassification.Asset)
+    .map((type) => type.value);
 
   return (
-    <Card mt="0.5rem" elevation={1}>
-      <Tabs
-        variant="pills"
-        defaultValue="values"
-        keepMounted={false}
-        radius="md"
-      >
-        <Tabs.List grow>
-          <Tabs.Tab value="values">
-            <PrimaryText size="sm">{t("values")}</PrimaryText>
-          </Tabs.Tab>
-        </Tabs.List>
-        <Tabs.Panel value="values">
-          <ValuesTab />
-        </Tabs.Panel>
-      </Tabs>
-    </Card>
+    <Stack p="0.5rem">
+      <AccountsSelectHeader
+        selectedAccountIds={selectedAccountIds}
+        setSelectedAccountIds={setSelectedAccountIds}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        filters={assetAccountTypes}
+      />
+      <ValueChart
+        values={(balancesQuery.data ?? []).map((balance) => ({
+          ...balance,
+          parentId: balance.accountID || "",
+        }))}
+        items={(accountsQuery.data ?? [])
+          .filter((a) => selectedAccountIds.includes(a.id))
+          .map(
+            (account) =>
+              ({
+                id: account.id,
+                name: account.name,
+              }) as IItem,
+          )}
+        dateRange={dateRange}
+        isPending={balancesQuery.isPending || accountsQuery.isPending}
+      />
+    </Stack>
   );
 };
 

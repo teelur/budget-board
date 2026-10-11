@@ -1,4 +1,5 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { IGoalResponse } from "~/models/goal";
 import { AxiosError } from "axios";
@@ -9,7 +10,6 @@ import { NotificationType, showNotification } from "~/helpers/notifications";
 import { translateAxiosError } from "~/helpers/requests";
 import CompletedGoalsAccordion from "./CompletedGoalsAccordion/CompletedGoalsAccordion";
 import GoalDetails from "./GoalDetails/GoalDetails";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { InfoIcon } from "lucide-react";
 import { useGoalsQuery } from "~/hooks/queries/useGoalsQuery";
@@ -70,8 +70,10 @@ const Goals = (): React.ReactNode => {
           <Skeleton h={100} w="100%" radius="lg" />
         ) : activeGoals.length === 0 ? (
           <Group justify="center" align="center" gap="0.5rem">
-            <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
-            <DimmedText size="sm">{t("no_goals")}</DimmedText>
+            <InfoIcon size={20} color="var(--bbui-color-text-muted)" />
+            <BodyText tone="muted" size="sm">
+              {t("no_goals")}
+            </BodyText>
           </Group>
         ) : (
           activeGoals.map((goal: IGoalResponse) => (

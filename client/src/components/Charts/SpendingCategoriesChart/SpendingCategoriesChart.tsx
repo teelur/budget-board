@@ -20,11 +20,10 @@ import { SignDisplay } from "~/helpers/currency";
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
 import SpendingCategoriesTooltip from "./SpendingCategoriesTooltip/SpendingCategoriesTooltip";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { areStringsEqual } from "~/helpers/utils";
 import { CategoryTypes } from "~/models/category";
+import { BodyText } from "@teelur/budget-board-ui";
 
 interface SpendingChartProps {
   transactions: ITransaction[];
@@ -249,9 +248,9 @@ const SpendingCategoriesChart = (
   if (props.transactions.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="sm">
+        <BodyText tone="muted" size="sm">
           {t("select_an_account_to_display_the_chart")}
-        </DimmedText>
+        </BodyText>
       </Group>
     );
   }
@@ -341,26 +340,20 @@ const SpendingCategoriesChart = (
                     flexShrink: 0,
                   }}
                 />
-                <span
-                  style={{
-                    color: "var(--base-color-text-dimmed)",
-                    fontWeight: 600,
-                    fontSize: "0.875rem",
-                  }}
-                >
+                <BodyText tone="secondary" size="sm" fw={500}>
                   {entry.name}
-                </span>
+                </BodyText>
               </div>
             ),
           )}
         </div>
       )}
-      <DimmedText ta="center" size="sm">
+      <BodyText tone="secondary" size="sm" ta="center">
         {t("total_spending")}:{" "}
-        <PrimaryText span fw={600}>
+        <BodyText span tone="primary" fw={500}>
           {formatValue(totalSpending)}
-        </PrimaryText>
-      </DimmedText>
+        </BodyText>
+      </BodyText>
     </Stack>
   );
 };

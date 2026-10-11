@@ -1,5 +1,10 @@
 import { Affix, FloatingWindow, Group, Stack, Transition } from "@mantine/core";
-import { Button, Progress } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  HeadingText,
+  Progress,
+} from "@teelur/budget-board-ui";
 import type { SetFloatingWindowPosition } from "@mantine/hooks";
 import {
   BanIcon,
@@ -12,8 +17,6 @@ import {
 } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { transactionImportJobTerminalStatuses } from "~/hooks/queries/useTransactionImportJobQuery";
 import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
 import classes from "./TransactionImportJobPanel.module.css";
@@ -154,10 +157,12 @@ const TransactionImportJobPanel = () => {
                 wrap="nowrap"
               >
                 <Stack gap={0}>
-                  <PrimaryHeading order={5}>
+                  <HeadingText tone="heading" level={5}>
                     {t("import_transactions")}
-                  </PrimaryHeading>
-                  <PrimaryText size="sm">{statusMessage}</PrimaryText>
+                  </HeadingText>
+                  <BodyText tone="secondary" size="sm">
+                    {statusMessage}
+                  </BodyText>
                 </Stack>
                 <Group gap={4} wrap="nowrap">
                   {isTerminal && (
@@ -200,16 +205,16 @@ const TransactionImportJobPanel = () => {
                     striped={!isTerminal && !isCancellationRequested}
                     ariaLabel={statusMessage}
                   />
-                  <PrimaryText size="sm">
+                  <BodyText tone="secondary" size="sm">
                     {t("import_progress", {
                       processed: job?.processedCount ?? 0,
                       total: job?.totalCount ?? 0,
                     })}
-                  </PrimaryText>
+                  </BodyText>
                   {job?.errorMessage ? (
-                    <PrimaryText size="sm" c="red">
+                    <BodyText tone="secondary" size="sm" c="red">
                       {job.errorMessage}
-                    </PrimaryText>
+                    </BodyText>
                   ) : null}
                 </>
               )}
@@ -228,9 +233,9 @@ const TransactionImportJobPanel = () => {
               )}
               {activeJobId && !isTerminal && isConfirmingCancel && (
                 <Stack gap="xs">
-                  <PrimaryText size="sm">
+                  <BodyText tone="secondary" size="sm">
                     {t("confirm_stop_import_message")}
-                  </PrimaryText>
+                  </BodyText>
                   <Group gap="0.5rem">
                     <Button
                       variant="filled"

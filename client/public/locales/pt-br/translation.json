@@ -223,7 +223,6 @@
   "fields": "Campos",
   "file_must_be_csv_message": "O arquivo deve ser um CSV. Recebido {{fileName}} ({{fileType}}).",
   "filter_duplicates": "Filtrar duplicadas",
-  "filter_duplicates_description": "Remova transações duplicadas com base nas colunas selecionadas.",
   "filters": "Filtros",
   "fix_parent_budgets": "Corrigir orçamentos pai",
   "force_sync_lookback_period": "Período retroativo de sincronização forçada",

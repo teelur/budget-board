@@ -1,13 +1,11 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { BodyText, Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
 import Drawer from "~/components/core/Drawer/Drawer";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -16,7 +14,6 @@ import {
   getParentAccountType,
 } from "~/helpers/accountType";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useBalancesQuery } from "~/hooks/queries/useBalancesQuery";
 
 interface AccountDetailsProps {
@@ -52,9 +49,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       position="right"
       size="md"
       title={
-        <PrimaryHeading component="span" order={4}>
+        <HeadingText tone="heading" level={4}>
           {t("account_details")}
-        </PrimaryHeading>
+        </HeadingText>
       }
     >
       {!props.account ? (
@@ -63,33 +60,35 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
         <Stack gap="1rem">
           <Group justify="space-between" align="center">
             <Stack gap={0}>
-              <DimmedText size="xs">{t("account_name")}</DimmedText>
-              <PrimaryText size="lg">{props.account.name}</PrimaryText>
+              <BodyText tone="secondary" size="xs">
+                {t("account_name")}
+              </BodyText>
+              <BodyText tone="primary" size="lg" fw={500}>
+                {props.account.name}
+              </BodyText>
             </Stack>
             <Stack gap={0}>
-              <DimmedText size="xs">{t("account_type")}</DimmedText>
-              <PrimaryText size="lg">
+              <BodyText tone="secondary" size="xs">
+                {t("account_type")}
+              </BodyText>
+              <BodyText tone="primary" size="lg" fw={500}>
                 {props.account.type ? props.account.type : t("no_type")}
-              </PrimaryText>
+              </BodyText>
               {!getIsParentAccountType(props.account.type, allAccountTypes) && (
-                <DimmedText size="xs">
+                <BodyText tone="secondary" size="xs">
                   {getParentAccountType(props.account.type, allAccountTypes)}
-                </DimmedText>
+                </BodyText>
               )}
             </Stack>
           </Group>
           <Accordion elevation={1}>
             <Accordion.Item
-              title={
-                <PrimaryHeading order={5}>{t("add_balance")}</PrimaryHeading>
-              }
+              title={<HeadingText level={5}>{t("add_balance")}</HeadingText>}
             >
               <AddBalance accountId={props.account.id} />
             </Accordion.Item>
             <Accordion.Item
-              title={
-                <PrimaryHeading order={5}>{t("account_trends")}</PrimaryHeading>
-              }
+              title={<HeadingText level={5}>{t("account_trends")}</HeadingText>}
             >
               <Group gap="0.5rem">
                 <Button
@@ -139,9 +138,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
             </Accordion.Item>
             <Accordion.Item
               title={
-                <PrimaryHeading order={5}>
-                  {t("recent_balances")}
-                </PrimaryHeading>
+                <HeadingText level={5}>{t("recent_balances")}</HeadingText>
               }
             >
               <Stack gap="0.5rem">
@@ -150,7 +147,9 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                 )}
                 {sortedBalances.length === 0 ? (
                   <Group justify="center">
-                    <DimmedText size="sm">{t("no_balance_entries")}</DimmedText>
+                    <BodyText tone="muted" size="sm">
+                      {t("no_balance_entries")}
+                    </BodyText>
                   </Group>
                 ) : (
                   <BalanceItems balances={sortedBalances} />

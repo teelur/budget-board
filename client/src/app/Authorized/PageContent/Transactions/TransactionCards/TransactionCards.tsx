@@ -4,8 +4,6 @@ import { ITransaction } from "~/models/transaction";
 import { Group, Skeleton, Stack } from "@mantine/core";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
-import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { InfoIcon } from "lucide-react";
 import classes from "./TransactionCards.module.css";
 import {
@@ -13,6 +11,8 @@ import {
   TransactionDisplayItem,
 } from "~/helpers/transactions";
 import TransactionTransferGroup from "./TransactionTransferGroup";
+import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import { BodyText } from "@teelur/budget-board-ui";
 
 interface TransactionCardsProps {
   currentViewTransactions: ITransaction[];
@@ -97,8 +97,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
                       <TransactionCard
                         transaction={transaction}
                         categories={allTransactionCategories}
-                        elevation={1}
-                        isSelected={props.selectedIds.has(transaction.id)}
+                        selected={props.selectedIds.has(transaction.id)}
                         onToggleSelect={props.onToggleSelect}
                       />
                     )}
@@ -108,8 +107,10 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
             </div>
           ) : (
             <Group justify="center" align="center" gap="0.5rem">
-              <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
-              <DimmedText size="sm">{t("no_transactions")}</DimmedText>
+              <InfoIcon size={20} color="var(--bbui-color-text-muted)" />
+              <BodyText tone="muted" size="sm">
+                {t("no_transactions")}
+              </BodyText>
             </Group>
           )}
         </div>

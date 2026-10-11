@@ -1,4 +1,5 @@
 import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import React from "react";
 import { IInstitution, InstitutionIndexRequest } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
@@ -7,7 +8,6 @@ import { move } from "@dnd-kit/helpers";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import AccountDetails from "./AccountDetails/AccountDetails";
 import { IAccountResponse } from "~/models/account";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { InfoIcon } from "lucide-react";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
@@ -80,8 +80,10 @@ const AccountsContent = (props: AccountsContentProps) => {
         </>
       ) : sortedInstitutions.length === 0 ? (
         <Group justify="center" align="center" gap="0.5rem">
-          <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
-          <DimmedText size="sm">{t("no_institutions")}</DimmedText>
+          <InfoIcon size={20} color="var(--bbui-color-text-muted)" />
+          <BodyText tone="muted" size="sm">
+            {t("no_institutions")}
+          </BodyText>
         </Group>
       ) : (
         <DragDropProvider

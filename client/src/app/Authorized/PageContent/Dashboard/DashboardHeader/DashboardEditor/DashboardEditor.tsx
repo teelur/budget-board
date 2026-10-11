@@ -1,10 +1,9 @@
 import { Group, Stack, Popover as MantinePopover } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { BodyText, Button } from "@teelur/budget-board-ui";
 import { PlusIcon, RotateCcwIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useDeleteWidgetSettingsMutation";
 import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useResetSmallScreenLayoutMutation";
 import { useResetToDefaultMutation } from "~/hooks/mutations/widgetSettings/useResetToDefaultMutation";
@@ -78,7 +77,9 @@ const DashboardEditor = ({
         </MantinePopover.Target>
         <MantinePopover.Dropdown maw={350}>
           <Stack gap={10}>
-            <PrimaryText size="xs">{t("reset_dashboard_warning")}</PrimaryText>
+            <BodyText tone="primary" size="xs">
+              {t("reset_dashboard_warning")}
+            </BodyText>
             <Group gap="xs" justify="flex-end">
               <Button
                 variant="filled"
@@ -122,7 +123,9 @@ const DashboardEditor = ({
         </MantinePopover.Target>
         <MantinePopover.Dropdown maw={350}>
           <Stack gap={10}>
-            <PrimaryText size="xs">{t("clear_dashboard_warning")}</PrimaryText>
+            <BodyText tone="primary" size="xs">
+              {t("clear_dashboard_warning")}
+            </BodyText>
             <Group gap="xs" justify="flex-end">
               <Button
                 variant="filled"

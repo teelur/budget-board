@@ -1,11 +1,20 @@
 import classes from "./Trends.module.css";
 
 import { Box, Group, Stack } from "@mantine/core";
+import {
+  ArrowRightLeftIcon,
+  ChartLineIcon,
+  CreditCardIcon,
+  GitBranchIcon,
+  LandmarkIcon,
+  LineChartIcon,
+  TagsIcon,
+  TrendingUpIcon,
+} from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import NavLink from "~/components/ui/SettingsNavLink/SettingsNavLink";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
+import { BodyText, NavbarLink } from "@teelur/budget-board-ui";
 
 const Trends = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -15,6 +24,64 @@ const Trends = (): React.ReactNode => {
   const navigateToTrend = (path: string) => {
     navigate(path);
   };
+
+  const navbarLinkSections = [
+    {
+      label: t("transactions"),
+      links: [
+        {
+          label: t("spending"),
+          path: "spending",
+          icon: <LineChartIcon color="currentColor" />,
+        },
+        {
+          label: t("spending_categories"),
+          path: "spending-categories",
+          icon: <TagsIcon color="currentColor" />,
+        },
+        {
+          label: t("net_cash_flow"),
+          path: "net-cash-flow",
+          icon: <ArrowRightLeftIcon color="currentColor" />,
+        },
+        {
+          label: t("flows"),
+          path: "flows",
+          icon: <GitBranchIcon color="currentColor" />,
+        },
+      ],
+    },
+    {
+      label: t("accounts"),
+      links: [
+        {
+          label: t("assets"),
+          path: "assets",
+          icon: <LandmarkIcon color="currentColor" />,
+        },
+        {
+          label: t("liabilities"),
+          path: "liabilities",
+          icon: <CreditCardIcon color="currentColor" />,
+        },
+        {
+          label: t("net_worth"),
+          path: "net-worth",
+          icon: <TrendingUpIcon color="currentColor" />,
+        },
+      ],
+    },
+    {
+      label: t("assets"),
+      links: [
+        {
+          label: t("values"),
+          path: "values",
+          icon: <ChartLineIcon color="currentColor" />,
+        },
+      ],
+    },
+  ];
 
   return (
     <Stack className={classes.root} p="0.5rem">
@@ -26,55 +93,28 @@ const Trends = (): React.ReactNode => {
             flexShrink: 0,
           }}
         >
-          <DimmedText size="xs" px="0.5rem">
-            {t("transactions")}
-          </DimmedText>
-          <NavLink
-            label={t("spending")}
-            active={location.pathname.endsWith("/spending")}
-            onClick={() => navigateToTrend("spending")}
-          />
-          <NavLink
-            label={t("spending_categories")}
-            active={location.pathname.endsWith("/spending-categories")}
-            onClick={() => navigateToTrend("spending-categories")}
-          />
-          <NavLink
-            label={t("net_cash_flow")}
-            active={location.pathname.endsWith("/net-cash-flow")}
-            onClick={() => navigateToTrend("net-cash-flow")}
-          />
-          <NavLink
-            label={t("flows")}
-            active={location.pathname.endsWith("/flows")}
-            onClick={() => navigateToTrend("flows")}
-          />
-          <DimmedText size="xs" px="0.5rem" mt="xs">
-            {t("accounts")}
-          </DimmedText>
-          <NavLink
-            label={t("assets")}
-            active={location.pathname.endsWith("/assets")}
-            onClick={() => navigateToTrend("assets")}
-          />
-          <NavLink
-            label={t("liabilities")}
-            active={location.pathname.endsWith("/liabilities")}
-            onClick={() => navigateToTrend("liabilities")}
-          />
-          <NavLink
-            label={t("net_worth")}
-            active={location.pathname.endsWith("/net-worth")}
-            onClick={() => navigateToTrend("net-worth")}
-          />
-          <DimmedText size="xs" px="0.5rem" mt="xs">
-            {t("assets")}
-          </DimmedText>
-          <NavLink
-            label={t("values")}
-            active={location.pathname.endsWith("/values")}
-            onClick={() => navigateToTrend("values")}
-          />
+          {navbarLinkSections.map((section, sectionIndex) => (
+            <React.Fragment key={section.label}>
+              <BodyText
+                tone="secondary"
+                size="xs"
+                px="0.5rem"
+                mt={sectionIndex === 0 ? undefined : "xs"}
+              >
+                {section.label}
+              </BodyText>
+              {section.links.map((link) => (
+                <NavbarLink
+                  key={link.path}
+                  label={link.label}
+                  icon={link.icon}
+                  showLabel
+                  active={location.pathname.endsWith(`/${link.path}`)}
+                  onClick={() => navigateToTrend(link.path)}
+                />
+              ))}
+            </React.Fragment>
+          ))}
         </Stack>
         <Box w={{ base: "100%", sm: "auto" }} style={{ flex: 1, minWidth: 0 }}>
           <Outlet />

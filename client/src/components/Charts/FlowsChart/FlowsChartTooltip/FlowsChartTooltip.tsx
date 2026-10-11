@@ -1,9 +1,7 @@
-import { Stack } from "@mantine/core";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { Group, Stack } from "@mantine/core";
 import type { FlowsChartData, FlowType } from "~/helpers/charts";
 import classes from "./FlowsChartTooltip.module.css";
+import { BodyText, Card, HeadingText, Progress } from "@teelur/budget-board-ui";
 
 interface FlowsChartTooltipProps {
   active?: boolean;
@@ -43,21 +41,6 @@ const getFlowLabel = (
       return labels.deficit;
     default:
       return null;
-  }
-};
-
-const getFlowClass = (flowType: FlowType | undefined) => {
-  switch (flowType) {
-    case "income":
-      return classes.income;
-    case "expense":
-      return classes.expense;
-    case "surplus":
-      return classes.surplus;
-    case "deficit":
-      return classes.deficit;
-    default:
-      return "";
   }
 };
 
@@ -148,74 +131,84 @@ const FlowsChartTooltip = ({
   ];
   const hasTransactionCount =
     metadata?.transactionCount !== undefined && metadata.transactionCount > 0;
-  const tooltipClassName = `${classes.tooltip} ${getFlowClass(flowType)}`;
 
   return (
-    <Card className={tooltipClassName} elevation={0} p="0.75rem">
-      <Stack gap="0.75rem">
-        {flowLabel && (
-          <div className={classes.header}>
-            <DimmedText className={classes.flowLabel}>{flowLabel}</DimmedText>
-          </div>
-        )}
-        {isLink ? (
-          <Stack className={classes.route} gap="0.25rem">
-            <DimmedText className={classes.routeLabel}>
-              {labels.from}
-            </DimmedText>
-            <PrimaryText className={classes.routeValue}>
-              {sourceName}
-            </PrimaryText>
-            <DimmedText className={classes.routeLabel}>{labels.to}</DimmedText>
-            <PrimaryText className={classes.routeValue}>
-              {targetName}
-            </PrimaryText>
-          </Stack>
-        ) : (
-          <PrimaryText className={classes.nodeName}>{item.name}</PrimaryText>
-        )}
-        <div className={classes.amountBlock}>
-          <DimmedText className={classes.amountLabel}>
+    <Card w="min(18rem, calc(100vw - 2rem))">
+      <Card.Section>
+        <Stack pl="0.625rem" p="0.25rem" gap="0.5rem">
+          {flowLabel && (
+            <HeadingText tone="heading" level={6}>
+              {flowLabel}
+            </HeadingText>
+          )}
+          {isLink ? (
+            <Stack className={classes.route} gap="0.25rem">
+              <BodyText
+                tone="secondary"
+                size="sm"
+                className={classes.routeLabel}
+              >
+                {labels.from}
+              </BodyText>
+              <BodyText tone="primary" fw={500} className={classes.routeValue}>
+                {sourceName}
+              </BodyText>
+              <BodyText tone="secondary" className={classes.routeLabel}>
+                {labels.to}
+              </BodyText>
+              <BodyText tone="primary" fw={500} className={classes.routeValue}>
+                {targetName}
+              </BodyText>
+            </Stack>
+          ) : (
+            <BodyText tone="primary" fw={500} className={classes.nodeName}>
+              {item.name}
+            </BodyText>
+          )}
+        </Stack>
+      </Card.Section>
+      <Card.Section>
+        <Stack pl="0.625rem" p="0.25rem" gap="0.125rem">
+          <BodyText tone="secondary" className={classes.amountLabel}>
             {labels.amount}
-          </DimmedText>
-          <PrimaryText className={classes.amount}>
+          </BodyText>
+          <BodyText tone="primary" fw={500} className={classes.amount}>
             {valueFormatter(value)}
-          </PrimaryText>
-        </div>
-        {(percentageMetrics.length > 0 || hasTransactionCount) && (
-          <div className={classes.metrics}>
-            {percentageMetrics.map((metric) => {
-              const numericPercent = Number.parseFloat(metric.value);
+          </BodyText>
+        </Stack>
+      </Card.Section>
+      <Card.Section>
+        <Group pl="0.625rem" pb="0.5rem" p="0.25rem">
+          {(percentageMetrics.length > 0 || hasTransactionCount) &&
+            percentageMetrics.map((metric) => {
               return (
-                <div className={classes.metric} key={metric.label}>
-                  <DimmedText className={classes.metricLabel}>
+                <Stack gap="0.125rem" key={metric.label}>
+                  <BodyText tone="secondary" className={classes.metricLabel}>
                     {metric.label}
-                  </DimmedText>
-                  <PrimaryText className={classes.metricValue}>
+                  </BodyText>
+                  <BodyText tone="primary" className={classes.metricValue}>
                     {metric.value}
-                  </PrimaryText>
-                  <div className={classes.progressTrack}>
-                    <div
-                      className={classes.progressBar}
-                      style={{ width: `${Math.min(numericPercent, 100)}%` }}
-                    />
-                  </div>
-                </div>
+                  </BodyText>
+                  <Progress
+                    value={Number.parseFloat(metric.value)}
+                    size="xs"
+                    ariaLabel={metric.label}
+                  />
+                </Stack>
               );
             })}
-            {hasTransactionCount && (
-              <div className={`${classes.metric} ${classes.transactionCount}`}>
-                <DimmedText className={classes.metricLabel}>
-                  {labels.transactions}
-                </DimmedText>
-                <PrimaryText className={classes.metricValue}>
-                  {metadata.transactionCount}
-                </PrimaryText>
-              </div>
-            )}
-          </div>
-        )}
-      </Stack>
+          {hasTransactionCount && (
+            <Stack gap="0.125rem">
+              <BodyText tone="secondary" className={classes.metricLabel}>
+                {labels.transactions}
+              </BodyText>
+              <BodyText tone="primary" className={classes.metricValue}>
+                {metadata.transactionCount}
+              </BodyText>
+            </Stack>
+          )}
+        </Group>
+      </Card.Section>
     </Card>
   );
 };

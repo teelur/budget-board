@@ -4,15 +4,11 @@ import { getRollingTotalSpendingForMonth } from "~/helpers/transactions";
 import { Box, Group, Skeleton, Stack } from "@mantine/core";
 import React from "react";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import SplitCard, {
-  BorderThickness,
-} from "~/components/ui/SplitCard/SplitCard";
 import { LineChartIcon } from "lucide-react";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
+import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
 
 const SpendingTrendsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -83,39 +79,39 @@ const SpendingTrendsWidget = (): React.ReactNode => {
   };
 
   return (
-    <SplitCard
-      w="100%"
-      h="100%"
-      border={BorderThickness.Thick}
-      header={
+    <Card h="100%" w="100%">
+      <Card.Section separatorThickness="thick">
         <Group gap="0.25rem">
-          <LineChartIcon color="var(--base-color-text-dimmed)" />
-          <PrimaryHeading order={3} lh={1}>
-            {t("spending_trends")}
-          </PrimaryHeading>
+          <LineChartIcon size="1.5rem" color="var(--bbui-color-primary)" />
+          <HeadingText level={4}>{t("spending_trends")}</HeadingText>
         </Group>
-      }
-      elevation={1}
-    >
-      <Stack gap={0} w="100%" p="0.5rem" style={{ flex: 1, minHeight: 0 }}>
+      </Card.Section>
+      <Card.Section
+        style={{
+          display: "flex",
+          flex: "1 1 0",
+          flexDirection: "column",
+          minHeight: 0,
+        }}
+      >
         {transactionsQuery.isPending ? (
           <Skeleton height="100%" radius="md" />
         ) : (
-          <>
-            <DimmedText size="sm" ta="right">
+          <Stack gap={0} style={{ flex: "1 1 0", minHeight: 0 }}>
+            <BodyText tone="secondary" size="sm" ta="right">
               {getSpendingComparisonString()}
-            </DimmedText>
-            <Box style={{ flex: 1, minHeight: 0 }}>
+            </BodyText>
+            <Box style={{ flex: "1 1 0", minHeight: 0 }}>
               <SpendingChart
                 months={months}
                 transactions={transactionsQuery.data ?? []}
                 includeYAxis={false}
               />
             </Box>
-          </>
+          </Stack>
         )}
-      </Stack>
-    </SplitCard>
+      </Card.Section>
+    </Card>
   );
 };
 

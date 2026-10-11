@@ -1,5 +1,10 @@
 import { Alert, Group, Paper, Skeleton, Stack } from "@mantine/core";
-import { Button, NumberInput } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  HeadingText,
+  NumberInput,
+} from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
@@ -12,8 +17,6 @@ import { ITransaction } from "~/models/transaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import LinkCandidateCard from "./LinkCandidateCard/LinkCandidateCard";
 
 interface TransactionLinkDialogProps {
@@ -113,10 +116,14 @@ const TransactionLinkDialog = ({
       <Modal
         opened={linkOpened}
         onClose={closeLink}
-        title={<PrimaryHeading order={4}>{t("link_transfer")}</PrimaryHeading>}
+        title={
+          <HeadingText tone="heading" level={4}>
+            {t("link_transfer")}
+          </HeadingText>
+        }
       >
         <Stack gap="sm">
-          <DimmedText size="sm">
+          <BodyText tone="secondary" size="sm">
             {t("link_transfer_source", {
               account: transaction.accountName,
               amount: convertNumberToCurrency(
@@ -128,7 +135,7 @@ const TransactionLinkDialog = ({
               ),
               date: formatDate(transaction.date),
             })}
-          </DimmedText>
+          </BodyText>
           <Alert
             color="orange"
             icon={<AlertCircle size="1rem" />}
@@ -171,7 +178,9 @@ const TransactionLinkDialog = ({
               ))}
             </Stack>
           ) : (
-            <DimmedText size="sm">{t("no_transfer_candidates")}</DimmedText>
+            <BodyText tone="muted" size="sm">
+              {t("no_transfer_candidates")}
+            </BodyText>
           )}
           <Button
             variant="filled"
@@ -194,11 +203,15 @@ const TransactionLinkDialog = ({
         opened={unlinkOpened}
         onClose={closeUnlink}
         title={
-          <PrimaryHeading order={4}>{t("unlink_transactions")}</PrimaryHeading>
+          <HeadingText tone="heading" level={4}>
+            {t("unlink_transactions")}
+          </HeadingText>
         }
       >
         <Stack gap="sm">
-          <DimmedText size="sm">{t("unlink_transfer_message")}</DimmedText>
+          <BodyText tone="secondary" size="sm">
+            {t("unlink_transfer_message")}
+          </BodyText>
           <Group gap="0.5rem">
             <Button
               variant="filled"

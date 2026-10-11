@@ -1,6 +1,8 @@
 import { Group } from "@mantine/core";
 import {
   ActionIcon,
+  BodyText,
+  Card,
   CategorySelect,
   DateInput,
   Select,
@@ -20,8 +22,6 @@ import {
   IRuleParameterEdit,
 } from "~/models/automaticRule";
 import { ICategory } from "~/models/category";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { isValidAmountExpression } from "~/helpers/automaticRuleExpressions";
@@ -34,6 +34,7 @@ export interface ActionItemProps {
   doDelete: (index: number) => void;
   index: number;
   categories: ICategory[];
+  surface?: "sunken" | "default";
 }
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {
@@ -199,7 +200,7 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
   );
 
   return (
-    <Card elevation={1}>
+    <Card surface={props.surface ?? "default"}>
       <Group gap="0.5rem">
         {props.ruleParameter.operator === "delete" ? (
           getOperatorSelect()
@@ -207,7 +208,9 @@ const ActionItem = (props: ActionItemProps): React.ReactNode => {
           <>
             {getFieldSelect()}
             {getOperatorSelect()}
-            <PrimaryText size="sm">{t("to")}</PrimaryText>
+            <BodyText tone="primary" size="sm" fw={500}>
+              {t("to")}
+            </BodyText>
             {getValueInput()}
           </>
         )}

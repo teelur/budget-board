@@ -1,10 +1,8 @@
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon, BodyText, Card } from "@teelur/budget-board-ui";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
 import { IAssetResponse } from "~/models/asset";
-import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useRestoreAssetsMutation } from "~/hooks/mutations/assets/useRestoreAssetsMutation";
 
 interface DeletedAssetCardProps {
@@ -15,11 +13,12 @@ const DeletedAssetCard = (props: DeletedAssetCardProps): React.ReactNode => {
   const restoreAssetMutation = useRestoreAssetsMutation();
 
   return (
-    <ElevatedCard>
-      <LoadingOverlay visible={restoreAssetMutation.isPending} />
+    <Card p="0.25rem">
       <Group justify="space-between">
         <Stack gap={0}>
-          <PrimaryText size="sm">{props.asset.name}</PrimaryText>
+          <BodyText tone="primary" size="sm" fw={500}>
+            {props.asset.name}
+          </BodyText>
         </Stack>
         <Group style={{ alignSelf: "stretch" }}>
           <ActionIcon
@@ -27,13 +26,14 @@ const DeletedAssetCard = (props: DeletedAssetCardProps): React.ReactNode => {
             color="primary"
             size="compact-xs"
             h="100%"
+            loading={restoreAssetMutation.isPending}
             onClick={() => restoreAssetMutation.mutate(props.asset.id)}
           >
             <Undo2Icon size="1.2rem" />
           </ActionIcon>
         </Group>
       </Group>
-    </ElevatedCard>
+    </Card>
   );
 };
 

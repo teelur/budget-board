@@ -1,10 +1,8 @@
 import { Group } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { ArrowLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useNavigate } from "react-router";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 interface SettingsHeadingProps {
   title: React.ReactNode;
@@ -29,11 +27,18 @@ const SettingsHeading = ({
       >
         <ArrowLeftIcon />
       </ActionIcon>
-      <PrimaryHeading order={5}>{title}</PrimaryHeading>
+      <HeadingText tone="heading" level={5}>
+        {title}
+      </HeadingText>
       {activeItem && (
         <>
-          <ChevronRightIcon size="1rem" color="var(--base-color-text-dimmed)" />
-          <SecondaryHeading order={5}>{activeItem}</SecondaryHeading>
+          <ChevronRightIcon
+            size="1rem"
+            color="var(--bbui-color-text-primary)"
+          />
+          <HeadingText tone="secondary" level={5}>
+            {activeItem}
+          </HeadingText>
         </>
       )}
     </Group>

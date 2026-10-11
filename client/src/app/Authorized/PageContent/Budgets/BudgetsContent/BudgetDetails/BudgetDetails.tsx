@@ -8,17 +8,14 @@ import { areStringsEqual } from "~/helpers/utils";
 import TransactionCards from "./TransactionCards/TransactionCards";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Drawer from "~/components/core/Drawer/Drawer";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { CategoryTypes } from "~/models/category";
 import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
-import { AmountText } from "@teelur/budget-board-ui";
+import { AmountText, BodyText, HeadingText } from "@teelur/budget-board-ui";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -105,11 +102,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={
-        <PrimaryHeading component="span" order={4}>
-          {t("budget_details")}
-        </PrimaryHeading>
-      }
+      title={<HeadingText level={4}>{t("budget_details")}</HeadingText>}
     >
       {transactionsQuery.isPending ||
       props.month === null ||
@@ -119,25 +112,29 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
         <Stack gap="1rem">
           <Group justify="space-between" align="center">
             <Stack gap={0}>
-              <DimmedText size="xs">{t("category")}</DimmedText>
-              <PrimaryText size="lg">
+              <BodyText tone="secondary" size="xs">
+                {t("category")}
+              </BodyText>
+              <BodyText tone="primary" size="lg" fw={500}>
                 {categoryIcon.length > 0 ? `${categoryIcon} ` : ""}
                 {props.category ?? t("no_category")}
-              </PrimaryText>
+              </BodyText>
             </Stack>
             <Stack gap={0}>
-              <DimmedText size="xs">{t("month")}</DimmedText>
-              <PrimaryText size="lg">
+              <BodyText tone="secondary" size="xs">
+                {t("month")}
+              </BodyText>
+              <BodyText tone="primary" size="lg" fw={500}>
                 {dayjs(props.month).format("MMMM YYYY")}
-              </PrimaryText>
+              </BodyText>
             </Stack>
           </Group>
           <Accordion elevation={1}>
             <Accordion.Item
               title={
-                <PrimaryHeading order={5} size="md">
+                <HeadingText level={5}>
                   {isExpenseCategory ? t("expense_trends") : t("income_trends")}
-                </PrimaryHeading>
+                </HeadingText>
               }
             >
               <MonthlySpendingChart
@@ -149,9 +146,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             </Accordion.Item>
             <Accordion.Item
               title={
-                <PrimaryHeading order={5} size="md">
-                  {t("recent_transactions")}
-                </PrimaryHeading>
+                <HeadingText level={5}>{t("recent_transactions")}</HeadingText>
               }
             >
               <TransactionCards
@@ -160,11 +155,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
               />
             </Accordion.Item>
             <Accordion.Item
-              title={
-                <PrimaryHeading order={5} size="md">
-                  {t("projected")}
-                </PrimaryHeading>
-              }
+              title={<HeadingText level={5}>{t("projected")}</HeadingText>}
             >
               {forecastQuery.isPending ? (
                 <Skeleton height={35} radius="md" />
@@ -175,9 +166,9 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                       key={`${occurrence.ruleID}-${occurrence.date}`}
                       justify="space-between"
                     >
-                      <PrimaryText size="sm">
+                      <BodyText tone="primary" size="sm" fw={500}>
                         {dayjs(occurrence.date).format("LL")}
-                      </PrimaryText>
+                      </BodyText>
                       <AmountText
                         size="sm"
                         amount={occurrence.amount}
@@ -190,9 +181,9 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                   ))}
                 </Stack>
               ) : (
-                <DimmedText size="sm">
+                <BodyText tone="muted" size="sm">
                   {t("no_projected_transactions")}
-                </DimmedText>
+                </BodyText>
               )}
             </Accordion.Item>
           </Accordion>

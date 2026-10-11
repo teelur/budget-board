@@ -2,7 +2,9 @@ import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
+  BodyText,
   Button,
+  Card,
   CategorySelect,
   SegmentedControl,
   TextInput,
@@ -11,9 +13,6 @@ import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useDeleteTransactionCategoryMutation";
 import { useUpdateTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useUpdateTransactionCategoryMutation";
 import { CategoryTypes, ICategoryResponse } from "~/models/category";
@@ -92,7 +91,7 @@ const CustomCategoryCard = (
     return (
       <Group w="100%" maw={600} wrap="nowrap">
         {props.isChildCard && <CornerDownRight />}
-        <Card flex={1} p="0.5rem" elevation={1}>
+        <Card flex={1}>
           <LoadingOverlay
             visible={
               updateTransactionCategoryMutation.isPending ||
@@ -105,7 +104,9 @@ const CustomCategoryCard = (
               label={t("category_name")}
             />
             <Stack gap="0.25rem" justify="center">
-              <PrimaryText size="sm">{t("category_level")}</PrimaryText>
+              <BodyText tone="primary" size="sm" fw={600}>
+                {t("category_level")}
+              </BodyText>
               <SegmentedControl
                 color="secondary"
                 size="compact-sm"
@@ -136,7 +137,9 @@ const CustomCategoryCard = (
               />
             ) : (
               <Stack gap="0.25rem">
-                <PrimaryText size="sm">{t("classification")}</PrimaryText>
+                <BodyText tone="primary" size="sm" fw={600}>
+                  {t("classification")}
+                </BodyText>
                 <SegmentedControl
                   color="secondary"
                   size="compact-sm"
@@ -180,14 +183,16 @@ const CustomCategoryCard = (
   return (
     <Group w="100%" maw={600} wrap="nowrap">
       {props.isChildCard && <CornerDownRight />}
-      <Card flex={1} p="0.25rem" elevation={1}>
+      <Card flex={1} p="0.25rem">
         <Group justify="space-between">
           <Group gap="0.5rem">
-            {props.isBuiltIn ? (
-              <DimmedText size="sm">{props.category.value}</DimmedText>
-            ) : (
-              <PrimaryText size="sm">{props.category.value}</PrimaryText>
-            )}
+            <BodyText
+              tone={props.isBuiltIn ? "secondary" : "primary"}
+              size="sm"
+              fw={500}
+            >
+              {props.category.value}
+            </BodyText>
             {props.isBuiltIn && (
               <Badge variant="light" color="primary" size="xs">
                 {t("built_in")}

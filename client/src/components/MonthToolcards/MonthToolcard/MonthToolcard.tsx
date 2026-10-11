@@ -1,8 +1,6 @@
 import { Stack } from "@mantine/core";
+import { BodyText, Card } from "@teelur/budget-board-ui";
 import { CashFlowValue } from "~/models/budget";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import classes from "./MonthToolcard.module.css";
 
@@ -50,10 +48,9 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
       flex="0 0 auto"
       p="0.125rem"
       onClick={() => props.handleClick(props.date)}
-      hoverEffect={false}
-      elevation={props.isSelected ? 2 : 1}
+      hoverable={false}
       className={classes.card}
-      data-selected={props.isSelected ? "true" : "false"}
+      selected={props.isSelected}
     >
       <Stack gap={0} style={{ userSelect: "none" }}>
         <Card
@@ -66,14 +63,15 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
           )}
           withBorder={false}
           shadow="none"
-          elevation={1}
           className={classes.statusStrip}
           data-cash-flow={cashFlowState}
         />
-        <PrimaryText size="sm">{dayjs(props.date).format("MMM")}</PrimaryText>
-        <DimmedText size="xs" c="dimmed">
+        <BodyText tone="primary" size="sm" fw={500}>
+          {dayjs(props.date).format("MMM")}
+        </BodyText>
+        <BodyText tone="secondary" size="xs">
           {dayjs(props.date).format("YYYY")}
-        </DimmedText>
+        </BodyText>
       </Stack>
     </Card>
   );

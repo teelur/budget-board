@@ -1,10 +1,9 @@
 import { Box, Group, Stack } from "@mantine/core";
+import { HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation } from "react-router";
 import { ChevronRightIcon } from "lucide-react";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import SecondaryHeading from "~/components/core/Heading/SecondaryHeading/SecondaryHeading";
 
 const Settings = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -23,14 +22,18 @@ const Settings = (): React.ReactNode => {
   return (
     <Stack w="100%" p="0.5rem">
       <Group gap="xs">
-        <PrimaryHeading order={5}>{t("settings")}</PrimaryHeading>
+        <HeadingText level={5} tone="heading">
+          {t("settings")}
+        </HeadingText>
         {activeItem && (
           <>
             <ChevronRightIcon
               size="1rem"
-              color="var(--base-color-text-dimmed)"
+              color="var(--bbui-color-text-primary)"
             />
-            <SecondaryHeading order={5}>{activeItem.label}</SecondaryHeading>
+            <HeadingText level={5} tone="secondary">
+              {activeItem.label}
+            </HeadingText>
           </>
         )}
       </Group>

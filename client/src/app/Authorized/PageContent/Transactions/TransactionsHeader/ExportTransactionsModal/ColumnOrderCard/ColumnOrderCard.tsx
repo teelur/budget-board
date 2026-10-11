@@ -1,12 +1,11 @@
 import React from "react";
 import { Stack } from "@mantine/core";
+import { HeadingText } from "@teelur/budget-board-ui";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
-import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
 import ColumnOrderItem from "./ColumnOrderItem/ColumnOrderItem";
 import { EXPORT_FIELDS } from "../ExportTransactionsModal";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface ColumnOrderCardProps {
   orderedFields: string[];
@@ -25,28 +24,26 @@ const ColumnOrderCard = (props: ColumnOrderCardProps): React.ReactNode => {
   );
 
   return (
-    <Card w="100%" elevation={1}>
-      <Stack gap="0.5rem">
-        <PrimaryHeading order={5}>{t("column_order")}</PrimaryHeading>
-        <DragDropProvider
-          onDragEnd={(event) => {
-            props.onChange(move(props.orderedFields, event));
-          }}
-        >
-          <Stack ref={setListElement} gap="0.5rem">
-            {props.orderedFields.map((key, index) => (
-              <ColumnOrderItem
-                key={key}
-                fieldKey={key}
-                label={fieldLabelMap[key] ?? key}
-                index={index}
-                container={listElement ?? undefined}
-              />
-            ))}
-          </Stack>
-        </DragDropProvider>
-      </Stack>
-    </Card>
+    <Stack w="100%" gap="0.5rem">
+      <HeadingText level={5}>{t("column_order")}</HeadingText>
+      <DragDropProvider
+        onDragEnd={(event) => {
+          props.onChange(move(props.orderedFields, event));
+        }}
+      >
+        <Stack ref={setListElement} gap="0.5rem">
+          {props.orderedFields.map((key, index) => (
+            <ColumnOrderItem
+              key={key}
+              fieldKey={key}
+              label={fieldLabelMap[key] ?? key}
+              index={index}
+              container={listElement ?? undefined}
+            />
+          ))}
+        </Stack>
+      </DragDropProvider>
+    </Stack>
   );
 };
 

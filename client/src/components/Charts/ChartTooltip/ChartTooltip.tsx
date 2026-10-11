@@ -1,11 +1,9 @@
 import { ChartSeries, getFilteredChartTooltipPayload } from "@mantine/charts";
 import { getThemeColor, Group, Stack, useMantineTheme } from "@mantine/core";
+import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
 import { Square } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getSeriesLabels } from "~/helpers/get-series-labels";
 
 interface ChartTooltipProps {
@@ -31,9 +29,11 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
   }
 
   return (
-    <Card elevation={0}>
-      <Stack gap="1rem">
-        <PrimaryText>{props.label}</PrimaryText>
+    <Card>
+      <Stack gap="0.5rem">
+        <HeadingText tone="heading" level={6}>
+          {props.label}
+        </HeadingText>
         <Stack gap="0.25rem">
           {filteredPayload.map((item: any) => (
             <Group
@@ -49,15 +49,15 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
                   width={18}
                   height={18}
                 />
-                <DimmedText size="sm">
+                <BodyText tone="secondary" size="sm">
                   {labels[item.name] ?? item.name}
-                </DimmedText>
+                </BodyText>
               </Group>
-              <PrimaryText size="sm">
+              <BodyText tone="primary" size="sm" fw={500}>
                 {typeof props.valueFormatter === "function"
                   ? props.valueFormatter(item.value)
                   : item.value}
-              </PrimaryText>
+              </BodyText>
             </Group>
           ))}
         </Stack>
@@ -70,15 +70,15 @@ const ChartTooltip = (props: ChartTooltipProps): React.ReactNode => {
                 width={18}
                 height={18}
               />
-              <DimmedText size="sm">{t("total")}</DimmedText>
+              <BodyText size="sm">{t("total")}</BodyText>
             </Group>
-            <PrimaryText size="sm">
+            <BodyText size="sm">
               {typeof props.valueFormatter === "function"
                 ? props.valueFormatter(
-                    filteredPayload.reduce((acc, item) => acc + item.value, 0)
+                    filteredPayload.reduce((acc, item) => acc + item.value, 0),
                   )
                 : filteredPayload.reduce((acc, item) => acc + item.value, 0)}
-            </PrimaryText>
+            </BodyText>
           </Group>
         )}
       </Stack>

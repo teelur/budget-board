@@ -1,8 +1,7 @@
 import { Group, Stack } from "@mantine/core";
-import { Button, Progress } from "@teelur/budget-board-ui";
+import { BodyText, Button, Progress } from "@teelur/budget-board-ui";
 import { BanIcon } from "lucide-react";
 import React from "react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { ITransactionImportJobResponse } from "~/models/transaction";
 import { useTranslation } from "react-i18next";
 
@@ -50,7 +49,9 @@ const ImportProgress = (props: ImportProgressProps) => {
       mx="auto"
       py="1rem"
     >
-      <PrimaryText size="md">{statusMessage}</PrimaryText>
+      <BodyText tone="primary" size="md" fw={500}>
+        {statusMessage}
+      </BodyText>
       {props.isLoading && !props.job ? (
         <Progress value={0} animated striped ariaLabel={statusMessage} />
       ) : (
@@ -62,16 +63,16 @@ const ImportProgress = (props: ImportProgressProps) => {
             striped={animated}
             ariaLabel={statusMessage}
           />
-          <PrimaryText size="sm">
+          <BodyText tone="secondary" size="sm">
             {t("import_progress", {
               processed: props.job?.processedCount ?? 0,
               total: props.job?.totalCount ?? 0,
             })}
-          </PrimaryText>
+          </BodyText>
           {props.job?.errorMessage ? (
-            <PrimaryText size="sm" c="red">
+            <BodyText tone="secondary" size="sm">
               {props.job.errorMessage}
-            </PrimaryText>
+            </BodyText>
           ) : null}
           {canCancel && !isConfirmingCancel ? (
             <Button
@@ -87,9 +88,9 @@ const ImportProgress = (props: ImportProgressProps) => {
           ) : null}
           {canCancel && isConfirmingCancel ? (
             <Stack gap="xs">
-              <PrimaryText size="sm">
+              <BodyText tone="secondary" size="sm">
                 {t("confirm_stop_import_message")}
-              </PrimaryText>
+              </BodyText>
               <Group grow>
                 <Button
                   variant="filled"

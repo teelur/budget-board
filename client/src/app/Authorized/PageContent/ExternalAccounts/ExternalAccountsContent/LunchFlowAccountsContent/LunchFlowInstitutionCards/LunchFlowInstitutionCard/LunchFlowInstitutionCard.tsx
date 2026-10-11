@@ -1,6 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { Card, HeadingText } from "@teelur/budget-board-ui";
 import { IGroupedLunchFlowAccounts } from "../LunchFlowInstitutionCards";
 import LunchFlowAccountCard from "./LunchFlowAccountCard/LunchFlowAccountCard";
 
@@ -16,12 +15,12 @@ const LunchFlowInstitutionCard = (
   );
 
   return (
-    <Card elevation={1}>
+    <Card>
       <Stack p={0} gap="0.5rem">
         <Group gap="0.5rem">
-          <PrimaryText size="md">
+          <HeadingText tone="primary" level={5}>
             {props.lunchFlowInstitution.institutionName}
-          </PrimaryText>
+          </HeadingText>
         </Group>
         <Stack gap="0.5rem">
           {sortedAccounts.map((account) => (

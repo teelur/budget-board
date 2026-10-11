@@ -1,10 +1,9 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { Badge, Button } from "@teelur/budget-board-ui";
+import { Badge, Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import SimpleFinOrganizationCards from "./SimpleFinOrganizationCards/SimpleFinOrganizationCards";
 import LinkSimpleFin from "./LinkSimpleFin/LinkSimpleFin";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
 import { useRemoveAccessTokenMutation } from "~/hooks/mutations/simpleFin/useRemoveAccessTokenMutation";
 
@@ -29,7 +28,9 @@ const SimpleFinAccountsContent = (): React.ReactNode => {
     <Stack p={0} gap="0.5rem">
       <Group justify="space-between">
         <Group>
-          <PrimaryHeading order={4}>{t("simplefin")}</PrimaryHeading>
+          <HeadingText tone="heading" level={4}>
+            {t("simplefin")}
+          </HeadingText>
           {applicationUserQuery.data?.simpleFinAccessToken && (
             <Badge variant="light" color="success" size="xs">
               {t("connected")}

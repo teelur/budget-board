@@ -1,6 +1,8 @@
-import { LoadingOverlay, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import {
+  BodyText,
   Button,
+  Card,
   CategorySelect,
   SegmentedControl,
   TextInput,
@@ -8,8 +10,6 @@ import {
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { useCreateAssetTypeMutation } from "~/hooks/mutations/assetTypes/useCreateAssetTypeMutation";
 
@@ -33,15 +33,16 @@ const AddAssetType = (): React.ReactNode => {
   const parentTypes = allAssetTypes.filter((type) => type.parent === "");
 
   return (
-    <Card elevation={1}>
-      <LoadingOverlay visible={createAssetTypeMutation.isPending} />
-      <Stack>
+    <Card>
+      <Stack gap="0.5rem">
         <TextInput
           {...nameField.getInputProps()}
           label={t("asset_type_name")}
         />
         <Stack gap="0.25rem" justify="center">
-          <PrimaryText size="sm">{t("category_level")}</PrimaryText>
+          <BodyText tone="primary" size="sm" fw={600}>
+            {t("category_level")}
+          </BodyText>
           <SegmentedControl
             color="secondary"
             size="compact-sm"
@@ -76,6 +77,7 @@ const AddAssetType = (): React.ReactNode => {
           color="primary"
           size="xs"
           fullWidth
+          loading={createAssetTypeMutation.isPending}
           onClick={() => {
             createAssetTypeMutation.mutate(
               {

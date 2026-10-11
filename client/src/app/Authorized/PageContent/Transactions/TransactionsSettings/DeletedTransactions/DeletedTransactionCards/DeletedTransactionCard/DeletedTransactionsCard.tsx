@@ -1,14 +1,11 @@
 import classes from "./DeletedTransactionsCard.module.css";
 
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon, BodyText, Card } from "@teelur/budget-board-ui";
 import { getDaysSinceDate } from "~/helpers/datetime";
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useRestoreTransactionMutation } from "~/hooks/mutations/transactions/useRestoreTransactionsMutation";
 
@@ -23,18 +20,19 @@ const DeletedTransactionsCard = (
   const restoreTransactionMutation = useRestoreTransactionMutation();
 
   return (
-    <Card elevation={1}>
-      <LoadingOverlay visible={restoreTransactionMutation.isPending} />
+    <Card p="0.25rem">
       <Group justify="space-between" wrap="nowrap">
         <Stack gap={0}>
-          <PrimaryText size="md">
-            {props.deletedTransaction.merchantName}
-          </PrimaryText>
-          <DimmedText size="sm">
+          <BodyText tone="primary" size="sm" fw={500}>
+            {(props.deletedTransaction.merchantName?.length ?? 0) > 0
+              ? props.deletedTransaction.merchantName
+              : t("no_name")}
+          </BodyText>
+          <BodyText tone="secondary" size="xs">
             {t("days_since_deleted", {
               days: getDaysSinceDate(props.deletedTransaction.deleted!),
             })}
-          </DimmedText>
+          </BodyText>
         </Stack>
         <Group className={classes.buttonGroup}>
           <ActionIcon
@@ -42,6 +40,7 @@ const DeletedTransactionsCard = (
             color="primary"
             size="compact-sm"
             h="100%"
+            loading={restoreTransactionMutation.isPending}
             onClick={() =>
               restoreTransactionMutation.mutate([props.deletedTransaction.id])
             }

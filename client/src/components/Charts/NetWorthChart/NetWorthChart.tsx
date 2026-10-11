@@ -1,8 +1,9 @@
+import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
+import { Group, Skeleton } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import { filterBalancesByDateRange } from "~/helpers/balances";
 import { SignDisplay } from "~/helpers/currency";
 import { DateString, getDateFromMonthsAgo } from "~/helpers/datetime";
-import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
-import { Group, Skeleton } from "@mantine/core";
 import { AccountTypeClassification, IAccountResponse } from "~/models/account";
 import { IBalanceResponse } from "~/models/balance";
 import React from "react";
@@ -10,7 +11,6 @@ import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { buildValueChartData } from "../ValueChart/helpers/valueChart";
@@ -113,9 +113,9 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   if (props.accounts?.length === 0 || props.balances?.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="sm">
+        <BodyText tone="muted" size="sm">
           {t("select_an_account_to_display_the_chart")}
-        </DimmedText>
+        </BodyText>
       </Group>
     );
   }

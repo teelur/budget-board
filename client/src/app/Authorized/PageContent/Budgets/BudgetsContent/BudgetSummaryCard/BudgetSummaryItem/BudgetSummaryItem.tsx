@@ -1,17 +1,15 @@
+import { Flex, Group, Stack } from "@mantine/core";
+import { AmountText, BodyText, Progress } from "@teelur/budget-board-ui";
 import { StatusColorType } from "~/helpers/budgets";
 import { SignDisplay } from "~/helpers/currency";
-import { Flex, Group, Stack } from "@mantine/core";
 import React from "react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { Trans } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
-import { AmountText, Progress } from "@teelur/budget-board-ui";
 
 interface BudgetSummaryItemProps {
   label: string;
@@ -99,7 +97,7 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
           values={{ total: formattedTotal }}
           components={[
             <AmountText {...amountTextProps} key="amount" />,
-            <DimmedText size="sm" key="of" />,
+            <BodyText tone="secondary" size="sm" key="of" />,
             <AmountText
               amount={props.total ?? 0}
               disableStatusColor
@@ -126,10 +124,10 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
           i18nKey="budget_projected_fraction_styled"
           values={{ total: formattedTotal }}
           components={[
-            <DimmedText size="xs" key="label" />,
+            <BodyText tone="secondary" size="xs" key="label" />,
             <AmountText {...projectedAmountTextProps} key="amount" />,
-            <DimmedText size="xs" key="of" />,
-            <PrimaryText size="sm" key="total" />,
+            <BodyText tone="secondary" size="xs" key="of" />,
+            <BodyText tone="primary" size="sm" key="total" />,
           ]}
         />
       );
@@ -137,9 +135,9 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
 
     return (
       <>
-        <DimmedText size="xs" key="label">
+        <BodyText tone="secondary" size="xs" key="label">
           {t("projected_colon")}
-        </DimmedText>
+        </BodyText>
         <AmountText {...projectedAmountTextProps} key="amount" />
       </>
     );
@@ -149,7 +147,9 @@ const BudgetSummaryItem = (props: BudgetSummaryItemProps): React.ReactNode => {
     <Stack gap={0}>
       <Group gap="0.25rem" justify="space-between" align="center">
         <Flex style={{ flex: "1 1 auto", minWidth: 0 }}>
-          <PrimaryText size="md">{props.label}</PrimaryText>
+          <BodyText tone="primary" size="md" fw={500}>
+            {props.label}
+          </BodyText>
         </Flex>
         <Stack
           gap={0}

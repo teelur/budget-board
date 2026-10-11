@@ -1,8 +1,8 @@
 import { Skeleton, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import React from "react";
 import { getDeletedTransactions } from "~/helpers/transactions";
 import DeletedTransactionCards from "./DeletedTransactionCards/DeletedTransactionCards";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
@@ -28,7 +28,9 @@ const Deleted = (): React.ReactNode => {
     if (deletedTransactions.length === 0) {
       return (
         <Stack align="center" p="1rem">
-          <DimmedText size="sm">{t("no_deleted_transactions")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_deleted_transactions")}
+          </BodyText>
         </Stack>
       );
     }
@@ -38,9 +40,9 @@ const Deleted = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
-      <DimmedText size="sm">
+      <BodyText tone="secondary" size="sm">
         {t("view_and_restore_deleted_transactions")}
-      </DimmedText>
+      </BodyText>
       {getDeletedTransactionContent()}
     </Stack>
   );

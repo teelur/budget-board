@@ -1,12 +1,15 @@
 import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
-import { Button, Checkbox } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  Card,
+  Checkbox,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
 import Divider from "~/components/core/Divider/Divider";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
@@ -91,7 +94,11 @@ const AccountsWidgetSettings = ({
     }
 
     if (visibleInstitutions.length === 0) {
-      return <DimmedText size="sm">{t("no_accounts_found")}</DimmedText>;
+      return (
+        <BodyText tone="muted" size="sm" ta="center">
+          {t("no_accounts_found")}
+        </BodyText>
+      );
     }
 
     return (
@@ -117,11 +124,11 @@ const AccountsWidgetSettings = ({
         >
           <Stack gap="0.75rem">
             {visibleInstitutions.map((inst) => (
-              <Card key={inst.id} p="0.5rem" elevation={1}>
+              <Card key={inst.id} p="0.5rem">
                 <Stack gap="0.5rem">
-                  <PrimaryText size="sm" fw={600}>
+                  <BodyText tone="secondary" size="sm" fw={500}>
                     {inst.name}
-                  </PrimaryText>
+                  </BodyText>
                   <Stack gap="0.4rem" pl="0.25rem">
                     {inst.accounts.map((account) => (
                       <Checkbox
@@ -148,12 +155,12 @@ const AccountsWidgetSettings = ({
     <Modal
       opened={opened}
       onClose={handleClose}
-      title={<PrimaryText size="md">{t("accounts_settings")}</PrimaryText>}
+      title={<HeadingText level={4}>{t("accounts_settings")}</HeadingText>}
     >
       <Stack gap="0.75rem">
-        <DimmedText size="sm">
+        <BodyText tone="secondary" size="sm">
           {t("accounts_settings_widget_message")}
-        </DimmedText>
+        </BodyText>
         {getAccountsWidgetSettingsContent()}
         <Group gap="0.5rem">
           <Button
