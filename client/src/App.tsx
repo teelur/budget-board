@@ -208,6 +208,7 @@ const resolver: CSSVariablesResolver = () => ({
   light: {
     "--bbui-color-page": budgetBoardColors.light.page,
     "--bbui-color-text-primary": budgetBoardColors.light.textPrimary,
+    "--bbui-color-text-secondary": budgetBoardColors.light.textSecondary,
     "--bbui-color-primary": budgetBoardColors.light.primary,
     // Base colors
     "--background-color-base": backgroundEggshell[0],
@@ -249,6 +250,7 @@ const resolver: CSSVariablesResolver = () => ({
   dark: {
     "--bbui-color-page": budgetBoardColors.dark.page,
     "--bbui-color-text-primary": budgetBoardColors.dark.textPrimary,
+    "--bbui-color-text-secondary": budgetBoardColors.dark.textSecondary,
     "--bbui-color-primary": budgetBoardColors.dark.primary,
     // Base colors
     "--background-color-base": backgroundGray[9],

@@ -1,12 +1,9 @@
-import { Flex, Skeleton, Stack, Text } from "@mantine/core";
+import { Flex, Skeleton, Stack } from "@mantine/core";
+import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import SplitCard, {
-  BorderThickness,
-} from "~/components/ui/SplitCard/SplitCard";
 import WidgetErrorMessage from "~/components/ui/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import {
   buildDataRequirements,
   hasCurrencyMetric,
@@ -19,7 +16,6 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import MetricWidgetSettings from "./MetricWidgetSettings/MetricWidgetSettings";
-import classes from "./MetricWidget.module.css";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
@@ -227,35 +223,46 @@ const MetricWidget = ({
         w="100%"
         align="center"
         justify="center"
-        p="1rem"
-        gap="0.25rem"
+        gap={0}
+        style={{ containerType: "inline-size" }}
       >
-        <Text className={classes.value} ta="center">
+        <BodyText tone="primary" size="2rem" fw={700} responsive ta="center">
           {valueText}
-        </Text>
+        </BodyText>
         {labelText && (
-          <DimmedText size="sm" ta="center">
+          <BodyText tone="secondary" size="sm" ta="center" responsive>
             {labelText}
-          </DimmedText>
+          </BodyText>
         )}
       </Stack>
     );
   };
 
   return (
-    <SplitCard
+    <Card
       w="100%"
       h="100%"
-      style={{ containerType: "inline-size" }}
-      border={BorderThickness.Thick}
-      header={
-        <PrimaryHeading order={4} className={classes.title}>
-          {titleText}
-        </PrimaryHeading>
-      }
-      elevation={1}
+      miw={0}
+      style={{
+        containerType: "inline-size",
+        display: "grid",
+        gridTemplateRows: "auto minmax(0, 1fr)",
+        minHeight: 0,
+        overflow: "hidden",
+      }}
     >
-      {renderContent()}
+      <Card.Section p="0.25rem" separatorThickness="thick">
+        <Flex
+          w="100%"
+          justify="center"
+          style={{ containerType: "inline-size" }}
+        >
+          <HeadingText tone="heading" size="1.25rem" responsive>
+            {titleText}
+          </HeadingText>
+        </Flex>
+      </Card.Section>
+      <Card.Section p="0.5rem">{renderContent()}</Card.Section>
       {settingsOpened !== undefined && onSettingsClose && (
         <MetricWidgetSettings
           widget={widget}
@@ -263,7 +270,7 @@ const MetricWidget = ({
           onClose={onSettingsClose}
         />
       )}
-    </SplitCard>
+    </Card>
   );
 };
 

@@ -155,7 +155,7 @@ const Login = (props: LoginProps): React.ReactNode => {
         </Card.Section>
       )}
       {isLocalAuthEnabled && (
-        <Card.Section withBorder label={t("or")}>
+        <Card.Section p="1rem" withBorder label={t("or")}>
           <Stack
             component="form"
             onSubmit={(event) => {
@@ -215,7 +215,7 @@ const Login = (props: LoginProps): React.ReactNode => {
         </Card.Section>
       )}
       {isOidcEnabled && (
-        <Card.Section>
+        <Card.Section p="1rem">
           <Button
             variant="filled"
             color="secondary"
@@ -231,7 +231,7 @@ const Login = (props: LoginProps): React.ReactNode => {
           </Button>
         </Card.Section>
       )}
-      <Card.Section>
+      <Card.Section p="1rem">
         <Checkbox
           label={t("remember_device")}
           checked={props.rememberMe}

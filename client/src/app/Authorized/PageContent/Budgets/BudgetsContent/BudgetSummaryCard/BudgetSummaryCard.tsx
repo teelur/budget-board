@@ -1,21 +1,13 @@
 import { Flex, Group, Skeleton, Stack } from "@mantine/core";
+import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import BudgetSummaryItem from "./BudgetSummaryItem/BudgetSummaryItem";
 import { IBudget } from "~/models/budget";
 import { ICategory } from "~/models/category";
 import { areStringsEqual } from "~/helpers/utils";
-import {
-  getRangeRolloverBudgetIds,
-  StatusColorType,
-} from "~/helpers/budgets";
+import { getRangeRolloverBudgetIds, StatusColorType } from "~/helpers/budgets";
 import { useTranslation } from "react-i18next";
-import SplitCard, {
-  BorderThickness,
-} from "~/components/ui/SplitCard/SplitCard";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { PiggyBankIcon } from "lucide-react";
-import Divider from "~/components/core/Divider/Divider";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface BudgetSummaryCardProps {
   incomeCategories: ICategory[];
@@ -115,32 +107,29 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
       : projectedNetExpensesTotal + projectedUnbudgetedTotal;
 
   return (
-    <SplitCard
-      border={BorderThickness.Thick}
-      header={
+    <Card>
+      <Card.Section p="0.25rem" separatorThickness="thick">
         <Group gap="0.25rem">
-          <PiggyBankIcon color="var(--base-color-text-dimmed)" />
-          <PrimaryHeading order={4} lh={1}>
+          <PiggyBankIcon color="var(--bbui-color-text-secondary)" />
+          <HeadingText tone="heading" level={4}>
             {t("budget_summary")}
-          </PrimaryHeading>
+          </HeadingText>
         </Group>
-      }
-      elevation={1}
-    >
-      {props.isForecastError && (
-        <Group gap="0.25rem" px="0.75rem" mt="0.25rem">
-          <DimmedText size="xs">
-            {t("error_loading_configuration_message")}
-          </DimmedText>
-        </Group>
-      )}
-      <Stack my="0.5rem" gap={0}>
+      </Card.Section>
+      <Card.Section p="0.25rem">
+        {props.isForecastError && (
+          <Group gap="0.25rem" px="0.75rem" mt="0.25rem">
+            <BodyText tone="secondary" size="xs">
+              {t("error_loading_configuration_message")}
+            </BodyText>
+          </Group>
+        )}
         {props.isPending ? (
-          <Flex h="100%" w="100%" p="0.5rem">
+          <Flex h="100%" w="100%">
             <Skeleton h={100} radius="md" />
           </Flex>
         ) : (
-          <Stack px="0.5rem" gap="0.25rem">
+          <Stack gap="0.25rem">
             <BudgetSummaryItem
               label={t("income")}
               amount={incomeTransactionsTotal}
@@ -167,13 +156,14 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
             />
           </Stack>
         )}
-        <Divider my="0.25rem" elevation={1} />
+      </Card.Section>
+      <Card.Section p="0.25rem">
         {props.isPending ? (
-          <Flex h="100%" w="100%" p="0.5rem">
+          <Flex h="100%" w="100%">
             <Skeleton h={43} radius="md" />
           </Flex>
         ) : (
-          <Stack px="0.5rem" gap="0.25rem">
+          <Stack gap="0.25rem">
             <BudgetSummaryItem
               label={t("unbudgeted")}
               amount={unbudgetedTransactionsTotal}
@@ -184,13 +174,14 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
             />
           </Stack>
         )}
-        <Divider my="0.25rem" elevation={1} />
+      </Card.Section>
+      <Card.Section p="0.25rem">
         {props.isPending ? (
-          <Flex h="100%" w="100%" p="0.5rem">
+          <Flex h="100%" w="100%">
             <Skeleton h={43} radius="md" />
           </Flex>
         ) : (
-          <Stack px="0.5rem" gap="0.25rem">
+          <Stack gap="0.25rem">
             <BudgetSummaryItem
               label={t("net_cash_flow")}
               amount={
@@ -205,8 +196,8 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
             />
           </Stack>
         )}
-      </Stack>
-    </SplitCard>
+      </Card.Section>
+    </Card>
   );
 };
 
