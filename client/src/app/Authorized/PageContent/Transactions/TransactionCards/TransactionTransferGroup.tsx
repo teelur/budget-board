@@ -4,9 +4,9 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import classes from "./TransactionTransferGroup.module.css";
 import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import { BodyText, Card } from "@teelur/budget-board-ui";
 
 interface TransactionTransferGroupProps {
   transactions: [ITransaction, ITransaction];
@@ -32,44 +32,54 @@ const TransactionTransferGroup = ({
     transaction.accountName.trim() || t("unknown_account");
 
   return (
-    <Stack className={classes.transferGroup} gap="0.25rem">
-      <div className={classes.summary}>
-        <Group className={classes.summaryMain} gap="0.5rem" wrap="nowrap">
+    <Card surface="sunken" className={classes.transferGroup}>
+      <Stack gap="0.25rem">
+        <Group gap="0.5rem" wrap="nowrap">
           <ArrowRightLeft
             className={classes.transferIcon}
             size="1.1rem"
             aria-hidden="true"
           />
-          <Stack className={classes.summaryContent} gap={0}>
-            <PrimaryText size="sm">{t("transfer")}</PrimaryText>
-            <Group
-              className={classes.accountSummary}
-              gap="0.35rem"
-              wrap="nowrap"
-            >
-              <PrimaryText size="xs" className={classes.accountName}>
+          <Stack gap={0}>
+            <BodyText tone="primary" size="sm" fw={500}>
+              {t("transfer")}
+            </BodyText>
+            <Group gap="0.35rem" wrap="nowrap">
+              <BodyText
+                tone="secondary"
+                size="xs"
+                className={classes.accountName}
+              >
                 {getAccountName(outgoingTransaction)}
-              </PrimaryText>
-              <ArrowRight size="0.8rem" aria-hidden="true" />
-              <PrimaryText size="xs" className={classes.accountName}>
+              </BodyText>
+              <ArrowRight
+                color="var(--bbui-color-primary)"
+                size="0.8rem"
+                aria-hidden="true"
+              />
+              <BodyText
+                tone="secondary"
+                size="xs"
+                className={classes.accountName}
+              >
                 {getAccountName(incomingTransaction)}
-              </PrimaryText>
+              </BodyText>
             </Group>
           </Stack>
         </Group>
-      </div>
-      {transactions.map((transaction) => (
-        <div key={transaction.id} className={classes.leg}>
-          <TransactionCard
-            transaction={transaction}
-            categories={categories}
-            selected={selectedIds.has(transaction.id)}
-            onToggleSelect={onToggleSelect}
-            p="0.2rem"
-          />
-        </div>
-      ))}
-    </Stack>
+        {transactions.map((transaction) => (
+          <div key={transaction.id} className={classes.leg}>
+            <TransactionCard
+              transaction={transaction}
+              categories={categories}
+              selected={selectedIds.has(transaction.id)}
+              onToggleSelect={onToggleSelect}
+              p="0.2rem"
+            />
+          </div>
+        ))}
+      </Stack>
+    </Card>
   );
 };
 

@@ -4,11 +4,9 @@ import {
   Skeleton,
   Stack,
 } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { BodyText, Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -86,15 +84,17 @@ const DisableBuiltInAssetTypes = (): React.ReactNode => {
 
   return (
     <Stack gap="0.25rem">
-      <PrimaryText size="sm">{t("built_in_asset_types")}</PrimaryText>
-      <DimmedText size="xs">
+      <BodyText tone="heading" size="sm" fw={500}>
+        {t("built_in_asset_types")}
+      </BodyText>
+      <BodyText tone="secondary" size="xs">
         {t("disable_built_in_asset_types_description")}
-      </DimmedText>
+      </BodyText>
       {!canDisable &&
         blockingReasons.map((reason, i) => (
-          <PrimaryText key={i} size="xs">
+          <BodyText tone="primary" size="xs" fw={500} key={i}>
             {reason}
-          </PrimaryText>
+          </BodyText>
         ))}
       {shouldConfirmDisable ? (
         <Popover
@@ -106,13 +106,13 @@ const DisableBuiltInAssetTypes = (): React.ReactNode => {
           <MantinePopover.Target>{toggleButton}</MantinePopover.Target>
           <MantinePopover.Dropdown maw={350}>
             <Stack gap="0.5rem">
-              <PrimaryText size="xs">
+              <BodyText tone="primary" size="xs">
                 {t("disable_built_in_asset_types_warning")}
-              </PrimaryText>
+              </BodyText>
               {blockingReasons.map((reason, i) => (
-                <PrimaryText key={i} size="xs">
+                <BodyText tone="primary" size="xs" fw={500} key={i}>
                   {reason}
-                </PrimaryText>
+                </BodyText>
               ))}
               <Group justify="flex-end" gap="0.5rem">
                 <Button

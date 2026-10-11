@@ -2,11 +2,10 @@ import classes from "./UnbudgetChildCard.module.css";
 import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { Box, Group, LoadingOverlay } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, BodyText } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { roundAwayFromZero } from "~/helpers/utils";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
@@ -39,7 +38,7 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
       p="0.25rem"
       pl="1.5rem"
       data-hover-effect="true"
-      className={`${classes.row} ${hoverClasses.hoverable} ${hoverClasses.outline}`}
+      className={`${hoverClasses.hoverable} ${hoverClasses.outline}`}
       onClick={() => {
         if (props.selectedDate) {
           props.openDetails(props.category, props.selectedDate);
@@ -52,10 +51,10 @@ const UnbudgetChildCard = (props: UnbudgetChildCardProps): React.ReactNode => {
         w="100%"
         style={{ containerType: "inline-size" }}
       >
-        <PrimaryText className={classes.text} elevation={1}>
+        <BodyText tone="primary" fw={500} className={classes.text}>
           {props.icon.length > 0 ? `${props.icon} ` : ""}
           {props.category}
-        </PrimaryText>
+        </BodyText>
         <Group gap="0.5rem">
           <AmountText
             amount={props.amount * (props.isIncome ? 1 : -1)}

@@ -1,8 +1,6 @@
 import { Stack } from "@mantine/core";
-import { Card } from "@teelur/budget-board-ui";
+import { BodyText, Card } from "@teelur/budget-board-ui";
 import { CashFlowValue } from "~/models/budget";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import classes from "./MonthToolcard.module.css";
 
@@ -68,10 +66,12 @@ const MonthToolcard = (props: MonthToolcardProps): React.ReactNode => {
           className={classes.statusStrip}
           data-cash-flow={cashFlowState}
         />
-        <PrimaryText size="sm">{dayjs(props.date).format("MMM")}</PrimaryText>
-        <DimmedText size="xs" c="dimmed">
+        <BodyText tone="primary" size="sm" fw={500}>
+          {dayjs(props.date).format("MMM")}
+        </BodyText>
+        <BodyText tone="secondary" size="xs">
           {dayjs(props.date).format("YYYY")}
-        </DimmedText>
+        </BodyText>
       </Stack>
     </Card>
   );

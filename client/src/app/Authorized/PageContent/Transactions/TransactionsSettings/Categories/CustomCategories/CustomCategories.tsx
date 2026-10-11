@@ -1,8 +1,7 @@
 import { Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import AddCategory from "./AddCategory/AddCategory";
 import CustomCategoryCards from "./CustomCategoryCards/CustomCategoryCards";
 
@@ -11,9 +10,13 @@ const CustomCategories = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
-      <Stack gap="0.25rem">
-        <PrimaryText size="md">{t("custom_categories")}</PrimaryText>
-        <DimmedText size="sm">{t("custom_categories_description")}</DimmedText>
+      <Stack gap={0}>
+        <BodyText tone="primary" size="md" fw={500}>
+          {t("custom_categories")}
+        </BodyText>
+        <BodyText tone="secondary" size="sm">
+          {t("custom_categories_description")}
+        </BodyText>
       </Stack>
       <AddCategory />
       <CustomCategoryCards />

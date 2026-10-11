@@ -3,14 +3,17 @@ import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { SignDisplay } from "~/helpers/currency";
 import { Box, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, AmountText, Progress } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  AmountText,
+  BodyText,
+  Progress,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { useField } from "@mantine/form";
 import { PencilIcon, TrashIcon } from "lucide-react";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useDisclosure } from "@mantine/hooks";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import BudgetMetrics from "../BudgetMetrics/BudgetMetrics";
 import RolloverButton from "../RolloverButton/RolloverButton";
 import BudgetLimitInput from "../BudgetLimitInput/BudgetLimitInput";
@@ -89,8 +92,7 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
           Math.max(
             0,
             roundAwayFromZero(
-              ((projectedAmount * (props.isIncome ? 1 : -1)) /
-                availableLimit) *
+              ((projectedAmount * (props.isIncome ? 1 : -1)) / availableLimit) *
                 100,
             ),
           ),
@@ -162,10 +164,10 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                   size="compact-xs"
                 />
               )}
-              <PrimaryText className={classes.title} elevation={1}>
+              <BodyText tone="primary" fw={500} className={classes.title}>
                 {!isSelected && props.icon.length > 0 ? `${props.icon} ` : ""}
                 {props.categoryValue}
-              </PrimaryText>
+              </BodyText>
               <ActionIcon
                 variant="ghost"
                 color="primary"
@@ -199,7 +201,11 @@ const BudgetChildCard = (props: BudgetChildCardProps): React.ReactNode => {
                     className={classes.text}
                     key="amount"
                   />,
-                  <DimmedText size="sm" key="of" elevation={1} />,
+                  <BodyText
+                    tone="secondary"
+                    className={classes.text}
+                    key="of"
+                  />,
                   getElementForLimit(),
                 ]}
               />

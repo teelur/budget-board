@@ -1,10 +1,9 @@
 import { Group, Stepper } from "@mantine/core";
-import { Button, HeadingText } from "@teelur/budget-board-ui";
+import { BodyText, Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import SelectType from "./SelectType/SelectType";
 import ConfigureGoal, {
@@ -115,7 +114,9 @@ const AddGoalModal = (): React.ReactNode => {
           </Stepper.Step>
           <Stepper.Completed>
             <Group justify="center">
-              <PrimaryText>{t("goal_created_successfully")}</PrimaryText>
+              <BodyText tone="secondary" size="sm">
+                {t("goal_created_successfully")}
+              </BodyText>
             </Group>
           </Stepper.Completed>
         </Stepper>

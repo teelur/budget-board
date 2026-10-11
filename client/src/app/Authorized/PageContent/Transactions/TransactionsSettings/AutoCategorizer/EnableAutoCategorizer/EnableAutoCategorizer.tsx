@@ -1,9 +1,7 @@
 import { Stack, Tooltip } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, BodyText } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
@@ -46,14 +44,16 @@ const EnableAutoCategorizer = (): React.ReactNode => {
   );
 
   return (
-    <Stack gap="0.25rem">
-      <PrimaryText size="md">{t("enable_auto_categorizer")}</PrimaryText>
-      <DimmedText size="sm">
+    <Stack gap={0}>
+      <BodyText tone="primary" size="md" fw={500}>
+        {t("enable_auto_categorizer")}
+      </BodyText>
+      <BodyText tone="secondary" size="sm">
         {t("enable_auto_categorizer_description")}
-      </DimmedText>
-      <PrimaryText size="sm">
+      </BodyText>
+      <BodyText tone="primary" size="sm" fw={500}>
         {t("enable_auto_categorizer_warning")}
-      </PrimaryText>
+      </BodyText>
       {autoCategorizerModelOID == null ? tooltip : button}
     </Stack>
   );

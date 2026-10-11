@@ -1,9 +1,12 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon, Badge, AmountText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  Badge,
+  AmountText,
+  BodyText,
+} from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import {
   getIsParentAccountType,
   getParentAccountType,
@@ -40,7 +43,11 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
 
   const getAccountTypeDisplay = (): React.ReactNode => {
     if (props.account.type?.length === 0) {
-      return <DimmedText size="sm">{t("no_type")}</DimmedText>;
+      return (
+        <BodyText tone="muted" size="sm">
+          {t("no_type")}
+        </BodyText>
+      );
     }
 
     const isParentAccountType = getIsParentAccountType(
@@ -54,11 +61,15 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
 
     return (
       <Group gap="0.25rem">
-        <DimmedText size="sm">{accountType}</DimmedText>
+        <BodyText tone="secondary" size="sm">
+          {accountType}
+        </BodyText>
         {!isParentAccountType && (
           <>
             <ChevronRightIcon size={14} />
-            <DimmedText size="sm">{props.account.type}</DimmedText>
+            <BodyText tone="secondary" size="sm">
+              {props.account.type}
+            </BodyText>
           </>
         )}
       </Group>
@@ -69,11 +80,11 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
     <Stack gap={0} flex="1 1 auto">
       <Group justify="space-between" align="center">
         <Group gap="0.5rem" align="center">
-          <PrimaryText size="md">
+          <BodyText tone="primary" size="md" fw={500}>
             {props.account.name && props.account.name.length > 0
               ? props.account.name
               : t("no_name")}
-          </PrimaryText>
+          </BodyText>
           <ActionIcon
             variant="ghost"
             color="primary"
@@ -122,13 +133,13 @@ const AccountItemContent = (props: IAccountItemContentProps) => {
       </Group>
       <Group justify="space-between" align="center">
         {getAccountTypeDisplay()}
-        <DimmedText size="sm">
+        <BodyText tone="secondary" size="sm">
           {t("last_updated", {
             date: dayjs(props.account.balanceDate).isValid()
               ? dayjs(props.account.balanceDate).format(`${dateFormat}`)
               : t("never"),
           })}
-        </DimmedText>
+        </BodyText>
       </Group>
     </Stack>
   );

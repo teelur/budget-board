@@ -1,9 +1,7 @@
 import { Flex, Group } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText } from "@teelur/budget-board-ui";
 import { ChevronRightIcon, PencilIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getSubtypeOptions, NET_WORTH_CATEGORY_TYPES } from "~/helpers/widgets";
 import { INetWorthWidgetCategory } from "~/models/widgetSettings";
 
@@ -42,15 +40,23 @@ const NetWorthLineCategoryContent = (
     >
       <Group gap="0.25rem" align="center">
         {props.category.type.length > 0 ? (
-          <PrimaryText size="sm">{getTypeDisplayString()}</PrimaryText>
+          <BodyText tone="primary" size="sm">
+            {getTypeDisplayString()}
+          </BodyText>
         ) : (
-          <DimmedText size="sm">{t("no_type")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_type")}
+          </BodyText>
         )}
         <ChevronRightIcon size={14} />
         {props.category.subtype.length > 0 ? (
-          <DimmedText size="sm">{getSubtypeDisplayString()}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {getSubtypeDisplayString()}
+          </BodyText>
         ) : (
-          <DimmedText size="sm">{t("no_subtype")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_subtype")}
+          </BodyText>
         )}
         <ActionIcon
           variant="ghost"
@@ -61,7 +67,9 @@ const NetWorthLineCategoryContent = (
           <PencilIcon size={14} />
         </ActionIcon>
       </Group>
-      <PrimaryText size="sm">{props.category.value}</PrimaryText>
+      <BodyText tone="primary" size="sm">
+        {props.category.value}
+      </BodyText>
     </Flex>
   );
 };

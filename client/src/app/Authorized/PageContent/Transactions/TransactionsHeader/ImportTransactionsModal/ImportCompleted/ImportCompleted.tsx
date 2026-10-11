@@ -1,8 +1,7 @@
 import { Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { BodyText, Button } from "@teelur/budget-board-ui";
 import { MoveLeftIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 
 interface ImportCompletedProps {
   goBackToPreviousDialog: () => void;
@@ -24,7 +23,7 @@ const ImportCompleted = (props: ImportCompletedProps) => {
       maw="100%"
       mx="auto"
     >
-      <PrimaryText size="md" py="1rem">
+      <BodyText tone="secondary" size="md" py="1rem">
         {t(
           props.isCancelled
             ? "import_stopped"
@@ -34,7 +33,7 @@ const ImportCompleted = (props: ImportCompletedProps) => {
                 ? "import_completed_with_errors"
                 : "import_completed_successfully",
         )}
-      </PrimaryText>
+      </BodyText>
       <Group w="100%">
         <Button
           variant="filled"

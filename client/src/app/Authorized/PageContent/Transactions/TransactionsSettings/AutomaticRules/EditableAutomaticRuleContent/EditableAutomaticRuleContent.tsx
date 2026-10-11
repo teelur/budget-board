@@ -1,5 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import {
@@ -13,7 +13,6 @@ import { getDefaultAction } from "~/helpers/automaticRules";
 import ActionItem from "./ActionItem/ActionItem";
 import ConditionItem from "./ConditionItem/ConditionItem";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 
 interface EditableAutomaticRuleContentProps {
@@ -68,9 +67,11 @@ const EditableAutomaticRuleContent = (
 
   return (
     <Stack gap="0.5rem">
-      <Stack gap="0.5rem">
+      <Stack gap="0.25rem">
         <Group align="center" justify="space-between">
-          <PrimaryText size="sm">{t("if")}</PrimaryText>
+          <BodyText tone="primary" size="sm" fw={500}>
+            {t("if")}
+          </BodyText>
           <ActionIcon
             variant="filled"
             color="primary"
@@ -98,9 +99,11 @@ const EditableAutomaticRuleContent = (
           />
         ))}
       </Stack>
-      <Stack gap="0.5rem">
+      <Stack gap="0.25rem">
         <Group align="center" justify="space-between">
-          <PrimaryText size="sm">{t("then")}</PrimaryText>
+          <BodyText tone="primary" size="sm" fw={500}>
+            {t("then")}
+          </BodyText>
           <ActionIcon
             variant="filled"
             color="primary"

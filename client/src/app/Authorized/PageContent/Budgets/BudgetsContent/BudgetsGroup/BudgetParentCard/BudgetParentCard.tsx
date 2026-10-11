@@ -13,6 +13,7 @@ import {
 import {
   ActionIcon,
   AmountText,
+  BodyText,
   Button,
   Card,
   HeadingText,
@@ -28,8 +29,6 @@ import { CategoryTypes, ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
 import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
 import Divider from "~/components/core/Divider/Divider";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Popover from "~/components/core/Popover/Popover";
 import BudgetMetrics from "./BudgetMetrics/BudgetMetrics";
 import RolloverButton from "./RolloverButton/RolloverButton";
@@ -383,7 +382,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       className={classes.text}
                       key="amount"
                     />,
-                    <DimmedText size="sm" key="of" elevation={1} />,
+                    <BodyText tone="secondary" size="sm" key="of" />,
                     getElementForLimit(),
                   ]}
                 />
@@ -452,12 +451,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 </MantinePopover.Target>
                 <MantinePopover.Dropdown p="0.5rem" maw={200}>
                   <Stack gap={5}>
-                    <PrimaryText size="sm" elevation={1}>
+                    <BodyText tone="primary" size="sm">
                       {t("confirm_delete_budget_message")}
-                    </PrimaryText>
-                    <DimmedText size="xs" elevation={1}>
+                    </BodyText>
+                    <BodyText tone="secondary" size="xs">
                       {t("all_children_will_also_be_deleted")}
-                    </DimmedText>
+                    </BodyText>
                     <Button
                       variant="filled"
                       color="error"

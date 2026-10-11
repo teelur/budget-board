@@ -1,10 +1,8 @@
 import { Group, Stack } from "@mantine/core";
-import { Badge, Button } from "@teelur/budget-board-ui";
+import { Badge, BodyText, Button } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { WidgetRegistryEntry } from "~/shared/dashboardGrid";
 
 interface WidgetPickerItemProps {
@@ -33,14 +31,18 @@ const WidgetPickerItem = ({
     >
       <Stack gap={0} style={{ flex: 1 }}>
         <Group gap="0.25rem">
-          <PrimaryText size="sm">{t(widget.labelKey)}</PrimaryText>
+          <BodyText tone="primary" size="sm" fw={500}>
+            {t(widget.labelKey)}
+          </BodyText>
           {isDisabled && (
             <Badge variant="light" color="primary" size="xs">
               {t("widget_already_added")}
             </Badge>
           )}
         </Group>
-        <DimmedText size="xs">{t(widget.descriptionKey)}</DimmedText>
+        <BodyText tone="secondary" size="xs">
+          {t(widget.descriptionKey)}
+        </BodyText>
       </Stack>
       <Button
         variant="filled"

@@ -1,9 +1,8 @@
 import { Divider, Flex, Pagination, Stack, Table } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, BodyText } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import {
   ITransaction,
   ITransactionImportTableData,
@@ -104,9 +103,9 @@ const DuplicateTransactionTable = (
                       </ActionIcon>
                     </Table.Td>
                     <Table.Td>
-                      <PrimaryText size="sm">
+                      <BodyText tone="secondary" size="sm">
                         {t("imported_transaction")}
-                      </PrimaryText>
+                      </BodyText>
                     </Table.Td>
                     <Table.Td>
                       {dayjs(row.importedTransaction.date).format(dateFormat)}
@@ -125,8 +124,10 @@ const DuplicateTransactionTable = (
                     <Table.Td>{row.importedTransaction.account}</Table.Td>
                     <Table.Td>
                       <Stack gap={0}>
-                        <PrimaryText size="xs">{t("matched_on")}:</PrimaryText>
-                        <PrimaryText size="xs">
+                        <BodyText tone="secondary" size="xs">
+                          {t("matched_on")}:
+                        </BodyText>
+                        <BodyText tone="primary" size="xs" fw={500}>
                           {props.matchFields
                             .get(row.importedTransaction.uid)
                             ?.map((field) =>
@@ -137,7 +138,7 @@ const DuplicateTransactionTable = (
                               ),
                             )
                             .join(", ")}
-                        </PrimaryText>
+                        </BodyText>
                       </Stack>
                     </Table.Td>
                   </Table.Tr>
@@ -146,9 +147,9 @@ const DuplicateTransactionTable = (
                     <Table.Td>
                       <Flex align="center" gap="0.25rem">
                         <CornerDownRightIcon size="1rem" />
-                        <PrimaryText size="sm">
+                        <BodyText tone="secondary" size="sm">
                           {t("existing_transaction")}
-                        </PrimaryText>
+                        </BodyText>
                       </Flex>
                     </Table.Td>
                     <Table.Td>

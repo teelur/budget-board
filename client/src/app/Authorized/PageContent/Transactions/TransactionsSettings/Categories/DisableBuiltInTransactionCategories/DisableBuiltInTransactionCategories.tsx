@@ -4,11 +4,9 @@ import {
   Skeleton,
   Stack,
 } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { BodyText, Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -100,18 +98,20 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
 
   return (
     <Stack gap="0.25rem">
-      <PrimaryText size="md">
-        {t("built_in_transaction_categories")}
-      </PrimaryText>
-      <DimmedText size="sm">
-        {t("disable_built_in_transaction_categories_description")}
-      </DimmedText>
-      {hasBlockingReferences &&
-        blockingReasons.map((reason, i) => (
-          <PrimaryText key={i} size="xs">
-            {reason}
-          </PrimaryText>
-        ))}
+      <Stack gap={0}>
+        <BodyText tone="primary" size="md" fw={500}>
+          {t("built_in_transaction_categories")}
+        </BodyText>
+        <BodyText tone="secondary" size="sm">
+          {t("disable_built_in_transaction_categories_description")}
+        </BodyText>
+        {hasBlockingReferences &&
+          blockingReasons.map((reason, i) => (
+            <BodyText tone="primary" size="xs" fw={500} key={i}>
+              {reason}
+            </BodyText>
+          ))}
+      </Stack>
       {shouldConfirmDisable ? (
         <Popover
           opened={isConfirmationOpen}
@@ -121,14 +121,14 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
         >
           <MantinePopover.Target>{toggleButton}</MantinePopover.Target>
           <MantinePopover.Dropdown maw={350}>
-            <Stack gap="0.5rem">
-              <PrimaryText size="xs">
+            <Stack gap="0.25rem">
+              <BodyText tone="primary" size="xs">
                 {t("disable_built_in_transaction_categories_warning")}
-              </PrimaryText>
+              </BodyText>
               {blockingReasons.map((reason, i) => (
-                <PrimaryText key={i} size="xs">
+                <BodyText tone="primary" size="xs" fw={500} key={i}>
                   {reason}
-                </PrimaryText>
+                </BodyText>
               ))}
               <Group justify="flex-end" gap="0.5rem">
                 <Button

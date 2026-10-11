@@ -1,12 +1,15 @@
 import { Code, Group, ScrollArea, Stack } from "@mantine/core";
-import { Button, HeadingText, TextInput } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  HeadingText,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Modal from "~/components/core/Modal/Modal";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -141,20 +144,18 @@ const MetricWidgetSettings = ({
       }
       size="lg"
     >
-      <Stack gap="0.75rem">
-        <DimmedText size="sm">{t("metric_widget_settings_message")}</DimmedText>
-        <Stack gap="0.75rem">
+      <Stack gap="0.5rem">
+        <BodyText tone="secondary" size="sm">
+          {t("metric_widget_settings_message")}
+        </BodyText>
+        <Stack gap="0.5rem">
           <TextInput
             label={t("metric_widget_title_label")}
             placeholder={t("metric_widget_title_placeholder")}
             {...titleField.getInputProps()}
           />
           <FormulaTextInput
-            label={
-              <PrimaryText size="sm">
-                {t("metric_widget_value_label")}
-              </PrimaryText>
-            }
+            label={t("metric_widget_value_label")}
             placeholder={t("metric_widget_value_placeholder")}
             value={valueField.getValue()}
             onChange={valueField.setValue}
@@ -164,11 +165,7 @@ const MetricWidgetSettings = ({
             accountNames={accountNames}
           />
           <FormulaTextInput
-            label={
-              <PrimaryText size="sm">
-                {t("metric_widget_label_label")}
-              </PrimaryText>
-            }
+            label={t("metric_widget_label_label")}
             placeholder={t("metric_widget_label_placeholder")}
             value={labelField.getValue()}
             onChange={labelField.setValue}
@@ -182,9 +179,9 @@ const MetricWidgetSettings = ({
           <Accordion.Item
             defaultOpen={false}
             title={
-              <DimmedText size="sm">
+              <BodyText tone="secondary" size="sm" fw={500}>
                 {t("metric_widget_syntax_reference")}
-              </DimmedText>
+              </BodyText>
             }
           >
             <ScrollArea.Autosize mah={320} type="auto">
@@ -192,21 +189,21 @@ const MetricWidgetSettings = ({
                 <Code block style={{ fontSize: "0.75rem" }}>
                   {t("metric_widget_syntax_schema")}
                 </Code>
-                <DimmedText size="xs">
+                <BodyText tone="secondary" size="xs">
                   {t("metric_widget_syntax_sources")}:{"  "}
                   <Code>transactions</Code>, <Code>budgets</Code>,{" "}
                   <Code>goals</Code>, <Code>accounts</Code>
-                </DimmedText>
-                <DimmedText size="xs">
+                </BodyText>
+                <BodyText tone="secondary" size="xs">
                   {t("metric_widget_syntax_periods")}:{"  "}
                   <Code>this_month</Code> <Code>last_month</Code>{" "}
                   <Code>this_year</Code> <Code>last_3_months</Code>{" "}
                   <Code>last_6_months</Code> <Code>last_12_months</Code>{" "}
                   <Code>all_time</Code>
-                </DimmedText>
-                <DimmedText size="xs" fw={600} mt="0.25rem">
+                </BodyText>
+                <BodyText tone="secondary" size="xs" fw={500} mt="0.25rem">
                   {t("metric_widget_syntax_examples")}:
-                </DimmedText>
+                </BodyText>
                 <Code block style={{ fontSize: "0.75rem", whiteSpace: "pre" }}>
                   {SYNTAX_EXAMPLES}
                 </Code>

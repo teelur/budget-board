@@ -24,7 +24,9 @@ const DeletedTransactionsCard = (
       <Group justify="space-between" wrap="nowrap">
         <Stack gap={0}>
           <BodyText tone="primary" size="sm" fw={500}>
-            {props.deletedTransaction.merchantName}
+            {(props.deletedTransaction.merchantName?.length ?? 0) > 0
+              ? props.deletedTransaction.merchantName
+              : t("no_name")}
           </BodyText>
           <BodyText tone="secondary" size="xs">
             {t("days_since_deleted", {

@@ -1,8 +1,8 @@
 import { Group, Pagination, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import React from "react";
 import { ITransaction } from "~/models/transaction";
 import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 
 interface DeletedTransactionCardsProps {
@@ -33,7 +33,9 @@ const DeletedTransactionCards = (
               />
             ))
         ) : (
-          <PrimaryText size="xs">{t("no_transactions")}</PrimaryText>
+          <BodyText tone="muted" size="sm" ta="center">
+            {t("no_transactions")}
+          </BodyText>
         )}
       </Stack>
       <Group justify="center">
