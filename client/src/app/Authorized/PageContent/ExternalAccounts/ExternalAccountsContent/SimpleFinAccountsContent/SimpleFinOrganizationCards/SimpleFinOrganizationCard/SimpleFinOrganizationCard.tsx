@@ -19,7 +19,7 @@ const SimpleFinOrganizationCard = (
       <Stack p={0} gap="0.5rem">
         <Group gap="0.5rem">
           <BodyText tone="primary" size="md" fw={500}>
-            {props.simpleFinOrganization.name ??
+            {props.simpleFinOrganization.name ||
               props.simpleFinOrganization.domain}
           </BodyText>
           {props.simpleFinOrganization.simpleFinUrl && (
