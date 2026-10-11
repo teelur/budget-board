@@ -1,11 +1,11 @@
 import { Group, Pagination, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
 import React from "react";
-import TransactionCard from "~/components/core/Card/TransactionCard/TransactionCard";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
+import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -43,7 +43,9 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
   if (props.transactions.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="sm">{t("no_transactions")}</DimmedText>
+        <BodyText tone="muted" size="sm">
+          {t("no_transactions")}
+        </BodyText>
       </Group>
     );
   }
@@ -56,8 +58,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
             key={transaction.id}
             transaction={transaction}
             categories={props.categories}
-            elevation={2}
-            isSelected={selectedIds.has(transaction.id)}
+            selected={selectedIds.has(transaction.id)}
             onToggleSelect={onToggleSelect}
           />
         ))}

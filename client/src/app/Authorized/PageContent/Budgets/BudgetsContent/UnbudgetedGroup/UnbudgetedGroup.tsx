@@ -6,11 +6,9 @@ import { SignDisplay } from "~/helpers/currency";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, CategoryTypes, ICategoryNode } from "~/models/category";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
-import { AmountText } from "@teelur/budget-board-ui";
+import { AmountText, BodyText } from "@teelur/budget-board-ui";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -85,7 +83,9 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
         slim
         title={
           <Group justify="space-between" align="center" w="100%" pr="0.25rem">
-            <PrimaryText size="lg">{t("unbudgeted")}</PrimaryText>
+            <BodyText tone="primary" size="lg" fw={500}>
+              {t("unbudgeted")}
+            </BodyText>
             <AmountText
               amount={total}
               disableStatusColor
@@ -103,7 +103,9 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
           {unbudgetedCards.length > 0 ? (
             unbudgetedCards
           ) : (
-            <DimmedText size="sm">{t("no_unbudgeted_categories")}</DimmedText>
+            <BodyText tone="muted" size="sm" ta="center">
+              {t("no_unbudgeted_categories")}
+            </BodyText>
           )}
         </Stack>
       </Accordion.Item>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, Card } from "@teelur/budget-board-ui";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { Flex, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -10,7 +10,6 @@ import { closestCenter } from "@dnd-kit/collision";
 import { GripVertical } from "lucide-react";
 import AssetItemContent from "./AssetItemContent/AssetItemContent";
 import EditableAssetItemContent from "./EditableAssetItemContent/EditableAssetItemContent";
-import Card from "~/components/core/Card/Card";
 
 interface AssetItemProps {
   asset: IAssetResponse;
@@ -38,8 +37,7 @@ const AssetItem = (props: AssetItemProps): React.ReactNode => {
     <Card
       ref={props.isSortable ? ref : undefined}
       onClick={() => !isSelected && props.openDetails(props.asset)}
-      hoverEffect={!isSelected}
-      elevation={1}
+      hoverable={!isSelected}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (

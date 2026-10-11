@@ -1,5 +1,5 @@
 import { Stepper } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, HeadingText } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { FileDownIcon } from "lucide-react";
 import React from "react";
@@ -17,7 +17,6 @@ import { useDisclosure } from "@mantine/hooks";
 import ImportCompleted from "./ImportCompleted/ImportCompleted";
 import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useImportTransactionsMutation } from "~/hooks/mutations/transactions/useImportTransactionsMutation";
 import ImportProgress from "./ImportProgress/ImportProgress";
 import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
@@ -244,9 +243,9 @@ const ImportTransactionsModal = () => {
         onClose={close}
         size="auto"
         title={
-          <PrimaryHeading component="span" order={4}>
+          <HeadingText tone="heading" level={4}>
             {t("import_transactions")}
-          </PrimaryHeading>
+          </HeadingText>
         }
       >
         <Stepper active={activeStep} allowNextStepsSelect={false} w="100%">

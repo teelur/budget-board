@@ -10,6 +10,7 @@ import {
   NumberInput,
   TextInput,
   DateInput,
+  BodyText,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";
@@ -20,8 +21,6 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import { useField } from "@mantine/form";
 import { DateValue } from "@mantine/dates";
 import { getGoalTargetAmount } from "~/helpers/goals";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { StatusColorType } from "~/helpers/budgets";
 import { Trans, useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -150,9 +149,9 @@ const EditableGoalCardContent = (
     }
 
     return (
-      <PrimaryText size="sm" key="date-not-edit">
+      <BodyText tone="primary" size="sm" key="date-not-edit">
         {dayjs(props.goal.completeDate).format("MMMM YYYY")}
-      </PrimaryText>
+      </BodyText>
     );
   };
 
@@ -294,7 +293,7 @@ const EditableGoalCardContent = (
                     decimalPlaces={0}
                     key="amount"
                   />,
-                  <DimmedText size="sm" key="of" />,
+                  <BodyText size="sm" key="of" />,
                   getElementForTargetAmount(),
                 ]}
               />
@@ -309,7 +308,9 @@ const EditableGoalCardContent = (
           <Flex className={classes.footer}>
             <Group align="center" gap="sm">
               <Flex align="center" gap="0.25rem">
-                <DimmedText size="sm">{t("projected_colon")}</DimmedText>
+                <BodyText tone="secondary" size="sm">
+                  {t("projected_colon")}
+                </BodyText>
                 {getElementForCompleteDate()}
               </Flex>
             </Group>
@@ -328,9 +329,9 @@ const EditableGoalCardContent = (
                     decimalPlaces={decimalPlaces}
                     key="amount"
                   />,
-                  <DimmedText size="sm" key="of" />,
+                  <BodyText size="sm" key="of" />,
                   getElementForMonthlyContribution(),
-                  <DimmedText size="sm" key="this_month" />,
+                  <BodyText size="sm" key="this_month" />,
                 ]}
               />
             </Flex>

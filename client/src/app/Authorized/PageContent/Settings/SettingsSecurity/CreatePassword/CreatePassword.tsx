@@ -1,9 +1,12 @@
 import { Stack } from "@mantine/core";
-import { Button, PasswordInput } from "@teelur/budget-board-ui";
+import {
+  Button,
+  Card,
+  HeadingText,
+  PasswordInput,
+} from "@teelur/budget-board-ui";
 import { hasLength, useField } from "@mantine/form";
 import React from "react";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useUpdatePasswordMutation } from "~/hooks/mutations/auth/useUpdatePasswordMutation";
 
@@ -27,19 +30,23 @@ const CreatePassword = (): React.ReactNode => {
   });
 
   return (
-    <Card elevation={1}>
+    <Card>
       <Stack gap="1rem">
-        <PrimaryText size="lg">{t("create_password")}</PrimaryText>
-        <PasswordInput
-          {...newPasswordField.getInputProps()}
-          label={t("new_password")}
-          w="100%"
-        />
-        <PasswordInput
-          {...confirmNewPasswordField.getInputProps()}
-          label={t("confirm_password")}
-          w="100%"
-        />
+        <HeadingText tone="heading" level={4}>
+          {t("create_password")}
+        </HeadingText>
+        <Stack gap="0.5rem">
+          <PasswordInput
+            {...newPasswordField.getInputProps()}
+            label={t("new_password")}
+            w="100%"
+          />
+          <PasswordInput
+            {...confirmNewPasswordField.getInputProps()}
+            label={t("confirm_password")}
+            w="100%"
+          />
+        </Stack>
         <Button
           variant="filled"
           color="primary"

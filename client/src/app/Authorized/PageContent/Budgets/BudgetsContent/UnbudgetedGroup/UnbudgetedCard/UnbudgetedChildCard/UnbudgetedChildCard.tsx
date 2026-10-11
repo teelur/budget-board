@@ -1,12 +1,15 @@
 import classes from "./UnbudgetedChildCard.module.css";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { Group, LoadingOverlay } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  AmountText,
+  BodyText,
+  Card,
+} from "@teelur/budget-board-ui";
 import { CornerDownRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 import { roundAwayFromZero } from "~/helpers/utils";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { SignDisplay } from "~/helpers/currency";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -43,15 +46,14 @@ const UnbudgetedChildCard = (
             props.openDetails(props.category, props.selectedDate);
           }
         }}
-        hoverEffect
-        elevation={2}
+        hoverable
       >
         <LoadingOverlay visible={createBudgetMutation.isPending} />
         <Group w="100%" justify="space-between">
-          <PrimaryText className={classes.text}>
+          <BodyText className={classes.text}>
             {props.icon.length > 0 ? `${props.icon} ` : ""}
             {props.category}
-          </PrimaryText>
+          </BodyText>
           <Group gap="sm">
             <AmountText
               amount={props.amount}

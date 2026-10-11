@@ -4,13 +4,11 @@ import hoverClasses from "~/styles/Hoverable.module.css";
 import { Group, Stack } from "@mantine/core";
 import { IAccountResponse } from "~/models/account";
 import React from "react";
-import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
-import DimmedText from "../core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import { AmountText } from "@teelur/budget-board-ui";
+import { AmountText, BodyText } from "@teelur/budget-board-ui";
 
 interface AccountItemProps {
   account: IAccountResponse;
@@ -37,16 +35,16 @@ const AccountItem = (props: AccountItemProps): React.ReactNode => {
       onClick={props.onClick}
     >
       <Stack h="100%" gap={0}>
-        <PrimaryText className={classes.title}>
+        <BodyText tone="primary" fw={500} className={classes.title}>
           {props.account.name}
-        </PrimaryText>
-        <DimmedText className={classes.timestamp} size="xs">
+        </BodyText>
+        <BodyText tone="secondary" className={classes.timestamp}>
           {t("last_updated", {
             date: dayjs(props.account.balanceDate).isValid()
               ? dayjs(props.account.balanceDate).format(`${dateFormat}`)
               : t("never"),
           })}
-        </DimmedText>
+        </BodyText>
       </Stack>
       <Stack h="100%" justify="flex-start">
         <AmountText

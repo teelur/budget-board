@@ -5,6 +5,8 @@ import {
   AmountText,
   DateInput,
   Select,
+  Card,
+  BodyText,
 } from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";
@@ -12,9 +14,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteLunchFlowAccountMutation } from "~/hooks/mutations/lunchFlowAccount/useDeleteLunchFlowAccountMutation";
 import { useUpdateLinkedAccountMutation } from "~/hooks/mutations/lunchFlowAccount/useUpdateLinkedAccountMutation";
 import { useUpdateSyncStartDateMutation } from "~/hooks/mutations/lunchFlowAccount/useUpdateSyncStartDateMutation";
@@ -153,7 +152,7 @@ const LunchFlowAccountCard = (
   }, [accountsQuery.data, props.lunchFlowAccount.linkedAccountId]);
 
   return (
-    <Card elevation={2}>
+    <Card>
       <LoadingOverlay
         visible={
           updateLinkedAccountMutation.isPending ||
@@ -162,10 +161,12 @@ const LunchFlowAccountCard = (
         }
       />
       <Group w={"100%"} gap={"0.5rem"}>
-        <Stack gap="0.25rem" flex={1}>
+        <Stack gap="0.125rem" flex={1}>
           <Group justify="space-between" align="center">
             <Group gap="0.5rem">
-              <PrimaryText size="sm">{props.lunchFlowAccount.name}</PrimaryText>
+              <BodyText tone="primary" size="sm" fw={500}>
+                {props.lunchFlowAccount.name}
+              </BodyText>
               <ActionIcon
                 variant="ghost"
                 color="primary"
@@ -192,9 +193,9 @@ const LunchFlowAccountCard = (
             <Group gap="0.5rem">
               {isEditable ? (
                 <Group gap="0.5rem">
-                  <PrimaryText size="xs">
+                  <BodyText tone="secondary" size="xs">
                     {t("linked_account_input")}
-                  </PrimaryText>
+                  </BodyText>
                   <Select
                     size="xs"
                     placeholder={t("select_an_account")}
@@ -221,7 +222,7 @@ const LunchFlowAccountCard = (
                         : t("none"),
                     }}
                     components={[
-                      <DimmedText size="xs" key="label" />,
+                      <BodyText tone="secondary" size="xs" key="label" />,
                       getBadgeForAccountName(),
                     ]}
                   />
@@ -234,9 +235,9 @@ const LunchFlowAccountCard = (
               )}
               {isEditable ? (
                 <Group gap="0.5rem">
-                  <PrimaryText size="xs">
+                  <BodyText tone="secondary" size="xs">
                     {t("sync_start_date_input")}
-                  </PrimaryText>
+                  </BodyText>
                   <DateInput
                     size="xs"
                     w="8rem"
@@ -270,13 +271,13 @@ const LunchFlowAccountCard = (
                         : t("auto"),
                     }}
                     components={[
-                      <DimmedText size="xs" key="label" />,
+                      <BodyText tone="secondary" size="xs" key="label" />,
                       getBadgeForSyncStartDate(),
                     ]}
                   />
                 </Group>
               )}
-              <DimmedText size="xs">
+              <BodyText tone="secondary" size="xs">
                 {t("last_sync", {
                   date: dayjs(props.lunchFlowAccount.lastSync).isValid()
                     ? dayjs(props.lunchFlowAccount.lastSync).format(
@@ -284,9 +285,9 @@ const LunchFlowAccountCard = (
                       )
                     : t("never"),
                 })}
-              </DimmedText>
+              </BodyText>
             </Group>
-            <DimmedText size="xs">
+            <BodyText tone="secondary" size="xs">
               {t("last_updated", {
                 date: dayjs(props.lunchFlowAccount.balanceDate).isValid()
                   ? dayjs(props.lunchFlowAccount.balanceDate).format(
@@ -294,7 +295,7 @@ const LunchFlowAccountCard = (
                     )
                   : t("never"),
               })}
-            </DimmedText>
+            </BodyText>
           </Group>
         </Stack>
         {isEditable && (

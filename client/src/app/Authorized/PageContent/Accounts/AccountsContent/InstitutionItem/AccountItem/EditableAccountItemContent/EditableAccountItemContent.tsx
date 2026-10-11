@@ -6,6 +6,7 @@ import {
   NumberInput,
   TextInput,
   CategorySelect,
+  BodyText,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useField } from "@mantine/form";
@@ -13,7 +14,6 @@ import { useDidUpdate } from "@mantine/hooks";
 import { PencilIcon } from "lucide-react";
 import { IAccountResponse } from "~/models/account";
 import DeleteAccountPopover from "./DeleteAccountPopover/DeleteAccountPopover";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
@@ -200,13 +200,13 @@ const EditableAccountItemContent = (props: EditableAccountItemContentProps) => {
             }}
             withinPortal
           />
-          <DimmedText size="sm">
+          <BodyText tone="secondary" size="sm">
             {t("last_updated", {
               date: dayjs(props.account.balanceDate).isValid()
                 ? dayjs(props.account.balanceDate).format(`${dateFormat}`)
                 : t("never"),
             })}
-          </DimmedText>
+          </BodyText>
         </Group>
       </Stack>
       <Group style={{ alignSelf: "stretch" }}>

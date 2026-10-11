@@ -1,5 +1,5 @@
 import { Alert, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { BodyText, Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import {
@@ -15,7 +15,6 @@ import { areStringsEqual } from "~/helpers/utils";
 import ColumnsSelect, { ISelectedColumns } from "./ColumnsSelect/ColumnsSelect";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { InfoIcon, MoveLeftIcon, MoveRightIcon } from "lucide-react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
@@ -477,6 +476,9 @@ const ConfigureTransactions = (
 
   return (
     <Stack gap="0.5rem" w="auto" maw="100%" mx="auto">
+      <HeadingText tone="heading" level={5}>
+        {t("configure_transactions")}
+      </HeadingText>
       {alertDetails && (
         <Alert
           variant="outline"
@@ -486,7 +488,9 @@ const ConfigureTransactions = (
           radius="md"
           bg="var(--background-color-surface)"
         >
-          <PrimaryText size="sm">{alertDetails}</PrimaryText>
+          <BodyText tone="secondary" size="sm">
+            {alertDetails}
+          </BodyText>
         </Alert>
       )}
       {importedTransactionsTableData.length > 0 && (

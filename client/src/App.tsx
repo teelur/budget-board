@@ -206,6 +206,13 @@ const theme = createTheme({
 const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {
+    "--bbui-color-page": budgetBoardColors.light.page,
+    "--bbui-color-surface": budgetBoardColors.light.surface,
+    "--bbui-color-text-primary": budgetBoardColors.light.textPrimary,
+    "--bbui-color-text-secondary": budgetBoardColors.light.textSecondary,
+    "--bbui-color-text-muted": budgetBoardColors.light.textMuted,
+    "--bbui-color-primary": budgetBoardColors.light.primary,
+    "--bbui-color-button-hover": budgetBoardColors.light.buttonHoverBorder,
     // Base colors
     "--background-color-base": backgroundEggshell[0],
     "--base-color-border": backgroundEggshell[4],
@@ -244,6 +251,13 @@ const resolver: CSSVariablesResolver = () => ({
     "--light-color-off": backgroundEggshell[8],
   },
   dark: {
+    "--bbui-color-page": budgetBoardColors.dark.page,
+    "--bbui-color-surface": budgetBoardColors.dark.surface,
+    "--bbui-color-text-primary": budgetBoardColors.dark.textPrimary,
+    "--bbui-color-text-secondary": budgetBoardColors.dark.textSecondary,
+    "--bbui-color-text-muted": budgetBoardColors.dark.textMuted,
+    "--bbui-color-primary": budgetBoardColors.dark.primary,
+    "--bbui-color-button-hover": budgetBoardColors.dark.buttonHoverBorder,
     // Base colors
     "--background-color-base": backgroundGray[9],
     "--base-color-border": backgroundGray[4],

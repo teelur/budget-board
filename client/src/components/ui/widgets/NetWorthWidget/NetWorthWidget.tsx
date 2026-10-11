@@ -1,18 +1,14 @@
-import { Flex, Group, Skeleton, Stack } from "@mantine/core";
+import { Flex, Group, Skeleton } from "@mantine/core";
+import { Card, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import { filterVisibleAssets } from "~/helpers/assets";
 import { parseNetWorthConfiguration } from "~/helpers/widgets";
 import NetWorthCardSettings from "./NetWorthCardSettings/NetWorthCardSettings";
 import { useTranslation } from "react-i18next";
-import SplitCard, {
-  BorderThickness,
-} from "~/components/ui/SplitCard/SplitCard";
 import { TrendingUpIcon } from "lucide-react";
 import WidgetErrorMessage from "../shared/WidgetErrorMessage/WidgetErrorMessage";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import NetWorthGroup from "./NetWorthGroup/NetWorthGroup";
-import Divider from "~/components/core/Divider/Divider";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useAssetsQuery } from "~/hooks/queries/useAssetsQuery";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -66,42 +62,30 @@ const NetWorthWidget = ({
     const validAccounts = filterVisibleAccounts(accountsQuery.data ?? []);
     const validAssets = filterVisibleAssets(assetsQuery.data ?? []);
 
-    return (
-      <Stack h="100%" w="100%" my="0.5rem" justify="space-around" gap={0}>
-        {orderedGroups.map((group, index) => (
-          <React.Fragment key={group.id}>
-            <NetWorthGroup
-              netWorthWidgetGroup={group}
-              validAccounts={validAccounts}
-              validAssets={validAssets}
-              orderedGroups={orderedGroups}
-            />
-            {index < orderedGroups.length - 1 && (
-              <Divider my={"0.5rem"} size="xs" elevation={1} />
-            )}
-          </React.Fragment>
-        ))}
-      </Stack>
-    );
+    return orderedGroups.map((group) => (
+      <Card.Section p="0.5rem" key={group.id}>
+        <NetWorthGroup
+          netWorthWidgetGroup={group}
+          validAccounts={validAccounts}
+          validAssets={validAssets}
+          orderedGroups={orderedGroups}
+        />
+      </Card.Section>
+    ));
   };
 
   return (
-    <SplitCard
-      w="100%"
-      h="100%"
-      border={BorderThickness.Thick}
-      header={
+    <Card w="100%" h="100%" p={0}>
+      <Card.Section separatorThickness="thick">
         <Group w="100%" justify="space-between">
           <Group gap="0.25rem">
-            <TrendingUpIcon color="var(--base-color-text-dimmed)" />
-            <PrimaryHeading order={3} lh={1}>
+            <TrendingUpIcon size="1.5rem" color="var(--bbui-color-primary)" />
+            <HeadingText tone="heading" level={4}>
               {t("net_worth")}
-            </PrimaryHeading>
+            </HeadingText>
           </Group>
         </Group>
-      }
-      elevation={1}
-    >
+      </Card.Section>
       {getNetWorthGroups()}
       {settingsOpened !== undefined && onSettingsClose && (
         <NetWorthCardSettings
@@ -110,7 +94,7 @@ const NetWorthWidget = ({
           onClose={onSettingsClose}
         />
       )}
-    </SplitCard>
+    </Card>
   );
 };
 

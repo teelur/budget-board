@@ -56,31 +56,20 @@ const BudgetsSettings = lazy(
 );
 const Goals = lazy(() => import("./Goals/Goals"));
 const Trends = lazy(() => import("./Trends/Trends"));
-const TrendsSpending = lazy(
-  () => import("./Trends/TransactionsTab/SpendingTab/SpendingTab"),
-);
+const TrendsSpending = lazy(() => import("./Trends/SpendingTab/SpendingTab"));
 const TrendsSpendingCategories = lazy(
-  () =>
-    import("./Trends/TransactionsTab/SpendingCategoriesTab/SpendingCategoriesTab"),
+  () => import("./Trends/SpendingCategoriesTab/SpendingCategoriesTab"),
 );
 const TrendsNetCashFlow = lazy(
-  () => import("./Trends/TransactionsTab/NetCashFlowTab/NetCashFlowTab"),
+  () => import("./Trends/NetCashFlowTab/NetCashFlowTab"),
 );
-const TrendsFlows = lazy(
-  () => import("./Trends/TransactionsTab/FlowsTab/FlowsTab"),
-);
-const TrendsAssets = lazy(
-  () => import("./Trends/AccountsTab/AssetsTab/AssetsTab"),
-);
+const TrendsFlows = lazy(() => import("./Trends/FlowsTab/FlowsTab"));
+const TrendsAssets = lazy(() => import("./Trends/AssetsTab/AssetsTab"));
 const TrendsLiabilities = lazy(
-  () => import("./Trends/AccountsTab/LiabilitiesTab/LiabilitiesTab"),
+  () => import("./Trends/LiabilitiesTab/LiabilitiesTab"),
 );
-const TrendsNetWorth = lazy(
-  () => import("./Trends/AccountsTab/NetWorthTab/NetWorthTab"),
-);
-const TrendsValues = lazy(
-  () => import("./Trends/AssetsTab/ValuesTab/ValuesTab"),
-);
+const TrendsNetWorth = lazy(() => import("./Trends/NetWorthTab/NetWorthTab"));
+const TrendsValues = lazy(() => import("./Trends/ValuesTab"));
 const ExternalAccounts = lazy(
   () => import("./ExternalAccounts/ExternalAccounts"),
 );

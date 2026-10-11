@@ -1,5 +1,5 @@
-import { Stack, Divider, Group } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Stack, Group } from "@mantine/core";
+import { Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import AccountMappingItem from "./AccountMappingItem/AccountMappingItem";
@@ -55,7 +55,9 @@ const AccountMapping = (props: AccountMappingProps) => {
 
   return (
     <Stack gap="0.5rem" w={800} maw="100%" mx="auto">
-      <Divider label={t("account_mapping")} labelPosition="center" />
+      <HeadingText tone="heading" level={5}>
+        {t("account_mapping")}
+      </HeadingText>
       {Array.from(props.accountNameToAccountIdMap.entries()).map(
         ([accountName, accountId]) => (
           <AccountMappingItem

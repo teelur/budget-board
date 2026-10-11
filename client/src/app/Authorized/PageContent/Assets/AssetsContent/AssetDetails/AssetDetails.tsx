@@ -1,5 +1,10 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { Button, AmountText } from "@teelur/budget-board-ui";
+import {
+  Button,
+  AmountText,
+  HeadingText,
+  BodyText,
+} from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { MoveRightIcon } from "lucide-react";
 import { SignDisplay } from "~/helpers/currency";
@@ -9,12 +14,9 @@ import React from "react";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import Drawer from "~/components/core/Drawer/Drawer";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -56,19 +58,19 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={
-        <PrimaryHeading component="span" order={4}>
-          {t("asset_details")}
-        </PrimaryHeading>
-      }
+      title={<HeadingText level={4}>{t("asset_details")}</HeadingText>}
     >
       {!props.asset ? (
         <Skeleton height={425} radius="lg" />
       ) : (
-        <Stack gap="1rem">
+        <Stack gap="0.5rem">
           <Stack gap={0}>
-            <DimmedText size="xs">{t("asset_name")}</DimmedText>
-            <PrimaryText size="xl">{props.asset?.name}</PrimaryText>
+            <BodyText tone="secondary" size="xs">
+              {t("asset_name")}
+            </BodyText>
+            <BodyText tone="primary" size="lg" fw={500}>
+              {props.asset?.name}
+            </BodyText>
           </Stack>
           <Group justify="space-between">
             {props.asset?.purchaseDate && props.asset.purchasePrice && (
@@ -82,8 +84,17 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                     price: formatSensitiveAmount(props.asset.purchasePrice),
                   }}
                   components={[
-                    <DimmedText size="xs" key="purchased-label" />,
-                    <PrimaryText size="md" key="purchased-value" />,
+                    <BodyText
+                      tone="secondary"
+                      size="xs"
+                      key="purchased-label"
+                    />,
+                    <BodyText
+                      tone="primary"
+                      size="md"
+                      fw={500}
+                      key="purchased-value"
+                    />,
                   ]}
                 />
               </Stack>
@@ -115,8 +126,13 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                       price: formatSensitiveAmount(props.asset.sellPrice),
                     }}
                     components={[
-                      <DimmedText size="xs" key="sold-label" />,
-                      <PrimaryText size="md" key="sold-value" />,
+                      <BodyText tone="secondary" size="xs" key="sold-label" />,
+                      <BodyText
+                        tone="primary"
+                        size="md"
+                        fw={500}
+                        key="sold-value"
+                      />,
                     ]}
                   />
                 </Stack>
@@ -125,14 +141,18 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
           <Accordion elevation={1}>
             <Accordion.Item
               title={
-                <PrimaryHeading order={5}>{t("add_value")}</PrimaryHeading>
+                <HeadingText tone="heading" level={5}>
+                  {t("add_value")}
+                </HeadingText>
               }
             >
               <AddValue assetId={props.asset.id} />
             </Accordion.Item>
             <Accordion.Item
               title={
-                <PrimaryHeading order={5}>{t("value_trends")}</PrimaryHeading>
+                <HeadingText tone="heading" level={5}>
+                  {t("value_trends")}
+                </HeadingText>
               }
             >
               <Group gap="0.5rem">
@@ -183,14 +203,18 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
             </Accordion.Item>
             <Accordion.Item
               title={
-                <PrimaryHeading order={5}>{t("value_history")}</PrimaryHeading>
+                <HeadingText tone="heading" level={5}>
+                  {t("value_history")}
+                </HeadingText>
               }
             >
               <Stack gap="0.5rem">
                 {valuesQuery.isPending && <Skeleton height={20} radius="lg" />}
                 {sortedValues.length === 0 ? (
                   <Group justify="center">
-                    <DimmedText size="sm">{t("no_value_entries")}</DimmedText>
+                    <BodyText tone="muted" size="sm">
+                      {t("no_value_entries")}
+                    </BodyText>
                   </Group>
                 ) : (
                   <ValueItems values={sortedValues} />

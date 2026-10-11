@@ -1,10 +1,13 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  BodyText,
+  Button,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
 import Modal from "~/components/core/Modal/Modal";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import NetWorthGroupItem from "./NetWorthGroupItem/NetWorthGroupItem";
 import React from "react";
 import { INetWorthWidgetGroupCreateRequest } from "~/models/netWorthWidgetConfiguration";
@@ -83,12 +86,16 @@ const NetWorthCardSettings = ({
       size="40rem"
       opened={opened}
       onClose={onClose}
-      title={<PrimaryText size="md">{t("net_worth_settings")}</PrimaryText>}
+      title={
+        <HeadingText tone="heading" level={4}>
+          {t("net_worth_settings")}
+        </HeadingText>
+      }
     >
       <Stack gap="0.5rem">
-        <DimmedText size="sm">
+        <BodyText tone="secondary" size="sm">
           {t("net_worth_settings_widget_message")}
-        </DimmedText>
+        </BodyText>
         <Group>
           <Button
             variant="filled"
@@ -145,9 +152,9 @@ const NetWorthCardSettings = ({
                   />
                 ))
               ) : (
-                <DimmedText size="sm" ta="center">
+                <BodyText tone="muted" size="sm" ta="center">
                   {t("no_groups_found")}
-                </DimmedText>
+                </BodyText>
               )}
             </Stack>
           </DragDropProvider>

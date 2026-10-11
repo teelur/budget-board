@@ -1,15 +1,19 @@
 import { Group, Skeleton, Stack, Tooltip } from "@mantine/core";
-import { ActionIcon, AmountText, Badge, Button } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  AmountText,
+  Badge,
+  BodyText,
+  Button,
+  Card,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import RecurringRuleForm from "~/components/RecurringRuleForm/RecurringRuleForm";
 import { useDeleteRecurringRuleMutation } from "~/hooks/mutations/recurringRules/useDeleteRecurringRuleMutation";
 import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
@@ -37,13 +41,13 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
   const hasUnsupportedCadence = props.rule.cadence.unsupported === true;
 
   return (
-    <Card elevation={1}>
+    <Card>
       <Group justify="space-between" align="flex-start" wrap="nowrap">
         <Stack gap="0.25rem" miw={0}>
           <Group gap="0.5rem">
-            <PrimaryText>
+            <BodyText tone="primary" size="md" fw={500}>
               {props.rule.merchantName || t("any_merchant")}
-            </PrimaryText>
+            </BodyText>
             <Badge variant="outline" color="primary" size="xs">
               {getRecurringCadenceLabel(props.rule.cadence, t)}
             </Badge>
@@ -53,16 +57,16 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
               </Badge>
             )}
           </Group>
-          <DimmedText size="sm">
+          <BodyText tone="secondary" size="sm">
             {props.rule.accountName} · {category}
-          </DimmedText>
+          </BodyText>
           <Group gap="0.75rem">
-            <DimmedText size="sm">
+            <BodyText tone="secondary" size="sm">
               {props.rule.amountMode === RecurringAmountModes.Automatic
                 ? t("automatic_amount")
                 : t("fixed_amount")}
               :
-            </DimmedText>
+            </BodyText>
             <AmountText
               amount={props.rule.amount}
               size="sm"
@@ -72,20 +76,20 @@ const RecurringRuleCard = (props: RecurringRuleCardProps): React.ReactNode => {
               currency={preferredCurrency}
               decimalPlaces={decimalPlaces}
             />
-            <DimmedText size="sm">
+            <BodyText tone="secondary" size="sm">
               {t("recurring_matched_transactions", {
                 count: props.rule.matchedTransactionCount,
               })}
-            </DimmedText>
+            </BodyText>
           </Group>
           {props.rule.nextOccurrenceDate && (
-            <DimmedText size="sm">
+            <BodyText tone="secondary" size="sm">
               {t("recurring_next_occurrence", {
                 date: dayjs(props.rule.nextOccurrenceDate).format(
                   longDateFormat,
                 ),
               })}
-            </DimmedText>
+            </BodyText>
           )}
         </Stack>
         <Group gap="0.25rem" wrap="nowrap" style={{ alignSelf: "stretch" }}>
@@ -146,8 +150,14 @@ const RecurringRules = (): React.ReactNode => {
 
   return (
     <Stack gap="0.5rem">
-      <PrimaryText size="md">{t("recurring_rules")}</PrimaryText>
-      <DimmedText size="sm">{t("recurring_rules_description")}</DimmedText>
+      <Stack gap="0.25rem">
+        <HeadingText tone="heading" level={4}>
+          {t("recurring_rules")}
+        </HeadingText>
+        <BodyText tone="secondary" size="sm">
+          {t("recurring_rules_description")}
+        </BodyText>
+      </Stack>
       <Button
         variant="filled"
         color="primary"
@@ -166,16 +176,18 @@ const RecurringRules = (): React.ReactNode => {
         ))
       ) : (
         <Group justify="center" p="1rem">
-          <DimmedText size="sm">{t("no_recurring_rules")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_recurring_rules")}
+          </BodyText>
         </Group>
       )}
       <Modal
         opened={opened}
         onClose={close}
         title={
-          <PrimaryHeading order={4}>
+          <HeadingText level={4}>
             {editingRule ? t("edit_recurring_rule") : t("add_recurring_rule")}
-          </PrimaryHeading>
+          </HeadingText>
         }
       >
         <RecurringRuleForm

@@ -1,13 +1,16 @@
 import { Stack } from "@mantine/core";
-import { Button, DateInput } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  DateInput,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import React from "react";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useTrainAutomaticTransactionCategorizerMutation } from "~/hooks/mutations/automaticTransactionCategorizer/useTrainAutomaticTransactionCategorizerMutation";
 
@@ -58,32 +61,45 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
 
   return (
     <>
-      <PrimaryText size="md">{t("train_auto_categorizer")}</PrimaryText>
-      <DimmedText size="sm">
-        {t("train_auto_categorizer_description")}
-      </DimmedText>
-      <DimmedText size="xs">
-        {autoCategorizerLastTrained != null
-          ? t("train_auto_categorizer_last_trained", {
-              lastTrained: autoCategorizerLastTrained,
-              trainDataStartDate: autoCategorizerModelStartDate,
-              trainDataEndDate: autoCategorizerModelEndDate,
-            })
-          : t("train_auto_categorizer_not_trained")}
-      </DimmedText>
-      <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
-        {t("train_auto_categorizer_button")}
-      </Button>
+      <Stack gap={0}>
+        <BodyText tone="primary" size="md" fw={500}>
+          {t("train_auto_categorizer")}
+        </BodyText>
+        <BodyText tone="secondary" size="sm">
+          {t("train_auto_categorizer_description")}
+        </BodyText>
+        <BodyText tone="primary" size="xs" fw={500}>
+          {autoCategorizerLastTrained != null
+            ? t("train_auto_categorizer_last_trained", {
+                lastTrained: autoCategorizerLastTrained,
+                trainDataStartDate: autoCategorizerModelStartDate,
+                trainDataEndDate: autoCategorizerModelEndDate,
+              })
+            : t("train_auto_categorizer_not_trained")}
+        </BodyText>
+        <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
+          onClick={open}
+        >
+          {t("train_auto_categorizer_button")}
+        </Button>
+      </Stack>
       <Modal
         opened={opened}
         onClose={close}
-        title={<PrimaryText>{t("train_auto_categorizer")}</PrimaryText>}
+        title={
+          <HeadingText tone="heading" level={4}>
+            {t("train_auto_categorizer")}
+          </HeadingText>
+        }
       >
         <Stack gap="1rem">
-          <Stack gap="0.25rem">
-            <DimmedText size="xs">
+          <Stack gap={0}>
+            <BodyText tone="secondary" size="xs">
               {t("train_auto_categorizer_date_range_description")}
-            </DimmedText>
+            </BodyText>
             <DateInput
               label={t("start_date")}
               placeholder={t("select_a_date")}

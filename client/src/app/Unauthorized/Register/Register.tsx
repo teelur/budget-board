@@ -1,5 +1,10 @@
 import { Stack, Group } from "@mantine/core";
-import { Button, PasswordInput, TextInput } from "@teelur/budget-board-ui";
+import {
+  Button,
+  Card,
+  PasswordInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -36,23 +41,25 @@ const Register = (props: RegisterProps): React.ReactNode => {
   });
 
   return (
-    <Stack gap="0.75rem" align="center" p="1rem">
-      <Stack align="center" gap="0.5rem" w="100%">
-        <TextInput
-          label={t("email_address")}
-          w="100%"
-          {...emailField.getInputProps()}
-        />
-        <PasswordInput
-          label={t("password")}
-          w="100%"
-          {...passwordField.getInputProps()}
-        />
-        <PasswordInput
-          label={t("confirm_password")}
-          w="100%"
-          {...confirmPasswordField.getInputProps()}
-        />
+    <Card.Section>
+      <Stack align="center" gap="1rem" w="100%">
+        <Stack gap="0.5rem" w="100%">
+          <TextInput
+            label={t("email_address")}
+            w="100%"
+            {...emailField.getInputProps()}
+          />
+          <PasswordInput
+            label={t("password")}
+            w="100%"
+            {...passwordField.getInputProps()}
+          />
+          <PasswordInput
+            label={t("confirm_password")}
+            w="100%"
+            {...confirmPasswordField.getInputProps()}
+          />
+        </Stack>
         <Group gap="0.5rem" w="100%">
           <Button
             variant="filled"
@@ -99,7 +106,7 @@ const Register = (props: RegisterProps): React.ReactNode => {
           </Button>
         </Group>
       </Stack>
-    </Stack>
+    </Card.Section>
   );
 };
 

@@ -8,22 +8,25 @@
 
 .dateText {
   width: 135px;
-  font-size: var(--mantine-font-size-sm);
+  font-size: 0.875rem;
 
   @container (max-width: 634px) {
     width: 100%;
   }
 
   @container (max-width: 400px) {
-    font-size: var(--mantine-font-size-xs);
+    font-size: 0.75rem;
   }
 }
 
 .merchantNameText {
-  font-size: var(--mantine-font-size-md);
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
 
   @container (max-width: 400px) {
-    font-size: var(--mantine-font-size-sm);
+    font-size: 0.875rem;
   }
 }
 

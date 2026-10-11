@@ -3,8 +3,10 @@ import classes from "./FilterCard.module.css";
 import { Flex, Stack } from "@mantine/core";
 import {
   Button,
+  Card,
   CategorySelect,
   DatePickerInput,
+  HeadingText,
   NumberInput,
   TagsInput,
   TextInput,
@@ -13,12 +15,10 @@ import { DatesRangeValue } from "@mantine/dates";
 import { Filters } from "~/models/transaction";
 import React from "react";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
-import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useTagSuggestionsQuery } from "~/hooks/queries/useTagSuggestionsQuery";
 
@@ -54,7 +54,7 @@ const FilterCard = (): React.ReactNode => {
   };
 
   return (
-    <Card elevation={1}>
+    <Card>
       <Stack gap="0.25rem" className={classes.root}>
         <Flex
           className={classes.header}
@@ -62,7 +62,7 @@ const FilterCard = (): React.ReactNode => {
           align="center"
           wrap="nowrap"
         >
-          <PrimaryHeading order={5}>{t("filters")}</PrimaryHeading>
+          <HeadingText level={5}>{t("filters")}</HeadingText>
           <Button
             variant="filled"
             color="primary"

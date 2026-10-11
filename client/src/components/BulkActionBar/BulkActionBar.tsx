@@ -9,6 +9,7 @@ import {
 import {
   ActionIcon,
   Badge,
+  BodyText,
   Button,
   CategorySelect,
   DateInput,
@@ -26,14 +27,12 @@ import { getCurrencySymbol } from "~/helpers/currency";
 import { getTagChanges, getUniqueTags } from "~/helpers/tags";
 import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
-import SplitTransaction from "~/components/core/Card/TransactionCard/TransactionCardBase/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
-import TransactionLinkDialog from "~/components/core/Card/TransactionCard/TransactionCardBase/TransactionCardDetails/TransactionLinkDialog/TransactionLinkDialog";
+import SplitTransaction from "~/components/core/TransactionCard/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
+import TransactionLinkDialog from "~/components/core/TransactionCard/TransactionCardDetails/TransactionLinkDialog/TransactionLinkDialog";
 import RecurringRuleAction from "~/components/RecurringRuleAction/RecurringRuleAction";
 import BulkRecurringRuleAction from "~/components/BulkRecurringRuleAction/BulkRecurringRuleAction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import useIsMobile from "~/hooks/useIsMobile";
-import DimmedText from "../core/Text/DimmedText/DimmedText";
-import PrimaryText from "../core/Text/PrimaryText/PrimaryText";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 import { useUpdateTransactionsMutation } from "~/hooks/mutations/transactions/useUpdateTransactionsMutation";
 import { useDeleteTransactionsMutation } from "~/hooks/mutations/transactions/useDeleteTransactionsMutation";
@@ -282,9 +281,9 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
           >
             {/* Selection controls row */}
             <Group gap="0.5rem" wrap="wrap">
-              <DimmedText size="sm">
+              <BodyText tone="secondary" size="xs">
                 {t("n_selected", { count: props.selectedIds.size })}
-              </DimmedText>
+              </BodyText>
               <Button
                 variant="ghost"
                 color="primary"
@@ -465,11 +464,11 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
             {/* Inline delete confirmation */}
             <Collapse expanded={showDeleteConfirm}>
               <Group gap="0.5rem" align="center">
-                <PrimaryText size="sm">
+                <BodyText tone="primary" size="sm">
                   {t("confirm_delete_transactions_message", {
                     count: props.selectedIds.size,
                   })}
-                </PrimaryText>
+                </BodyText>
                 <Button
                   variant="filled"
                   color="neutral"

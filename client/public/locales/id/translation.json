@@ -274,7 +274,6 @@
   "file_must_be_csv_message": "Berkas harus berformat CSV. Yang diterima: {{fileName}} ({{fileType}}).",
   "filter_duplicates": "Filter Duplikat",
   "filter_duplicates_by": "Cocokkan duplikat berdasarkan",
-  "filter_duplicates_description": "Hapus transaksi duplikat berdasarkan kolom-kolom yang dipilih.",
   "filters": "Filter",
   "fixed_amount": "Jumlah tetap",
   "flows": "Aliran",

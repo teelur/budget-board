@@ -1,12 +1,12 @@
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
-import Card from "~/components/core/Card/Card";
 import {
   INetWorthWidgetCategory,
   INetWorthWidgetLine,
 } from "~/models/widgetSettings";
 import NetWorthLineCategoryContent from "./NetWorthLineCategoryContent/NetWorthLineCategoryContent";
 import EditableNetWorthLineCategoryContent from "./EditableNetWorthLineCategoryContent/EditableNetWorthLineCategoryContent";
+import { Card } from "@teelur/budget-board-ui";
 
 export interface NetWorthLineCategoryProps {
   category: INetWorthWidgetCategory;
@@ -17,12 +17,12 @@ export interface NetWorthLineCategoryProps {
 }
 
 const NetWorthLineCategory = (
-  props: NetWorthLineCategoryProps
+  props: NetWorthLineCategoryProps,
 ): React.ReactNode => {
   const [isEditing, { open, close }] = useDisclosure(false);
 
   return (
-    <Card elevation={2}>
+    <Card py="0.25rem" px="0.5rem">
       {isEditing ? (
         <EditableNetWorthLineCategoryContent
           category={props.category}

@@ -1,13 +1,10 @@
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Badge } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { ActionIcon, Badge, BodyText, Card } from "@teelur/budget-board-ui";
 import { Undo2Icon } from "lucide-react";
 import React from "react";
 import { IAccountResponse } from "~/models/account";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import PermaDeleteAccountPopover from "./PermaDeleteAccountPopover/PermaDeleteAccountPopover";
-import Card from "~/components/core/Card/Card";
 import { useRestoreAccountMutation } from "~/hooks/mutations/accounts/useRestoreAccountMutation";
 
 interface DeletedAccountCardProps {
@@ -23,21 +20,20 @@ const DeletedAccountCard = (
   const doRestoreAccount = useRestoreAccountMutation();
 
   return (
-    <Card elevation={1}>
-      <LoadingOverlay visible={doRestoreAccount.isPending} />
+    <Card>
       <Group justify="space-between" wrap="nowrap">
         <Group gap="0.5rem">
           <Stack gap={0}>
-            <PrimaryText size="sm">
+            <BodyText component="span" tone="primary" size="sm" fw={500}>
               {props.account.name && props.account.name.length > 0
                 ? props.account.name
                 : t("unknown_account")}
-            </PrimaryText>
-            <DimmedText size="xs">
+            </BodyText>
+            <BodyText component="span" tone="secondary" size="xs">
               {props.institutionName && props.institutionName.length > 0
                 ? props.institutionName
                 : t("unknown_institution")}
-            </DimmedText>
+            </BodyText>
           </Stack>
           <Badge variant="filled" color="primary" size="xs">
             {t(props.account.source)}
@@ -49,6 +45,7 @@ const DeletedAccountCard = (
             color="primary"
             size="compact-sm"
             h="100%"
+            loading={doRestoreAccount.isPending}
             onClick={() => doRestoreAccount.mutate(props.account.id)}
           >
             <Undo2Icon size="1.2rem" />

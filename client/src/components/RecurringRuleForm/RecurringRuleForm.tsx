@@ -1,5 +1,6 @@
 import { Group, Stack } from "@mantine/core";
 import {
+  BodyText,
   Button,
   CategorySelect,
   Checkbox,
@@ -29,7 +30,6 @@ import { ITransaction } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import DimmedText from "../core/Text/DimmedText/DimmedText";
 import {
   createRecurringCadence,
   getRecurringCadenceIntervalMaximum,
@@ -317,8 +317,12 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
       </Group>
       {previewDates.length > 0 && (
         <Stack gap="0.25rem">
-          <DimmedText size="sm">{t("recurring_upcoming_dates")}</DimmedText>
-          <DimmedText size="sm">{previewDates.join(", ")}</DimmedText>
+          <BodyText tone="primary" size="sm" fw={500}>
+            {t("recurring_upcoming_dates")}
+          </BodyText>
+          <BodyText tone="secondary" size="sm">
+            {previewDates.join(", ")}
+          </BodyText>
         </Stack>
       )}
       <Group grow>
@@ -353,9 +357,7 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
       </Group>
       <NumberInput
         label={t("amount")}
-        description={
-          <DimmedText size="xs">{t("recurring_amount_description")}</DimmedText>
-        }
+        description={t("recurring_amount_description")}
         placeholder={t("enter_amount")}
         prefix={getCurrencySymbol(preferredCurrency)}
         decimalScale={decimalPlaces}

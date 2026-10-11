@@ -6,6 +6,7 @@ import {
   Badge,
   AmountText,
   Progress,
+  BodyText,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -14,8 +15,6 @@ import { SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
 import { PencilIcon } from "lucide-react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { StatusColorType } from "~/helpers/budgets";
 import { Trans, useTranslation } from "react-i18next";
@@ -42,7 +41,9 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
       <Stack w="100%" gap="0.1rem">
         <Flex className={classes.header}>
           <Group align="center" gap={10} wrap="nowrap">
-            <PrimaryText size="lg">{props.goal.name}</PrimaryText>
+            <BodyText tone="primary" size="lg" fw={500}>
+              {props.goal.name}
+            </BodyText>
             {props.includeInterest && props.goal.interestRate && (
               <Badge variant="light" color="primary" size="xs">
                 {t("interest_rate_apr", {
@@ -84,7 +85,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   invertSign={false}
                   key="amount"
                 />,
-                <DimmedText size="md" key="of" />,
+                <BodyText tone="secondary" size="md" key="of" />,
                 <AmountText
                   amount={getGoalTargetAmount(
                     props.goal.amount,
@@ -112,12 +113,12 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
         />
         <Flex className={classes.footer}>
           <Group align="center" gap="0.25rem">
-            <DimmedText size="sm" key="label">
+            <BodyText tone="secondary" size="sm" key="label">
               {t("projected_colon")}
-            </DimmedText>
-            <PrimaryText size="sm" key="date-not-edit">
+            </BodyText>
+            <BodyText tone="primary" size="sm" key="date-not-edit">
               {dayjs(props.goal.completeDate).format("MMMM YYYY")}
-            </PrimaryText>
+            </BodyText>
           </Group>
           <Flex justify="flex-end" align="center" gap="0.25rem">
             <Trans
@@ -137,7 +138,7 @@ const GoalCardContent = (props: GoalCardContentProps): React.ReactNode => {
                   decimalPlaces={0}
                   key="amount"
                 />,
-                <DimmedText size="sm" key="of" />,
+                <BodyText tone="secondary" size="sm" key="of" />,
                 <AmountText
                   amount={props.goal.monthlyContribution}
                   size="md"

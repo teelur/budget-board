@@ -1,11 +1,11 @@
-import { ITransaction } from "~/models/transaction";
+import { Group, Skeleton, Stack } from "@mantine/core";
 import { BarChart } from "@mantine/charts";
+import { BodyText } from "@teelur/budget-board-ui";
+import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { buildMonthlySpendingChartData } from "~/helpers/charts";
 import { SignDisplay } from "~/helpers/currency";
-import { Group, Skeleton, Stack } from "@mantine/core";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 
 interface SpendingChartProps {
@@ -70,9 +70,9 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   if (props.months.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="md">
+        <BodyText tone="muted" size="md">
           {t("select_a_month_to_display_the_chart")}
-        </DimmedText>
+        </BodyText>
       </Group>
     );
   }
@@ -88,10 +88,12 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   return (
     <Stack gap="1rem">
       <Group justify="space-between" align="center">
-        <DimmedText size="sm">
+        <BodyText tone="secondary" size="sm">
           {props.invertData ? t("average_spending") : t("average_income")}
-        </DimmedText>
-        <DimmedText size="sm">{chartValueFormatter(average)}</DimmedText>
+        </BodyText>
+        <BodyText tone="primary" size="sm" fw={500}>
+          {chartValueFormatter(average)}
+        </BodyText>
       </Group>
       <BarChart
         h={400}

@@ -2,7 +2,9 @@ import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
+  BodyText,
   Button,
+  Card,
   CategorySelect,
   SegmentedControl,
   TextInput,
@@ -11,9 +13,6 @@ import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteAccountTypeMutation } from "~/hooks/mutations/accountTypes/useDeleteAccountTypeMutation";
 import { useUpdateAccountTypeMutation } from "~/hooks/mutations/accountTypes/useUpdateAccountTypeMutation";
 import { AccountTypeClassification } from "~/models/account";
@@ -77,7 +76,7 @@ const CustomAccountTypeCard = (
     return (
       <Group w="100%" maw={600} wrap="nowrap">
         {props.isChildCard && <CornerDownRight />}
-        <Card flex={1} p="0.5rem" elevation={1}>
+        <Card flex={1}>
           <LoadingOverlay
             visible={
               updateAccountTypeMutation.isPending ||
@@ -90,7 +89,9 @@ const CustomAccountTypeCard = (
               label={t("account_type_name")}
             />
             <Stack gap="0.25rem" justify="center">
-              <PrimaryText size="sm">{t("category_level")}</PrimaryText>
+              <BodyText component="span" tone="primary" size="sm" fw={600}>
+                {t("category_level")}
+              </BodyText>
               <SegmentedControl
                 color="secondary"
                 size="compact-sm"
@@ -121,7 +122,9 @@ const CustomAccountTypeCard = (
               />
             ) : (
               <Stack gap="0.25rem">
-                <PrimaryText size="sm">{t("classification")}</PrimaryText>
+                <BodyText component="span" tone="primary" size="sm">
+                  {t("classification")}
+                </BodyText>
                 <SegmentedControl
                   color="secondary"
                   size="compact-sm"
@@ -185,14 +188,17 @@ const CustomAccountTypeCard = (
   return (
     <Group w="100%" maw={600} wrap="nowrap">
       {props.isChildCard && <CornerDownRight />}
-      <Card flex={1} p="0.25rem" elevation={1}>
+      <Card flex={1} p="0.25rem">
         <Group justify="space-between">
           <Group gap="0.5rem">
-            {props.isBuiltIn ? (
-              <DimmedText size="sm">{props.accountType.value}</DimmedText>
-            ) : (
-              <PrimaryText size="sm">{props.accountType.value}</PrimaryText>
-            )}
+            <BodyText
+              component="span"
+              tone={props.isBuiltIn ? "secondary" : "primary"}
+              fw={500}
+              size="sm"
+            >
+              {props.accountType.value}
+            </BodyText>
             {props.isBuiltIn && (
               <Badge variant="filled" color="primary" size="xs">
                 {t("built_in")}

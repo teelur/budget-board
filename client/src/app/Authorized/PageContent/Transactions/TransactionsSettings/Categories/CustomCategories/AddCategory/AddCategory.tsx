@@ -1,6 +1,8 @@
 import { LoadingOverlay, Stack } from "@mantine/core";
 import {
+  BodyText,
   Button,
+  Card,
   CategorySelect,
   SegmentedControl,
   TextInput,
@@ -9,8 +11,6 @@ import { useField } from "@mantine/form";
 import { CategoryTypes, ICategoryCreateRequest } from "~/models/category";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useCreateTransactionCategoryMutation } from "~/hooks/mutations/transactionCategories/useCreateTransactionCategoryMutation";
 
@@ -48,12 +48,14 @@ const AddCategory = (): React.ReactNode => {
   };
 
   return (
-    <Card elevation={1}>
+    <Card>
       <LoadingOverlay visible={createTransactionCategoryMutation.isPending} />
-      <Stack>
+      <Stack gap="0.5rem">
         <TextInput {...nameField.getInputProps()} label={t("category_name")} />
         <Stack gap="0.25rem" justify="center">
-          <PrimaryText size="sm">{t("category_level")}</PrimaryText>
+          <BodyText tone="primary" size="sm" fw={600}>
+            {t("category_level")}
+          </BodyText>
           <SegmentedControl
             color="secondary"
             size="compact-sm"
@@ -84,7 +86,9 @@ const AddCategory = (): React.ReactNode => {
           />
         ) : (
           <Stack gap="0.25rem">
-            <PrimaryText size="sm">{t("category_type")}</PrimaryText>
+            <BodyText tone="primary" size="sm" fw={600}>
+              {t("category_type")}
+            </BodyText>
             <SegmentedControl
               color="secondary"
               size="compact-sm"

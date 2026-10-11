@@ -5,17 +5,21 @@ import {
   CopyButton,
   Skeleton,
 } from "@mantine/core";
-import { Badge, Button, PinInput } from "@teelur/budget-board-ui";
+import {
+  Badge,
+  BodyText,
+  Button,
+  Card,
+  HeadingText,
+  PinInput,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { useTwoFactorAuthenticationQuery } from "~/hooks/queries/useTwoFactorAuthenticationQuery";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
 import { useDisclosure } from "@mantine/hooks";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import Code from "~/components/core/Code/Code";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useSetTwoFactorAuthenticationMutation } from "~/hooks/mutations/auth/useSetTwoFactorAuthenticationMutation";
 import { TwoFactorAuthRequest } from "~/models/twoFactorAuth";
@@ -63,10 +67,12 @@ const TwoFactorAuth = (): React.ReactNode => {
         <Stack gap="1rem">
           {recoveryCodes.length > 0 && (
             <Stack gap="0.5rem" align="center">
-              <PrimaryText size="md">{t("recovery_codes")}</PrimaryText>
-              <DimmedText size="sm">
+              <HeadingText tone="primary" level={6}>
+                {t("recovery_codes")}
+              </HeadingText>
+              <BodyText tone="secondary" size="sm">
                 {t("two_factor_auth_recovery_codes_info")}
-              </DimmedText>
+              </BodyText>
               <Group gap="0.5rem" align="center" justify="center">
                 {recoveryCodes.map((code, index) => (
                   <Code key={index} elevation={1}>
@@ -135,9 +141,9 @@ const TwoFactorAuth = (): React.ReactNode => {
       return (
         <Stack>
           <Stack gap="0.5rem" align="center">
-            <PrimaryText size="sm">
+            <BodyText tone="secondary" size="sm">
               {t("scan_the_qr_code_with_your_authenticator_app")}
-            </PrimaryText>
+            </BodyText>
             <QRCodeSVG
               value={buildAuthenticatorUrl(
                 twoFactorAuthQuery.data?.sharedKey ?? "",
@@ -172,9 +178,9 @@ const TwoFactorAuth = (): React.ReactNode => {
             </Group>
           </Stack>
           <Stack justify="center" align="center" gap="0.5rem">
-            <PrimaryText size="sm">
+            <BodyText tone="primary" size="sm" fw={500}>
               {t("enter_the_verification_code_from_your_authenticator_app")}
-            </PrimaryText>
+            </BodyText>
             <PinInput
               length={6}
               type="number"
@@ -223,11 +229,13 @@ const TwoFactorAuth = (): React.ReactNode => {
   }
 
   return (
-    <Card elevation={1}>
+    <Card>
       <LoadingOverlay visible={setTwoFactorAuthenticationMutation.isPending} />
       <Stack gap="1rem">
         <Group gap="1rem">
-          <PrimaryText size="lg">{t("two_factor_authentication")}</PrimaryText>
+          <HeadingText tone="heading" level={4}>
+            {t("two_factor_authentication")}
+          </HeadingText>
           {twoFactorAuthQuery.data?.isTwoFactorEnabled ? (
             <Badge variant="light" color="success" size="xs">
               {t("enabled")}

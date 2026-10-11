@@ -1,6 +1,8 @@
-import { LoadingOverlay, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import {
+  BodyText,
   Button,
+  Card,
   CategorySelect,
   SegmentedControl,
   TextInput,
@@ -8,8 +10,6 @@ import {
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { AccountTypeClassification } from "~/models/account";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { useCreateAccountTypeMutation } from "~/hooks/mutations/accountTypes/useCreateAccountTypeMutation";
@@ -49,15 +49,16 @@ const AddAccountType = (): React.ReactNode => {
   };
 
   return (
-    <Card elevation={1}>
-      <LoadingOverlay visible={createAccountTypeMutation.isPending} />
+    <Card>
       <Stack>
         <TextInput
           {...nameField.getInputProps()}
           label={t("account_type_name")}
         />
         <Stack gap="0.25rem" justify="center">
-          <PrimaryText size="sm">{t("category_level")}</PrimaryText>
+          <BodyText component="span" tone="primary" size="sm" fw={600}>
+            {t("category_level")}
+          </BodyText>
           <SegmentedControl
             color="secondary"
             size="compact-sm"
@@ -88,7 +89,9 @@ const AddAccountType = (): React.ReactNode => {
           />
         ) : (
           <Stack gap="0.25rem">
-            <PrimaryText size="sm">{t("classification")}</PrimaryText>
+            <BodyText component="span" tone="primary" size="sm" fw={600}>
+              {t("classification")}
+            </BodyText>
             <SegmentedControl
               color="secondary"
               size="compact-sm"
@@ -111,6 +114,7 @@ const AddAccountType = (): React.ReactNode => {
           color="primary"
           size="xs"
           fullWidth
+          loading={createAccountTypeMutation.isPending}
           onClick={() => {
             createAccountTypeMutation.mutate(
               {

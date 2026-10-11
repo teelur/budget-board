@@ -1,38 +1,31 @@
 import { Group, Stack } from "@mantine/core";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { BodyText, Card } from "@teelur/budget-board-ui";
 import { ISimpleFinOrganizationResponse } from "~/models/simpleFinOrganization";
 import SimpleFinAccountCard from "./SimpleFinAccountCard/SimpleFinAccountCard";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 
 interface ISimpleFinOrganizationCardProps {
   simpleFinOrganization: ISimpleFinOrganizationResponse;
 }
 
 const SimpleFinOrganizationCard = (
-  props: ISimpleFinOrganizationCardProps
+  props: ISimpleFinOrganizationCardProps,
 ): React.ReactNode => {
   const sortedAccounts = props.simpleFinOrganization.accounts.sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   return (
-    <Card elevation={1}>
+    <Card>
       <Stack p={0} gap="0.5rem">
         <Group gap="0.5rem">
-          {props.simpleFinOrganization.name ? (
-            <PrimaryText size="md">
-              {props.simpleFinOrganization.name}
-            </PrimaryText>
-          ) : (
-            <PrimaryText size="md">
-              {props.simpleFinOrganization.domain}
-            </PrimaryText>
-          )}
+          <BodyText tone="primary" size="md" fw={500}>
+            {props.simpleFinOrganization.name ||
+              props.simpleFinOrganization.domain}
+          </BodyText>
           {props.simpleFinOrganization.simpleFinUrl && (
-            <DimmedText size="sm">
+            <BodyText tone="secondary" size="sm">
               {props.simpleFinOrganization.simpleFinUrl}
-            </DimmedText>
+            </BodyText>
           )}
         </Group>
         <Stack gap="0.5rem">

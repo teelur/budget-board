@@ -1,11 +1,11 @@
 import { Stack } from "@mantine/core";
+import { HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Drawer from "~/components/core/Drawer/Drawer";
 import { WIDGET_REGISTRY } from "~/shared/dashboardGrid";
 import WidgetPickerItem from "./WidgetPickerItem/WidgetPickerItem";
 import { NotificationType, showNotification } from "~/helpers/notifications";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useCreateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useCreateWidgetSettingsMutation";
 
@@ -59,11 +59,7 @@ const WidgetPicker = ({
     <Drawer
       opened={opened}
       onClose={onClose}
-      title={
-        <PrimaryHeading component="span" order={4}>
-          {t("add_widget")}
-        </PrimaryHeading>
-      }
+      title={<HeadingText level={4}>{t("add_widget")}</HeadingText>}
       position="right"
       size="sm"
     >

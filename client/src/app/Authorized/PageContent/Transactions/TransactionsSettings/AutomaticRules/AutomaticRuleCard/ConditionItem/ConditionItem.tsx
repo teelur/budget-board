@@ -1,8 +1,6 @@
 import { Group } from "@mantine/core";
-import { Badge } from "@teelur/budget-board-ui";
+import { Badge, BodyText } from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { getFormattedValue } from "~/helpers/automaticRules";
 import { IAccountResponse } from "~/models/account";
 import {
@@ -38,28 +36,26 @@ const ConditionItem = (props: ConditionItemProps) => {
     dayjs(dateStr).format(dateFormat);
 
   return (
-    <Card p="0.25rem" shadow="xs" elevation={2}>
-      <Group gap="0.3rem">
-        <Badge variant="outline" color="secondary" size="xs">
-          {fieldLabelKey ? t(fieldLabelKey) : props.condition.field}
-        </Badge>
-        <PrimaryText size="sm">
-          {operatorLabelKey ? t(operatorLabelKey) : props.condition.operator}
-        </PrimaryText>
-        <Badge variant="filled" color="accent" size="xs">
-          {getFormattedValue(
-            props.condition.field,
-            props.condition.value,
-            props.currency,
-            decimalPlaces,
-            props.categories,
-            formatDate,
-            intlLocale,
-            props.accounts,
-          )}
-        </Badge>
-      </Group>
-    </Card>
+    <Group gap="0.3rem">
+      <Badge variant="outline" color="secondary" size="xs">
+        {fieldLabelKey ? t(fieldLabelKey) : props.condition.field}
+      </Badge>
+      <BodyText tone="primary" size="sm" fw={500}>
+        {operatorLabelKey ? t(operatorLabelKey) : props.condition.operator}
+      </BodyText>
+      <Badge variant="filled" color="accent" size="xs">
+        {getFormattedValue(
+          props.condition.field,
+          props.condition.value,
+          props.currency,
+          decimalPlaces,
+          props.categories,
+          formatDate,
+          intlLocale,
+          props.accounts,
+        )}
+      </Badge>
+    </Group>
   );
 };
 

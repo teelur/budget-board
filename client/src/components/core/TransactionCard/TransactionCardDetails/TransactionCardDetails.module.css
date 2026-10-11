@@ -1,0 +1,9 @@
+.value {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.tags {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}

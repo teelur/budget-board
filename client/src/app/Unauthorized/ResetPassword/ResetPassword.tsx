@@ -1,5 +1,10 @@
 import { Stack, Group } from "@mantine/core";
-import { Button, PasswordInput, TextInput } from "@teelur/budget-board-ui";
+import {
+  Button,
+  Card,
+  PasswordInput,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { hasLength, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
@@ -37,23 +42,25 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
   });
 
   return (
-    <Stack gap="0.75rem" align="center" p="1rem">
-      <Stack align="center" gap="0.5rem" w="100%">
-        <TextInput
-          label={t("reset_code")}
-          w="100%"
-          {...resetCodeField.getInputProps()}
-        />
-        <PasswordInput
-          label={t("new_password")}
-          w="100%"
-          {...passwordField.getInputProps()}
-        />
-        <PasswordInput
-          label={t("confirm_password")}
-          w="100%"
-          {...confirmPasswordField.getInputProps()}
-        />
+    <Card.Section>
+      <Stack align="center" gap="1rem" w="100%">
+        <Stack gap="0.5rem" w="100%">
+          <TextInput
+            label={t("reset_code")}
+            w="100%"
+            {...resetCodeField.getInputProps()}
+          />
+          <PasswordInput
+            label={t("new_password")}
+            w="100%"
+            {...passwordField.getInputProps()}
+          />
+          <PasswordInput
+            label={t("confirm_password")}
+            w="100%"
+            {...confirmPasswordField.getInputProps()}
+          />
+        </Stack>
         <Group wrap="nowrap" gap="0.5rem" w="100%">
           <Button
             variant="filled"
@@ -101,7 +108,7 @@ const ResetPassword = (props: ResetPasswordProps): React.ReactNode => {
           </Button>
         </Group>
       </Stack>
-    </Stack>
+    </Card.Section>
   );
 };
 

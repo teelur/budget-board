@@ -3,6 +3,7 @@ import {
   Button,
   CategorySelect,
   DateInput,
+  HeadingText,
   NumberInput,
   Select,
   TextInput,
@@ -20,7 +21,6 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateTransactionMutation } from "~/hooks/mutations/transactions/useCreateTransactionMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
@@ -102,7 +102,9 @@ const CreateTransactionModal = (): React.ReactNode => {
         opened={opened}
         onClose={close}
         title={
-          <PrimaryHeading order={4}>{t("create_transaction")}</PrimaryHeading>
+          <HeadingText tone="heading" level={4}>
+            {t("create_transaction")}
+          </HeadingText>
         }
       >
         <Stack gap="1rem">

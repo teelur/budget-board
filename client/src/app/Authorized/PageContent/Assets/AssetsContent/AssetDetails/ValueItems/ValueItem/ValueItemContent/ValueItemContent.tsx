@@ -1,8 +1,7 @@
 import { Group } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, BodyText } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { PencilIcon } from "lucide-react";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { IValueResponse } from "~/models/value";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -20,9 +19,9 @@ const ValueItemContent = (props: ValueItemContentProps): React.ReactNode => {
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
-        <PrimaryText size="md">
+        <BodyText tone="primary" size="sm" fw={500}>
           {dayjs(props.value.date).format(longDateFormat)}
-        </PrimaryText>
+        </BodyText>
         <ActionIcon
           variant="ghost"
           color="primary"

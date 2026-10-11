@@ -8,12 +8,16 @@ import {
   Stack,
   UnstyledButton,
 } from "@mantine/core";
-import { ActionIcon, Button, TextInput } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  BodyText,
+  Button,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { SmilePlusIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Popover from "~/components/core/Popover/Popover";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import {
   filterCategoryIconGroups,
   ICategoryIconGroup,
@@ -121,9 +125,9 @@ const CategoryIconPicker = (
             size="xs"
           />
           {groups.length === 0 ? (
-            <DimmedText size="xs" elevation={1}>
+            <BodyText tone="muted" size="xs">
               {t("no_icons_found")}
-            </DimmedText>
+            </BodyText>
           ) : (
             <ScrollArea.Autosize
               mah={260}
@@ -133,9 +137,9 @@ const CategoryIconPicker = (
               <Stack gap="0.5rem">
                 {groups.map((group) => (
                   <Stack key={group.labelKey} gap="0.25rem">
-                    <DimmedText size="xs" elevation={1}>
+                    <BodyText tone="secondary" size="xs">
                       {getGroupLabel(group)}
-                    </DimmedText>
+                    </BodyText>
                     <SimpleGrid
                       cols={7}
                       spacing="0.25rem"

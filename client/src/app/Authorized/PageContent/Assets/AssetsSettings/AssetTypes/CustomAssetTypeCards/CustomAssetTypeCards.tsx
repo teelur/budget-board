@@ -1,7 +1,7 @@
 import { Group, Stack } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
 import React from "react";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { IAssetTypeResponse } from "~/models/assetType";
 import { defaultGuid } from "~/models/applicationUser";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
@@ -14,7 +14,9 @@ const CustomAssetTypeCards = (): React.ReactNode => {
   if (customAssetTypes.length === 0) {
     return (
       <Group justify="center" p="1rem">
-        <DimmedText size="sm">{t("no_custom_asset_types")}</DimmedText>
+        <BodyText tone="muted" size="sm">
+          {t("no_custom_asset_types")}
+        </BodyText>
       </Group>
     );
   }

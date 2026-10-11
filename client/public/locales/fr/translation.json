@@ -276,7 +276,6 @@
   "file_must_be_csv_message": "Le fichier doit être un CSV. Reçu {{fileName}} ({{fileType}}).",
   "filter_duplicates": "Filtrer les doublons",
   "filter_duplicates_by": "Rechercher les doublons par",
-  "filter_duplicates_description": "Enlever les doublons en se basant sur les transactions des colonnes sélectionnées.",
   "filters": "Filtres",
   "fix_parent_budgets": "Réparer les budgets parents",
   "fixed_amount": "Montant fixé",

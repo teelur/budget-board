@@ -1,5 +1,11 @@
 import { Stack, Group } from "@mantine/core";
-import { Button, PinInput } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  Card,
+  HeadingText,
+  PinInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -7,8 +13,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { translateAxiosError } from "~/helpers/requests";
 import { NotificationType, showNotification } from "~/helpers/notifications";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { LoginCardState } from "../Welcome";
 import { useLoginMutation } from "~/hooks/mutations/auth/useLoginMutation";
@@ -76,67 +80,69 @@ const LoginWith2fa = (props: LoginProps): React.ReactNode => {
   };
 
   return (
-    <Stack gap="md" align="center" w="100%" p="1rem">
-      <Stack align="center" gap={5} w="100%">
-        <PrimaryText size="lg" ta="center">
-          {t("two_factor_authentication")}
-        </PrimaryText>
-        <DimmedText size="sm" ta="center">
-          {t("enter_security_code_message")}
-        </DimmedText>
+    <Card.Section>
+      <Stack gap="1rem" align="center" w="100%">
+        <Stack align="center" gap={5} w="100%">
+          <HeadingText level={5} ta="center">
+            {t("two_factor_authentication")}
+          </HeadingText>
+          <BodyText component="p" tone="secondary" size="sm">
+            {t("enter_security_code_message")}
+          </BodyText>
+        </Stack>
+        <PinInput
+          length={6}
+          type="number"
+          inputMode="numeric"
+          oneTimeCode
+          ariaLabel={t("enter_security_code_message")}
+          getInputProps={(index) =>
+            index === 0 ? { name: "two-factor-code" } : {}
+          }
+          autoFocus
+          value={authenticationCodeField.getValue()}
+          onChange={(value) => authenticationCodeField.setValue(value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              submitUserLogin();
+            }
+          }}
+        />
+        <Button
+          variant="filled"
+          color="primary"
+          size="compact-md"
+          fullWidth
+          loading={loginMutation.isPending}
+          onClick={submitUserLogin}
+        >
+          {t("submit")}
+        </Button>
+        <Group wrap="nowrap" gap="0.5rem" w="100%">
+          <Button
+            variant="filled"
+            color="neutral"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={() => props.setLoginCardState(LoginCardState.Login)}
+          >
+            {t("return_to_login")}
+          </Button>
+          <Button
+            variant="filled"
+            color="secondary"
+            size="compact-sm"
+            flex="1 1 0"
+            onClick={() =>
+              props.setLoginCardState(LoginCardState.LoginWithRecovery)
+            }
+          >
+            {t("use_recovery_code")}
+          </Button>
+        </Group>
       </Stack>
-      <PinInput
-        length={6}
-        type="number"
-        inputMode="numeric"
-        oneTimeCode
-        ariaLabel={t("enter_security_code_message")}
-        getInputProps={(index) =>
-          index === 0 ? { name: "two-factor-code" } : {}
-        }
-        autoFocus
-        value={authenticationCodeField.getValue()}
-        onChange={(value) => authenticationCodeField.setValue(value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            submitUserLogin();
-          }
-        }}
-      />
-      <Button
-        variant="filled"
-        color="primary"
-        size="compact-md"
-        fullWidth
-        loading={loginMutation.isPending}
-        onClick={submitUserLogin}
-      >
-        {t("submit")}
-      </Button>
-      <Group wrap="nowrap" gap="0.5rem" w="100%">
-        <Button
-          variant="filled"
-          color="neutral"
-          size="compact-sm"
-          flex="1 1 0"
-          onClick={() => props.setLoginCardState(LoginCardState.Login)}
-        >
-          {t("return_to_login")}
-        </Button>
-        <Button
-          variant="filled"
-          color="secondary"
-          size="compact-sm"
-          flex="1 1 0"
-          onClick={() =>
-            props.setLoginCardState(LoginCardState.LoginWithRecovery)
-          }
-        >
-          {t("use_recovery_code")}
-        </Button>
-      </Group>
-    </Stack>
+    </Card.Section>
   );
 };
 

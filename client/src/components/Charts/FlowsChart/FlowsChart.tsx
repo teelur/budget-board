@@ -1,5 +1,6 @@
-import { SankeyChart as MantineSankeyChart } from "@mantine/charts";
 import { Group, Skeleton } from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
+import { SankeyChart as MantineSankeyChart } from "@mantine/charts";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { buildFlowsChartData, chartColors } from "~/helpers/charts";
@@ -7,7 +8,6 @@ import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter
 import { SignDisplay } from "~/helpers/currency";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import type { SankeyElementType, SankeyLinkProps, SankeyProps } from "recharts";
 import FlowsChartTooltip from "./FlowsChartTooltip/FlowsChartTooltip";
 
@@ -154,7 +154,9 @@ const FlowsChart = (props: FlowsChartProps): React.ReactNode => {
   if (chartData.links.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="sm">{t("no_flow_data")}</DimmedText>
+        <BodyText tone="muted" size="sm">
+          {t("no_flow_data")}
+        </BodyText>
       </Group>
     );
   }

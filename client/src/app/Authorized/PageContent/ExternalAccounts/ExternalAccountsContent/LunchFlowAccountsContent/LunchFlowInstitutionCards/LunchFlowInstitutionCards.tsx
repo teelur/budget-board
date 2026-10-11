@@ -1,9 +1,9 @@
 import { Group, Stack } from "@mantine/core";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { ILunchFlowAccountResponse } from "~/models/lunchFlowAccount";
 import LunchFlowInstitutionCard from "./LunchFlowInstitutionCard/LunchFlowInstitutionCard";
 import { useLunchFlowAccountsQuery } from "~/hooks/queries/useLunchFlowAccountsQuery";
+import { BodyText } from "@teelur/budget-board-ui";
 
 export interface IGroupedLunchFlowAccounts {
   institutionName: string;
@@ -52,7 +52,9 @@ const LunchFlowInstitutionCards = (): React.ReactNode => {
         ))
       ) : (
         <Group justify="center">
-          <DimmedText size="sm">{t("no_lunchflow_accounts_found")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_lunchflow_accounts_found")}
+          </BodyText>
         </Group>
       )}
     </Stack>

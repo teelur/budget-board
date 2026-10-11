@@ -1,14 +1,17 @@
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, Button, TextInput } from "@teelur/budget-board-ui";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import {
+  ActionIcon,
+  BodyText,
+  Button,
+  Card,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { INetWorthWidgetLine } from "~/models/widgetSettings";
 import NetWorthLineCategory from "./NetWorthLineCategory/NetWorthLineCategory";
 import { GripVertical, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useField } from "@mantine/form";
 import { INetWorthWidgetCategoryCreateRequest } from "~/models/netWorthWidgetConfiguration";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { RestrictToElement } from "@dnd-kit/dom/modifiers";
@@ -51,7 +54,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
   });
 
   return (
-    <Card ref={props.isSortable ? ref : undefined} elevation={1}>
+    <Card ref={props.isSortable ? ref : undefined} surface="sunken">
       <LoadingOverlay visible={updateNetWorthWidgetLineMutation.isPending} />
       <Group gap="0.5rem">
         {props.isSortable && (
@@ -85,9 +88,13 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
                   }}
                 />
               ) : props.line.name.length > 0 ? (
-                <PrimaryText size="sm">{props.line.name}</PrimaryText>
+                <BodyText tone="primary" size="sm" fw={500}>
+                  {props.line.name}
+                </BodyText>
               ) : (
-                <DimmedText size="sm">{t("no_name")}</DimmedText>
+                <BodyText tone="muted" size="sm" fw={500}>
+                  {t("no_name")}
+                </BodyText>
               )}
               <ActionIcon
                 variant="ghost"
@@ -130,9 +137,9 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
               />
             ))}
             {props.line.categories.length === 0 && (
-              <Group justify="center">
-                <DimmedText size="sm">{t("no_categories")}</DimmedText>
-              </Group>
+              <BodyText tone="muted" size="xs" ta="center">
+                {t("no_categories")}
+              </BodyText>
             )}
           </Stack>
         </Stack>

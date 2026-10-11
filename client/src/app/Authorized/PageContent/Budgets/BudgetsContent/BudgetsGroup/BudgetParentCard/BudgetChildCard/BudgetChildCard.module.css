@@ -6,22 +6,22 @@
   font-size: 1rem;
 
   @container (max-width: 380px) {
-    font-size: 1rem;
+    font-size: 0.8rem;
   }
 }
 
 .text {
-  font-size: 1rem;
+  font-size: 0.9rem;
 
   @container (max-width: 380px) {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 }
 
 .textSmall {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 
   @container (max-width: 300px) {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
   }
 }

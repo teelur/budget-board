@@ -1,5 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import {
@@ -13,7 +13,6 @@ import { getDefaultAction } from "~/helpers/automaticRules";
 import ActionItem from "./ActionItem/ActionItem";
 import ConditionItem from "./ConditionItem/ConditionItem";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 
 interface EditableAutomaticRuleContentProps {
@@ -21,6 +20,7 @@ interface EditableAutomaticRuleContentProps {
   actionItems: IRuleParameterEdit[];
   setConditionItems: React.Dispatch<React.SetStateAction<IRuleParameterEdit[]>>;
   setActionItems: React.Dispatch<React.SetStateAction<IRuleParameterEdit[]>>;
+  surface?: "sunken" | "default";
 }
 
 const EditableAutomaticRuleContent = (
@@ -67,9 +67,11 @@ const EditableAutomaticRuleContent = (
 
   return (
     <Stack gap="0.5rem">
-      <Stack gap="0.5rem">
+      <Stack gap="0.25rem">
         <Group align="center" justify="space-between">
-          <PrimaryText size="sm">{t("if")}</PrimaryText>
+          <BodyText tone="primary" size="sm" fw={500}>
+            {t("if")}
+          </BodyText>
           <ActionIcon
             variant="filled"
             color="primary"
@@ -93,12 +95,15 @@ const EditableAutomaticRuleContent = (
             doDelete={removeCondition}
             index={index}
             categories={transactionCategories}
+            surface={props.surface}
           />
         ))}
       </Stack>
-      <Stack gap="0.5rem">
+      <Stack gap="0.25rem">
         <Group align="center" justify="space-between">
-          <PrimaryText size="sm">{t("then")}</PrimaryText>
+          <BodyText tone="primary" size="sm" fw={500}>
+            {t("then")}
+          </BodyText>
           <ActionIcon
             variant="filled"
             color="primary"
@@ -122,6 +127,7 @@ const EditableAutomaticRuleContent = (
             doDelete={removeAction}
             index={index}
             categories={transactionCategories}
+            surface={props.surface}
           />
         ))}
       </Stack>

@@ -1,3 +1,4 @@
+import { BodyText } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import { AreaChart } from "@mantine/charts";
 import React from "react";
@@ -9,7 +10,6 @@ import { SignDisplay } from "~/helpers/currency";
 import { Group, Skeleton } from "@mantine/core";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
@@ -57,9 +57,9 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   if (props.months.length === 0) {
     return (
       <Group justify="center">
-        <DimmedText size="sm">
+        <BodyText tone="muted" size="sm">
           {t("select_a_month_to_display_the_chart")}
-        </DimmedText>
+        </BodyText>
       </Group>
     );
   }

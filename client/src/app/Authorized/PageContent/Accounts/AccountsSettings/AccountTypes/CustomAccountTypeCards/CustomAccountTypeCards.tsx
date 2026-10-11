@@ -1,11 +1,11 @@
 import { Group, Stack } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import React from "react";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { IAccountTypeResponse } from "~/models/accountType";
 import { defaultGuid } from "~/models/applicationUser";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import CustomAccountTypeCard from "./CustomAccountTypeCard/CustomAccountTypeCard";
+import { BodyText } from "@teelur/budget-board-ui";
 
 const CustomAccountTypeCards = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -14,7 +14,9 @@ const CustomAccountTypeCards = (): React.ReactNode => {
   if (customAccountTypes.length === 0) {
     return (
       <Group justify="center" p="1rem">
-        <DimmedText size="sm">{t("no_custom_account_types")}</DimmedText>
+        <BodyText tone="muted" size="sm">
+          {t("no_custom_account_types")}
+        </BodyText>
       </Group>
     );
   }

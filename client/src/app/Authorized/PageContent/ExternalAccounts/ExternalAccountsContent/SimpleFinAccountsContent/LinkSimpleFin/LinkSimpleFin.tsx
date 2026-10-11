@@ -1,10 +1,8 @@
-import { LoadingOverlay, Stack } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Stack } from "@mantine/core";
+import { BodyText, Button, Card, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { isNotEmpty, useField } from "@mantine/form";
-import Card from "~/components/core/Card/Card";
 import { useTranslation } from "react-i18next";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useUpdateAccessTokenMutation } from "~/hooks/mutations/simpleFin/useUpdateAccessTokenMutation";
 
 const LinkSimpleFin = (): React.ReactNode => {
@@ -17,13 +15,11 @@ const LinkSimpleFin = (): React.ReactNode => {
   });
 
   return (
-    <Card elevation={1}>
-      <LoadingOverlay
-        visible={updateAccessTokenMutation.isPending}
-        zIndex={1000}
-      />
+    <Card>
       <Stack gap="0.5rem">
-        <DimmedText size="sm">{t("link_simplefin_description")}</DimmedText>
+        <BodyText tone="secondary" size="sm">
+          {t("link_simplefin_description")}
+        </BodyText>
         <Stack gap="0.5rem">
           <TextInput
             {...simpleFinKeyField.getInputProps()}
@@ -33,6 +29,7 @@ const LinkSimpleFin = (): React.ReactNode => {
             variant="filled"
             color="primary"
             size="xs"
+            loading={updateAccessTokenMutation.isPending}
             onClick={() => {
               simpleFinKeyField.validate();
 

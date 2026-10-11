@@ -1,8 +1,10 @@
-import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
+  BodyText,
   Button,
+  Card,
   CategorySelect,
   SegmentedControl,
   TextInput,
@@ -11,9 +13,6 @@ import { useField } from "@mantine/form";
 import { CornerDownRight, PencilIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Card from "~/components/core/Card/Card";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useDeleteAssetTypeMutation } from "~/hooks/mutations/assetTypes/useDeleteAssetTypeMutation";
 import { useUpdateAssetTypeMutation } from "~/hooks/mutations/assetTypes/useUpdateAssetTypeMutation";
 import { IAssetTypeResponse } from "~/models/assetType";
@@ -61,20 +60,16 @@ const CustomAssetTypeCard = (
     return (
       <Group w="100%" maw={600} wrap="nowrap">
         {props.isChildCard && <CornerDownRight />}
-        <Card flex={1} p="0.5rem" elevation={1}>
-          <LoadingOverlay
-            visible={
-              updateAssetTypeMutation.isPending ||
-              deleteAssetTypeMutation.isPending
-            }
-          />
+        <Card flex={1}>
           <Stack gap="0.5rem">
             <TextInput
               {...nameField.getInputProps()}
               label={t("asset_type_name")}
             />
             <Stack gap="0.25rem" justify="center">
-              <PrimaryText size="sm">{t("category_level")}</PrimaryText>
+              <BodyText tone="primary" size="sm" fw={600}>
+                {t("category_level")}
+              </BodyText>
               <SegmentedControl
                 color="secondary"
                 size="compact-sm"
@@ -119,6 +114,7 @@ const CustomAssetTypeCard = (
                 color="primary"
                 size="xs"
                 flex="1 1 auto"
+                loading={updateAssetTypeMutation.isPending}
                 onClick={() =>
                   updateAssetTypeMutation.mutate(
                     {
@@ -146,14 +142,16 @@ const CustomAssetTypeCard = (
   return (
     <Group w="100%" maw={600} wrap="nowrap">
       {props.isChildCard && <CornerDownRight />}
-      <Card flex={1} p="0.25rem" elevation={1}>
+      <Card flex={1} p="0.25rem">
         <Group justify="space-between">
           <Group gap="0.5rem">
-            {props.isBuiltIn ? (
-              <DimmedText size="sm">{props.assetType.value}</DimmedText>
-            ) : (
-              <PrimaryText size="sm">{props.assetType.value}</PrimaryText>
-            )}
+            <BodyText
+              tone={props.isBuiltIn ? "secondary" : "primary"}
+              size="sm"
+              fw={500}
+            >
+              {props.assetType.value}
+            </BodyText>
             {props.isBuiltIn && (
               <Badge variant="filled" color="primary" size="xs">
                 {t("built_in")}
@@ -175,6 +173,7 @@ const CustomAssetTypeCard = (
                   variant="filled"
                   color="error"
                   size="compact-sm"
+                  loading={deleteAssetTypeMutation.isPending}
                   onClick={() =>
                     deleteAssetTypeMutation.mutateAsync(props.assetType.id)
                   }

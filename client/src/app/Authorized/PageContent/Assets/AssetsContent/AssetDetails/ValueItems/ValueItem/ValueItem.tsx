@@ -1,8 +1,8 @@
+import { Card } from "@teelur/budget-board-ui";
 import { IValueResponse } from "~/models/value";
 import ValueItemContent from "./ValueItemContent/ValueItemContent";
 import { useDisclosure } from "@mantine/hooks";
 import EditableValueItemContent from "./EditableValueItemContent/EditableValueItemContent";
-import ElevatedCard from "~/components/core/Card/ElevatedCard/ElevatedCard";
 
 interface ValueItemProps {
   value: IValueResponse;
@@ -11,13 +11,13 @@ interface ValueItemProps {
 const ValueItem = (props: ValueItemProps) => {
   const [isSelected, { open, close }] = useDisclosure(false);
   return (
-    <ElevatedCard radius="md">
+    <Card p="0.25rem">
       {isSelected ? (
         <EditableValueItemContent value={props.value} doUnSelect={close} />
       ) : (
         <ValueItemContent value={props.value} doSelect={open} />
       )}
-    </ElevatedCard>
+    </Card>
   );
 };
 

@@ -1,5 +1,5 @@
 import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, Card } from "@teelur/budget-board-ui";
 import { IInstitution } from "~/models/institution";
 import AccountItem from "./AccountItem/AccountItem";
 import { GripVertical } from "lucide-react";
@@ -14,7 +14,6 @@ import React from "react";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
 import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
-import Card from "~/components/core/Card/Card";
 import { useOrderAccountsMutation } from "~/hooks/mutations/accounts/useOrderAccountsMutation";
 import Divider from "~/components/core/Divider/Divider";
 
@@ -110,7 +109,6 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
         flexDirection: "column",
       }}
       ref={props.isSortable ? ref : undefined}
-      elevation={1}
     >
       <LoadingOverlay visible={orderAccountsMutation.isPending} />
       <Stack px="0.5rem" py="0.25rem">

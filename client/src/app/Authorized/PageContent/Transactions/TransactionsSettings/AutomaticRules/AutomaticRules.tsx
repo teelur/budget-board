@@ -3,10 +3,9 @@ import React from "react";
 import { IAutomaticRuleResponse } from "~/models/automaticRule";
 import AddAutomaticRule from "./AddAutomaticRule/AddAutomaticRule";
 import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { useTranslation } from "react-i18next";
 import { useAutomaticRulesQuery } from "~/hooks/queries/useAutomaticRulesQuery";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
+import { BodyText } from "@teelur/budget-board-ui";
 
 const AutomaticRules = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -20,7 +19,9 @@ const AutomaticRules = (): React.ReactNode => {
     if ((automaticRuleQuery.data ?? []).length === 0) {
       return (
         <Group justify="center" p="1rem">
-          <DimmedText size="sm">{t("no_automatic_rules")}</DimmedText>
+          <BodyText tone="muted" size="sm">
+            {t("no_automatic_rules")}
+          </BodyText>
         </Group>
       );
     }
@@ -32,8 +33,14 @@ const AutomaticRules = (): React.ReactNode => {
 
   return (
     <Stack gap="0.25rem">
-      <PrimaryText size="md">{t("automatic_rules")}</PrimaryText>
-      <DimmedText size="sm">{t("automatic_rules_description")}</DimmedText>
+      <Stack gap={0}>
+        <BodyText tone="primary" size="md" fw={500}>
+          {t("automatic_rules")}
+        </BodyText>
+        <BodyText tone="secondary" size="sm">
+          {t("automatic_rules_description")}
+        </BodyText>
+      </Stack>
       <AddAutomaticRule />
       {getAutomaticRulesContent()}
     </Stack>

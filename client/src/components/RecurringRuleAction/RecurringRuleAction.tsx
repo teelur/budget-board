@@ -1,10 +1,14 @@
 import { Group, Stack } from "@mantine/core";
-import { Button, SegmentedControl, Select } from "@teelur/budget-board-ui";
+import {
+  Button,
+  HeadingText,
+  SegmentedControl,
+  Select,
+} from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { Link2OffIcon, Repeat2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import ModalContentHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import RecurringRuleForm from "~/components/RecurringRuleForm/RecurringRuleForm";
 import { useAssignRecurringTransactionsMutation } from "~/hooks/mutations/recurringRules/useAssignRecurringTransactionsMutation";
 import { useUnassignRecurringTransactionMutation } from "~/hooks/mutations/recurringRules/useUnassignRecurringTransactionMutation";
@@ -87,11 +91,11 @@ const RecurringRuleAction = (
         opened={opened}
         onClose={closeModal}
         title={
-          <ModalContentHeading order={4}>
+          <HeadingText tone="heading" level={4}>
             {mode === "new"
               ? t("mark_as_recurring")
               : t("use_existing_recurring_rule")}
-          </ModalContentHeading>
+          </HeadingText>
         }
       >
         <Stack gap="0.75rem">

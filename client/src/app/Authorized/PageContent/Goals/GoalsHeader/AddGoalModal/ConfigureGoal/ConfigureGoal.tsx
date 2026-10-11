@@ -4,7 +4,6 @@ import { Group, Stack } from "@mantine/core";
 import { Button, TextInput } from "@teelur/budget-board-ui";
 import { MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useTranslation } from "react-i18next";
 import { useField } from "@mantine/form";
 import SaveGoalOptions from "./SaveGoalOptions/SaveGoalOptions";
@@ -86,7 +85,7 @@ const ConfigureGoal = (props: ConfigureGoalProps): React.ReactNode => {
     <Stack gap="2rem" justify="space-between">
       <Stack gap={"0.5rem"}>
         <TextInput
-          label={<PrimaryText size="sm">{t("goal_name")}</PrimaryText>}
+          label={t("goal_name")}
           placeholder={t("enter_goal_name")}
           {...goalNameField.getInputProps()}
         />

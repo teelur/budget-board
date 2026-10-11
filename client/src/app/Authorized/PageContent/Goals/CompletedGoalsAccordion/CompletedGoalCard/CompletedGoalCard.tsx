@@ -1,12 +1,10 @@
 import { Flex, Group } from "@mantine/core";
+import { BodyText, Card } from "@teelur/budget-board-ui";
 import React from "react";
 import { SignDisplay } from "~/helpers/currency";
 import { getGoalTargetAmount } from "~/helpers/goals";
 import { IGoalResponse } from "~/models/goal";
-import Card from "~/components/core/Card/Card";
-import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
@@ -19,13 +17,15 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
   const formatSensitiveAmount = useSensitiveAmountFormatter();
 
   return (
-    <Card elevation={2}>
+    <Card>
       <Flex
         justify="space-between"
         align={{ base: "start", xs: "center" }}
         direction={{ base: "column", xs: "row" }}
       >
-        <PrimaryText size="lg">{props.goal.name}</PrimaryText>
+        <BodyText tone="primary" size="md" fw={500}>
+          {props.goal.name}
+        </BodyText>
         <Flex
           gap={0}
           direction={{ base: "row", xs: "column" }}
@@ -45,8 +45,8 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
                 ),
               }}
               components={[
-                <DimmedText size="sm" key="label" />,
-                <PrimaryText size="md" key="amount" />,
+                <BodyText tone="secondary" size="sm" key="label" />,
+                <BodyText tone="primary" size="md" key="amount" fw={500} />,
               ]}
             />
           </Group>
@@ -57,8 +57,8 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
                 date: dayjs(props.goal.completed).format("MMMM YYYY"),
               }}
               components={[
-                <DimmedText size="sm" key="label" />,
-                <PrimaryText size="md" key="amount" />,
+                <BodyText tone="secondary" size="sm" key="label" />,
+                <BodyText tone="primary" size="md" key="amount" fw={500} />,
               ]}
             />
           </Group>
