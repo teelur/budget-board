@@ -1,8 +1,8 @@
 import cardClasses from "../BudgetsGroup/BudgetParentCard/BudgetParentCard.module.css";
 
 import { Group } from "@mantine/core";
+import { HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 
 interface BudgetGroupHeaderProps {
   groupName: string;
@@ -12,7 +12,9 @@ const BudgetsGroupHeader = (props: BudgetGroupHeaderProps): React.ReactNode => {
   return (
     <Group className={cardClasses.dataContainer} px="0.5rem">
       <Group className={cardClasses.budgetNameContainer}>
-        <PrimaryHeading order={5}>{props.groupName}</PrimaryHeading>
+        <HeadingText tone="heading" level={4}>
+          {props.groupName}
+        </HeadingText>
       </Group>
     </Group>
   );

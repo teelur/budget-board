@@ -2,7 +2,7 @@ import classes from "./ExportTransactionsModal.module.css";
 
 import React from "react";
 import { Flex, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, HeadingText } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { FileUpIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,6 @@ import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/Tr
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { ITransaction, Filters } from "~/models/transaction";
 import { getFilteredTransactions } from "~/helpers/transactions";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 
@@ -167,7 +166,9 @@ const ExportTransactionsModal = (): React.ReactNode => {
         fullScreen={isMobile}
         size="80rem"
         title={
-          <PrimaryHeading order={4}>{t("export_transactions")}</PrimaryHeading>
+          <HeadingText tone="heading" level={4}>
+            {t("export_transactions")}
+          </HeadingText>
         }
       >
         <Stack className={classes.container} gap="0.5rem">

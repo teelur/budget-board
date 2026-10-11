@@ -1,5 +1,10 @@
 import { Stack } from "@mantine/core";
-import { Autocomplete, Button, TextInput } from "@teelur/budget-board-ui";
+import {
+  Autocomplete,
+  Button,
+  HeadingText,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -8,7 +13,6 @@ import { areStringsEqual } from "~/helpers/utils";
 import { AccountSource, IAccountCreateRequest } from "~/models/account";
 import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateAccountMutation } from "~/hooks/mutations/accounts/useCreateAccountMutation";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 import { useCreateInstitutionMutation } from "~/hooks/mutations/institutions/useCreateInstitutionMutation";
@@ -93,11 +97,7 @@ const CreateAccount = () => {
       <Modal
         opened={opened}
         onClose={close}
-        title={
-          <PrimaryHeading component="span" order={4}>
-            {t("create_account")}
-          </PrimaryHeading>
-        }
+        title={<HeadingText level={4}>{t("create_account")}</HeadingText>}
       >
         <Stack gap="0.5rem">
           <TextInput

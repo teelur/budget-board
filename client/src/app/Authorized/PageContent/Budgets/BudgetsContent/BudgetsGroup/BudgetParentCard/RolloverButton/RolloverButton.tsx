@@ -1,11 +1,10 @@
 import { Flex, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ActionIcon, Button } from "@teelur/budget-board-ui";
+import { ActionIcon, Button, HeadingText } from "@teelur/budget-board-ui";
 import { RepeatIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Modal from "~/components/core/Modal/Modal";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import RolloverControl from "../RolloverControl/RolloverControl";
 
@@ -59,9 +58,9 @@ const RolloverButton = (props: RolloverButtonProps): React.ReactNode => {
         onClose={close}
         size="sm"
         title={
-          <PrimaryHeading component="span" order={4}>
+          <HeadingText level={4}>
             {t("rollover_settings", { category: props.category })}
-          </PrimaryHeading>
+          </HeadingText>
         }
       >
         <Stack gap="1rem">

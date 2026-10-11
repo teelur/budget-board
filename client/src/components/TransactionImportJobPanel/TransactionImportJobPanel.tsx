@@ -1,5 +1,5 @@
 import { Affix, FloatingWindow, Group, Stack, Transition } from "@mantine/core";
-import { Button, Progress } from "@teelur/budget-board-ui";
+import { Button, HeadingText, Progress } from "@teelur/budget-board-ui";
 import type { SetFloatingWindowPosition } from "@mantine/hooks";
 import {
   BanIcon,
@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
 import { transactionImportJobTerminalStatuses } from "~/hooks/queries/useTransactionImportJobQuery";
 import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
@@ -154,9 +153,9 @@ const TransactionImportJobPanel = () => {
                 wrap="nowrap"
               >
                 <Stack gap={0}>
-                  <PrimaryHeading order={5}>
+                  <HeadingText tone="heading" level={5}>
                     {t("import_transactions")}
-                  </PrimaryHeading>
+                  </HeadingText>
                   <PrimaryText size="sm">{statusMessage}</PrimaryText>
                 </Stack>
                 <Group gap={4} wrap="nowrap">

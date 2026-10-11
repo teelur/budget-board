@@ -1,11 +1,10 @@
 import { Group } from "@mantine/core";
-import { ActionIcon, AmountText } from "@teelur/budget-board-ui";
+import { ActionIcon, AmountText, HeadingText } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { PencilIcon } from "lucide-react";
 import React from "react";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { IInstitution } from "~/models/institution";
 
 interface IInstitutionItemContentProps {
@@ -24,7 +23,9 @@ const InstitutionItemContent = (
   return (
     <Group justify="space-between" align="center">
       <Group gap="0.5rem">
-        <PrimaryHeading size="lg">{props.institution.name}</PrimaryHeading>
+        <HeadingText tone="heading" level={4}>
+          {props.institution.name}
+        </HeadingText>
         <ActionIcon
           variant="ghost"
           color="primary"

@@ -1,10 +1,9 @@
 import { Code, Group, ScrollArea, Stack } from "@mantine/core";
-import { Button, TextInput } from "@teelur/budget-board-ui";
+import { Button, HeadingText, TextInput } from "@teelur/budget-board-ui";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import Modal from "~/components/core/Modal/Modal";
 import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import PrimaryText from "~/components/core/Text/PrimaryText/PrimaryText";
@@ -136,9 +135,9 @@ const MetricWidgetSettings = ({
       opened={opened}
       onClose={handleClose}
       title={
-        <PrimaryHeading component="span" order={4}>
+        <HeadingText tone="heading" level={4}>
           {t("metric_widget_settings")}
-        </PrimaryHeading>
+        </HeadingText>
       }
       size="lg"
     >

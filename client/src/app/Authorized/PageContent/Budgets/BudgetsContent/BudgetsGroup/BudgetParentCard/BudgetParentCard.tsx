@@ -15,6 +15,7 @@ import {
   AmountText,
   Button,
   Card,
+  HeadingText,
   Progress,
 } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
@@ -38,7 +39,6 @@ import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUpdateBudgetMutation } from "~/hooks/mutations/budgets/useUpdateBudgetMutation";
 import { useDeleteBudgetMutation } from "~/hooks/mutations/budgets/useDeleteBudgetMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import CategoryIconPicker from "~/components/CategoryIconPicker/CategoryIconPicker";
 import { getCategoryIcon } from "~/helpers/category";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -344,12 +344,12 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                     icon={categoryIcon}
                   />
                 )}
-                <PrimaryHeading className={classes.title}>
+                <HeadingText tone="primary" className={classes.title}>
                   {!isSelected && categoryIcon.length > 0
                     ? `${categoryIcon} `
                     : ""}
                   {props.categoryTree.value}
-                </PrimaryHeading>
+                </HeadingText>
                 <ActionIcon
                   variant="ghost"
                   color="primary"

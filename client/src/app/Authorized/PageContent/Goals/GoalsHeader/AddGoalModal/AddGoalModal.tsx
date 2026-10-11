@@ -1,5 +1,5 @@
 import { Group, Stepper } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
@@ -13,7 +13,6 @@ import ConfigureGoal, {
 import SetTarget from "./SetTarget/SetTarget";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { IGoalCreateRequest } from "~/models/goal";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useCreateGoalMutation } from "~/hooks/mutations/goals/useCreateGoalMutation";
 
 const AddGoalModal = (): React.ReactNode => {
@@ -82,9 +81,9 @@ const AddGoalModal = (): React.ReactNode => {
         onClose={close}
         size="600px"
         title={
-          <PrimaryHeading component="span" order={4}>
+          <HeadingText tone="heading" level={4}>
             {t("add_goal")}
-          </PrimaryHeading>
+          </HeadingText>
         }
       >
         <Stepper active={activeStep} allowNextStepsSelect={false} w="100%">
