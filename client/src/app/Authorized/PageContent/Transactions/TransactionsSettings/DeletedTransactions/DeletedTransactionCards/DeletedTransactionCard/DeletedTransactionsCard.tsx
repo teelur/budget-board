@@ -1,6 +1,6 @@
 import classes from "./DeletedTransactionsCard.module.css";
 
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { ActionIcon, BodyText, Card } from "@teelur/budget-board-ui";
 import { getDaysSinceDate } from "~/helpers/datetime";
 import { ITransaction } from "~/models/transaction";
