@@ -75,7 +75,7 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
         </>
       ) : sortedAssets.length === 0 ? (
         <Group justify="center" align="center" gap="0.5rem">
-          <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
+          <InfoIcon size={20} color="var(--bbui-color-text-muted)" />
           <BodyText tone="muted" size="sm">
             {t("no_assets")}
           </BodyText>

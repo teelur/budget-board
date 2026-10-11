@@ -340,15 +340,9 @@ const SpendingCategoriesChart = (
                     flexShrink: 0,
                   }}
                 />
-                <span
-                  style={{
-                    color: "var(--base-color-text-dimmed)",
-                    fontWeight: 600,
-                    fontSize: "0.875rem",
-                  }}
-                >
+                <BodyText tone="secondary" size="sm" fw={500}>
                   {entry.name}
-                </span>
+                </BodyText>
               </div>
             ),
           )}

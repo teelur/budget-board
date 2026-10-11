@@ -70,7 +70,7 @@ const Goals = (): React.ReactNode => {
           <Skeleton h={100} w="100%" radius="lg" />
         ) : activeGoals.length === 0 ? (
           <Group justify="center" align="center" gap="0.5rem">
-            <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
+            <InfoIcon size={20} color="var(--bbui-color-text-muted)" />
             <BodyText tone="muted" size="sm">
               {t("no_goals")}
             </BodyText>

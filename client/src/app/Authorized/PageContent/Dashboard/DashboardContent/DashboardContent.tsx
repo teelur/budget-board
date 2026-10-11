@@ -173,7 +173,7 @@ const DashboardContent = ({
         </Stack>
       ) : showEmptyMessage ? (
         <Group justify="center" align="center" gap="0.5rem" w="100%">
-          <InfoIcon size={20} color="var(--base-color-text-dimmed)" />
+          <InfoIcon size={20} color="var(--bbui-color-text-muted)" />
           <BodyText tone="muted" size="sm">
             {t("no_widgets")}
           </BodyText>
