@@ -1,13 +1,9 @@
-import { Box, Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton } from "@mantine/core";
+import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
 import { GitBranchIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import FlowsChart from "~/components/Charts/FlowsChart/FlowsChart";
-import SplitCard, {
-  BorderThickness,
-} from "~/components/ui/SplitCard/SplitCard";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
 import { parseFlowsConfiguration } from "~/helpers/widgets";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -68,37 +64,28 @@ const FlowsWidget = ({
 
   return (
     <>
-      <SplitCard
-        w="100%"
-        h="100%"
-        border={BorderThickness.Thick}
-        header={
-          <Group gap="0.5rem" align="baseline" wrap="wrap">
-            <GitBranchIcon color="var(--base-color-text-dimmed)" />
-            <PrimaryHeading order={3} lh={1}>
-              {t("flows")}
-            </PrimaryHeading>
-            <DimmedText size="xs" lh={1.2}>
+      <Card w="100%" h="100%">
+        <Card.Section>
+          <Group gap="0.5rem" align="flex-end">
+            <GitBranchIcon size="1.5rem" color="var(--bbui-color-primary)" />
+            <HeadingText level={4}>{t("flows")}</HeadingText>
+            <BodyText tone="secondary" size="xs">
               {t("flows_widget_month_range", { range: monthRange })}
-            </DimmedText>
+            </BodyText>
           </Group>
-        }
-        elevation={1}
-      >
-        <Stack gap={0} w="100%" p="0.5rem" style={{ flex: 1, minHeight: 0 }}>
+        </Card.Section>
+        <Card.Section>
           {isPending ? (
             <Skeleton height="100%" radius="md" />
           ) : (
-            <Box style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-              <FlowsChart
-                transactions={transactionsQuery.data ?? []}
-                categories={allTransactionCategories}
-                height={480}
-              />
-            </Box>
+            <FlowsChart
+              transactions={transactionsQuery.data ?? []}
+              categories={allTransactionCategories}
+              height={480}
+            />
           )}
-        </Stack>
-      </SplitCard>
+        </Card.Section>
+      </Card>
       {settingsOpened !== undefined && onSettingsClose && (
         <FlowsWidgetSettings
           widget={widget}

@@ -1,17 +1,13 @@
-import { Flex, Group, Skeleton, Stack } from "@mantine/core";
+import { Flex, Group, Skeleton } from "@mantine/core";
+import { Card, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
 import { useTranslation } from "react-i18next";
-import SplitCard, {
-  BorderThickness,
-} from "~/components/ui/SplitCard/SplitCard";
 import { LandmarkIcon } from "lucide-react";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import AccountsWidgetSettings from "./AccountsWidgetSettings/AccountsWidgetSettings";
 import WidgetErrorMessage from "~/components/ui/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
-import Divider from "~/components/core/Divider/Divider";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -63,7 +59,7 @@ const AccountsWidget = ({
   const getAccountsContent = () => {
     if (institutionQuery.isPending || widgetSettingsQuery.isPending) {
       return (
-        <Flex h="100%" w="100%" p="0.5rem">
+        <Flex h="100%" w="100%" p="0.25rem">
           <Skeleton flex={1} radius="md" />
         </Flex>
       );
@@ -75,40 +71,32 @@ const AccountsWidget = ({
       );
     }
 
-    return (
-      <Stack h="100%" w="100%" my="0.5rem" justify="space-around" gap={0}>
-        {(sortedFilteredInstitutionsForDisplay ?? []).map(
-          (institution: IInstitution, index: number) => (
-            <React.Fragment key={institution.id}>
-              <InstitutionItem institution={institution} />
-              {index < sortedFilteredInstitutionsForDisplay.length - 1 && (
-                <Divider my={"0.5rem"} size="xs" elevation={1} />
-              )}
-            </React.Fragment>
-          ),
-        )}
-      </Stack>
+    return (sortedFilteredInstitutionsForDisplay ?? []).map(
+      (institution: IInstitution) => (
+        <Card.Section key={institution.id}>
+          <InstitutionItem institution={institution} />
+        </Card.Section>
+      ),
     );
   };
 
   return (
-    <SplitCard
+    <Card
       w="100%"
       h="100%"
-      border={BorderThickness.Thick}
-      header={
-        <Group gap="0.25rem">
-          <LandmarkIcon color="var(--base-color-text-dimmed)" />
-          <PrimaryHeading order={3} lh={1}>
-            {t("accounts")}
-          </PrimaryHeading>
-        </Group>
-      }
+      p={0}
       style={{
         containerType: "inline-size",
       }}
-      elevation={1}
     >
+      <Card.Section>
+        <Group gap="0.25rem">
+          <LandmarkIcon size="1.5rem" color="var(--bbui-color-primary)" />
+          <HeadingText tone="heading" level={4}>
+            {t("accounts")}
+          </HeadingText>
+        </Group>
+      </Card.Section>
       {getAccountsContent()}
       {settingsOpened !== undefined && onSettingsClose && (
         <AccountsWidgetSettings
@@ -117,7 +105,7 @@ const AccountsWidget = ({
           onClose={onSettingsClose}
         />
       )}
-    </SplitCard>
+    </Card>
   );
 };
 

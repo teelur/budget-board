@@ -1,43 +1,19 @@
 .hoverable {
   transition:
     background 0.2s ease,
-    border-color 0.2s ease,
     outline-color 0.2s ease;
 }
 
 .hoverable[data-hover-effect="true"]:hover {
   background-color: color-mix(
     in srgb,
-    var(--mantine-primary-color-filled) 8%,
-    var(--card-bg)
+    var(--bbui-color-button-hover) 8%,
+    var(--bbui-color-surface)
   );
-  border-color: var(--mantine-primary-color-filled);
   cursor: pointer;
 }
 
-.hoverable[data-hover-effect="true"] {
-  border-color: var(--hoverable-border-color);
-}
-
-@keyframes hoverable-card-border-flash {
-  0% {
-    border-color: var(--hoverable-border-color);
-  }
-
-  35% {
-    border-color: var(--mantine-color-white, #ffffff);
-  }
-
-  100% {
-    border-color: var(--mantine-primary-color-filled);
-  }
-}
-
-.hoverable[data-hover-effect="true"][data-hover-variant="card"]:hover {
-  animation: hoverable-card-border-flash 0.2s ease both;
-}
-
 .outline[data-hover-effect="true"]:hover {
-  outline: 2px solid var(--mantine-primary-color-filled);
+  outline: 2px solid var(--bbui-color-button-hover);
   outline-offset: 1px;
 }

@@ -3,17 +3,13 @@ import {
   getVisibleTransactions,
 } from "~/helpers/transactions";
 import { Group, Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
-import SplitCard, {
-  BorderThickness,
-} from "~/components/ui/SplitCard/SplitCard";
 import { TagsIcon } from "lucide-react";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
-import DimmedText from "~/components/core/Text/DimmedText/DimmedText";
-import PrimaryHeading from "~/components/core/Heading/PrimaryHeading/PrimaryHeading";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
 
@@ -67,21 +63,18 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
 
     if (sortedFilteredTransactions.length === 0) {
       return (
-        <Group justify="center" align="center" gap="0.5rem" h="100%">
-          <TagsIcon size={24} color="var(--base-color-text-dimmed)" />
-          <DimmedText>{t("no_uncategorized_transactions")}</DimmedText>
-        </Group>
+        <BodyText tone="muted" size="sm" ta="center">
+          {t("no_uncategorized_transactions")}
+        </BodyText>
       );
     }
 
     return (
       <ScrollArea
         w="100%"
-        h="100%"
-        p="0.125rem"
         type="auto"
         offsetScrollbars="present"
-        style={{ flex: 1, minHeight: 0 }}
+        style={{ flex: "1 1 0", minHeight: 0 }}
       >
         <Stack gap="0.3rem">
           {currentPageTransactions.map((transaction: ITransaction) => (
@@ -91,6 +84,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
               categories={transactionCategories}
               selected={selectedIds.has(transaction.id)}
               onToggleSelect={onToggleSelect}
+              surface="sunken"
             />
           ))}
         </Stack>
@@ -100,39 +94,48 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
 
   return (
     <>
-      <SplitCard
+      <Card
         w="100%"
         h="100%"
-        border={BorderThickness.Thick}
-        header={
-          <Group gap="0.25rem">
-            <TagsIcon color="var(--base-color-text-dimmed)" />
-            <PrimaryHeading order={3} lh={1}>
-              {t("uncategorized_transactions")}
-            </PrimaryHeading>
-          </Group>
-        }
-        elevation={1}
+        style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
       >
-        <Stack
+        <Card.Section separatorThickness="thick">
+          <Group gap="0.25rem">
+            <TagsIcon size="1.5rem" color="var(--bbui-color-primary)" />
+            <HeadingText tone="heading" level={4}>
+              {t("uncategorized_transactions")}
+            </HeadingText>
+          </Group>
+        </Card.Section>
+        <Card.Section
           p="0.5rem"
-          gap="0.5rem"
-          align="center"
-          w="100%"
-          style={{ flex: 1, minHeight: 0 }}
+          style={{
+            display: "flex",
+            flex: "1 1 0",
+            flexDirection: "column",
+            minHeight: 0,
+          }}
         >
-          {getWidgetContent()}
-          {sortedFilteredTransactions.length > itemsPerPage && (
-            <Pagination
-              value={activePage}
-              onChange={setPage}
-              total={Math.ceil(
-                sortedFilteredTransactions.length / itemsPerPage,
-              )}
-            />
-          )}
-        </Stack>
-      </SplitCard>
+          <Stack
+            gap="0.5rem"
+            justify="center"
+            align="center"
+            w="100%"
+            style={{ flex: "1 1 0", minHeight: 0 }}
+          >
+            {getWidgetContent()}
+            {sortedFilteredTransactions.length > itemsPerPage && (
+              <Pagination
+                value={activePage}
+                onChange={setPage}
+                total={Math.ceil(
+                  sortedFilteredTransactions.length / itemsPerPage,
+                )}
+              />
+            )}
+          </Stack>
+        </Card.Section>
+      </Card>
       <BulkActionBar
         selectedIds={selectedIds}
         currentPageTransactions={currentPageTransactions}
