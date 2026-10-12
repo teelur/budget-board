@@ -1,7 +1,7 @@
 import { Group, Stack } from "@mantine/core";
 import {
   Button,
-  HeadingText,
+  Modal,
   SegmentedControl,
   Select,
 } from "@teelur/budget-board-ui";
@@ -14,7 +14,6 @@ import { useAssignRecurringTransactionsMutation } from "~/hooks/mutations/recurr
 import { useUnassignRecurringTransactionMutation } from "~/hooks/mutations/recurringRules/useUnassignRecurringTransactionMutation";
 import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
 import { ITransaction } from "~/models/transaction";
-import Modal from "../core/Modal/Modal";
 
 interface RecurringRuleActionProps {
   transaction: ITransaction;
@@ -91,11 +90,9 @@ const RecurringRuleAction = (
         opened={opened}
         onClose={closeModal}
         title={
-          <HeadingText tone="heading" level={4}>
-            {mode === "new"
-              ? t("mark_as_recurring")
-              : t("use_existing_recurring_rule")}
-          </HeadingText>
+          mode === "new"
+            ? t("mark_as_recurring")
+            : t("use_existing_recurring_rule")
         }
       >
         <Stack gap="0.75rem">

@@ -101,15 +101,7 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
   }, [props.isSortable]);
 
   return (
-    <Card
-      p={0}
-      style={{
-        borderWidth: "2px",
-        display: "flex",
-        flexDirection: "column",
-      }}
-      ref={props.isSortable ? ref : undefined}
-    >
+    <Card p={0} ref={props.isSortable ? ref : undefined}>
       <LoadingOverlay visible={orderAccountsMutation.isPending} />
       <Stack px="0.5rem" py="0.25rem">
         {isEditable ? (

@@ -1,9 +1,8 @@
 import { Group, Stepper } from "@mantine/core";
-import { BodyText, Button, HeadingText } from "@teelur/budget-board-ui";
+import { BodyText, Button, Modal } from "@teelur/budget-board-ui";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
-import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import SelectType from "./SelectType/SelectType";
 import ConfigureGoal, {
@@ -75,16 +74,7 @@ const AddGoalModal = (): React.ReactNode => {
       <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
         <PlusIcon size={22} />
       </Button>
-      <Modal
-        opened={isOpen}
-        onClose={close}
-        size="600px"
-        title={
-          <HeadingText tone="heading" level={4}>
-            {t("add_goal")}
-          </HeadingText>
-        }
-      >
+      <Modal opened={isOpen} onClose={close} size="600px" title={t("add_goal")}>
         <Stepper active={activeStep} allowNextStepsSelect={false} w="100%">
           <Stepper.Step label={t("step_1")} description={t("select_type")}>
             <SelectType

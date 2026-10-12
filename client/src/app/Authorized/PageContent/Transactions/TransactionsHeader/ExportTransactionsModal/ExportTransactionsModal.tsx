@@ -2,11 +2,10 @@ import classes from "./ExportTransactionsModal.module.css";
 
 import React from "react";
 import { Flex, Stack } from "@mantine/core";
-import { Button, HeadingText } from "@teelur/budget-board-ui";
+import { Button, Modal } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { FileUpIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import Modal from "~/components/core/Modal/Modal";
 import FilterCard from "../FilterCard/FilterCard";
 import FieldSelectionCard from "./FieldSelectionCard/FieldSelectionCard";
 import ColumnOrderCard from "./ColumnOrderCard/ColumnOrderCard";
@@ -165,11 +164,7 @@ const ExportTransactionsModal = (): React.ReactNode => {
         onClose={close}
         fullScreen={isMobile}
         size="80rem"
-        title={
-          <HeadingText tone="heading" level={4}>
-            {t("export_transactions")}
-          </HeadingText>
-        }
+        title={t("export_transactions")}
       >
         <Stack className={classes.container} gap="0.5rem">
           <FilterCard />
