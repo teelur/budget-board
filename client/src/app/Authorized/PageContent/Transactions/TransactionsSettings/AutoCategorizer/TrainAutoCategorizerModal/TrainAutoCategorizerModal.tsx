@@ -1,15 +1,9 @@
 import { Stack } from "@mantine/core";
-import {
-  BodyText,
-  Button,
-  DateInput,
-  HeadingText,
-} from "@teelur/budget-board-ui";
+import { BodyText, Button, DateInput, Modal } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import React from "react";
-import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useTrainAutomaticTransactionCategorizerMutation } from "~/hooks/mutations/automaticTransactionCategorizer/useTrainAutomaticTransactionCategorizerMutation";
@@ -89,11 +83,7 @@ const TrainAutoCategorizerModal = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={
-          <HeadingText tone="heading" level={4}>
-            {t("train_auto_categorizer")}
-          </HeadingText>
-        }
+        title={t("train_auto_categorizer")}
       >
         <Stack gap="1rem">
           <Stack gap={0}>

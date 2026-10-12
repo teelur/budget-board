@@ -1,11 +1,10 @@
 import { Stack } from "@mantine/core";
-import { Button, HeadingText, TextInput } from "@teelur/budget-board-ui";
+import { Button, Modal, TextInput } from "@teelur/budget-board-ui";
 import { isNotEmpty, useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
 import React from "react";
 import { IAssetCreateRequest } from "~/models/asset";
-import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import { useCreateAssetMutation } from "~/hooks/mutations/assets/useCreateAssetMutation";
 
@@ -25,11 +24,7 @@ const CreateAsset = (): React.ReactNode => {
       <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
         <PlusIcon size={22} />
       </Button>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={<HeadingText level={4}>{t("create_asset")}</HeadingText>}
-      >
+      <Modal opened={opened} onClose={close} title={t("create_asset")}>
         <Stack gap="0.5rem">
           <TextInput
             {...assetNameField.getInputProps()}

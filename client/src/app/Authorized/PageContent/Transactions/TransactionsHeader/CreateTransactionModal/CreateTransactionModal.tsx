@@ -3,7 +3,7 @@ import {
   Button,
   CategorySelect,
   DateInput,
-  HeadingText,
+  Modal,
   NumberInput,
   Select,
   TextInput,
@@ -18,7 +18,6 @@ import { getCurrencySymbol } from "~/helpers/currency";
 import { AccountSource } from "~/models/account";
 import { ITransactionCreateRequest } from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateTransactionMutation } from "~/hooks/mutations/transactions/useCreateTransactionMutation";
@@ -98,15 +97,7 @@ const CreateTransactionModal = (): React.ReactNode => {
       <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
         <PlusIcon size={22} />
       </Button>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={
-          <HeadingText tone="heading" level={4}>
-            {t("create_transaction")}
-          </HeadingText>
-        }
-      >
+      <Modal opened={opened} onClose={close} title={t("create_transaction")}>
         <Stack gap="1rem">
           <Stack gap="0.25rem">
             <DateInput

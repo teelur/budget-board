@@ -1,9 +1,8 @@
 import { Group, Stack } from "@mantine/core";
-import { Button, HeadingText, Select } from "@teelur/budget-board-ui";
+import { Button, Modal, Select } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Modal from "~/components/core/Modal/Modal";
 import { parseFlowsConfiguration } from "~/helpers/widgets";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -53,11 +52,7 @@ const FlowsWidgetSettings = ({
     <Modal
       opened={opened}
       onClose={handleClose}
-      title={
-        <HeadingText tone="heading" level={4}>
-          {t("flows_widget_settings")}
-        </HeadingText>
-      }
+      title={t("flows_widget_settings")}
       size="sm"
     >
       <Stack gap="0.75rem">

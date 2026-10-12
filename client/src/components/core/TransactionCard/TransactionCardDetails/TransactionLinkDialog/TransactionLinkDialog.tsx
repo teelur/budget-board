@@ -1,10 +1,5 @@
 import { Alert, Group, Paper, Skeleton, Stack } from "@mantine/core";
-import {
-  BodyText,
-  Button,
-  HeadingText,
-  NumberInput,
-} from "@teelur/budget-board-ui";
+import { BodyText, Button, Modal, NumberInput } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
@@ -16,7 +11,6 @@ import { useTransactionLinkCandidatesQuery } from "~/hooks/queries/useTransactio
 import { ITransaction } from "~/models/transaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
-import Modal from "~/components/core/Modal/Modal";
 import LinkCandidateCard from "./LinkCandidateCard/LinkCandidateCard";
 
 interface TransactionLinkDialogProps {
@@ -113,15 +107,7 @@ const TransactionLinkDialog = ({
   return (
     <>
       {linkAction}
-      <Modal
-        opened={linkOpened}
-        onClose={closeLink}
-        title={
-          <HeadingText tone="heading" level={4}>
-            {t("link_transfer")}
-          </HeadingText>
-        }
-      >
+      <Modal opened={linkOpened} onClose={closeLink} title={t("link_transfer")}>
         <Stack gap="sm">
           <BodyText tone="secondary" size="sm">
             {t("link_transfer_source", {
@@ -202,11 +188,7 @@ const TransactionLinkDialog = ({
       <Modal
         opened={unlinkOpened}
         onClose={closeUnlink}
-        title={
-          <HeadingText tone="heading" level={4}>
-            {t("unlink_transactions")}
-          </HeadingText>
-        }
+        title={t("unlink_transactions")}
       >
         <Stack gap="sm">
           <BodyText tone="secondary" size="sm">

@@ -1,15 +1,9 @@
 import { Code, Group, ScrollArea, Stack } from "@mantine/core";
-import {
-  BodyText,
-  Button,
-  HeadingText,
-  TextInput,
-} from "@teelur/budget-board-ui";
+import { BodyText, Button, Modal, TextInput } from "@teelur/budget-board-ui";
 import Accordion from "~/components/core/Accordion/Accordion";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Modal from "~/components/core/Modal/Modal";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -137,11 +131,7 @@ const MetricWidgetSettings = ({
     <Modal
       opened={opened}
       onClose={handleClose}
-      title={
-        <HeadingText tone="heading" level={4}>
-          {t("metric_widget_settings")}
-        </HeadingText>
-      }
+      title={t("metric_widget_settings")}
       size="lg"
     >
       <Stack gap="0.5rem">
