@@ -1,11 +1,5 @@
 import { Stack } from "@mantine/core";
-import {
-  BodyText,
-  Button,
-  DateInput,
-  HeadingText,
-  Modal,
-} from "@teelur/budget-board-ui";
+import { BodyText, Button, DateInput, Modal } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { NotificationType, showNotification } from "~/helpers/notifications";

@@ -1,5 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import { Button, HeadingText, Modal, Select } from "@teelur/budget-board-ui";
+import { Button, Modal, Select } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";

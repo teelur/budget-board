@@ -1,11 +1,5 @@
 import { Group, Stack } from "@mantine/core";
-import {
-  ActionIcon,
-  BodyText,
-  Button,
-  HeadingText,
-  Modal,
-} from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText, Button, Modal } from "@teelur/budget-board-ui";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
 import NetWorthGroupItem from "./NetWorthGroupItem/NetWorthGroupItem";

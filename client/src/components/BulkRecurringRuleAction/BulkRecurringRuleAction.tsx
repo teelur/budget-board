@@ -1,7 +1,6 @@
 import { Group, Stack } from "@mantine/core";
 import {
   Button,
-  HeadingText,
   Modal,
   SegmentedControl,
   Select,
