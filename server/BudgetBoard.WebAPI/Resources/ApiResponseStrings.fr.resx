@@ -134,6 +134,6 @@
     <value>The channel must be either 'stable' or 'dev'.</value>
   </data>
   <data name="UpdateChannelNotSupported" xml:space="preserve">
-    <value>The update channel is not supported.</value>
+    <value>Le canal de mise à jour n'est pas pris en charge.</value>
   </data>
 </root>
