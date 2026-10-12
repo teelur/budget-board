@@ -1,12 +1,6 @@
 import { Flex, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import {
-  ActionIcon,
-  BodyText,
-  Button,
-  HeadingText,
-  Modal,
-} from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText, Button, Modal } from "@teelur/budget-board-ui";
 import { RepeatIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
