@@ -7,13 +7,13 @@ import {
   Button,
   Card,
   HeadingText,
+  Modal,
 } from "@teelur/budget-board-ui";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useDisclosure } from "@mantine/hooks";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Modal from "~/components/core/Modal/Modal";
 import RecurringRuleForm from "~/components/RecurringRuleForm/RecurringRuleForm";
 import { useDeleteRecurringRuleMutation } from "~/hooks/mutations/recurringRules/useDeleteRecurringRuleMutation";
 import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
@@ -184,11 +184,7 @@ const RecurringRules = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={close}
-        title={
-          <HeadingText level={4}>
-            {editingRule ? t("edit_recurring_rule") : t("add_recurring_rule")}
-          </HeadingText>
-        }
+        title={editingRule ? t("edit_recurring_rule") : t("add_recurring_rule")}
       >
         <RecurringRuleForm
           key={editingRule?.id ?? "new"}

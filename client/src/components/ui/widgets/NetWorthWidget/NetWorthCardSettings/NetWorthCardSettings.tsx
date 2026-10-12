@@ -4,10 +4,10 @@ import {
   BodyText,
   Button,
   HeadingText,
+  Modal,
 } from "@teelur/budget-board-ui";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { PlusIcon } from "lucide-react";
-import Modal from "~/components/core/Modal/Modal";
 import NetWorthGroupItem from "./NetWorthGroupItem/NetWorthGroupItem";
 import React from "react";
 import { INetWorthWidgetGroupCreateRequest } from "~/models/netWorthWidgetConfiguration";
@@ -86,11 +86,7 @@ const NetWorthCardSettings = ({
       size="40rem"
       opened={opened}
       onClose={onClose}
-      title={
-        <HeadingText tone="heading" level={4}>
-          {t("net_worth_settings")}
-        </HeadingText>
-      }
+      title={t("net_worth_settings")}
     >
       <Stack gap="0.5rem">
         <BodyText tone="secondary" size="sm">

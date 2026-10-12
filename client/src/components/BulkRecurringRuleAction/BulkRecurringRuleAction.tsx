@@ -2,6 +2,7 @@ import { Group, Stack } from "@mantine/core";
 import {
   Button,
   HeadingText,
+  Modal,
   SegmentedControl,
   Select,
 } from "@teelur/budget-board-ui";
@@ -9,7 +10,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { Repeat2Icon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Modal from "~/components/core/Modal/Modal";
 import RecurringRuleForm from "~/components/RecurringRuleForm/RecurringRuleForm";
 import { useAssignRecurringTransactionsMutation } from "~/hooks/mutations/recurringRules/useAssignRecurringTransactionsMutation";
 import { useRecurringRulesQuery } from "~/hooks/queries/useRecurringRulesQuery";
@@ -97,11 +97,9 @@ const BulkRecurringRuleAction = (
         opened={opened}
         onClose={closeModal}
         title={
-          <HeadingText tone="heading" level={4}>
-            {mode === "new"
-              ? t("mark_as_recurring")
-              : t("use_existing_recurring_rule")}
-          </HeadingText>
+          mode === "new"
+            ? t("mark_as_recurring")
+            : t("use_existing_recurring_rule")
         }
       >
         <Stack gap="0.75rem">

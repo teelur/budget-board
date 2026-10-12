@@ -5,11 +5,11 @@ import {
   BodyText,
   Button,
   HeadingText,
+  Modal,
 } from "@teelur/budget-board-ui";
 import { RepeatIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Modal from "~/components/core/Modal/Modal";
 import RolloverControl from "../RolloverControl/RolloverControl";
 
 interface RolloverButtonProps {
@@ -60,12 +60,7 @@ const RolloverButton = (props: RolloverButtonProps): React.ReactNode => {
       <Modal
         opened={isOpen}
         onClose={close}
-        size="sm"
-        title={
-          <HeadingText level={4}>
-            {t("rollover_settings", { category: props.category })}
-          </HeadingText>
-        }
+        title={t("rollover_settings", { category: props.category })}
       >
         <Stack gap="1rem">
           <Stack gap="0.5rem">

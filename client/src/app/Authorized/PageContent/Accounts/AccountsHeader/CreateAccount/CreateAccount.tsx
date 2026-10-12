@@ -2,7 +2,7 @@ import { Stack } from "@mantine/core";
 import {
   Autocomplete,
   Button,
-  HeadingText,
+  Modal,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { isNotEmpty, useField } from "@mantine/form";
@@ -11,7 +11,6 @@ import { NotificationType, showNotification } from "~/helpers/notifications";
 import { PlusIcon } from "lucide-react";
 import { areStringsEqual } from "~/helpers/utils";
 import { AccountSource, IAccountCreateRequest } from "~/models/account";
-import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import { useCreateAccountMutation } from "~/hooks/mutations/accounts/useCreateAccountMutation";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
@@ -94,11 +93,7 @@ const CreateAccount = () => {
       <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
         <PlusIcon size={22} />
       </Button>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={<HeadingText level={4}>{t("create_account")}</HeadingText>}
-      >
+      <Modal opened={opened} onClose={close} title={t("create_account")}>
         <Stack gap="0.5rem">
           <TextInput
             {...accountNameField.getInputProps()}

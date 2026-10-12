@@ -4,10 +4,9 @@ import {
   Button,
   Card,
   Checkbox,
-  HeadingText,
+  Modal,
 } from "@teelur/budget-board-ui";
 import React from "react";
-import Modal from "~/components/core/Modal/Modal";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
 import Divider from "~/components/core/Divider/Divider";
@@ -152,11 +151,7 @@ const AccountsWidgetSettings = ({
   };
 
   return (
-    <Modal
-      opened={opened}
-      onClose={handleClose}
-      title={<HeadingText level={4}>{t("accounts_settings")}</HeadingText>}
-    >
+    <Modal opened={opened} onClose={handleClose} title={t("accounts_settings")}>
       <Stack gap="0.75rem">
         <BodyText tone="secondary" size="sm">
           {t("accounts_settings_widget_message")}

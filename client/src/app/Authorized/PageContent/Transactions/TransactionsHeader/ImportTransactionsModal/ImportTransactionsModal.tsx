@@ -1,5 +1,5 @@
 import { Stepper } from "@mantine/core";
-import { Button, HeadingText } from "@teelur/budget-board-ui";
+import { Button, HeadingText, Modal } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { FileDownIcon } from "lucide-react";
 import React from "react";
@@ -15,7 +15,6 @@ import AccountMapping from "./AccountMapping/AccountMapping";
 import ConfigureTransactions from "./ConfigureTransactions/ConfigureTransactions";
 import { useDisclosure } from "@mantine/hooks";
 import ImportCompleted from "./ImportCompleted/ImportCompleted";
-import Modal from "~/components/core/Modal/Modal";
 import { useTranslation } from "react-i18next";
 import { useImportTransactionsMutation } from "~/hooks/mutations/transactions/useImportTransactionsMutation";
 import ImportProgress from "./ImportProgress/ImportProgress";
@@ -242,11 +241,7 @@ const ImportTransactionsModal = () => {
         opened={opened}
         onClose={close}
         size="auto"
-        title={
-          <HeadingText tone="heading" level={4}>
-            {t("import_transactions")}
-          </HeadingText>
-        }
+        title={t("import_transactions")}
       >
         <Stepper active={activeStep} allowNextStepsSelect={false} w="100%">
           <Stepper.Step label={t("step_1")} description={t("load_csv")}>
