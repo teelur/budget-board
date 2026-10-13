@@ -1,5 +1,5 @@
-import { Group, Pagination, Stack } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Pagination } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import { ICategory } from "~/models/category";
 import React from "react";
@@ -65,6 +65,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
         {props.transactions.length > itemsPerPage && (
           <Group justify="center">
             <Pagination
+              size="sm"
               total={Math.ceil(props.transactions.length / itemsPerPage)}
               value={page}
               onChange={setPage}

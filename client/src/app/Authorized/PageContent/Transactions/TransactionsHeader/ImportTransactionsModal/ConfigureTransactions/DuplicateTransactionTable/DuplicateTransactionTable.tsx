@@ -1,5 +1,10 @@
-import { Divider, Flex, Pagination, Stack, Table } from "@mantine/core";
-import { ActionIcon, AmountText, BodyText } from "@teelur/budget-board-ui";
+import { Divider, Flex, Stack, Table } from "@mantine/core";
+import {
+  ActionIcon,
+  AmountText,
+  BodyText,
+  Pagination,
+} from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";
 import React from "react";
@@ -184,7 +189,7 @@ const DuplicateTransactionTable = (
             total={numberOfPages}
             value={page}
             onChange={setPage}
-            mt="sm"
+            mt="0.5rem"
             size="sm"
           />
         </Flex>
