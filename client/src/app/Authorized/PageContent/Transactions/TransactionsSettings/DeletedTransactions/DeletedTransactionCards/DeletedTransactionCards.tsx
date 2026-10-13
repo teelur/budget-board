@@ -1,5 +1,5 @@
-import { Group, Pagination, Stack } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Pagination } from "@teelur/budget-board-ui";
 import React from "react";
 import { ITransaction } from "~/models/transaction";
 import DeletedTransactionsCard from "./DeletedTransactionCard/DeletedTransactionsCard";
