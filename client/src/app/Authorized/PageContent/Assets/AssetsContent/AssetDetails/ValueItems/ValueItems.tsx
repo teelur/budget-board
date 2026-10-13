@@ -1,7 +1,8 @@
-import { Group, Pagination, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import React from "react";
 import { IValueResponse } from "~/models/value";
 import ValueItem from "./ValueItem/ValueItem";
+import { Pagination } from "@teelur/budget-board-ui";
 
 interface ValueItemsProps {
   values: IValueResponse[];
@@ -25,6 +26,7 @@ const ValueItems = (props: ValueItemsProps): React.ReactNode => {
         ))}
       <Group justify="center">
         <Pagination
+          size="sm"
           total={Math.ceil(props.values.length / itemsPerPage)}
           value={page}
           onChange={setPage}

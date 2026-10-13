@@ -1,7 +1,8 @@
-import { Group, Pagination, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import React from "react";
 import { IBalanceResponse } from "~/models/balance";
 import BalanceItem from "./BalanceItem/BalanceItem";
+import { Pagination } from "@teelur/budget-board-ui";
 
 interface BalanceItemsProps {
   balances: IBalanceResponse[];
@@ -25,6 +26,7 @@ const BalanceItems = (props: BalanceItemsProps) => {
         ))}
       <Group justify="center">
         <Pagination
+          size="sm"
           total={Math.ceil(props.balances.length / itemsPerPage)}
           value={page}
           onChange={setPage}

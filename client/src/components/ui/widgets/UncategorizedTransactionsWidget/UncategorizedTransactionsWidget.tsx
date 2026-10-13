@@ -1,9 +1,14 @@
+import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import {
+  BodyText,
+  Card,
+  HeadingText,
+  Pagination,
+} from "@teelur/budget-board-ui";
 import {
   getTransactionsByCategory,
   getVisibleTransactions,
 } from "~/helpers/transactions";
-import { Group, Pagination, ScrollArea, Skeleton, Stack } from "@mantine/core";
-import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
@@ -126,6 +131,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
             {getWidgetContent()}
             {sortedFilteredTransactions.length > itemsPerPage && (
               <Pagination
+                size="sm"
                 value={activePage}
                 onChange={setPage}
                 total={Math.ceil(
