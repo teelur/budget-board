@@ -211,19 +211,6 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
   const getAlerts = (): React.ReactNode[] => {
     const alerts: React.ReactNode[] = [];
 
-    if (activeFilterFields.length === 0) {
-      alerts.push(
-        <Alert
-          key="no-filter-criteria"
-          variant="light"
-          color="error"
-          icon={<InfoIcon />}
-        >
-          {t("duplicate_filter_no_criteria_message")}
-        </Alert>,
-      );
-    }
-
     if (transactionsQuery.isError) {
       alerts.push(
         <Stack key="transaction-query-error" gap="0.5rem">
@@ -242,7 +229,25 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
           </Button>
         </Stack>,
       );
-    } else if (filteredTransactions.length === 0) {
+    }
+
+    if (!filterDuplicatesField.getValue()) {
+      alerts.push(
+        <Alert
+          key="duplicate-filter-disabled"
+          variant="light"
+          color="warning"
+          icon={<InfoIcon />}
+        >
+          {t("duplicate_review_filter_disabled_message")}
+        </Alert>,
+      );
+
+      // The remaining alerts are not relevant if the duplicate filter is disabled
+      return alerts;
+    }
+
+    if (filteredTransactions.length === 0) {
       alerts.push(
         <Alert
           key="no-transactions"
@@ -255,15 +260,15 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
       );
     }
 
-    if (!filterDuplicatesField.getValue()) {
+    if (activeFilterFields.length === 0) {
       alerts.push(
         <Alert
-          key="duplicate-filter-disabled"
+          key="no-filter-criteria"
           variant="light"
-          color="warning"
+          color="error"
           icon={<InfoIcon />}
         >
-          {t("duplicate_review_filter_disabled_message")}
+          {t("duplicate_filter_no_criteria_message")}
         </Alert>,
       );
     }
@@ -322,11 +327,7 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
         {filterDuplicatesField.getValue() &&
           activeFilterFields.length > 0 &&
           duplicateTransactions.size === 0 && (
-            <Alert
-              variant="light"
-              color="success"
-              icon={<InfoIcon />}
-            >
+            <Alert variant="light" color="success" icon={<InfoIcon />}>
               {t("duplicate_review_no_duplicates_message")}
             </Alert>
           )}
