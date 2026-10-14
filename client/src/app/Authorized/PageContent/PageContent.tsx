@@ -1,10 +1,11 @@
-import { Alert, ScrollArea, Stack } from "@mantine/core";
+import { ScrollArea, Stack } from "@mantine/core";
 import { Navigate, Route, Routes } from "react-router";
 import { Suspense, lazy } from "react";
 import LoadingScreen from "~/components/LoadingScreen/LoadingScreen";
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
 import { useTranslation } from "react-i18next";
 import { TriangleAlert } from "lucide-react";
+import { Alert } from "@teelur/budget-board-ui";
 
 const Dashboard = lazy(() => import("./Dashboard/Dashboard"));
 const Accounts = lazy(() => import("./Accounts/Accounts"));
@@ -108,12 +109,10 @@ const PageContent = (): React.ReactNode => {
       <Stack w="100%" p="0.5rem" pb="var(--bulk-bar-height, 0)" align="center">
         {isDemoMode && (
           <Alert
+            variant="filled"
+            color="warning"
             icon={<TriangleAlert size={16} />}
-            color="yellow"
-            radius="md"
             w="100%"
-            p="0.5rem"
-            styles={{ message: { fontSize: "var(--mantine-font-size-sm)" } }}
           >
             {t("demo_mode_banner")}
           </Alert>

@@ -1,5 +1,11 @@
-import { Alert, Group, Paper, Skeleton, Stack } from "@mantine/core";
-import { BodyText, Button, Modal, NumberInput } from "@teelur/budget-board-ui";
+import { Group, Paper, Skeleton, Stack } from "@mantine/core";
+import {
+  Alert,
+  BodyText,
+  Button,
+  Modal,
+  NumberInput,
+} from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
@@ -123,7 +129,8 @@ const TransactionLinkDialog = ({
             })}
           </BodyText>
           <Alert
-            color="orange"
+            variant="light"
+            color="warning"
             icon={<AlertCircle size="1rem" />}
             title={t("transfer_category_warning_title")}
           >
@@ -151,7 +158,13 @@ const TransactionLinkDialog = ({
               ))}
             </Stack>
           ) : candidatesQuery.isError ? (
-            <Alert color="red">{t("transaction_link_candidates_error")}</Alert>
+            <Alert
+              variant="light"
+              color="error"
+              icon={<AlertCircle size="1rem" />}
+            >
+              {t("transaction_link_candidates_error")}
+            </Alert>
           ) : candidatesQuery.data?.length ? (
             <Stack gap="xs">
               {candidatesQuery.data.map((candidate) => (

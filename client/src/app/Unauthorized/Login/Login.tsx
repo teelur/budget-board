@@ -1,5 +1,6 @@
-import { Alert, Stack, Group } from "@mantine/core";
+import { Stack, Group } from "@mantine/core";
 import {
+  Alert,
   Button,
   Card,
   Checkbox,
@@ -144,11 +145,11 @@ const Login = (props: LoginProps): React.ReactNode => {
       {isDemoMode && (
         <Card.Section p={0} withBorder={false}>
           <Alert
+            variant="light"
+            color="info"
             icon={<Info size={16} />}
-            color="blue"
             title={t("demo_mode")}
             w="100%"
-            radius={0}
           >
             {t("demo_mode_login_hint")}
           </Alert>
