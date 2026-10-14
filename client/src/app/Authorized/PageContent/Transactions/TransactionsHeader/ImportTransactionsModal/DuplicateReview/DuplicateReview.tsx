@@ -1,5 +1,6 @@
-import { Alert, Group, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
+  Alert,
   BodyText,
   Button,
   Card,
@@ -207,6 +208,132 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
     });
   };
 
+  const getAlerts = (): React.ReactNode[] => {
+    const alerts: React.ReactNode[] = [];
+
+    if (activeFilterFields.length === 0) {
+      alerts.push(
+        <Alert
+          key="no-filter-criteria"
+          variant="light"
+          color="error"
+          icon={<InfoIcon />}
+        >
+          {t("duplicate_filter_no_criteria_message")}
+        </Alert>,
+      );
+    }
+
+    if (transactionsQuery.isError) {
+      alerts.push(
+        <Stack key="transaction-query-error" gap="0.5rem">
+          <Alert variant="light" color="error" icon={<InfoIcon />}>
+            {t("duplicate_review_error_message")}
+          </Alert>
+          <Button
+            variant="filled"
+            color="primary"
+            size="compact-sm"
+            rightSection={<RefreshCwIcon size={16} />}
+            loading={transactionsQuery.isRefetching}
+            onClick={() => transactionsQuery.refetch()}
+          >
+            {t("retry")}
+          </Button>
+        </Stack>,
+      );
+    } else if (filteredTransactions.length === 0) {
+      alerts.push(
+        <Alert
+          key="no-transactions"
+          variant="light"
+          color="error"
+          icon={<InfoIcon />}
+        >
+          {t("duplicate_review_no_transactions_message")}
+        </Alert>,
+      );
+    }
+
+    if (!filterDuplicatesField.getValue()) {
+      alerts.push(
+        <Alert
+          key="duplicate-filter-disabled"
+          variant="light"
+          color="warning"
+          icon={<InfoIcon />}
+        >
+          {t("duplicate_review_filter_disabled_message")}
+        </Alert>,
+      );
+    }
+
+    return alerts;
+  };
+
+  const getTransactionsContent = () => {
+    if (transactionsQuery.isPending) {
+      return (
+        <BodyText tone="secondary" size="sm">
+          {t("duplicate_review_loading_message")}
+        </BodyText>
+      );
+    }
+    if (transactionsQuery.isError) {
+      return (
+        <BodyText tone="muted" size="sm">
+          {t("error")}
+        </BodyText>
+      );
+    }
+    return (
+      <Stack gap="0.5rem">
+        <Group justify="space-between" gap="1rem">
+          <BodyText tone="secondary" size="sm">
+            {t("duplicate_review_imported_count", {
+              count: props.importedTransactions.length,
+            })}
+          </BodyText>
+          <BodyText tone="secondary" size="sm">
+            {t("duplicate_review_duplicates_count", {
+              count: duplicateTransactions.size,
+            })}
+          </BodyText>
+          <BodyText tone="secondary" size="sm">
+            {t("duplicate_review_ready_count", {
+              count: filteredTransactions.length,
+            })}
+          </BodyText>
+        </Group>
+        {filterDuplicatesField.getValue() && activeFilterFields.length > 0 && (
+          <BodyText size="xs">
+            {t("duplicate_review_matching_on", {
+              fields: activeFilterFields.map(({ label }) => label).join(", "),
+            })}
+          </BodyText>
+        )}
+        {duplicateTransactions.size > 0 && (
+          <DuplicateTransactionTable
+            tableData={duplicateTransactions}
+            matchFields={duplicateMatchFields}
+            restoreTransaction={restoreImportedTransaction}
+          />
+        )}
+        {filterDuplicatesField.getValue() &&
+          activeFilterFields.length > 0 &&
+          duplicateTransactions.size === 0 && (
+            <Alert
+              variant="light"
+              color="success"
+              icon={<InfoIcon />}
+            >
+              {t("duplicate_review_no_duplicates_message")}
+            </Alert>
+          )}
+      </Stack>
+    );
+  };
+
   return (
     <Stack gap="0.75rem" w={800} maw="100%" mx="auto">
       <Stack gap="0.25rem">
@@ -216,6 +343,7 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
         <BodyText tone="secondary" size="sm">
           {t("duplicate_review_description")}
         </BodyText>
+        {getAlerts()}
       </Stack>
       <Checkbox
         checked={filterDuplicatesField.getValue()}
@@ -252,121 +380,12 @@ const DuplicateReview = (props: DuplicateReviewProps): React.ReactNode => {
                     {t("duplicate_review_unavailable_fields_message")}
                   </BodyText>
                 )}
-                {activeFilterFields.length === 0 && (
-                  <Alert
-                    variant="outline"
-                    color="var(--text-color-status-warn)"
-                    icon={<InfoIcon />}
-                  >
-                    <BodyText tone="secondary" size="sm">
-                      {t("duplicate_filter_no_criteria_message")}
-                    </BodyText>
-                  </Alert>
-                )}
               </Stack>
             )}
           </Stack>
         </Card>
       )}
-      {transactionsQuery.isPending ? (
-        <BodyText tone="secondary" size="sm">
-          {t("duplicate_review_loading_message")}
-        </BodyText>
-      ) : transactionsQuery.isError ? (
-        <Alert
-          variant="outline"
-          color="var(--text-color-status-bad)"
-          icon={<InfoIcon />}
-        >
-          <Stack gap="0.5rem">
-            <BodyText tone="secondary" size="sm">
-              {t("duplicate_review_error_message")}
-            </BodyText>
-            <Button
-              variant="filled"
-              color="primary"
-              size="compact-sm"
-              rightSection={<RefreshCwIcon size={16} />}
-              loading={transactionsQuery.isRefetching}
-              onClick={() => transactionsQuery.refetch()}
-            >
-              {t("retry")}
-            </Button>
-          </Stack>
-        </Alert>
-      ) : (
-        <Stack gap="0.5rem">
-          <Group justify="space-between" gap="1rem">
-            <BodyText tone="secondary" size="sm">
-              {t("duplicate_review_imported_count", {
-                count: props.importedTransactions.length,
-              })}
-            </BodyText>
-            <BodyText tone="secondary" size="sm">
-              {t("duplicate_review_duplicates_count", {
-                count: duplicateTransactions.size,
-              })}
-            </BodyText>
-            <BodyText tone="secondary" size="sm">
-              {t("duplicate_review_ready_count", {
-                count: filteredTransactions.length,
-              })}
-            </BodyText>
-          </Group>
-          {filterDuplicatesField.getValue() &&
-            activeFilterFields.length > 0 && (
-              <BodyText size="xs">
-                {t("duplicate_review_matching_on", {
-                  fields: activeFilterFields
-                    .map(({ label }) => label)
-                    .join(", "),
-                })}
-              </BodyText>
-            )}
-          {duplicateTransactions.size > 0 && (
-            <DuplicateTransactionTable
-              tableData={duplicateTransactions}
-              matchFields={duplicateMatchFields}
-              restoreTransaction={restoreImportedTransaction}
-            />
-          )}
-          {!filterDuplicatesField.getValue() && (
-            <Alert
-              variant="outline"
-              color="var(--text-color-status-warn)"
-              icon={<InfoIcon />}
-            >
-              <BodyText tone="secondary" size="sm">
-                {t("duplicate_review_filter_disabled_message")}
-              </BodyText>
-            </Alert>
-          )}
-          {filterDuplicatesField.getValue() &&
-            activeFilterFields.length > 0 &&
-            duplicateTransactions.size === 0 && (
-              <Alert
-                variant="outline"
-                color="var(--text-color-status-good)"
-                icon={<InfoIcon />}
-              >
-                <BodyText tone="secondary" size="sm">
-                  {t("duplicate_review_no_duplicates_message")}
-                </BodyText>
-              </Alert>
-            )}
-          {filteredTransactions.length === 0 && (
-            <Alert
-              variant="outline"
-              color="var(--text-color-status-bad)"
-              icon={<InfoIcon />}
-            >
-              <BodyText tone="secondary" size="sm">
-                {t("duplicate_review_no_transactions_message")}
-              </BodyText>
-            </Alert>
-          )}
-        </Stack>
-      )}
+      {getTransactionsContent()}
       <Group w="100%">
         <Button
           variant="filled"

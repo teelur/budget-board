@@ -1,5 +1,5 @@
-import { Alert, Group, Stack } from "@mantine/core";
-import { BodyText, Button, HeadingText } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { Alert, Button, HeadingText } from "@teelur/budget-board-ui";
 import React from "react";
 import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import {
@@ -481,16 +481,12 @@ const ConfigureTransactions = (
       </HeadingText>
       {alertDetails && (
         <Alert
-          variant="outline"
-          color="var(--text-color-status-bad)"
+          variant="light"
+          color="error"
           title={t("missing_information")}
           icon={<InfoIcon />}
-          radius="md"
-          bg="var(--background-color-surface)"
         >
-          <BodyText tone="secondary" size="sm">
-            {alertDetails}
-          </BodyText>
+          {alertDetails}
         </Alert>
       )}
       {importedTransactionsTableData.length > 0 && (
