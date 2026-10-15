@@ -58,7 +58,7 @@ const AddCategory = (): React.ReactNode => {
           </BodyText>
           <SegmentedControl
             color="secondary"
-            size="compact-sm"
+            size="sm"
             fullWidth
             value={isChildCategory ? "child" : "parent"}
             data={[
@@ -91,7 +91,7 @@ const AddCategory = (): React.ReactNode => {
             </BodyText>
             <SegmentedControl
               color="secondary"
-              size="compact-sm"
+              size="sm"
               fullWidth
               value={categoryTypeField.getValue()}
               data={[

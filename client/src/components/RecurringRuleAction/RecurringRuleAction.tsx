@@ -99,7 +99,7 @@ const RecurringRuleAction = (
           {hasExistingRules && (
             <SegmentedControl
               color="secondary"
-              size="compact-sm"
+              size="sm"
               fullWidth
               value={mode}
               data={[

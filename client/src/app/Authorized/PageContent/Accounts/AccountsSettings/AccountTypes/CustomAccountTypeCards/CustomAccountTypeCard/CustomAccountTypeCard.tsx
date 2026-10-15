@@ -94,7 +94,7 @@ const CustomAccountTypeCard = (
               </BodyText>
               <SegmentedControl
                 color="secondary"
-                size="compact-sm"
+                size="sm"
                 fullWidth
                 value={isChildType ? "child" : "parent"}
                 data={[
@@ -127,7 +127,7 @@ const CustomAccountTypeCard = (
                 </BodyText>
                 <SegmentedControl
                   color="secondary"
-                  size="compact-sm"
+                  size="sm"
                   fullWidth
                   value={classificationField.getValue()}
                   data={[

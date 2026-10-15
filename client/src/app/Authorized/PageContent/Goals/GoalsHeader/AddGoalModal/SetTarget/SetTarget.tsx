@@ -56,7 +56,7 @@ const SetTarget = (props: SetTargetProps): React.ReactNode => {
     <Stack gap={"1rem"}>
       <SegmentedControl
         color="secondary"
-        size="compact-sm"
+        size="sm"
         fullWidth
         value={targetType}
         data={[
