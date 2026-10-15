@@ -39,6 +39,7 @@ const UnbudgetedChildCard = (
     <Group w="100%" align="center" wrap="nowrap" gap="0.5rem">
       <CornerDownRightIcon size={20} />
       <Card
+        surface="sunken"
         p="0.25rem"
         w="100%"
         onClick={() => {
@@ -50,14 +51,13 @@ const UnbudgetedChildCard = (
       >
         <LoadingOverlay visible={createBudgetMutation.isPending} />
         <Group w="100%" justify="space-between">
-          <BodyText className={classes.text}>
+          <BodyText fw={500} className={classes.text}>
             {props.icon.length > 0 ? `${props.icon} ` : ""}
             {props.category}
           </BodyText>
           <Group gap="sm">
             <AmountText
               amount={props.amount}
-              disableStatusColor
               size="sm"
               isSensitive={isPrivacyModeEnabled}
               currency={preferredCurrency}

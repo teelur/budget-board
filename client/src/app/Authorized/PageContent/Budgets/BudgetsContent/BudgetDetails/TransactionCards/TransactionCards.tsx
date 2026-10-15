@@ -56,6 +56,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
         {paginatedItems.map((transaction) => (
           <TransactionCard
             key={transaction.id}
+            surface="sunken"
             transaction={transaction}
             categories={props.categories}
             selected={selectedIds.has(transaction.id)}
