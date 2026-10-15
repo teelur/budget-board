@@ -1664,9 +1664,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@teelur/budget-board-ui@npm:^0.2.0-canary.63.1252136":
-  version: 0.2.0-canary.63.1252136
-  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.63.1252136"
+"@teelur/budget-board-ui@npm:^0.2.0-canary.64.3e95292":
+  version: 0.2.0-canary.64.3e95292
+  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.64.3e95292"
   dependencies:
     "@fontsource-variable/ibm-plex-sans": "npm:^5.3.0"
     "@fontsource-variable/plus-jakarta-sans": "npm:^5.3.0"
@@ -1677,7 +1677,7 @@ __metadata:
     dayjs: ^1.11.13
     react: ^19.3.0
     react-dom: ^19.3.0
-  checksum: 10c0/f09d4acce21a5b853aa0b7a3708bb4fa2e07f6a8d79953e2967322039282588101fa5a9a53ecab0d981ab1edf8582b387f3a3bc28e498df794d2ae12880d962f
+  checksum: 10c0/6156de8a8551e23c8b5b36e5afd3fbbd5e9a07fbdfb658cf01a9b402f04261f5ff885a3ba80000afa796e18bde633444c41d1098f29947b15a3cbc880a227525
   languageName: node
   linkType: hard
 
@@ -2532,7 +2532,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.104.1"
     "@tanstack/react-query-devtools": "npm:^5.104.1"
     "@tanstack/react-virtual": "npm:^3.14.13"
-    "@teelur/budget-board-ui": "npm:^0.2.0-canary.63.1252136"
+    "@teelur/budget-board-ui": "npm:^0.2.0-canary.64.3e95292"
     "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^26.6.4"
     "@types/papaparse": "npm:^5.5.2"
