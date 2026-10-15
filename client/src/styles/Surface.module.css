@@ -8,23 +8,6 @@
   background-color: var(--background-color-surface);
 }
 
-.input {
-  background-color: var(--surface-color-input-background);
-  border-color: var(--surface-color-input-border);
-  color: var(--surface-color-text-primary);
-  font-weight: 600;
-}
-
-.input::placeholder {
-  color: var(--surface-color-text-dimmed);
-}
-
-.accordion {
-  background-color: var(--background-color-surface);
-  border-color: var(--surface-color-border);
-  border-radius: 8px;
-}
-
 .code {
   background-color: var(--surface-color-input-background);
   color: var(--surface-color-text-primary);

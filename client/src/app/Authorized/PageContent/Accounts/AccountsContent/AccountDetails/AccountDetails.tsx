@@ -1,12 +1,16 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { BodyText, Button, HeadingText } from "@teelur/budget-board-ui";
+import {
+  BodyText,
+  Button,
+  CollapsibleCard,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
 import Drawer from "~/components/core/Drawer/Drawer";
-import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import {
@@ -81,14 +85,22 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
               )}
             </Stack>
           </Group>
-          <Accordion elevation={1}>
-            <Accordion.Item
-              title={<HeadingText level={5}>{t("add_balance")}</HeadingText>}
+          <Stack gap="0.5rem">
+            <CollapsibleCard
+              title={
+                <HeadingText tone="heading" level={5}>
+                  {t("add_balance")}
+                </HeadingText>
+              }
             >
               <AddBalance accountId={props.account.id} />
-            </Accordion.Item>
-            <Accordion.Item
-              title={<HeadingText level={5}>{t("account_trends")}</HeadingText>}
+            </CollapsibleCard>
+            <CollapsibleCard
+              title={
+                <HeadingText tone="heading" level={5}>
+                  {t("account_trends")}
+                </HeadingText>
+              }
             >
               <Group gap="0.5rem">
                 <Button
@@ -135,10 +147,12 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   dayjs().toString(),
                 ]}
               />
-            </Accordion.Item>
-            <Accordion.Item
+            </CollapsibleCard>
+            <CollapsibleCard
               title={
-                <HeadingText level={5}>{t("recent_balances")}</HeadingText>
+                <HeadingText tone="heading" level={5}>
+                  {t("recent_balances")}
+                </HeadingText>
               }
             >
               <Stack gap="0.5rem">
@@ -155,8 +169,8 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
                   <BalanceItems balances={sortedBalances} />
                 )}
               </Stack>
-            </Accordion.Item>
-          </Accordion>
+            </CollapsibleCard>
+          </Stack>
         </Stack>
       )}
     </Drawer>

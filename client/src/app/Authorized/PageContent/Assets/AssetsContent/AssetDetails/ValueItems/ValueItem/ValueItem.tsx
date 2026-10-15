@@ -11,7 +11,7 @@ interface ValueItemProps {
 const ValueItem = (props: ValueItemProps) => {
   const [isSelected, { open, close }] = useDisclosure(false);
   return (
-    <Card p="0.25rem">
+    <Card surface="sunken" p="0.25rem">
       {isSelected ? (
         <EditableValueItemContent value={props.value} doUnSelect={close} />
       ) : (

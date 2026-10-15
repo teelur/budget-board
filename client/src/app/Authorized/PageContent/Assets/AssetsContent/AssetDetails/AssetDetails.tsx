@@ -4,6 +4,7 @@ import {
   AmountText,
   HeadingText,
   BodyText,
+  CollapsibleCard,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { MoveRightIcon } from "lucide-react";
@@ -14,7 +15,6 @@ import React from "react";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import Drawer from "~/components/core/Drawer/Drawer";
-import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
@@ -138,8 +138,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 </Stack>
               )}
           </Group>
-          <Accordion elevation={1}>
-            <Accordion.Item
+          <Stack gap="0.5rem">
+            <CollapsibleCard
               title={
                 <HeadingText tone="heading" level={5}>
                   {t("add_value")}
@@ -147,8 +147,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
               }
             >
               <AddValue assetId={props.asset.id} />
-            </Accordion.Item>
-            <Accordion.Item
+            </CollapsibleCard>
+            <CollapsibleCard
               title={
                 <HeadingText tone="heading" level={5}>
                   {t("value_trends")}
@@ -200,8 +200,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   dayjs().toString(),
                 ]}
               />
-            </Accordion.Item>
-            <Accordion.Item
+            </CollapsibleCard>
+            <CollapsibleCard
               title={
                 <HeadingText tone="heading" level={5}>
                   {t("value_history")}
@@ -220,8 +220,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   <ValueItems values={sortedValues} />
                 )}
               </Stack>
-            </Accordion.Item>
-          </Accordion>
+            </CollapsibleCard>
+          </Stack>
         </Stack>
       )}
     </Drawer>

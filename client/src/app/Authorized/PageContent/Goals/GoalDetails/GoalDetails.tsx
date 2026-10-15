@@ -1,5 +1,10 @@
 import { Group, Skeleton, Stack } from "@mantine/core";
-import { Button, Card, HeadingText } from "@teelur/budget-board-ui";
+import {
+  Button,
+  Card,
+  CollapsibleCard,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
 import AccountItem from "~/components/AccountItem/AccountItem";
@@ -8,7 +13,6 @@ import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { DatesRangeValue } from "@mantine/dates";
 import { IBalanceResponse } from "~/models/balance";
 import Drawer from "~/components/core/Drawer/Drawer";
-import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useBalancesQuery } from "~/hooks/queries/useBalancesQuery";
@@ -34,6 +38,82 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
     dayjs().toISOString(),
   ];
 
+  const getContent = () => {
+    if (props.goal === null) {
+      return <Skeleton height={425} radius="lg" />;
+    }
+
+    return (
+      <Stack gap="0.5rem">
+        <CollapsibleCard
+          title={
+            <HeadingText tone="heading" level={5}>
+              {t("accounts")}
+            </HeadingText>
+          }
+        >
+          <Stack gap="0.5rem">
+            {props.goal.accounts.map((account: IAccountResponse) => (
+              <Card surface="sunken" key={account.id}>
+                <AccountItem account={account} />
+              </Card>
+            ))}
+          </Stack>
+        </CollapsibleCard>
+        <CollapsibleCard
+          title={
+            <HeadingText tone="heading" level={5}>
+              {t("goal_trends")}
+            </HeadingText>
+          }
+        >
+          <Stack>
+            <Group gap="0.5rem">
+              <Button
+                variant="filled"
+                color="primary"
+                size="compact-xs"
+                selected={chartLookbackMonths === 3}
+                onClick={() => setChartLookbackMonths(3)}
+              >
+                {t("3_months")}
+              </Button>
+              <Button
+                variant="filled"
+                color="primary"
+                size="compact-xs"
+                selected={chartLookbackMonths === 6}
+                onClick={() => setChartLookbackMonths(6)}
+              >
+                {t("6_months")}
+              </Button>
+              <Button
+                variant="filled"
+                color="primary"
+                size="compact-xs"
+                selected={chartLookbackMonths === 12}
+                onClick={() => setChartLookbackMonths(12)}
+              >
+                {t("12_months")}
+              </Button>
+            </Group>
+            <ValueChart
+              items={props.goal.accounts}
+              values={
+                balancesQuery.data?.map((balance: IBalanceResponse) => ({
+                  ...balance,
+                  parentId: balance.accountID || "",
+                })) ?? []
+              }
+              dateRange={dateRange}
+              invertYAxis={props.goal.amount === 0}
+            />
+          </Stack>
+        </CollapsibleCard>
+      </Stack>
+    );
+  };
+
   return (
     <Drawer
       opened={props.isOpen}
@@ -46,69 +126,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
         </HeadingText>
       }
     >
-      {props.goal === null ? (
-        <Skeleton height={425} radius="lg" />
-      ) : (
-        <Accordion elevation={1}>
-          <Accordion.Item
-            title={<HeadingText level={5}>{t("accounts")}</HeadingText>}
-          >
-            <Stack gap="0.5rem">
-              {props.goal.accounts.map((account: IAccountResponse) => (
-                <Card key={account.id}>
-                  <AccountItem account={account} />
-                </Card>
-              ))}
-            </Stack>
-          </Accordion.Item>
-          <Accordion.Item
-            title={<HeadingText level={5}>{t("goal_trends")}</HeadingText>}
-          >
-            <Stack>
-              <Group gap="0.5rem">
-                <Button
-                  variant="filled"
-                  color="primary"
-                  size="compact-xs"
-                  selected={chartLookbackMonths === 3}
-                  onClick={() => setChartLookbackMonths(3)}
-                >
-                  {t("3_months")}
-                </Button>
-                <Button
-                  variant="filled"
-                  color="primary"
-                  size="compact-xs"
-                  selected={chartLookbackMonths === 6}
-                  onClick={() => setChartLookbackMonths(6)}
-                >
-                  {t("6_months")}
-                </Button>
-                <Button
-                  variant="filled"
-                  color="primary"
-                  size="compact-xs"
-                  selected={chartLookbackMonths === 12}
-                  onClick={() => setChartLookbackMonths(12)}
-                >
-                  {t("12_months")}
-                </Button>
-              </Group>
-              <ValueChart
-                items={props.goal.accounts}
-                values={
-                  balancesQuery.data?.map((balance: IBalanceResponse) => ({
-                    ...balance,
-                    parentId: balance.accountID || "",
-                  })) ?? []
-                }
-                dateRange={dateRange}
-                invertYAxis={props.goal.amount === 0}
-              />
-            </Stack>
-          </Accordion.Item>
-        </Accordion>
-      )}
+      {getContent()}
     </Drawer>
   );
 };

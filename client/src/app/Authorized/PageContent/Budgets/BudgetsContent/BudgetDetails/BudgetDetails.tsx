@@ -8,14 +8,18 @@ import { areStringsEqual } from "~/helpers/utils";
 import TransactionCards from "./TransactionCards/TransactionCards";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import Drawer from "~/components/core/Drawer/Drawer";
-import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { CategoryTypes } from "~/models/category";
 import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
-import { AmountText, BodyText, HeadingText } from "@teelur/budget-board-ui";
+import {
+  AmountText,
+  BodyText,
+  CollapsibleCard,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -129,10 +133,10 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
               </BodyText>
             </Stack>
           </Group>
-          <Accordion elevation={1}>
-            <Accordion.Item
+          <Stack gap="0.5rem">
+            <CollapsibleCard
               title={
-                <HeadingText level={5}>
+                <HeadingText tone="heading" level={5}>
                   {isExpenseCategory ? t("expense_trends") : t("income_trends")}
                 </HeadingText>
               }
@@ -143,19 +147,25 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                 includeYAxis={false}
                 invertData={isExpenseCategory}
               />
-            </Accordion.Item>
-            <Accordion.Item
+            </CollapsibleCard>
+            <CollapsibleCard
               title={
-                <HeadingText level={5}>{t("recent_transactions")}</HeadingText>
+                <HeadingText tone="heading" level={5}>
+                  {t("recent_transactions")}
+                </HeadingText>
               }
             >
               <TransactionCards
                 transactions={transactionsForCategoryForCurrentMonth ?? []}
                 categories={allTransactionCategories}
               />
-            </Accordion.Item>
-            <Accordion.Item
-              title={<HeadingText level={5}>{t("projected")}</HeadingText>}
+            </CollapsibleCard>
+            <CollapsibleCard
+              title={
+                <HeadingText tone="heading" level={5}>
+                  {t("projected")}
+                </HeadingText>
+              }
             >
               {forecastQuery.isPending ? (
                 <Skeleton height={35} radius="md" />
@@ -185,8 +195,8 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
                   {t("no_projected_transactions")}
                 </BodyText>
               )}
-            </Accordion.Item>
-          </Accordion>
+            </CollapsibleCard>
+          </Stack>
         </Stack>
       )}
     </Drawer>

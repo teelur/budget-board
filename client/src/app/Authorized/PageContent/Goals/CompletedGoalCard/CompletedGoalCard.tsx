@@ -23,13 +23,14 @@ const CompletedGoalCard = (props: CompletedGoalCardProps): React.ReactNode => {
         align={{ base: "start", xs: "center" }}
         direction={{ base: "column", xs: "row" }}
       >
-        <BodyText tone="primary" size="md" fw={500}>
+        <BodyText tone="primary" size="lg" fw={500}>
           {props.goal.name}
         </BodyText>
         <Flex
           gap={0}
           direction={{ base: "row", xs: "column" }}
           justify={{ base: "space-between", xs: "flex-end" }}
+          align={{ base: "center", xs: "flex-end" }}
           w={{ base: "100%", xs: "auto" }}
         >
           <Group gap="0.25rem">
