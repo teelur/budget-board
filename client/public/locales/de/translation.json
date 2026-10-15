@@ -388,7 +388,7 @@
   "no_deleted_accounts": "Keine gelöschten Konten",
   "no_deleted_assets": "Keine gelöschten Vermögenswerte",
   "no_deleted_transactions": "Keine gelöschten Transaktionen",
-  "no_goals": "Es wurden keine Ziele gefunden. Füge ein Ziel hinzu, um loszulegen.",
+  "no_goals": "Es wurden keine Ziele gefunden.",
   "no_institutions": "Es wurden keine Institutionen gefunden. Fügen Sie ein Konto hinzu, um loszulegen.",
   "no_lines_found": "Keine Zeilen gefunden.",
   "no_lunchflow_accounts_found": "Kein LunchFlow-Konto gefunden.",
