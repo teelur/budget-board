@@ -45,7 +45,7 @@ const AddAssetType = (): React.ReactNode => {
           </BodyText>
           <SegmentedControl
             color="secondary"
-            size="compact-sm"
+            size="sm"
             fullWidth
             value={isChildType ? "child" : "parent"}
             data={[
