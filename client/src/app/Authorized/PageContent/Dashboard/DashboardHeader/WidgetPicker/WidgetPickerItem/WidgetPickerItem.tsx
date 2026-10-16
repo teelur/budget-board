@@ -19,7 +19,7 @@ const WidgetPickerItem = ({
   const { t } = useTranslation();
 
   return (
-    <Card>
+    <Card style={{ opacity: isDisabled ? 0.5 : 1 }}>
       <Group key={widget.widgetType} justify="space-between">
         <Stack gap={0} style={{ flex: 1 }}>
           <Group gap="0.25rem">
