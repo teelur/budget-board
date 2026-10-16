@@ -1,9 +1,8 @@
-import { Group, Stack, Popover as MantinePopover } from "@mantine/core";
-import { BodyText, Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Button, Popover } from "@teelur/budget-board-ui";
 import { PlusIcon, RotateCcwIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Popover from "~/components/core/Popover/Popover";
 import { useDeleteWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useDeleteWidgetSettingsMutation";
 import { useResetSmallScreenLayoutMutation } from "~/hooks/mutations/widgetSettings/useResetSmallScreenLayoutMutation";
 import { useResetToDefaultMutation } from "~/hooks/mutations/widgetSettings/useResetToDefaultMutation";
@@ -63,7 +62,7 @@ const DashboardEditor = ({
         position="bottom-end"
         withArrow
       >
-        <MantinePopover.Target>
+        <Popover.Target>
           <Button
             variant="filled"
             color="warning"
@@ -74,8 +73,8 @@ const DashboardEditor = ({
           >
             {t("reset_dashboard")}
           </Button>
-        </MantinePopover.Target>
-        <MantinePopover.Dropdown maw={350}>
+        </Popover.Target>
+        <Popover.Dropdown maw={350}>
           <Stack gap={10}>
             <BodyText tone="primary" size="xs">
               {t("reset_dashboard_warning")}
@@ -101,7 +100,7 @@ const DashboardEditor = ({
               </Button>
             </Group>
           </Stack>
-        </MantinePopover.Dropdown>
+        </Popover.Dropdown>
       </Popover>
       <Popover
         opened={isClearPopoverOpen}
@@ -109,7 +108,7 @@ const DashboardEditor = ({
         position="bottom-end"
         withArrow
       >
-        <MantinePopover.Target>
+        <Popover.Target>
           <Button
             variant="filled"
             color="error"
@@ -120,8 +119,8 @@ const DashboardEditor = ({
           >
             {t("clear_dashboard")}
           </Button>
-        </MantinePopover.Target>
-        <MantinePopover.Dropdown maw={350}>
+        </Popover.Target>
+        <Popover.Dropdown maw={350}>
           <Stack gap={10}>
             <BodyText tone="primary" size="xs">
               {t("clear_dashboard_warning")}
@@ -151,7 +150,7 @@ const DashboardEditor = ({
               </Button>
             </Group>
           </Stack>
-        </MantinePopover.Dropdown>
+        </Popover.Dropdown>
       </Popover>
       <Button variant="filled" color="primary" size="xs" onClick={onDone}>
         {t("done_editing")}

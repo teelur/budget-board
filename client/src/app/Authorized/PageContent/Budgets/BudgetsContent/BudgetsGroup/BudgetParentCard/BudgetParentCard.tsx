@@ -2,14 +2,7 @@ import classes from "./BudgetParentCard.module.css";
 import hoverClasses from "~/styles/Hoverable.module.css";
 
 import { SignDisplay } from "~/helpers/currency";
-import {
-  Box,
-  Flex,
-  Group,
-  LoadingOverlay,
-  Popover as MantinePopover,
-  Stack,
-} from "@mantine/core";
+import { Box, Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
@@ -17,6 +10,7 @@ import {
   Button,
   Card,
   HeadingText,
+  Popover,
   Progress,
 } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
@@ -29,7 +23,6 @@ import { CategoryTypes, ICategoryNode } from "~/models/category";
 import BudgetChildCard from "./BudgetChildCard/BudgetChildCard";
 import UnbudgetChildCard from "./UnbudgetChildCard/UnbudgetChildCard";
 import Divider from "~/components/core/Divider/Divider";
-import Popover from "~/components/core/Popover/Popover";
 import BudgetMetrics from "./BudgetMetrics/BudgetMetrics";
 import RolloverButton from "./RolloverButton/RolloverButton";
 import BudgetLimitInput from "./BudgetLimitInput/BudgetLimitInput";
@@ -439,7 +432,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                 }
               />
               <Popover>
-                <MantinePopover.Target>
+                <Popover.Target>
                   <ActionIcon
                     variant="filled"
                     color="error"
@@ -448,8 +441,8 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                   >
                     <TrashIcon size="1rem" />
                   </ActionIcon>
-                </MantinePopover.Target>
-                <MantinePopover.Dropdown p="0.5rem" maw={200}>
+                </Popover.Target>
+                <Popover.Dropdown maw={200}>
                   <Stack gap={5}>
                     <BodyText tone="primary" size="sm">
                       {t("confirm_delete_budget_message")}
@@ -469,7 +462,7 @@ const BudgetParentCard = (props: BudgetParentCardProps): React.ReactNode => {
                       {t("delete")}
                     </Button>
                   </Stack>
-                </MantinePopover.Dropdown>
+                </Popover.Dropdown>
               </Popover>
             </Flex>
           )}

@@ -1,5 +1,5 @@
-import { Popover, Stack } from "@mantine/core";
-import { ActionIcon, Button, Checkbox } from "@teelur/budget-board-ui";
+import { Stack } from "@mantine/core";
+import { ActionIcon, Button, Checkbox, Popover } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { Trash2Icon } from "lucide-react";
 import React from "react";

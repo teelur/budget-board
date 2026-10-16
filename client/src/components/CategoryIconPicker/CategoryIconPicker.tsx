@@ -1,23 +1,16 @@
 import classes from "./CategoryIconPicker.module.css";
-import dropdownClasses from "~/styles/Dropdown.module.css";
 
-import {
-  Popover as MantinePopover,
-  ScrollArea,
-  SimpleGrid,
-  Stack,
-  UnstyledButton,
-} from "@mantine/core";
+import { ScrollArea, SimpleGrid, Stack, UnstyledButton } from "@mantine/core";
 import {
   ActionIcon,
   BodyText,
   Button,
+  Popover,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { SmilePlusIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Popover from "~/components/core/Popover/Popover";
 import {
   filterCategoryIconGroups,
   ICategoryIconGroup,
@@ -88,7 +81,7 @@ const CategoryIconPicker = (
       trapFocus
       withArrow
     >
-      <MantinePopover.Target>
+      <Popover.Target>
         <ActionIcon
           variant="ghost"
           color="primary"
@@ -110,15 +103,10 @@ const CategoryIconPicker = (
             <SmilePlusIcon size={16} />
           )}
         </ActionIcon>
-      </MantinePopover.Target>
-      <MantinePopover.Dropdown
-        w={264}
-        p="0.5rem"
-        onClick={(e) => e.stopPropagation()}
-      >
+      </Popover.Target>
+      <Popover.Dropdown w={264} onClick={(e) => e.stopPropagation()}>
         <Stack gap="0.5rem">
           <TextInput
-            classNames={{ input: dropdownClasses.search }}
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
             placeholder={t("search_icons")}
@@ -176,7 +164,7 @@ const CategoryIconPicker = (
             </Button>
           )}
         </Stack>
-      </MantinePopover.Dropdown>
+      </Popover.Dropdown>
     </Popover>
   );
 };
