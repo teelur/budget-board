@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CollapsibleCard,
+  Drawer,
   HeadingText,
 } from "@teelur/budget-board-ui";
 import { IGoalResponse } from "~/models/goal";
@@ -12,7 +13,6 @@ import { IAccountResponse } from "~/models/account";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { DatesRangeValue } from "@mantine/dates";
 import { IBalanceResponse } from "~/models/balance";
-import Drawer from "~/components/core/Drawer/Drawer";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useBalancesQuery } from "~/hooks/queries/useBalancesQuery";
@@ -120,11 +120,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
       onClose={props.doClose}
       position="right"
       size="md"
-      title={
-        <HeadingText component="span" level={4}>
-          {t("goal_details")}
-        </HeadingText>
-      }
+      title={t("goal_details")}
     >
       {getContent()}
     </Drawer>

@@ -7,7 +7,6 @@ import { getDateFromMonthsAgo } from "~/helpers/datetime";
 import { areStringsEqual } from "~/helpers/utils";
 import TransactionCards from "./TransactionCards/TransactionCards";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
-import Drawer from "~/components/core/Drawer/Drawer";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
@@ -18,6 +17,7 @@ import {
   AmountText,
   BodyText,
   CollapsibleCard,
+  Drawer,
   HeadingText,
 } from "@teelur/budget-board-ui";
 
@@ -106,7 +106,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<HeadingText level={4}>{t("budget_details")}</HeadingText>}
+      title={t("budget_details")}
     >
       {transactionsQuery.isPending ||
       props.month === null ||
