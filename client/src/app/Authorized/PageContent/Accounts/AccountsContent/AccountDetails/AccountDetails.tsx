@@ -3,6 +3,7 @@ import {
   BodyText,
   Button,
   CollapsibleCard,
+  Drawer,
   HeadingText,
 } from "@teelur/budget-board-ui";
 import React from "react";
@@ -10,7 +11,6 @@ import ValueChart from "~/components/Charts/ValueChart/ValueChart";
 import { IAccountResponse } from "~/models/account";
 import BalanceItems from "./BalanceItems/BalanceItems";
 import AddBalance from "./AddBalance/AddBalance";
-import Drawer from "~/components/core/Drawer/Drawer";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import {
@@ -52,11 +52,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={
-        <HeadingText tone="heading" level={4}>
-          {t("account_details")}
-        </HeadingText>
-      }
+      title={t("account_details")}
     >
       {!props.account ? (
         <Skeleton height={425} radius="lg" />

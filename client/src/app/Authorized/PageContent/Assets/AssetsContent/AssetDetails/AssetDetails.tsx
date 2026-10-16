@@ -5,6 +5,7 @@ import {
   HeadingText,
   BodyText,
   CollapsibleCard,
+  Drawer,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { MoveRightIcon } from "lucide-react";
@@ -14,7 +15,6 @@ import AddValue from "./AddValue/AddValue";
 import React from "react";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
-import Drawer from "~/components/core/Drawer/Drawer";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
@@ -58,7 +58,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<HeadingText level={4}>{t("asset_details")}</HeadingText>}
+      title={t("asset_details")}
     >
       {!props.asset ? (
         <Skeleton height={425} radius="lg" />
