@@ -1,17 +1,17 @@
 import React from "react";
-import { Stack, Popover as MantinePopover } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import {
   ActionIcon,
   Button,
   CategorySelect,
   NumberInput,
+  Popover,
 } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { SplitIcon } from "lucide-react";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { ICategory } from "~/models/category";
-import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useSplitTransactionMutation } from "~/hooks/mutations/transactions/useSplitTransactionMutation";
@@ -40,12 +40,12 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
 
   return (
     <Popover>
-      <MantinePopover.Target>
+      <Popover.Target>
         <ActionIcon variant="filled" color="primary" size="compact-sm">
           <SplitIcon size="1rem" />
         </ActionIcon>
-      </MantinePopover.Target>
-      <MantinePopover.Dropdown style={{ padding: "0.5rem" }}>
+      </Popover.Target>
+      <Popover.Dropdown>
         <Stack gap="0.5rem">
           <NumberInput
             label={t("amount")}
@@ -89,7 +89,7 @@ const SplitTransaction = (props: SplitTransactionProps): React.ReactNode => {
             {t("split_transaction")}
           </Button>
         </Stack>
-      </MantinePopover.Dropdown>
+      </Popover.Dropdown>
     </Popover>
   );
 };

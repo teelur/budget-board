@@ -1,13 +1,7 @@
-import {
-  Group,
-  Popover as MantinePopover,
-  Skeleton,
-  Stack,
-} from "@mantine/core";
-import { BodyText, Button } from "@teelur/budget-board-ui";
+import { Group, Skeleton, Stack } from "@mantine/core";
+import { BodyText, Button, Popover } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
-import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useAssetTypes } from "~/providers/AssetTypeProvider/AssetTypeProvider";
 import { defaultGuid } from "~/models/applicationUser";
@@ -103,8 +97,8 @@ const DisableBuiltInAssetTypes = (): React.ReactNode => {
           position="bottom-start"
           withArrow
         >
-          <MantinePopover.Target>{toggleButton}</MantinePopover.Target>
-          <MantinePopover.Dropdown maw={350}>
+          <Popover.Target>{toggleButton}</Popover.Target>
+          <Popover.Dropdown maw={350}>
             <Stack gap="0.5rem">
               <BodyText tone="primary" size="xs">
                 {t("disable_built_in_asset_types_warning")}
@@ -139,7 +133,7 @@ const DisableBuiltInAssetTypes = (): React.ReactNode => {
                 </Button>
               </Group>
             </Stack>
-          </MantinePopover.Dropdown>
+          </Popover.Dropdown>
         </Popover>
       ) : (
         toggleButton
