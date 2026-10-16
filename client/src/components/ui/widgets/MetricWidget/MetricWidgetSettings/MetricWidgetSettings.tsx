@@ -1,7 +1,8 @@
-import { Code, Group, ScrollArea, Stack } from "@mantine/core";
+import { Group, ScrollArea, Stack } from "@mantine/core";
 import {
   BodyText,
   Button,
+  Code,
   CollapsibleCard,
   Modal,
   TextInput,
@@ -180,9 +181,7 @@ const MetricWidgetSettings = ({
         >
           <ScrollArea.Autosize mah={320} type="auto">
             <Stack gap="0.5rem">
-              <Code block style={{ fontSize: "0.75rem" }}>
-                {t("metric_widget_syntax_schema")}
-              </Code>
+              <Code block>{t("metric_widget_syntax_schema")}</Code>
               <BodyText tone="secondary" size="xs">
                 {t("metric_widget_syntax_sources")}:{"  "}
                 <Code>transactions</Code>, <Code>budgets</Code>,{" "}
@@ -198,7 +197,7 @@ const MetricWidgetSettings = ({
               <BodyText tone="secondary" size="xs" fw={500} mt="0.25rem">
                 {t("metric_widget_syntax_examples")}:
               </BodyText>
-              <Code block style={{ fontSize: "0.75rem", whiteSpace: "pre" }}>
+              <Code block style={{ whiteSpace: "pre" }}>
                 {SYNTAX_EXAMPLES}
               </Code>
             </Stack>

@@ -10,6 +10,7 @@ import {
   BodyText,
   Button,
   Card,
+  Code,
   HeadingText,
   PinInput,
 } from "@teelur/budget-board-ui";
@@ -19,7 +20,6 @@ import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
 import { useDisclosure } from "@mantine/hooks";
-import Code from "~/components/core/Code/Code";
 import { useTranslation } from "react-i18next";
 import { useSetTwoFactorAuthenticationMutation } from "~/hooks/mutations/auth/useSetTwoFactorAuthenticationMutation";
 import { TwoFactorAuthRequest } from "~/models/twoFactorAuth";
@@ -75,9 +75,7 @@ const TwoFactorAuth = (): React.ReactNode => {
               </BodyText>
               <Group gap="0.5rem" align="center" justify="center">
                 {recoveryCodes.map((code, index) => (
-                  <Code key={index} elevation={1}>
-                    {code}
-                  </Code>
+                  <Code key={index}>{code}</Code>
                 ))}
               </Group>
               <CopyButton value={recoveryCodes.join("\n")}>
@@ -152,9 +150,7 @@ const TwoFactorAuth = (): React.ReactNode => {
               fgColor="var(--base-color-text-primary)"
             />
             <Group>
-              <Code elevation={1}>
-                {formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
-              </Code>
+              <Code>{formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}</Code>
               <CopyButton
                 value={formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
               >

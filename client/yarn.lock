@@ -815,6 +815,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/ibm-plex-mono@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource/ibm-plex-mono@npm:5.3.0"
+  checksum: 10c0/4aaf5a3c9efc7c32de4fa46ff3187ac63720904beab825f331ac01800038899761da23270f09d3fb5cff22f7cdc366904834854e2107229ad60833bba71c223d
+  languageName: node
+  linkType: hard
+
 "@formatjs/ecma402-abstract@npm:2.3.6":
   version: 2.3.6
   resolution: "@formatjs/ecma402-abstract@npm:2.3.6"
@@ -1664,12 +1671,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@teelur/budget-board-ui@npm:^0.2.0-canary.67.a7335a6":
-  version: 0.2.0-canary.67.a7335a6
-  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.67.a7335a6"
+"@teelur/budget-board-ui@npm:^0.2.0-canary.68.ebd839e":
+  version: 0.2.0-canary.68.ebd839e
+  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.68.ebd839e"
   dependencies:
     "@fontsource-variable/ibm-plex-sans": "npm:^5.3.0"
     "@fontsource-variable/plus-jakarta-sans": "npm:^5.3.0"
+    "@fontsource/ibm-plex-mono": "npm:^5.3.0"
   peerDependencies:
     "@mantine/core": 9.6.1
     "@mantine/dates": 9.6.1
@@ -1677,7 +1685,7 @@ __metadata:
     dayjs: ^1.11.13
     react: ^19.3.0
     react-dom: ^19.3.0
-  checksum: 10c0/17f9b4ea9f3abbea80e9ca9acf1e718537de6cb2daf1999556f6d0147a13fdf64e004f9f7aa2e39530947104ab6e5e9f331ab105809868818d9ee561dafba02e
+  checksum: 10c0/713398a5f706aacf34006c2a1c0aa7f867133350c35116b8b7381c67f5ee0cd46d03ff86206c0b96ba0ff66a79f6ec6b6792c1498c1bb00ff026b04e1c520795
   languageName: node
   linkType: hard
 
@@ -2532,7 +2540,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.104.1"
     "@tanstack/react-query-devtools": "npm:^5.104.1"
     "@tanstack/react-virtual": "npm:^3.14.13"
-    "@teelur/budget-board-ui": "npm:^0.2.0-canary.67.a7335a6"
+    "@teelur/budget-board-ui": "npm:^0.2.0-canary.68.ebd839e"
     "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^26.6.4"
     "@types/papaparse": "npm:^5.5.2"
