@@ -25,4 +25,18 @@
 
 .root {
   border-radius: 4px;
+  transition:
+    background 0.2s ease,
+    outline-color 0.2s ease;
+}
+
+.root[data-hover-effect="true"]:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--bbui-color-button-hover) 8%,
+    var(--bbui-color-surface)
+  );
+  cursor: pointer;
+  outline: 2px solid var(--bbui-color-button-hover);
+  outline-offset: 1px;
 }
