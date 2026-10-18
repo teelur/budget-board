@@ -53,6 +53,7 @@ const UnbudgetedChildItem = (
             variant="filled"
             color="primary"
             size="compact-xs"
+            disabled={createBudgetMutation.isPending}
             onClick={(event) => {
               event.stopPropagation();
               createBudgetMutation.mutate([
