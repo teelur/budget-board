@@ -3,7 +3,7 @@ import { GoalType } from "~/models/goal";
 import { Group, Stack } from "@mantine/core";
 import { Button, TextInput } from "@teelur/budget-board-ui";
 import { MoveLeftIcon, MoveRightIcon } from "lucide-react";
-import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import AccountMultiSelect from "~/components/AccountMultiSelect/AccountMultiSelect";
 import { useTranslation } from "react-i18next";
 import { useField } from "@mantine/form";
 import SaveGoalOptions from "./SaveGoalOptions/SaveGoalOptions";
