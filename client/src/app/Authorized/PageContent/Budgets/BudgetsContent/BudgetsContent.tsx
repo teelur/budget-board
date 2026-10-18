@@ -4,7 +4,6 @@ import { buildCategoriesTree, getParentCategory } from "~/helpers/category";
 import { CategoryTypes } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import { buildCategoryToTransactionsTotalMap } from "~/helpers/transactions";
-import BudgetsGroupHeader from "./BudgetGroupHeader/BudgetsGroupHeader";
 import BudgetSummaryCard from "./BudgetSummaryCard/BudgetSummaryCard";
 import BudgetsGroup from "./BudgetsGroup/BudgetsGroup";
 import UnbudgetedGroup from "./UnbudgetedGroup/UnbudgetedGroup";
@@ -20,6 +19,7 @@ import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQ
 import { useRecurringForecastQueries } from "~/hooks/queries/useRecurringForecastQueries";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import classes from "./BudgetsContent.module.css";
+import { HeadingText } from "@teelur/budget-board-ui";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
@@ -35,7 +35,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null,
   );
-  const [selectedMonth, setSelectedMonth] = React.useState<Date | null>(null);
+  const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([]);
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
@@ -125,7 +125,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const openBudgetDetails = (category: string, month: Date | null) => {
     open();
     setSelectedCategory(category);
-    setSelectedMonth(month);
+    setSelectedMonths(month ? [month] : [...props.selectedDates]);
   };
 
   return (
@@ -134,17 +134,19 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         isOpen={opened}
         close={close}
         category={selectedCategory ?? null}
-        month={selectedMonth}
+        months={selectedMonths}
       />
       <Stack w={{ base: "100%", md: "70%" }}>
         <Stack gap="0.5rem">
-          <BudgetsGroupHeader groupName={t("income")} />
+          <HeadingText tone="heading" level={4}>
+            {t("income")}
+          </HeadingText>
           {props.isPending ? (
             <Skeleton h={65} radius="md" />
           ) : (
             <BudgetsGroup
               budgets={incomeBudgets}
-              categoryTree={incomeCategoryTree}
+              categoryNodes={incomeCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categoryToRecurringForecastTotalMap={
                 categoryToRecurringForecastTotalMap
@@ -165,13 +167,15 @@ const BudgetsContent = (props: BudgetsContentProps) => {
           )}
         </Stack>
         <Stack gap="0.5rem">
-          <BudgetsGroupHeader groupName={t("expenses")} />
+          <HeadingText tone="heading" level={4}>
+            {t("expenses")}
+          </HeadingText>
           {props.isPending ? (
             <Skeleton h={65} radius="md" />
           ) : (
             <BudgetsGroup
               budgets={expenseBudgets}
-              categoryTree={expenseCategoryTree}
+              categoryNodes={expenseCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
               categoryToRecurringForecastTotalMap={
                 categoryToRecurringForecastTotalMap

@@ -4,7 +4,7 @@ import { ActionIcon, BodyText, Button, Modal } from "@teelur/budget-board-ui";
 import { RepeatIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import RolloverControl from "../RolloverControl/RolloverControl";
+import RolloverControl from "../../../RolloverControl/RolloverControl";
 
 interface RolloverButtonProps {
   category: string;
