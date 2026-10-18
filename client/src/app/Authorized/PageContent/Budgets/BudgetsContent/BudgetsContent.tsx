@@ -35,7 +35,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null,
   );
-  const [selectedMonth, setSelectedMonth] = React.useState<Date | null>(null);
+  const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([]);
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
@@ -125,7 +125,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
   const openBudgetDetails = (category: string, month: Date | null) => {
     open();
     setSelectedCategory(category);
-    setSelectedMonth(month);
+    setSelectedMonths(month ? [month] : [...props.selectedDates]);
   };
 
   return (
@@ -134,7 +134,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         isOpen={opened}
         close={close}
         category={selectedCategory ?? null}
-        month={selectedMonth}
+        months={selectedMonths}
       />
       <Stack w={{ base: "100%", md: "70%" }}>
         <Stack gap="0.5rem">
