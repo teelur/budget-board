@@ -75,10 +75,6 @@
   flex: 1;
 }
 
-.updateTitle {
-  color: var(--base-color-text-primary);
-}
-
 .versionRow {
   width: 100%;
   min-height: 2rem;
@@ -87,13 +83,18 @@
 
 .versionText {
   min-width: 0;
+  flex: 1;
+}
+
+.collapsedVersionTooltipTarget {
+  display: block;
+  width: 100%;
+  max-width: 100%;
 }
 
 .collapsedVersion {
   max-width: 100%;
   overflow: hidden;
-  font-size: 0.625rem;
-  color: var(--base-color-text-secondary);
   white-space: nowrap;
   text-overflow: ellipsis;
 }

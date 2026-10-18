@@ -1,9 +1,9 @@
 import classes from "../Navbar.module.css";
 
-import { Group, Stack, Text, Tooltip } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { ArrowUpRightIcon, CircleArrowUpIcon } from "lucide-react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText, Tooltip } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { APP_REPOSITORY } from "~/helpers/appUpdates";
@@ -24,14 +24,14 @@ const NavbarFooter = ({
     ? t("update_available", { version: update.latestVersion })
     : undefined;
   const currentVersionLabel = t("current_version", { version });
-  const versionTextRef = React.useRef<HTMLParagraphElement>(null);
+  const versionTextRef = React.useRef<HTMLDivElement>(null);
   const [isVersionTruncated, setIsVersionTruncated] = React.useState(false);
   const openExternalLink = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   React.useEffect(() => {
-    const versionText = versionTextRef.current;
+    const versionText = versionTextRef.current?.querySelector<HTMLElement>("p");
     if (!versionText) {
       return;
     }
@@ -45,7 +45,7 @@ const NavbarFooter = ({
     observer.observe(versionText);
 
     return () => observer.disconnect();
-  }, [currentVersionLabel]);
+  }, [currentVersionLabel, showExpandedNav]);
 
   if (!showExpandedNav) {
     return (
@@ -66,10 +66,23 @@ const NavbarFooter = ({
             </ActionIcon>
           </Tooltip>
         )}
-        <Tooltip label={currentVersionLabel} position="right">
-          <Text className={classes.collapsedVersion} size="xs" ta="center">
-            {version}
-          </Text>
+        <Tooltip
+          label={currentVersionLabel}
+          position="right"
+          disabled={!isVersionTruncated}
+        >
+          <div
+            ref={versionTextRef}
+            className={classes.collapsedVersionTooltipTarget}
+          >
+            <BodyText
+              className={classes.collapsedVersion}
+              size="xs"
+              ta="center"
+            >
+              {version}
+            </BodyText>
+          </div>
         </Tooltip>
       </Stack>
     );
@@ -88,12 +101,12 @@ const NavbarFooter = ({
           <Group gap="xs" wrap="nowrap">
             <CircleArrowUpIcon className={classes.updateGlyph} size="1.25rem" />
             <Stack className={classes.updateText} gap={0}>
-              <Text className={classes.updateTitle} size="xs" fw={700}>
+              <BodyText tone="heading" size="xs" fw={600}>
                 {updateLabel}
-              </Text>
-              <Text size="xs" c="var(--base-color-text-secondary)" truncate>
+              </BodyText>
+              <BodyText tone="secondary" size="xs" truncate fw={500}>
                 {t("view_update")}
-              </Text>
+              </BodyText>
             </Stack>
             <ArrowUpRightIcon size="0.9rem" />
           </Group>
@@ -110,16 +123,11 @@ const NavbarFooter = ({
           position="right"
           disabled={!isVersionTruncated}
         >
-          <Text
-            ref={versionTextRef}
-            className={classes.versionText}
-            size="xs"
-            c="var(--base-color-text-primary)"
-            fw={500}
-            truncate
-          >
-            {currentVersionLabel}
-          </Text>
+          <div ref={versionTextRef} className={classes.versionText}>
+            <BodyText tone="primary" size="xs" fw={500} truncate>
+              {currentVersionLabel}
+            </BodyText>
+          </div>
         </Tooltip>
         <Tooltip label={t("github_repository")} position="right">
           <ActionIcon
