@@ -234,6 +234,7 @@ const BudgetChildItem = (props: BudgetChildItemProps): React.ReactNode => {
             color="error"
             size="compact-sm"
             h="100%"
+            disabled={deleteBudgetMutation.isPending}
             onClick={(e) => {
               e.stopPropagation();
               deleteBudgetMutation.mutate(props.id);
