@@ -10,14 +10,11 @@ import { closestCenter } from "@dnd-kit/collision";
 import { useDisclosure } from "@mantine/hooks";
 import AccountItemContent from "./AccountItemContent/AccountItemContent";
 import EditableAccountItemContent from "./EditableAccountItemContent/EditableAccountItemContent";
-import classes from "./AccountItem.module.css";
-import hoverClasses from "~/styles/Hoverable.module.css";
 
 interface IAccountItemProps {
   account: IAccountResponse;
   isSortable: boolean;
   container?: Element;
-  openDetails: (account: IAccountResponse | undefined) => void;
 }
 
 const AccountItem = (props: IAccountItemProps): React.ReactNode => {
@@ -39,11 +36,9 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
     <Stack
       mx="0.5rem"
       my="0.25rem"
-      className={`${classes.root} ${hoverClasses.hoverable} ${hoverClasses.outline}`}
       data-editing={isSelected}
       data-hover-effect={!isSelected ? "true" : undefined}
       ref={props.isSortable ? ref : undefined}
-      onClick={() => !isSelected && props.openDetails(props.account)}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (
