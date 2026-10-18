@@ -15,6 +15,7 @@ interface IAccountItemProps {
   account: IAccountResponse;
   isSortable: boolean;
   container?: Element;
+  openDetails?: (account: IAccountResponse) => void;
 }
 
 const AccountItem = (props: IAccountItemProps): React.ReactNode => {
@@ -39,6 +40,7 @@ const AccountItem = (props: IAccountItemProps): React.ReactNode => {
       data-editing={isSelected}
       data-hover-effect={!isSelected ? "true" : undefined}
       ref={props.isSortable ? ref : undefined}
+      onClick={() => !isSelected && props.openDetails?.(props.account)}
     >
       <Group w="100%" gap="0.5rem" wrap="nowrap">
         {props.isSortable && (

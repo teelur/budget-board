@@ -112,16 +112,12 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
     }
 
     return (
-      <Card.Section
-        p="0.125rem"
-        onClick={() => props.openDetails(account)}
-        hoverable
-        key={account.id}
-      >
+      <Card.Section p="0.125rem" hoverable key={account.id}>
         <AccountItem
           account={account}
           isSortable={props.isSortable}
           container={accountsContainer ?? undefined}
+          openDetails={props.openDetails}
         />
       </Card.Section>
     );
