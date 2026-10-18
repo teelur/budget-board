@@ -1,10 +1,11 @@
-import { Divider, Group, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   Autocomplete,
   BodyText,
   Button,
   Card,
   Checkbox,
+  Divider,
   HeadingText,
   Select,
   TextInput,

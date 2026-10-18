@@ -1,5 +1,10 @@
-import { Divider, Flex, Stack, Table } from "@mantine/core";
-import { ActionIcon, AmountText, Pagination } from "@teelur/budget-board-ui";
+import { Flex, Stack, Table } from "@mantine/core";
+import {
+  ActionIcon,
+  AmountText,
+  Divider,
+  Pagination,
+} from "@teelur/budget-board-ui";
 import { SquareXIcon } from "lucide-react";
 import React from "react";
 import { ITransactionImportTableData } from "~/models/transaction";

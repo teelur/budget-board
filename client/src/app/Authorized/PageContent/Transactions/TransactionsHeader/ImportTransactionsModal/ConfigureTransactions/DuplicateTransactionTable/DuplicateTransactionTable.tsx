@@ -1,8 +1,9 @@
-import { Divider, Flex, Stack, Table } from "@mantine/core";
+import { Flex, Stack, Table } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
   BodyText,
+  Divider,
   Pagination,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
