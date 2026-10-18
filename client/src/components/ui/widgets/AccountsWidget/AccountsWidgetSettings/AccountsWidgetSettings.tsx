@@ -4,12 +4,12 @@ import {
   Button,
   Card,
   Checkbox,
+  Divider,
   Modal,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
-import Divider from "~/components/core/Divider/Divider";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -111,7 +111,7 @@ const AccountsWidgetSettings = ({
         >
           {t("show_all")}
         </Button>
-        <Divider size="sm" label={t("or")} elevation={1} />
+        <Divider label={t("or")} />
         <ScrollArea.Autosize
           mah={360}
           type="auto"

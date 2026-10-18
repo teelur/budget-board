@@ -1,7 +1,7 @@
 import classes from "./TransactionCardContent.module.css";
 
-import { Flex, Group, Tooltip } from "@mantine/core";
-import { Badge, AmountText, BodyText } from "@teelur/budget-board-ui";
+import { Flex, Group } from "@mantine/core";
+import { Badge, AmountText, BodyText, Tooltip } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { ICategory } from "~/models/category";

@@ -1,5 +1,4 @@
-import { Tooltip } from "@mantine/core";
-import { Button, ActionIcon } from "@teelur/budget-board-ui";
+import { Button, ActionIcon, Tooltip } from "@teelur/budget-board-ui";
 import { CloudSyncIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";

@@ -1,7 +1,12 @@
 import classes from "./BudgetMetrics.module.css";
 
-import { Box, Group, Stack, Tooltip } from "@mantine/core";
-import { AmountText, BodyText } from "@teelur/budget-board-ui";
+import { Box, Group, Stack } from "@mantine/core";
+import {
+  AmountText,
+  BodyText,
+  Divider,
+  Tooltip,
+} from "@teelur/budget-board-ui";
 import { useTranslation } from "react-i18next";
 import React from "react";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -228,18 +233,16 @@ const RolloverBreakdown = (props: RolloverBreakdownProps): React.ReactNode => {
   return (
     <Stack gap={2}>
       {rows.map(([label, amount]) => (
-        <Group key={label} justify="space-between" gap="1rem" wrap="nowrap">
-          <span>{label}</span>
+        <Group key={label} justify="space-between" wrap="nowrap">
+          <BodyText size="sm">{label}</BodyText>
           {renderAmount(amount)}
         </Group>
       ))}
-      <Group
-        justify="space-between"
-        gap="1rem"
-        wrap="nowrap"
-        className={classes.breakdownTotal}
-      >
-        <span>{t("budget_breakdown_left")}</span>
+      <Divider />
+      <Group justify="space-between" wrap="nowrap">
+        <BodyText size="sm" fw={500}>
+          {t("budget_breakdown_left")}
+        </BodyText>
         {renderAmount(props.remaining)}
       </Group>
     </Stack>

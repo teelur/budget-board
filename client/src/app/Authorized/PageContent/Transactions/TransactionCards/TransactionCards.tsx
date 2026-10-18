@@ -11,7 +11,7 @@ import {
   TransactionDisplayItem,
 } from "~/helpers/transactions";
 import TransactionTransferGroup from "./TransactionTransferGroup";
-import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 import { BodyText } from "@teelur/budget-board-ui";
 
 interface TransactionCardsProps {

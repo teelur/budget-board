@@ -15,7 +15,6 @@ import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import InstitutionItemContent from "./InstitutionItemContent/InstitutionItemContent";
 import EditableInstitutionItemContent from "./EditableInstitutionItemContent/EditableInstitutionItemContent";
 import { useOrderAccountsMutation } from "~/hooks/mutations/accounts/useOrderAccountsMutation";
-import Divider from "~/components/core/Divider/Divider";
 
 interface IInstitutionItemProps {
   institution: IInstitution;
@@ -100,39 +99,68 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
     }
   }, [props.isSortable]);
 
+  const getAccountContent = (account: IAccountResponse): React.ReactNode => {
+    if (props.isSortable) {
+      return (
+        <AccountItem
+          key={account.id}
+          account={account}
+          isSortable={props.isSortable}
+          container={accountsContainer ?? undefined}
+        />
+      );
+    }
+
+    return (
+      <Card.Section p="0.125rem" hoverable key={account.id}>
+        <AccountItem
+          account={account}
+          isSortable={props.isSortable}
+          container={accountsContainer ?? undefined}
+          openDetails={props.openDetails}
+        />
+      </Card.Section>
+    );
+  };
+
   return (
-    <Card p={0} ref={props.isSortable ? ref : undefined}>
-      <LoadingOverlay visible={orderAccountsMutation.isPending} />
-      <Stack px="0.5rem" py="0.25rem">
-        {isEditable ? (
-          <EditableInstitutionItemContent
-            institution={props.institution}
-            totalBalance={totalBalance}
-            toggle={toggle}
-          />
-        ) : (
-          <InstitutionItemContent
-            institution={props.institution}
-            totalBalance={totalBalance}
-            toggle={toggle}
-          />
-        )}
-      </Stack>
-      <Divider w="100%" size="sm" elevation={0} />
-      <Group w="100%" p={0} wrap="nowrap" gap="0.25rem" align="flex-start">
-        {props.isSortable && (
-          <Flex m="0.25rem" ref={handleRef} style={{ alignSelf: "stretch" }}>
-            <Button variant="filled" color="primary" h="100%" px={0} w={30}>
-              <GripVertical size={25} />
-            </Button>
-          </Flex>
-        )}
+    <Group
+      w="100%"
+      p={0}
+      wrap="nowrap"
+      gap="0.25rem"
+      align="flex-start"
+      ref={props.isSortable ? ref : undefined}
+    >
+      {props.isSortable && (
+        <Flex m="0.25rem" ref={handleRef} style={{ alignSelf: "stretch" }}>
+          <Button variant="filled" color="primary" h="100%" px={0} w={30}>
+            <GripVertical size={25} />
+          </Button>
+        </Flex>
+      )}
+      <Card p={0} w="100%">
+        <LoadingOverlay visible={orderAccountsMutation.isPending} />
+        <Card.Section px="0.5rem" py="0.25rem" separatorThickness="thick">
+          {isEditable ? (
+            <EditableInstitutionItemContent
+              institution={props.institution}
+              totalBalance={totalBalance}
+              toggle={toggle}
+            />
+          ) : (
+            <InstitutionItemContent
+              institution={props.institution}
+              totalBalance={totalBalance}
+              toggle={toggle}
+            />
+          )}
+        </Card.Section>
         <Stack
           ref={setAccountsContainer}
           id={props.institution.id}
           w="100%"
-          py="0.125rem"
-          gap="0.5rem"
+          gap={0}
         >
           <DragDropProvider
             onDragEnd={(event) => {
@@ -146,23 +174,11 @@ const InstitutionItem = (props: IInstitutionItemProps) => {
               setSortedAccounts(updatedList);
             }}
           >
-            {sortedAccounts.map((account, index) => (
-              <React.Fragment key={account.id}>
-                <AccountItem
-                  account={account}
-                  isSortable={props.isSortable}
-                  container={accountsContainer ?? undefined}
-                  openDetails={props.openDetails}
-                />
-                {index < sortedAccounts.length - 1 && (
-                  <Divider w="100%" p={0} size="xs" elevation={0} />
-                )}
-              </React.Fragment>
-            ))}
+            {sortedAccounts.map((account) => getAccountContent(account))}
           </DragDropProvider>
         </Stack>
-      </Group>
-    </Card>
+      </Card>
+    </Group>
   );
 };
 

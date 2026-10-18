@@ -22,7 +22,7 @@ import {
 import { ICategory } from "~/models/category";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import AccountMultiSelect from "~/components/AccountMultiSelect/AccountMultiSelect";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 
 export interface ConditionItemProps {

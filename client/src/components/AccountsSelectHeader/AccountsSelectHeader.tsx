@@ -4,7 +4,7 @@ import { DatesRangeValue } from "@mantine/dates";
 import { IAccountResponse } from "~/models/account";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import AccountMultiSelect from "../core/Select/AccountMultiSelect/AccountMultiSelect";
+import AccountMultiSelect from "../AccountMultiSelect/AccountMultiSelect";
 import SelectLastNMonthsRange from "../SelectLastNMonthsRange/SelectLastNMonthsRange";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
 

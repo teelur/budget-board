@@ -1,4 +1,12 @@
 import {
+  getThemeColor,
+  Group,
+  Skeleton,
+  Stack,
+  useMantineTheme,
+} from "@mantine/core";
+import { BodyText } from "@teelur/budget-board-ui";
+import {
   hiddenTransactionCategory,
   ITransaction,
   uncategorizedTransactionCategory,
@@ -9,13 +17,6 @@ import {
   buildSpendingCategoryChartData,
   buildSpendingSubcategoryChartData,
 } from "~/helpers/charts";
-import {
-  getThemeColor,
-  Group,
-  Skeleton,
-  Stack,
-  useMantineTheme,
-} from "@mantine/core";
 import { SignDisplay } from "~/helpers/currency";
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
@@ -23,7 +24,6 @@ import SpendingCategoriesTooltip from "./SpendingCategoriesTooltip/SpendingCateg
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { areStringsEqual } from "~/helpers/utils";
 import { CategoryTypes } from "~/models/category";
-import { BodyText } from "@teelur/budget-board-ui";
 
 interface SpendingChartProps {
   transactions: ITransaction[];

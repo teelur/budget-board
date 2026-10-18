@@ -1,7 +1,7 @@
 import classes from "./Navbar.module.css";
 
-import { Burger, Flex, ScrollArea, Stack, Tooltip } from "@mantine/core";
-import { ActionIcon, NavbarLink } from "@teelur/budget-board-ui";
+import { Burger, Flex, ScrollArea, Stack } from "@mantine/core";
+import { ActionIcon, NavbarLink, Tooltip } from "@teelur/budget-board-ui";
 import {
   ArrowLeftFromLineIcon,
   ArrowRightFromLineIcon,
@@ -204,7 +204,6 @@ const Navbar = (props: NavbarProps) => {
                 : t("expand_sidebar")
             }
             position="right"
-            transitionProps={{ duration: 0 }}
           >
             <ActionIcon
               variant="ghost"
