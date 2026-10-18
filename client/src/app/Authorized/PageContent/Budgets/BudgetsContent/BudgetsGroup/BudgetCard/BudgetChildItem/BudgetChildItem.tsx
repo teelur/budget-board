@@ -148,21 +148,23 @@ const BudgetChildItem = (props: BudgetChildItemProps): React.ReactNode => {
               {!isEditing && props.icon.length > 0 ? `${props.icon} ` : ""}
               {props.categoryValue}
             </BodyText>
-            <ActionIcon
-              variant="ghost"
-              color="primary"
-              size="compact-xs"
-              selected={isEditing}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (props.id.length > 0) {
-                  newLimitField.setValue(props.limit);
-                  toggleEdit();
-                }
-              }}
-            >
-              <PencilIcon size={16} />
-            </ActionIcon>
+            {props.id.length > 0 && (
+              <ActionIcon
+                variant="ghost"
+                color="primary"
+                size="compact-xs"
+                selected={isEditing}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (props.id.length > 0) {
+                    newLimitField.setValue(props.limit);
+                    toggleEdit();
+                  }
+                }}
+              >
+                <PencilIcon size={16} />
+              </ActionIcon>
+            )}
           </Group>
           <Group gap="0.25rem" justify="flex-end" align="center">
             <Trans
