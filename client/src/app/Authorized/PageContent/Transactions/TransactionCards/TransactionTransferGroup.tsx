@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ICategory } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import classes from "./TransactionTransferGroup.module.css";
-import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 import { BodyText, Card } from "@teelur/budget-board-ui";
 
 interface TransactionTransferGroupProps {

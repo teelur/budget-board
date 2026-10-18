@@ -5,7 +5,7 @@ import { ICategory } from "~/models/category";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
-import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];

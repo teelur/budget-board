@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 import { TagsIcon } from "lucide-react";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
-import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const itemsPerPage = 15;
