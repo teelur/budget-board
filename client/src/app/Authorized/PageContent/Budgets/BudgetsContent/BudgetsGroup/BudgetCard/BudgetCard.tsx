@@ -51,7 +51,10 @@ const BudgetCard = (props: BudgetParentCardProps): React.ReactNode => {
           props.categoryToBudgetsMap.get(
             subCategory.value.toLocaleLowerCase(),
           ) ?? [];
-        const budget = budgets.length === 1 ? budgets[0] : null;
+        const budget =
+          props.selectedDate !== null && budgets.length === 1
+            ? budgets[0]
+            : null;
         budgetedChildCards.push([
           subCategory.value,
           <BudgetChildItem

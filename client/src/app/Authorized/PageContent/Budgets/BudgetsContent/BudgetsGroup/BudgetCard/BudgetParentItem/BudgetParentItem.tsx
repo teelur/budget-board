@@ -84,7 +84,8 @@ const BudgetParentItem = (props: BudgetParentItemProps): React.ReactNode => {
   const updateBudgetMutation = useUpdateBudgetMutation();
   const deleteBudgetMutation = useDeleteBudgetMutation();
 
-  const [isEditing, { toggle: toggleEditing }] = useDisclosure(false);
+  const [isEditing, { toggle: toggleEditing, close: closeEditing }] =
+    useDisclosure(false);
 
   const categoryKey = props.categoryNode.value.toLowerCase();
   const categoryIcon = getCategoryIcon(
@@ -95,7 +96,7 @@ const BudgetParentItem = (props: BudgetParentItemProps): React.ReactNode => {
   // This is technically just a single budget, but there may be multiple instances
   // if multiple months are selected.
   const budgets = props.categoryToBudgetsMap.get(categoryKey) ?? [];
-  const budget = budgets.length === 1 ? budgets[0] : null;
+  const budget = props.selectedDate && budgets.length === 1 ? budgets[0] : null;
 
   const amount = props.categoryToTransactionsTotalMap.get(categoryKey) ?? 0;
   const projectedAmount =
@@ -345,7 +346,7 @@ const BudgetParentItem = (props: BudgetParentItemProps): React.ReactNode => {
                   size="compact-xs"
                   onClick={() => {
                     deleteBudgetMutation.mutate(budget!.id);
-                    close();
+                    closeEditing();
                   }}
                 >
                   {t("delete")}
