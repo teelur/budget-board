@@ -1,11 +1,11 @@
-import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
-import { initCurrentMonth } from "~/helpers/datetime";
 import { Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, MonthToolcards } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
+import { initCurrentMonth } from "~/helpers/datetime";
+import { getMonthToolcardStatus } from "~/helpers/monthToolcards";
 import AddBudget from "./AddBudget/AddBudget";
-import { IBudgetCreateRequest } from "~/models/budget";
+import type { IBudgetCreateRequest } from "~/models/budget";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -25,8 +25,13 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   const [canSelectMultiple, { toggle }] = useDisclosure(false);
 
   const { t } = useTranslation();
-  const { dayjs } = useLocale();
+  const { dayjs, dayjsLocale } = useLocale();
   const createBudgetMutation = useCreateBudgetMutation({ isCopying: true });
+
+  const getMonthStatus = React.useCallback(
+    (date: Date) => getMonthToolcardStatus(props.timeToMonthlyTotalsMap, date),
+    [props.timeToMonthlyTotalsMap],
+  );
 
   const previousMonthDate = React.useMemo(() => {
     if (props.selectedDates.length !== 1) {
@@ -88,10 +93,11 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
       <MonthToolcards
         selectedDates={props.selectedDates}
         setSelectedDates={props.setSelectedDates}
-        timeToMonthlyTotalsMap={props.timeToMonthlyTotalsMap}
+        getMonthStatus={getMonthStatus}
         isPending={props.isPending}
         allowSelectMultiple={canSelectMultiple}
         allowFutureMonths
+        locale={dayjsLocale}
       />
       <Group justify="right" gap="0.5rem">
         <Button

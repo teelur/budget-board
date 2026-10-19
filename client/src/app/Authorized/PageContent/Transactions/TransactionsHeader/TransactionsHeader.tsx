@@ -1,7 +1,7 @@
 import classes from "./TransactionsHeader.module.css";
 
 import { Collapse, Flex, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, MonthToolcards } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { FilterIcon, ListChecksIcon } from "lucide-react";
 import React from "react";
@@ -14,7 +14,6 @@ import ImportTransactionsModal from "./ImportTransactionsModal/ImportTransaction
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTranslation } from "react-i18next";
 import ExportTransactionsModal from "./ExportTransactionsModal/ExportTransactionsModal";
-import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
 import SelectLastNMonths from "~/components/SelectLastNMonths/SelectLastNMonths";
 import { Filters, ITransaction } from "~/models/transaction";
 import {
@@ -22,6 +21,7 @@ import {
   getFilteredTransactions,
   sortTransactions,
 } from "~/helpers/transactions";
+import { getMonthToolcardStatus } from "~/helpers/monthToolcards";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { getMonthsInDateRange } from "~/helpers/datetime";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -45,7 +45,7 @@ const TransactionsHeader = (
   const { transactionFilters, isFiltersPanelOpen, toggleFiltersPanel } =
     useTransactionFilters();
   const { allTransactionCategories } = useTransactionCategories();
-  const { dayjs } = useLocale();
+  const { dayjs, dayjsLocale } = useLocale();
   const [canSelectMultiple, { toggle, open }] = useDisclosure(false);
 
   const toggleSelectMultiple = () => {
@@ -67,6 +67,11 @@ const TransactionsHeader = (
   const timeToMonthlyTotalsMap = React.useMemo(
     () => buildTimeToMonthlyTotalsMap(props.selectedMonths, props.transactions),
     [props.selectedMonths, props.transactions],
+  );
+
+  const getMonthStatus = React.useCallback(
+    (date: Date) => getMonthToolcardStatus(timeToMonthlyTotalsMap, date),
+    [timeToMonthlyTotalsMap],
   );
 
   React.useEffect(() => {
@@ -144,10 +149,11 @@ const TransactionsHeader = (
       <MonthToolcards
         selectedDates={props.selectedMonths}
         setSelectedDates={props.setSelectedMonths}
-        timeToMonthlyTotalsMap={timeToMonthlyTotalsMap}
+        getMonthStatus={getMonthStatus}
         isPending={props.isQueryPending}
         allowSelectMultiple={canSelectMultiple}
         allowFutureMonths
+        locale={dayjsLocale}
       />
       <Group w="100%" justify="space-between" align="center" wrap="wrap">
         <SortMenu
