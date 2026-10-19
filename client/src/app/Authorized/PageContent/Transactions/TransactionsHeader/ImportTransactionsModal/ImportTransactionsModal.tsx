@@ -1,5 +1,4 @@
-import { Stepper } from "@mantine/core";
-import { Button, Modal } from "@teelur/budget-board-ui";
+import { Button, Modal, Stepper } from "@teelur/budget-board-ui";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { FileDownIcon } from "lucide-react";
 import React from "react";
