@@ -1,5 +1,10 @@
-import { Group, LoadingOverlay } from "@mantine/core";
-import { ActionIcon, AmountText, TextInput } from "@teelur/budget-board-ui";
+import { Group } from "@mantine/core";
+import {
+  ActionIcon,
+  AmountText,
+  LoadingOverlay,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useField } from "@mantine/form";
 import { PencilIcon } from "lucide-react";

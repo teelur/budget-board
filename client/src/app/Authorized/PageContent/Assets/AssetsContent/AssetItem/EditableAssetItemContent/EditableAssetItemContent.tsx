@@ -1,4 +1,4 @@
-import { Group, Stack, LoadingOverlay, Flex } from "@mantine/core";
+import { Group, Stack, Flex } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
@@ -6,6 +6,7 @@ import {
   Button,
   CategorySelect,
   DateInput,
+  LoadingOverlay,
   NumberInput,
   TextInput,
 } from "@teelur/budget-board-ui";

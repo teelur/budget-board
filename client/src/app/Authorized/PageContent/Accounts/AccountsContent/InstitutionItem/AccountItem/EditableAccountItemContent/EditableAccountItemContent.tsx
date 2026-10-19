@@ -1,4 +1,4 @@
-import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
 import {
   Button,
   ActionIcon,
@@ -7,6 +7,7 @@ import {
   TextInput,
   CategorySelect,
   BodyText,
+  LoadingOverlay,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useField } from "@mantine/form";

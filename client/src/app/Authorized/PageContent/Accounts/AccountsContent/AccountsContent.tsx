@@ -1,5 +1,5 @@
-import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group, Skeleton, Stack } from "@mantine/core";
+import { BodyText, LoadingOverlay } from "@teelur/budget-board-ui";
 import React from "react";
 import { IInstitution, InstitutionIndexRequest } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";

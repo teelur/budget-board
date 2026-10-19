@@ -1,9 +1,10 @@
-import { LoadingOverlay, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import {
   BodyText,
   Button,
   Card,
   CategorySelect,
+  LoadingOverlay,
   SegmentedControl,
   TextInput,
 } from "@teelur/budget-board-ui";

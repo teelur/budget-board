@@ -1,10 +1,4 @@
-import {
-  Group,
-  LoadingOverlay,
-  Stack,
-  CopyButton,
-  Skeleton,
-} from "@mantine/core";
+import { Group, Stack, CopyButton, Skeleton } from "@mantine/core";
 import {
   Badge,
   BodyText,
@@ -12,6 +6,7 @@ import {
   Card,
   Code,
   HeadingText,
+  LoadingOverlay,
   PinInput,
 } from "@teelur/budget-board-ui";
 import React from "react";
