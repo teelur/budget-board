@@ -9,16 +9,13 @@
   width: 100%;
 
   &:hover {
-    background-color: var(--elevated-color-input-background);
+    background-color: var(--bbui-color-surface-hover);
   }
 
   &[data-selected] {
     &,
     &:hover {
-      background-color: light-dark(
-        var(--mantine-primary-color-5),
-        var(--mantine-primary-color-8)
-      );
+      background-color: var(--bbui-color-selection);
     }
   }
 }

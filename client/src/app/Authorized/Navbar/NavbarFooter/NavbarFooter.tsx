@@ -3,7 +3,12 @@ import classes from "../Navbar.module.css";
 import { Group, Stack } from "@mantine/core";
 import { ArrowUpRightIcon, CircleArrowUpIcon } from "lucide-react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
-import { ActionIcon, BodyText, Tooltip } from "@teelur/budget-board-ui";
+import {
+  ActionIcon,
+  BodyText,
+  Divider,
+  Tooltip,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { APP_REPOSITORY } from "~/helpers/appUpdates";
@@ -53,6 +58,7 @@ const NavbarFooter = ({
         className={`${classes.footer} ${classes.footerCollapsed}`}
         gap="xs"
       >
+        <Divider w="100%" />
         {update && updateLabel && (
           <Tooltip label={updateLabel} position="right">
             <ActionIcon
@@ -90,6 +96,7 @@ const NavbarFooter = ({
 
   return (
     <Stack className={classes.footer} gap="xs">
+      <Divider w="100%" />
       {update && updateLabel && (
         <a
           href={update.url}
