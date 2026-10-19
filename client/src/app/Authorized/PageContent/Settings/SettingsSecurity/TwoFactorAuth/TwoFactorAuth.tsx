@@ -1,4 +1,4 @@
-import { Group, Stack, CopyButton, Skeleton } from "@mantine/core";
+import { Group, Stack, CopyButton } from "@mantine/core";
 import {
   Badge,
   BodyText,
@@ -8,6 +8,7 @@ import {
   HeadingText,
   LoadingOverlay,
   PinInput,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTwoFactorAuthenticationQuery } from "~/hooks/queries/useTwoFactorAuthenticationQuery";
@@ -216,7 +217,7 @@ const TwoFactorAuth = (): React.ReactNode => {
   };
 
   if (twoFactorAuthQuery.isPending) {
-    return <Skeleton height={300} radius="md" />;
+    return <Skeleton height={300} />;
   }
 
   return (

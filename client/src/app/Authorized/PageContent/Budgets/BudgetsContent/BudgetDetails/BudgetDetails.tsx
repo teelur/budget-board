@@ -1,4 +1,12 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import {
+  AmountText,
+  BodyText,
+  CollapsibleCard,
+  Drawer,
+  HeadingText,
+  Skeleton,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import MonthlySpendingChart from "~/components/Charts/MonthlySpendingChart/MonthlySpendingChart";
@@ -14,13 +22,6 @@ import { CategoryTypes } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import { useRecurringForecastQueries } from "~/hooks/queries/useRecurringForecastQueries";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
-import {
-  AmountText,
-  BodyText,
-  CollapsibleCard,
-  Drawer,
-  HeadingText,
-} from "@teelur/budget-board-ui";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
@@ -90,15 +91,9 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
       !props.category ||
       getIsParentCategory(props.category, allTransactionCategories)
     ) {
-      return areStringsEqual(
-        transaction.category ?? "",
-        props.category ?? "",
-      );
+      return areStringsEqual(transaction.category ?? "", props.category ?? "");
     }
-    return areStringsEqual(
-      transaction.subcategory ?? "",
-      props.category,
-    );
+    return areStringsEqual(transaction.subcategory ?? "", props.category);
   };
 
   const transactionsForCategory = (transactionsQuery.data ?? [])
@@ -134,7 +129,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
 
   const getContent = (): React.ReactNode => {
     if (transactionsQuery.isPending) {
-      return <Skeleton height={425} radius="lg" />;
+      return <Skeleton height={425} />;
     }
 
     if (selectedMonths.length === 0 || !props.category) {
@@ -197,7 +192,7 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
             }
           >
             {forecastQueries.isPending ? (
-              <Skeleton height={35} radius="md" />
+              <Skeleton height={35} />
             ) : forecastForCategory.length > 0 ? (
               <Stack gap="0.25rem">
                 {forecastForCategory.map((occurrence) => (

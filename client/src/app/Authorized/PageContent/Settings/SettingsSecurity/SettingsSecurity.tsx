@@ -1,4 +1,5 @@
-import { Skeleton, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import TwoFactorAuth from "./TwoFactorAuth/TwoFactorAuth";
 import OidcSettings from "./OidcSettings/OidcSettings";
@@ -11,7 +12,7 @@ const SettingsSecurity = (): React.ReactNode => {
 
   const getPasswordManagementComponent = (): React.ReactNode => {
     if (applicationUserQuery.isPending) {
-      return <Skeleton height={250} radius="md" />;
+      return <Skeleton height={250} />;
     }
 
     if (!applicationUserQuery.data) {

@@ -1,5 +1,5 @@
-import { Group, Skeleton } from "@mantine/core";
-import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
+import { Group } from "@mantine/core";
+import { BodyText, Card, HeadingText, Skeleton } from "@teelur/budget-board-ui";
 import { GitBranchIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -76,7 +76,7 @@ const FlowsWidget = ({
         </Card.Section>
         <Card.Section>
           {isPending ? (
-            <Skeleton height="100%" radius="md" />
+            <Skeleton height="100%" />
           ) : (
             <FlowsChart
               transactions={transactionsQuery.data ?? []}

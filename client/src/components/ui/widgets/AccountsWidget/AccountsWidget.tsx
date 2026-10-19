@@ -1,5 +1,5 @@
-import { Flex, Group, Skeleton } from "@mantine/core";
-import { Card, HeadingText } from "@teelur/budget-board-ui";
+import { Flex, Group } from "@mantine/core";
+import { Card, HeadingText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { IInstitution } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
@@ -60,7 +60,7 @@ const AccountsWidget = ({
     if (institutionQuery.isPending || widgetSettingsQuery.isPending) {
       return (
         <Flex h="100%" w="100%" p="0.25rem">
-          <Skeleton flex={1} radius="md" />
+          <Skeleton flex={1} />
         </Flex>
       );
     }

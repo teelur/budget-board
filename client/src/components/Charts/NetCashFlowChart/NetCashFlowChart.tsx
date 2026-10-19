@@ -1,6 +1,6 @@
-import { Group, Skeleton } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
-import { BodyText } from "@teelur/budget-board-ui";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import { SignDisplay } from "~/helpers/currency";
 import { getTransactionsForMonth } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
@@ -91,7 +91,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   };
 
   if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
+    return <Skeleton height={425} />;
   }
 
   if (props.months.length === 0) {

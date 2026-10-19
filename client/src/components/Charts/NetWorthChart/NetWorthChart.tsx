@@ -1,6 +1,6 @@
 import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
-import { Group, Skeleton } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import { filterBalancesByDateRange } from "~/helpers/balances";
 import { SignDisplay } from "~/helpers/currency";
 import { DateString, getDateFromMonthsAgo } from "~/helpers/datetime";
@@ -107,7 +107,7 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
     .map((type) => type.value);
 
   if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
+    return <Skeleton height={425} />;
   }
 
   if (props.accounts?.length === 0 || props.balances?.length === 0) {

@@ -1,4 +1,5 @@
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import { AreaChart } from "@mantine/charts";
 import React from "react";
@@ -7,7 +8,6 @@ import {
   buildTransactionChartSeries,
 } from "~/helpers/charts";
 import { SignDisplay } from "~/helpers/currency";
-import { Group, Skeleton } from "@mantine/core";
 import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useTranslation } from "react-i18next";
@@ -51,7 +51,7 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   };
 
   if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
+    return <Skeleton height={425} />;
   }
 
   if (props.months.length === 0) {

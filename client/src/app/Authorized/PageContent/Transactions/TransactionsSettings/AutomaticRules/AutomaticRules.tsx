@@ -1,11 +1,11 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { IAutomaticRuleResponse } from "~/models/automaticRule";
 import AddAutomaticRule from "./AddAutomaticRule/AddAutomaticRule";
 import AutomaticRuleCard from "./AutomaticRuleCard/AutomaticRuleCard";
 import { useTranslation } from "react-i18next";
 import { useAutomaticRulesQuery } from "~/hooks/queries/useAutomaticRulesQuery";
-import { BodyText } from "@teelur/budget-board-ui";
 
 const AutomaticRules = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -13,7 +13,7 @@ const AutomaticRules = (): React.ReactNode => {
 
   const getAutomaticRulesContent = (): React.ReactNode => {
     if (automaticRuleQuery.isPending) {
-      return <Skeleton height={46} radius="md" />;
+      return <Skeleton height={46} />;
     }
 
     if ((automaticRuleQuery.data ?? []).length === 0) {

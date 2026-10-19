@@ -1,5 +1,5 @@
-import { Skeleton, Stack } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Stack } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
@@ -13,7 +13,7 @@ const OidcSettings = (): React.ReactNode => {
   const { envVariables } = getProjectEnvVariables();
 
   if (applicationUserQuery.isPending) {
-    return <Skeleton height={100} radius="md" />;
+    return <Skeleton height={100} />;
   }
 
   if (envVariables.VITE_OIDC_ENABLED?.toLowerCase() !== "true") {

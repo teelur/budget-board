@@ -1,6 +1,6 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { BarChart } from "@mantine/charts";
-import { BodyText } from "@teelur/budget-board-ui";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { buildMonthlySpendingChartData } from "~/helpers/charts";
@@ -64,7 +64,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   }, [chartData]);
 
   if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
+    return <Skeleton height={425} />;
   }
 
   if (props.months.length === 0) {

@@ -1,5 +1,5 @@
-import { Flex, Group, Skeleton, Stack } from "@mantine/core";
-import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
+import { Flex, Group, Stack } from "@mantine/core";
+import { BodyText, Card, HeadingText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import BudgetSummaryItem from "./BudgetSummaryItem/BudgetSummaryItem";
 import { IBudget } from "~/models/budget";
@@ -126,7 +126,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
         )}
         {props.isPending ? (
           <Flex h="100%" w="100%">
-            <Skeleton h={100} radius="md" />
+            <Skeleton h={100} />
           </Flex>
         ) : (
           <Stack gap="0.25rem">
@@ -160,7 +160,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
       <Card.Section p="0.25rem">
         {props.isPending ? (
           <Flex h="100%" w="100%">
-            <Skeleton h={43} radius="md" />
+            <Skeleton h={43} />
           </Flex>
         ) : (
           <Stack gap="0.25rem">
@@ -178,7 +178,7 @@ const BudgetSummaryCard = (props: BudgetSummaryCardProps): React.ReactNode => {
       <Card.Section p="0.25rem">
         {props.isPending ? (
           <Flex h="100%" w="100%">
-            <Skeleton h={43} radius="md" />
+            <Skeleton h={43} />
           </Flex>
         ) : (
           <Stack gap="0.25rem">

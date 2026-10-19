@@ -1,7 +1,7 @@
-import { BodyText } from "@teelur/budget-board-ui";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import { SignDisplay } from "~/helpers/currency";
 import { BarChart } from "@mantine/charts";
-import { Group, Skeleton } from "@mantine/core";
+import { Group } from "@mantine/core";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
 import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
@@ -66,7 +66,7 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   );
 
   if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
+    return <Skeleton height={425} />;
   }
 
   if (props.items?.length === 0 || props.values?.length === 0) {

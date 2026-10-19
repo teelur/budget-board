@@ -1,4 +1,4 @@
-import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Group, ScrollArea, Stack } from "@mantine/core";
 import {
   BodyText,
   Button,
@@ -6,6 +6,7 @@ import {
   Checkbox,
   Divider,
   Modal,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
@@ -89,7 +90,7 @@ const AccountsWidgetSettings = ({
 
   const getAccountsWidgetSettingsContent = () => {
     if (institutionQuery.isPending) {
-      return <Skeleton height={200} radius="lg" />;
+      return <Skeleton height={200} />;
     }
 
     if (visibleInstitutions.length === 0) {

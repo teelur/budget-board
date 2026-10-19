@@ -1,5 +1,5 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
-import { BodyText, LoadingOverlay } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, LoadingOverlay, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { IInstitution, InstitutionIndexRequest } from "~/models/institution";
 import InstitutionItem from "./InstitutionItem/InstitutionItem";
@@ -74,9 +74,9 @@ const AccountsContent = (props: AccountsContentProps) => {
       )}
       {institutionQuery.isPending ? (
         <>
-          <Skeleton height={60} radius="md" />
-          <Skeleton height={60} radius="md" />
-          <Skeleton height={60} radius="md" />
+          <Skeleton height={100} />
+          <Skeleton height={100} />
+          <Skeleton height={100} />
         </>
       ) : sortedInstitutions.length === 0 ? (
         <Group justify="center" align="center" gap="0.5rem">

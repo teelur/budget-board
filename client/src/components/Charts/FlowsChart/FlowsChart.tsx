@@ -1,5 +1,5 @@
-import { Group, Skeleton } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import { SankeyChart as MantineSankeyChart } from "@mantine/charts";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -148,7 +148,7 @@ const FlowsChart = (props: FlowsChartProps): React.ReactNode => {
   );
 
   if (props.isPending) {
-    return <Skeleton height={chartHeight} radius="lg" />;
+    return <Skeleton height={chartHeight} />;
   }
 
   if (chartData.links.length === 0) {
