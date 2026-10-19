@@ -1,32 +1,5 @@
 import { MantineColorsTuple } from "@mantine/core";
 
-export const backgroundEggshell: MantineColorsTuple = [
-  "#FFFFFE",
-  "#FAFAF9",
-  "#F6F6F4",
-  "#F1F1EE",
-  "#ECECE9",
-  "#E7E7E3",
-  "#E2E2DD",
-  "#DDDDD7",
-  "#D8D8D1",
-  "#D3D3CB",
-  "#CECEC5",
-];
-
-export const backgroundGray: MantineColorsTuple = [
-  "#505050",
-  "#494949",
-  "#424242",
-  "#3B3B3B",
-  "#343434",
-  "#2D2D2D",
-  "#262626",
-  "#1F1F1F",
-  "#181818",
-  "#121212",
-];
-
 export const green: MantineColorsTuple = [
   "#ebfff0",
   "#d4fee0",

@@ -39,14 +39,7 @@ import { AuthProvider } from "~/providers/AuthProvider/AuthProvider";
 import AuthorizedRoute from "~/providers/AuthProvider/AuthorizedRoute";
 import UnauthorizedRoute from "~/providers/AuthProvider/UnauthorizedRoute";
 import Authorized from "~/app/Authorized/Authorized";
-import {
-  backgroundGray,
-  backgroundEggshell,
-  green,
-  blue,
-  orange,
-  red,
-} from "./shared/colors";
+import { green, blue, orange, red } from "./shared/colors";
 import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
 import { LocaleProvider } from "./providers/LocaleProvider/LocaleProvider";
 import { PrivacyModeProvider } from "./providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -124,11 +117,8 @@ const theme = createTheme({
   fontFamily: "IBM Plex Sans Variable, sans-serif",
   headings: {
     fontFamily: "Plus Jakarta Sans Variable, sans-serif",
-    fontWeight: "600",
   },
-  cursorType: "pointer",
   defaultRadius: "xs",
-  primaryColor: "indigo",
   breakpoints: {
     xs: "30em", // 480px
     sm: "48em", // 768px
@@ -166,11 +156,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--bbui-color-button-hover": budgetBoardColors.light.buttonHoverBorder,
 
     "--bbui-color-selection": budgetBoardColors.light.selection,
-    // Button colors
-    "--button-color-confirm": green[9],
-    "--button-color-destructive": red[5],
-    // Other
-    "--light-color-off": backgroundEggshell[8],
   },
   dark: {
     "--bbui-color-page": budgetBoardColors.dark.page,
@@ -190,11 +175,6 @@ const resolver: CSSVariablesResolver = () => ({
     "--bbui-color-button-hover": budgetBoardColors.dark.buttonHoverBorder,
 
     "--bbui-color-selection": budgetBoardColors.dark.selection,
-    // Button colors
-    "--button-color-confirm": green[9],
-    "--button-color-destructive": red[4],
-    // Other
-    "--light-color-off": backgroundGray[3],
   },
 });
 
