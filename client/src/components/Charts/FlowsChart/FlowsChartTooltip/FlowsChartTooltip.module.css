@@ -1,5 +1,5 @@
 .route {
-  border-left: 2px solid var(--base-color-border);
+  border-left: 2px solid var(--bbui-color-border);
   padding-left: 0.625rem;
 }
 

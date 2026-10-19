@@ -1,5 +1,6 @@
 import React from "react";
-import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
+import { MonthToolcards } from "@teelur/budget-board-ui";
+import { getMonthToolcardStatus } from "~/helpers/monthToolcards";
 import { buildTimeToMonthlyTotalsMap } from "~/helpers/transactions";
 import NetCashFlowChart from "~/components/Charts/NetCashFlowChart/NetCashFlowChart";
 import { Stack } from "@mantine/core";
@@ -10,7 +11,7 @@ import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 const NetCashFlowTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];
 
-  const { dayjs } = useLocale();
+  const { dayjs, dayjsLocale } = useLocale();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
     dayjs().subtract(1, "month").startOf("month").toDate(),
@@ -24,17 +25,23 @@ const NetCashFlowTab = (): React.ReactNode => {
     })),
   });
 
+  const timeToMonthlyTotalsMap = React.useMemo(
+    () =>
+      buildTimeToMonthlyTotalsMap(selectedMonths, transactionsQuery.data ?? []),
+    [selectedMonths, transactionsQuery.data],
+  );
+
   return (
     <Stack p="0.5rem">
       <MonthToolcards
         selectedDates={selectedMonths}
         setSelectedDates={setSelectedMonths}
-        timeToMonthlyTotalsMap={buildTimeToMonthlyTotalsMap(
-          selectedMonths,
-          transactionsQuery.data ?? [],
-        )}
+        getMonthStatus={(date) =>
+          getMonthToolcardStatus(timeToMonthlyTotalsMap, date)
+        }
         isPending={transactionsQuery.isPending}
         allowSelectMultiple
+        locale={dayjsLocale}
       />
       <SelectLastNMonths
         monthButtons={monthButtons}

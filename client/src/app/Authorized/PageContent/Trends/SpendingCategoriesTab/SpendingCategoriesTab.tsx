@@ -1,7 +1,7 @@
-import MonthToolcards from "~/components/MonthToolcards/MonthToolcards";
+import { Button, MonthToolcards } from "@teelur/budget-board-ui";
 import { buildTimeToMonthlyTotalsMap } from "~/helpers/transactions";
+import { getMonthToolcardStatus } from "~/helpers/monthToolcards";
 import { Flex, Group, Stack } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
 import React from "react";
 import SpendingCategoriesChart from "~/components/Charts/SpendingCategoriesChart/SpendingCategoriesChart";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -13,7 +13,7 @@ import SelectLastNMonths from "~/components/SelectLastNMonths/SelectLastNMonths"
 
 const SpendingCategoriesTab = (): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs } = useLocale();
+  const { dayjs, dayjsLocale } = useLocale();
   const { allTransactionCategories } = useTransactionCategories();
 
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([
@@ -26,6 +26,12 @@ const SpendingCategoriesTab = (): React.ReactNode => {
       year: dayjs(month).year(),
     })),
   });
+
+  const timeToMonthlyTotalsMap = React.useMemo(
+    () =>
+      buildTimeToMonthlyTotalsMap(selectedMonths, transactionsQuery.data ?? []),
+    [selectedMonths, transactionsQuery.data],
+  );
 
   const [showSubcategories, setShowSubcategories] = React.useState(true);
 
@@ -60,12 +66,12 @@ const SpendingCategoriesTab = (): React.ReactNode => {
       <MonthToolcards
         selectedDates={selectedMonths}
         setSelectedDates={setSelectedMonths}
-        timeToMonthlyTotalsMap={buildTimeToMonthlyTotalsMap(
-          selectedMonths,
-          transactionsQuery.data ?? [],
-        )}
+        getMonthStatus={(date) =>
+          getMonthToolcardStatus(timeToMonthlyTotalsMap, date)
+        }
         isPending={transactionsQuery.isPending}
         allowSelectMultiple
+        locale={dayjsLocale}
       />
       <Group w="100%" justify="space-between">
         <Button

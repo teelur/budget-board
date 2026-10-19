@@ -24,7 +24,7 @@
   width: 32%;
   height: 2px;
   margin-bottom: -2px;
-  background-color: var(--mantine-primary-color-filled);
+  background-color: var(--bbui-color-primary);
   pointer-events: none;
   animation: transactionPending 1.1s ease-in-out infinite;
 }

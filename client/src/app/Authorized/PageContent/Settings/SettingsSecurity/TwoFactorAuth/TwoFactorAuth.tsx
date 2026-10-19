@@ -146,8 +146,8 @@ const TwoFactorAuth = (): React.ReactNode => {
               value={buildAuthenticatorUrl(
                 twoFactorAuthQuery.data?.sharedKey ?? "",
               )}
-              bgColor="var(--background-color-surface)"
-              fgColor="var(--base-color-text-primary)"
+              bgColor="var(--bbui-color-surface)"
+              fgColor="var(--bbui-color-text-heading)"
             />
             <Group>
               <Code>{formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}</Code>

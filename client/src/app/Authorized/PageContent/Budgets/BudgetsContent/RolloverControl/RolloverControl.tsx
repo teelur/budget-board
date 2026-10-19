@@ -39,7 +39,7 @@ const RolloverControl = (props: RolloverControlProps): React.ReactNode => {
           props.rolloverStartMonth === null ? props.disabledReason : undefined
         }
         styles={{
-          description: { color: "var(--bb-color-warning)" },
+          description: { color: "var(--bbui-color-warning)" },
         }}
         size={props.size ?? "xs"}
       />
