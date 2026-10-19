@@ -11,7 +11,6 @@ import {
   createTheme,
   CSSVariablesResolver,
   MantineProvider,
-  Notification,
 } from "@mantine/core";
 import {
   QueryCache,
@@ -23,7 +22,7 @@ import {
   Notifications,
   type NotificationData,
 } from "@mantine/notifications";
-import { budgetBoardColors } from "@teelur/budget-board-ui";
+import { budgetBoardColors, Notification } from "@teelur/budget-board-ui";
 import {
   AlertCircle,
   CircleCheckIcon,
@@ -154,52 +153,6 @@ const theme = createTheme({
     blue,
     orange,
     red,
-  },
-  components: {
-    Notification: {
-      defaultProps: {
-        radius: "xs",
-        withBorder: true,
-      },
-      styles: {
-        root: {
-          backgroundColor:
-            "color-mix(in srgb, var(--notification-color) 15%, var(--background-color-elevated))",
-          borderColor:
-            "color-mix(in srgb, var(--notification-color) 35%, var(--elevated-color-border))",
-          boxShadow: "var(--mantine-shadow-lg)",
-          padding: "var(--mantine-spacing-sm)",
-        },
-        icon: {
-          width: 24,
-          height: 24,
-          marginInlineEnd: "var(--mantine-spacing-sm)",
-        },
-        loader: {
-          width: 24,
-          height: 24,
-          marginInlineEnd: "var(--mantine-spacing-sm)",
-        },
-        body: {
-          marginInlineEnd: "var(--mantine-spacing-xs)",
-        },
-        title: {
-          color: "var(--base-color-text-primary)",
-          fontFamily: "Plus Jakarta Sans Variable, sans-serif",
-          fontSize: "var(--mantine-font-size-xs)",
-          fontWeight: 600,
-        },
-        description: {
-          color: "var(--base-color-text-secondary)",
-          fontFamily: "IBM Plex Sans Variable, sans-serif",
-          overflowWrap: "anywhere",
-        },
-        closeButton: {
-          color: "var(--base-color-text-dimmed)",
-          flexShrink: 0,
-        },
-      },
-    },
   },
 });
 
