@@ -1,5 +1,5 @@
-import { Combobox, useCombobox } from "@mantine/core";
-import { BodyText, TextInput } from "@teelur/budget-board-ui";
+import { useCombobox } from "@mantine/core";
+import { BodyText, Combobox, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import {
   METRIC_RANGE_ENDPOINTS,
