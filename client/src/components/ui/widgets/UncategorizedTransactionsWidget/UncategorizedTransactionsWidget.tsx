@@ -1,9 +1,10 @@
-import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Group, ScrollArea, Stack } from "@mantine/core";
 import {
   BodyText,
   Card,
   HeadingText,
   Pagination,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import {
   getTransactionsByCategory,
@@ -63,7 +64,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
 
   const getWidgetContent = () => {
     if (transactionsQuery.isPending) {
-      return <Skeleton h="100%" radius="md" />;
+      return <Skeleton h="100%" />;
     }
 
     if (sortedFilteredTransactions.length === 0) {

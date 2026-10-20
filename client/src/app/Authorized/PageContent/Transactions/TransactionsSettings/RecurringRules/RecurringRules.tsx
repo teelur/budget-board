@@ -1,4 +1,4 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
@@ -8,6 +8,7 @@ import {
   Card,
   HeadingText,
   Modal,
+  Skeleton,
   Tooltip,
 } from "@teelur/budget-board-ui";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";

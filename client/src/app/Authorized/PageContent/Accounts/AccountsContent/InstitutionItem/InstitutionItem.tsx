@@ -1,5 +1,5 @@
-import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { Button, Card } from "@teelur/budget-board-ui";
+import { Flex, Group, Stack } from "@mantine/core";
+import { Button, Card, LoadingOverlay } from "@teelur/budget-board-ui";
 import { IInstitution } from "~/models/institution";
 import AccountItem from "./AccountItem/AccountItem";
 import { GripVertical } from "lucide-react";

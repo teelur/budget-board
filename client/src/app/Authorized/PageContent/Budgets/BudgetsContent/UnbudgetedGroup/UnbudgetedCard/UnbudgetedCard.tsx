@@ -1,9 +1,10 @@
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
   BodyText,
   Card,
+  LoadingOverlay,
 } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";

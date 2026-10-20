@@ -1,10 +1,10 @@
-import { LoadingOverlay, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useUpdateUserSettingsMutation } from "~/hooks/mutations/userSettings/useUpdateUserSettingsMutation";
-import { Select } from "@teelur/budget-board-ui";
+import { LoadingOverlay, Select } from "@teelur/budget-board-ui";
 
 const ForceSyncLookbackPeriod = (): React.ReactNode => {
   interface IForceSyncOverrideOption {

@@ -1,5 +1,5 @@
-import { Flex, Group, Skeleton } from "@mantine/core";
-import { Card, HeadingText } from "@teelur/budget-board-ui";
+import { Flex, Group } from "@mantine/core";
+import { Card, HeadingText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { filterVisibleAccounts } from "~/helpers/accounts";
 import { filterVisibleAssets } from "~/helpers/assets";
@@ -32,7 +32,7 @@ const NetWorthWidget = ({
     if (accountsQuery.isPending || assetsQuery.isPending) {
       return (
         <Flex p="0.5rem" h="100%" w="100%">
-          <Skeleton height="100%" radius="md" />
+          <Skeleton height="100%" />
         </Flex>
       );
     }

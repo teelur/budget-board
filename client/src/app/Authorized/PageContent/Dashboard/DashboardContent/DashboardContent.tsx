@@ -1,4 +1,5 @@
-import { Box, Flex, Group, Skeleton, Stack } from "@mantine/core";
+import { Box, Flex, Group, Stack } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import { useMediaQuery } from "@mantine/hooks";
 import { InfoIcon } from "lucide-react";
 import React from "react";
@@ -27,7 +28,6 @@ import FlowsWidget from "~/components/ui/widgets/FlowsWidget/FlowsWidget";
 import { useTranslation } from "react-i18next";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
-import { BodyText } from "@teelur/budget-board-ui";
 
 const SKELETON_COUNT = 4;
 const SM_PREVIEW_WIDTH = 500;
@@ -168,7 +168,7 @@ const DashboardContent = ({
       {widgetSettingsQuery.isPending ? (
         <Stack gap="md">
           {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-            <Skeleton key={i} height={GRID_ROW_HEIGHT * 5} radius="md" />
+            <Skeleton key={i} height={GRID_ROW_HEIGHT * 5} />
           ))}
         </Stack>
       ) : showEmptyMessage ? (

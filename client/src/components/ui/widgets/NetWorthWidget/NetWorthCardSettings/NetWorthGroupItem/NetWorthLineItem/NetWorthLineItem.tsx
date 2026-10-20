@@ -1,9 +1,10 @@
-import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
 import {
   ActionIcon,
   BodyText,
   Button,
   Card,
+  LoadingOverlay,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { INetWorthWidgetLine } from "~/models/widgetSettings";

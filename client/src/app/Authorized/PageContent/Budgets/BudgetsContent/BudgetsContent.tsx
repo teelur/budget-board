@@ -1,4 +1,7 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import classes from "./BudgetsContent.module.css";
+
+import { Group, Stack } from "@mantine/core";
+import { HeadingText, Skeleton } from "@teelur/budget-board-ui";
 import { IBudget } from "~/models/budget";
 import { buildCategoriesTree, getParentCategory } from "~/helpers/category";
 import { CategoryTypes } from "~/models/category";
@@ -18,8 +21,6 @@ import { buildCategoryToRecurringForecastTotalMap } from "~/helpers/recurringRul
 import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
 import { useRecurringForecastQueries } from "~/hooks/queries/useRecurringForecastQueries";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import classes from "./BudgetsContent.module.css";
-import { HeadingText } from "@teelur/budget-board-ui";
 
 interface BudgetsContentProps {
   budgets: IBudget[];
@@ -142,7 +143,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             {t("income")}
           </HeadingText>
           {props.isPending ? (
-            <Skeleton h={65} radius="md" />
+            <Skeleton h={65} />
           ) : (
             <BudgetsGroup
               budgets={incomeBudgets}
@@ -156,7 +157,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             />
           )}
           {props.isPending ? (
-            <Skeleton h={65} radius="md" />
+            <Skeleton h={65} />
           ) : (
             <UnbudgetedGroup
               categoryTree={unbudgetedIncomeCategoryTree}
@@ -171,7 +172,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             {t("expenses")}
           </HeadingText>
           {props.isPending ? (
-            <Skeleton h={65} radius="md" />
+            <Skeleton h={65} />
           ) : (
             <BudgetsGroup
               budgets={expenseBudgets}
@@ -185,7 +186,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             />
           )}
           {props.isPending ? (
-            <Skeleton h={65} radius="md" />
+            <Skeleton h={65} />
           ) : (
             <UnbudgetedGroup
               categoryTree={unbudgetedExpenseCategoryTree}

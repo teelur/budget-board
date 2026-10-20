@@ -1,10 +1,11 @@
-import { Group, Paper, Skeleton, Stack } from "@mantine/core";
+import { Group, Paper, Stack } from "@mantine/core";
 import {
   Alert,
   BodyText,
   Button,
   Modal,
   NumberInput,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";

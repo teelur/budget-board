@@ -1,5 +1,11 @@
-import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
-import { ActionIcon, BodyText, Button, Card } from "@teelur/budget-board-ui";
+import { Flex, Group, Stack } from "@mantine/core";
+import {
+  ActionIcon,
+  BodyText,
+  Button,
+  Card,
+  LoadingOverlay,
+} from "@teelur/budget-board-ui";
 import {
   INetWorthWidgetGroup,
   INetWorthWidgetLine,

@@ -1,5 +1,5 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";
 import { IGoalResponse } from "~/models/goal";
 import { AxiosError } from "axios";
@@ -64,7 +64,7 @@ const Goals = (): React.ReactNode => {
 
   const getContent = () => {
     if (goalsQuery.isPending) {
-      return <Skeleton h={100} w="100%" radius="lg" />;
+      return <Skeleton h={100} w="100%" />;
     }
 
     if (goalCategory === GoalCategory.Completed) {

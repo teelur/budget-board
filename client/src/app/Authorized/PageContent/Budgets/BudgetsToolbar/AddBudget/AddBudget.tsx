@@ -1,7 +1,8 @@
-import { LoadingOverlay, Stack, Group } from "@mantine/core";
+import { Stack, Group } from "@mantine/core";
 import {
   Button,
   CategorySelect,
+  LoadingOverlay,
   NumberInput,
   Popover,
 } from "@teelur/budget-board-ui";

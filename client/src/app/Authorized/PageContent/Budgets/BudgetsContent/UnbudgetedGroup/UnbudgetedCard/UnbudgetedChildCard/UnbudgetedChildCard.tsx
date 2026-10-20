@@ -1,13 +1,15 @@
 import classes from "./UnbudgetedChildCard.module.css";
-import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
-import { Group, LoadingOverlay } from "@mantine/core";
+
+import { Group } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
   BodyText,
   Card,
+  LoadingOverlay,
 } from "@teelur/budget-board-ui";
 import { CornerDownRightIcon, PlusIcon } from "lucide-react";
+import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import React from "react";
 import { roundAwayFromZero } from "~/helpers/utils";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";

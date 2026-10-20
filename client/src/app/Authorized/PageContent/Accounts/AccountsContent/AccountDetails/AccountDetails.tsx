@@ -1,10 +1,11 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   BodyText,
   Button,
   CollapsibleCard,
   Drawer,
   HeadingText,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
@@ -55,7 +56,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
       title={t("account_details")}
     >
       {!props.account ? (
-        <Skeleton height={425} radius="lg" />
+        <Skeleton height={425} />
       ) : (
         <Stack gap="1rem">
           <Group justify="space-between" align="center">
@@ -152,9 +153,7 @@ const AccountDetails = (props: AccountDetailsProps): React.ReactNode => {
               }
             >
               <Stack gap="0.5rem">
-                {balancesQuery.isPending && (
-                  <Skeleton height={20} radius="lg" />
-                )}
+                {balancesQuery.isPending && <Skeleton height={20} />}
                 {sortedBalances.length === 0 ? (
                   <Group justify="center">
                     <BodyText tone="muted" size="sm">

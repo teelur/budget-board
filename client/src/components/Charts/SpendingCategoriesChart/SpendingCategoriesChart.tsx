@@ -1,11 +1,10 @@
 import {
   getThemeColor,
   Group,
-  Skeleton,
   Stack,
   useMantineTheme,
 } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import {
   hiddenTransactionCategory,
   ITransaction,
@@ -242,7 +241,7 @@ const SpendingCategoriesChart = (
   );
 
   if (props.isPending) {
-    return <Skeleton height={isNarrow ? 270 : 425} radius="lg" />;
+    return <Skeleton height={isNarrow ? 270 : 425} />;
   }
 
   if (props.transactions.length === 0) {

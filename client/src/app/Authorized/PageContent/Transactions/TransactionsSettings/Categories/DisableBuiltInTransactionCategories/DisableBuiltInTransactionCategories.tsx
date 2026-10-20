@@ -1,5 +1,5 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
-import { BodyText, Button, Popover } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Button, Popover, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ const DisableBuiltInTransactionCategories = (): React.ReactNode => {
   const [isConfirmationOpen, setIsConfirmationOpen] = React.useState(false);
 
   if (transactionsQuery.isPending) {
-    return <Skeleton height={75} radius="md" />;
+    return <Skeleton height={75} />;
   }
 
   const builtInCategoryValues = new Set(

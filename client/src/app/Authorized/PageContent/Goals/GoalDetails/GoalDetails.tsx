@@ -1,10 +1,11 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   Button,
   Card,
   CollapsibleCard,
   Drawer,
   HeadingText,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import { IGoalResponse } from "~/models/goal";
 import React from "react";
@@ -40,7 +41,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
 
   const getContent = () => {
     if (props.goal === null) {
-      return <Skeleton height={425} radius="lg" />;
+      return <Skeleton height={425} />;
     }
 
     return (

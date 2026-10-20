@@ -1,12 +1,16 @@
 import {
   Group,
-  LoadingOverlay,
   MantineColorScheme,
   Stack,
   useMantineColorScheme,
 } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { NumberInput, Select, TextInput } from "@teelur/budget-board-ui";
+import {
+  LoadingOverlay,
+  NumberInput,
+  Select,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import {

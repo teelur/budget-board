@@ -1,5 +1,5 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import DeletedAssetCard from "./DeletedAssetCard";
@@ -11,7 +11,7 @@ const DeletedAssets = (): React.ReactNode => {
 
   const getDeletedAssetsContent = (): React.ReactNode => {
     if (assetsQuery.isPending) {
-      return <Skeleton height={46} radius="md" />;
+      return <Skeleton height={46} />;
     }
 
     const deletedAssets = (assetsQuery.data ?? []).filter(

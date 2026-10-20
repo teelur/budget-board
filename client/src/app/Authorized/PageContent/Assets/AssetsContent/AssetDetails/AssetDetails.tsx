@@ -1,4 +1,4 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   Button,
   AmountText,
@@ -6,6 +6,7 @@ import {
   BodyText,
   CollapsibleCard,
   Drawer,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { MoveRightIcon } from "lucide-react";
@@ -61,7 +62,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       title={t("asset_details")}
     >
       {!props.asset ? (
-        <Skeleton height={425} radius="lg" />
+        <Skeleton height={425} />
       ) : (
         <Stack gap="0.5rem">
           <Stack gap={0}>
@@ -209,7 +210,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
               }
             >
               <Stack gap="0.5rem">
-                {valuesQuery.isPending && <Skeleton height={20} radius="lg" />}
+                {valuesQuery.isPending && <Skeleton height={20} />}
                 {sortedValues.length === 0 ? (
                   <Group justify="center">
                     <BodyText tone="muted" size="sm">
