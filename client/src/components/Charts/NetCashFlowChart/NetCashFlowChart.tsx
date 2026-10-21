@@ -1,31 +1,19 @@
-import { Group } from "@mantine/core";
-import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
-import { BodyText, Skeleton } from "@teelur/budget-board-ui";
+import { NetCashFlowChart as BBNetCashFlowChart } from "@teelur/budget-board-ui";
 import { SignDisplay } from "~/helpers/currency";
 import { getTransactionsForMonth } from "~/helpers/transactions";
 import { areStringsEqual } from "~/helpers/utils";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
-import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { CategoryTypes } from "~/models/category";
 
-interface ChartDatum {
-  month: string;
-  Income: number;
-  Spending: number;
-  Net: number;
-}
-
 interface NetCashFlowChartProps {
   transactions: ITransaction[];
   months: Date[];
   isPending?: boolean;
-  includeGrid?: boolean;
-  includeYAxis?: boolean;
 }
 
 const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
@@ -34,103 +22,70 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
   const { getCategoryType } = useTransactionCategories();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
 
-  const sortedMonths = props.months.sort(
-    (a, b) =>
-      dayjs(a).startOf("month").valueOf() - dayjs(b).startOf("month").valueOf(),
+  const chartData = React.useMemo(
+    () =>
+      [...props.months]
+        .sort(
+          (a, b) =>
+            dayjs(a).startOf("month").valueOf() -
+            dayjs(b).startOf("month").valueOf(),
+        )
+        .map((month) => {
+          const transactionsForMonth = getTransactionsForMonth(
+            props.transactions,
+            month,
+          );
+
+          const income = transactionsForMonth.reduce(
+            (acc: number, curr: ITransaction) =>
+              areStringsEqual(
+                getCategoryType(curr.category ?? ""),
+                CategoryTypes.Income,
+              )
+                ? acc + curr.amount
+                : acc,
+            0,
+          );
+
+          const spending = transactionsForMonth.reduce(
+            (acc: number, curr: ITransaction) =>
+              areStringsEqual(
+                getCategoryType(curr.category ?? ""),
+                CategoryTypes.Expense,
+              )
+                ? acc + curr.amount
+                : acc,
+            0,
+          );
+
+          return {
+            month: dayjs(month).format("MMMM YYYY"),
+            income,
+            spending,
+            net: income + spending,
+          };
+        }),
+    [dayjs, getCategoryType, props.months, props.transactions],
   );
 
-  const buildChartData = (): ChartDatum[] => {
-    const spendingTrendsChartData: ChartDatum[] = [];
-
-    sortedMonths.forEach((month) => {
-      const transactionsForMonth = getTransactionsForMonth(
-        props.transactions,
-        month,
-      );
-
-      const incomeTotal = transactionsForMonth.reduce(
-        (acc: number, curr: ITransaction) =>
-          areStringsEqual(
-            getCategoryType(curr.category ?? ""),
-            CategoryTypes.Income,
-          )
-            ? acc + curr.amount
-            : acc,
-        0,
-      );
-
-      const spendingTotal = transactionsForMonth.reduce(
-        (acc: number, curr: ITransaction) =>
-          areStringsEqual(
-            getCategoryType(curr.category ?? ""),
-            CategoryTypes.Expense,
-          )
-            ? acc + curr.amount
-            : acc,
-        0,
-      );
-
-      spendingTrendsChartData.push({
-        month: dayjs(month).format("MMMM YYYY"),
-        Income: incomeTotal,
-        Spending: spendingTotal,
-        Net: incomeTotal + spendingTotal,
-      });
-    });
-    return spendingTrendsChartData;
-  };
-
-  const chartSeries: CompositeChartSeries[] = [
-    { name: "Income", label: t("income"), color: "green.6", type: "bar" },
-    { name: "Spending", label: t("spending"), color: "red.6", type: "bar" },
-    { name: "Net", label: t("net"), color: "gray.0", type: "line" },
-  ];
-
-  const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
-  };
-
-  if (props.isPending) {
-    return <Skeleton height={425} />;
-  }
-
-  if (props.months.length === 0) {
-    return (
-      <Group justify="center">
-        <BodyText tone="muted" size="sm">
-          {t("select_a_month_to_display_the_chart")}
-        </BodyText>
-      </Group>
-    );
-  }
+  const chartValueFormatter = React.useCallback(
+    (value: number) =>
+      formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0),
+    [formatSensitiveAmount],
+  );
 
   return (
-    <CompositeChart
-      h={400}
-      w="100%"
-      data={buildChartData()}
-      series={chartSeries}
-      withLegend
-      dataKey="month"
-      composedChartProps={{ stackOffset: "sign" }}
-      barProps={{
-        stackId: "stack",
-        fillOpacity: 0.4,
-        strokeOpacity: 1,
+    <BBNetCashFlowChart
+      ariaLabel={t("net_cash_flow")}
+      data={chartData}
+      emptyMessage={t("select_a_month_to_display_the_chart")}
+      formatValue={chartValueFormatter}
+      isLoading={props.isPending}
+      seriesLabels={{
+        income: t("income"),
+        spending: t("spending"),
+        net: t("net"),
       }}
-      lineProps={{ type: "linear" }}
-      tooltipAnimationDuration={200}
-      tooltipProps={{
-        content: ({ label, payload }) => (
-          <ChartTooltip
-            label={label}
-            payload={payload}
-            series={chartSeries}
-            valueFormatter={chartValueFormatter}
-          />
-        ),
-      }}
-      valueFormatter={chartValueFormatter}
     />
   );
 };
