@@ -132,6 +132,13 @@ export const buildSpendingCategoryChartData = (
   }));
 };
 
+export interface ISpendingSubcategoryChartData {
+  name: string;
+  value: number;
+  color: string;
+  parent: string;
+}
+
 /**
  * Builds subcategory-level chart data for the outer ring of a two-ring pie chart.
  * Entries are ordered to align with the inner ring (grouped by parent).
@@ -141,7 +148,7 @@ export const buildSpendingSubcategoryChartData = (
   transactions: ITransaction[],
   categories: ICategory[],
   innerChartData: { name: string; color: string }[],
-): any[] => {
+): ISpendingSubcategoryChartData[] => {
   const filteredTransactions = transactions.filter(
     (transaction) =>
       !areStringsEqual(transaction.category ?? "", hiddenTransactionCategory),
@@ -174,7 +181,7 @@ export const buildSpendingSubcategoryChartData = (
   });
 
   const shadeSteps = [4, 7, 3, 8, 2, 9, 5];
-  const result: any[] = [];
+  const result: ISpendingSubcategoryChartData[] = [];
 
   innerChartData.forEach((parent) => {
     const colorFamily = parent.color.split(".")[0] ?? "gray";
