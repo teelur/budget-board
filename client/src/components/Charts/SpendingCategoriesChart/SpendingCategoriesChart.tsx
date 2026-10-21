@@ -39,7 +39,6 @@ const SpendingCategoriesChart = ({
     () =>
       transactions.filter(
         (tx) =>
-          tx.amount < 0 &&
           !areStringsEqual(tx.category, hiddenTransactionCategory) &&
           areStringsEqual(
             getCategoryType(tx.category ?? ""),

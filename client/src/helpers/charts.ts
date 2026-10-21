@@ -92,15 +92,14 @@ export const buildTransactionChartSeries = (
   }));
 
 /**
- * Builds chart data for spending categories based on a list of transactions and categories.
+ * Builds chart data for net spending by category.
  *
- * Iterates through each transaction, determines its formatted category name,
- * and aggregates the transaction amounts by category. The result is an array
- * of objects, each representing a category and the total amount spent in that category.
+ * Expense transactions are signed so refunds reduce the category total. Categories
+ * with a non-positive net total are omitted because pie slices must be positive.
  *
  * @param transactions - An array of transaction objects to be aggregated.
  * @param categories - An array of category objects used to format and match transaction categories.
- * @returns An array of objects, each containing a `name` (category) and `value` (total amount spent).
+ * @returns Positive net totals grouped by category.
  */
 export const buildSpendingCategoryChartData = (
   transactions: ITransaction[],
@@ -125,11 +124,13 @@ export const buildSpendingCategoryChartData = (
     );
   });
 
-  return Array.from(totalsMap.entries()).map(([name, value], i) => ({
-    name,
-    value,
-    color: chartColors[i % chartColors.length] ?? "gray.6",
-  }));
+  return Array.from(totalsMap.entries())
+    .filter(([, value]) => value > 0)
+    .map(([name, value], i) => ({
+      name,
+      value,
+      color: chartColors[i % chartColors.length] ?? "gray.6",
+    }));
 };
 
 export interface ISpendingSubcategoryChartData {
@@ -141,13 +142,14 @@ export interface ISpendingSubcategoryChartData {
 
 /**
  * Builds subcategory-level chart data for the outer ring of a two-ring pie chart.
- * Entries are ordered to align with the inner ring (grouped by parent).
+ * Non-positive net slices are omitted and remaining values are scaled to their
+ * parent's net total so the outer ring aligns with the inner ring.
  * Color shades are derived from the parent's color family.
  */
 export const buildSpendingSubcategoryChartData = (
   transactions: ITransaction[],
   categories: ICategory[],
-  innerChartData: { name: string; color: string }[],
+  innerChartData: { name: string; color: string; value: number }[],
 ): ISpendingSubcategoryChartData[] => {
   const filteredTransactions = transactions.filter(
     (transaction) =>
@@ -185,13 +187,21 @@ export const buildSpendingSubcategoryChartData = (
 
   innerChartData.forEach((parent) => {
     const colorFamily = parent.color.split(".")[0] ?? "gray";
-    const subs = [...subMap.values()].filter((s) => s.parent === parent.name);
+    const subs = [...subMap.values()].filter(
+      (s) => s.parent === parent.name && s.value > 0,
+    );
+    const positiveTotal = subs.reduce((total, sub) => total + sub.value, 0);
+    if (positiveTotal === 0) {
+      return;
+    }
+    const scale = parent.value / positiveTotal;
+
     subs.forEach((sub, i) => {
       const shade =
         subs.length === 1 ? 6 : (shadeSteps[i % shadeSteps.length] ?? 6);
       result.push({
         name: sub.name,
-        value: sub.value,
+        value: sub.value * scale,
         color: `${colorFamily}.${shade}`,
         parent: sub.parent,
       });
