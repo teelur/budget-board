@@ -65,7 +65,7 @@ const NetCashFlowChart = (props: NetCashFlowChartProps): React.ReactNode => {
             net: income + spending,
           };
         }),
-    [dayjs, getCategoryType, props.months, props.transactions],
+    [dayjs, getCategoryType, props.months, props.transactions, t],
   );
 
   const chartValueFormatter = React.useCallback(
