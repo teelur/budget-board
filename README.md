@@ -15,6 +15,11 @@ A simple app for tracking monthly spending and working towards financial goals.
 
 Check out the [wiki](https://budgetboard.net/) for instructions on how to setup Budget Board.
 
+## One-Click Deploy
+
+<a href="https://repocloud.io/details/Budget%20Board/"><img src="https://d16t0pc4846x52.cloudfront.net/deploylobe.svg" alt="Deploy on RepoCloud" height="42"></a>
+<a href="https://railway.com/deploy/budget-board"><img src="https://railway.com/button.svg" alt="Deploy on Railway" height="42"></a>
+
 ## About The Project
 
 I created this app to be a self-hosted alternative to the now-shut-down personal finance app Mint.
