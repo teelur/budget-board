@@ -1,3 +1,9 @@
+import type {
+  FlowsChartData,
+  FlowType,
+  SpendingChartData,
+  SpendingChartSeries,
+} from "@teelur/budget-board-ui";
 import {
   hiddenTransactionCategory,
   ITransaction,
@@ -12,6 +18,8 @@ import { getDaysInMonth } from "./datetime";
 import { areStringsEqual } from "./utils";
 import { getFormattedCategoryValue, getParentCategory } from "./category";
 import { ICategory } from "~/models/category";
+
+export type { FlowsChartData, FlowType } from "@teelur/budget-board-ui";
 
 export const chartColors = [
   "indigo.6",
@@ -35,9 +43,10 @@ export const buildTransactionChartData = (
   months: Date[],
   transactions: ITransaction[],
   formatDateString: (date: Date) => string,
-): any[] => {
-  const spendingTrendsChartData: any[] = [];
+): SpendingChartData[] => {
+  const spendingTrendsChartData: SpendingChartData[] = [];
   months.forEach((month) => {
+    const seriesKey = formatDateString(month);
     const transactionsForMonth = getTransactionsForMonth(transactions, month);
 
     // If it is the current month, we only want to show the data up to today's date.
@@ -62,13 +71,13 @@ export const buildTransactionChartData = (
 
         // On the very first loop, we need to create the data point.
         if (chartDay == null) {
-          const newChartDay: any = {
+          const newChartDay: SpendingChartData = {
             day: rollingTotalTransaction.day,
-            [formatDateString(month)]: rollingTotalTransaction.amount,
+            [seriesKey]: rollingTotalTransaction.amount,
           };
           spendingTrendsChartData.push(newChartDay);
         } else {
-          chartDay[formatDateString(month)] = rollingTotalTransaction.amount;
+          chartDay[seriesKey] = rollingTotalTransaction.amount;
         }
       },
     );
@@ -80,16 +89,16 @@ export const buildTransactionChartData = (
  * Builds the series for the transaction chart.
  *
  * @param months - An array of Date objects representing each month to include.
- * @returns An array of objects containing the name of the month and the color to use.
+ * @returns BBUI series definitions keyed and labeled by formatted month.
  */
 export const buildTransactionChartSeries = (
   months: Date[],
   formatDateString: (date: Date) => string,
-): { name: string; color: string }[] =>
-  months.map((month, i) => ({
-    name: formatDateString(month),
-    color: chartColors[i % chartColors.length] ?? "gray.6",
-  }));
+): SpendingChartSeries[] =>
+  months.map((month) => {
+    const label = formatDateString(month);
+    return { key: label, label };
+  });
 
 /**
  * Builds chart data for net spending by category.
@@ -210,33 +219,6 @@ export const buildSpendingSubcategoryChartData = (
 
   return result;
 };
-
-export type FlowType = "income" | "expense" | "surplus" | "deficit";
-
-export interface FlowsChartNode {
-  name: string;
-  color?: string;
-  flowType?: FlowType;
-  parentName?: string;
-  transactionCount?: number;
-  [key: string]: unknown;
-}
-
-export interface FlowsChartLink {
-  source: number;
-  target: number;
-  value: number;
-  transactionCount?: number;
-  flowType?: FlowType;
-  [key: string]: unknown;
-}
-
-export interface FlowsChartData {
-  nodes: FlowsChartNode[];
-  links: FlowsChartLink[];
-  totalIncome: number;
-  totalSpending: number;
-}
 
 interface FlowsChartLabels {
   cashAvailable: string;

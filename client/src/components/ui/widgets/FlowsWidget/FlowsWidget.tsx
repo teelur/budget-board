@@ -66,9 +66,20 @@ const FlowsWidget = ({
     <>
       <Card w="100%" h="100%">
         <Card.Section>
-          <Group gap="0.5rem" align="flex-end">
-            <GitBranchIcon size="1.5rem" color="var(--bbui-color-primary)" />
-            <HeadingText level={4}>{t("flows")}</HeadingText>
+          <Group
+            gap="0.5rem"
+            align="center"
+            justify="space-between"
+            wrap="wrap"
+          >
+            <Group gap="0.5rem" align="center">
+              <GitBranchIcon
+                size="1.25rem"
+                color="var(--bbui-color-primary)"
+                aria-hidden="true"
+              />
+              <HeadingText level={4}>{t("flows")}</HeadingText>
+            </Group>
             <BodyText tone="secondary" size="xs">
               {t("flows_widget_month_range", { range: monthRange })}
             </BodyText>
