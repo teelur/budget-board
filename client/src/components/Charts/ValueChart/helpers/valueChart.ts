@@ -1,5 +1,4 @@
 import { DateString, getUniqueDates } from "~/helpers/datetime";
-import { chartColors } from "~/helpers/charts";
 import dayjs from "dayjs";
 
 export interface IValue {
@@ -19,19 +18,12 @@ interface ValueChartData {
   [key: string]: number | string;
 }
 
-/**
- * Builds the series for the value chart.
- * @param items
- * @returns An array of objects containing the item ID, name, and color to use.
- */
+/** Builds chart series metadata from the selected items. */
 export const buildValueChartSeries = (items: IItem[]) =>
-  items.map((item: IItem) => {
-    return {
-      name: item.id,
-      label: item.name,
-      color: chartColors[items.indexOf(item) % chartColors.length] ?? "gray.6",
-    };
-  });
+  items.map((item) => ({
+    key: item.id,
+    label: item.name,
+  }));
 
 /**
  * Builds data for a value chart based on provided values and date range.

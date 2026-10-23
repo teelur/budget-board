@@ -31,24 +31,26 @@ const FlowsTab = (): React.ReactNode => {
   );
 
   return (
-    <Stack p="0.5rem">
-      <MonthToolcards
-        selectedDates={selectedMonths}
-        setSelectedDates={setSelectedMonths}
-        getMonthStatus={(date) =>
-          getMonthToolcardStatus(timeToMonthlyTotalsMap, date)
-        }
-        isPending={transactionsQuery.isPending}
-        allowSelectMultiple
-        locale={dayjsLocale}
-      />
-      <SelectLastNMonths
-        monthButtons={monthButtons}
-        selectedMonths={selectedMonths}
-        setSelectedMonths={setSelectedMonths}
-        size="compact-sm"
-        showClearButton
-      />
+    <Stack gap="lg" p="0.5rem">
+      <Stack gap="sm">
+        <MonthToolcards
+          selectedDates={selectedMonths}
+          setSelectedDates={setSelectedMonths}
+          getMonthStatus={(date) =>
+            getMonthToolcardStatus(timeToMonthlyTotalsMap, date)
+          }
+          isPending={transactionsQuery.isPending}
+          allowSelectMultiple
+          locale={dayjsLocale}
+        />
+        <SelectLastNMonths
+          monthButtons={monthButtons}
+          selectedMonths={selectedMonths}
+          setSelectedMonths={setSelectedMonths}
+          size="compact-sm"
+          showClearButton
+        />
+      </Stack>
       <FlowsChart
         transactions={transactionsQuery.data ?? []}
         categories={allTransactionCategories}

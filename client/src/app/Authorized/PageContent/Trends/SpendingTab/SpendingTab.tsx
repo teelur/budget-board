@@ -51,7 +51,7 @@ const SpendingTab = (): React.ReactNode => {
         showClearButton
       />
       <SpendingChart
-        h={400}
+        height={400}
         transactions={transactionsQuery.data ?? []}
         months={selectedMonths}
         isPending={transactionsQuery.isPending}

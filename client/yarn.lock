@@ -1062,19 +1062,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/charts@npm:^9.6.1":
-  version: 9.6.1
-  resolution: "@mantine/charts@npm:9.6.1"
-  peerDependencies:
-    "@mantine/core": 9.6.1
-    "@mantine/hooks": 9.6.1
-    react: ^19.2.0
-    react-dom: ^19.2.0
-    recharts: ">=3.2.1"
-  checksum: 10c0/17f38af4d8c9acb2278122c8124197eb37294ea9d10fa614d8ddacfd1b86dc0e0134e5dd6912145b20df87903f528da4a3affe1a6b1372af7dbea7621f977bad
-  languageName: node
-  linkType: hard
-
 "@mantine/code-highlight@npm:^9.6.1":
   version: 9.6.1
   resolution: "@mantine/code-highlight@npm:9.6.1"
@@ -1671,9 +1658,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@teelur/budget-board-ui@npm:^0.2.0-canary.83.8784535":
-  version: 0.2.0-canary.83.8784535
-  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.83.8784535"
+"@teelur/budget-board-ui@npm:^0.2.0-canary.84.51a592f":
+  version: 0.2.0-canary.84.51a592f
+  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.84.51a592f"
   dependencies:
     "@fontsource-variable/ibm-plex-sans": "npm:^5.3.0"
     "@fontsource-variable/plus-jakarta-sans": "npm:^5.3.0"
@@ -1687,7 +1674,7 @@ __metadata:
     react-dom: ^19.3.0
     react-is: ^19.0.0
     recharts: ^3.10.1
-  checksum: 10c0/a05f2a79c79c3d8ed27e538ba6351bf43ad73cfa743356b8b773879b01cf5a6611ff7d4fcd9cadd20aa066428d0ab50a733f73a225e9d224813e6a49440d03da
+  checksum: 10c0/89031e9084c4a1b3586ab264cd067900376f38299c31bce773100f4ee946e4bfc545e9a1a529b0923a5b047fcf719fe1b8e0ac49d341a02084b52b903ed9f1be
   languageName: node
   linkType: hard
 
@@ -2526,7 +2513,6 @@ __metadata:
     "@fontsource-variable/plus-jakarta-sans": "npm:^5.3.0"
     "@icons-pack/react-simple-icons": "npm:^13.15.1"
     "@mantine/carousel": "npm:^9.6.1"
-    "@mantine/charts": "npm:^9.6.1"
     "@mantine/code-highlight": "npm:^9.6.1"
     "@mantine/core": "npm:^9.6.1"
     "@mantine/dates": "npm:^9.6.1"
@@ -2542,7 +2528,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.104.1"
     "@tanstack/react-query-devtools": "npm:^5.104.1"
     "@tanstack/react-virtual": "npm:^3.14.13"
-    "@teelur/budget-board-ui": "npm:^0.2.0-canary.83.8784535"
+    "@teelur/budget-board-ui": "npm:^0.2.0-canary.84.51a592f"
     "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^26.6.4"
     "@types/papaparse": "npm:^5.5.2"
