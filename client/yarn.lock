@@ -815,6 +815,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/ibm-plex-mono@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource/ibm-plex-mono@npm:5.3.0"
+  checksum: 10c0/4aaf5a3c9efc7c32de4fa46ff3187ac63720904beab825f331ac01800038899761da23270f09d3fb5cff22f7cdc366904834854e2107229ad60833bba71c223d
+  languageName: node
+  linkType: hard
+
 "@formatjs/ecma402-abstract@npm:2.3.6":
   version: 2.3.6
   resolution: "@formatjs/ecma402-abstract@npm:2.3.6"
@@ -1052,19 +1059,6 @@ __metadata:
     react: ^19.2.0
     react-dom: ^19.2.0
   checksum: 10c0/e02f3daa6484e1aa2d1eb8292804e521e2e7977aa1cc640e13676a113c5b52dc6f9deb69b184be34f8838c846ac321d7df27aa3ebcff760ce1685d4bd7b567ac
-  languageName: node
-  linkType: hard
-
-"@mantine/charts@npm:^9.6.1":
-  version: 9.6.1
-  resolution: "@mantine/charts@npm:9.6.1"
-  peerDependencies:
-    "@mantine/core": 9.6.1
-    "@mantine/hooks": 9.6.1
-    react: ^19.2.0
-    react-dom: ^19.2.0
-    recharts: ">=3.2.1"
-  checksum: 10c0/17f38af4d8c9acb2278122c8124197eb37294ea9d10fa614d8ddacfd1b86dc0e0134e5dd6912145b20df87903f528da4a3affe1a6b1372af7dbea7621f977bad
   languageName: node
   linkType: hard
 
@@ -1664,12 +1658,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@teelur/budget-board-ui@npm:^0.2.0-canary.63.1252136":
-  version: 0.2.0-canary.63.1252136
-  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.63.1252136"
+"@teelur/budget-board-ui@npm:^0.2.0-canary.87.6166ac8":
+  version: 0.2.0-canary.87.6166ac8
+  resolution: "@teelur/budget-board-ui@npm:0.2.0-canary.87.6166ac8"
   dependencies:
     "@fontsource-variable/ibm-plex-sans": "npm:^5.3.0"
     "@fontsource-variable/plus-jakarta-sans": "npm:^5.3.0"
+    "@fontsource/ibm-plex-mono": "npm:^5.3.0"
   peerDependencies:
     "@mantine/core": 9.6.1
     "@mantine/dates": 9.6.1
@@ -1677,7 +1672,9 @@ __metadata:
     dayjs: ^1.11.13
     react: ^19.3.0
     react-dom: ^19.3.0
-  checksum: 10c0/f09d4acce21a5b853aa0b7a3708bb4fa2e07f6a8d79953e2967322039282588101fa5a9a53ecab0d981ab1edf8582b387f3a3bc28e498df794d2ae12880d962f
+    react-is: ^19.0.0
+    recharts: ^3.10.1
+  checksum: 10c0/5d1c8941c6ad9a2c67530ef752036a3b65fd7c60a77e8e21143847e2e5bdd395084063b660d7380d1611da55be988e815982bb909155f042f7ac8c2045cd5398
   languageName: node
   linkType: hard
 
@@ -2516,7 +2513,6 @@ __metadata:
     "@fontsource-variable/plus-jakarta-sans": "npm:^5.3.0"
     "@icons-pack/react-simple-icons": "npm:^13.15.1"
     "@mantine/carousel": "npm:^9.6.1"
-    "@mantine/charts": "npm:^9.6.1"
     "@mantine/code-highlight": "npm:^9.6.1"
     "@mantine/core": "npm:^9.6.1"
     "@mantine/dates": "npm:^9.6.1"
@@ -2532,7 +2528,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.104.1"
     "@tanstack/react-query-devtools": "npm:^5.104.1"
     "@tanstack/react-virtual": "npm:^3.14.13"
-    "@teelur/budget-board-ui": "npm:^0.2.0-canary.63.1252136"
+    "@teelur/budget-board-ui": "npm:^0.2.0-canary.87.6166ac8"
     "@types/babel__core": "npm:^7.20.5"
     "@types/node": "npm:^26.6.4"
     "@types/papaparse": "npm:^5.5.2"
@@ -3606,12 +3602,12 @@ __metadata:
   linkType: hard
 
 "follow-redirects@npm:^1.16.0":
-  version: 1.16.0
-  resolution: "follow-redirects@npm:1.16.0"
+  version: 1.16.1
+  resolution: "follow-redirects@npm:1.16.1"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 10c0/a1e2900163e6f1b4d1ed5c221b607f41decbab65534c63fe7e287e40a5d552a6496e7d9d7d976fa4ba77b4c51c11e5e9f683f10b43011ea11e442ff128d0e181
+  checksum: 10c0/544e24ccb93b7afb5dd5a2199bd556e167b84de2af7c13b2ced08494239677359d7883bae56ae43a9ca98ac5451e75cf4834a5fadd6fa79053b9248fac5447a4
   languageName: node
   linkType: hard
 
@@ -5997,9 +5993,9 @@ __metadata:
   linkType: hard
 
 "undici@npm:^8.4.1":
-  version: 8.11.2
-  resolution: "undici@npm:8.11.2"
-  checksum: 10c0/106f6991178fb7562fd90cdec7993c5f807a9428682306091f0c4b27fc474ec291f868e29972c6252988bf061ad193df943b3b99e775be157a28d92bbb95699d
+  version: 8.12.3
+  resolution: "undici@npm:8.12.3"
+  checksum: 10c0/714919e62b4160eea195fb35c7f5c4907235741e47bfde8a014ac58f6d24df13434e23400d7f48e2c455fd2b259d27f07fce514f04a5b4e99936ba62cbc4bb71
   languageName: node
   linkType: hard
 

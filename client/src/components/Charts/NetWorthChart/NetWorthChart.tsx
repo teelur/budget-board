@@ -1,6 +1,7 @@
-import { CompositeChart, CompositeChartSeries } from "@mantine/charts";
-import { Group, Skeleton } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import {
+  NetWorthChart as BBNetWorthChart,
+  type NetWorthChartData,
+} from "@teelur/budget-board-ui";
 import { filterBalancesByDateRange } from "~/helpers/balances";
 import { SignDisplay } from "~/helpers/currency";
 import { DateString, getDateFromMonthsAgo } from "~/helpers/datetime";
@@ -9,19 +10,11 @@ import { IBalanceResponse } from "~/models/balance";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
 import dayjs from "dayjs";
-import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { buildValueChartData } from "../ValueChart/helpers/valueChart";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
-
-interface NetWorthChartData {
-  date: DateString;
-  assets: number;
-  liabilities: number;
-  net: number;
-}
 
 /**
  * Builds data for a net worth chart based on provided balances and accounts.
@@ -46,8 +39,7 @@ const buildNetWorthChartData = (
     formatDateString,
   );
 
-  const chartData: NetWorthChartData[] = [];
-  accountChartData.forEach((dataPoint) => {
+  return accountChartData.map((dataPoint) => {
     const chartDataPoint: NetWorthChartData = {
       date: dataPoint.date,
       assets: 0,
@@ -56,19 +48,21 @@ const buildNetWorthChartData = (
     };
 
     accounts.forEach((account) => {
+      const accountValue = dataPoint[account.id];
+      if (typeof accountValue !== "number") {
+        return;
+      }
+
       const chartIndex = liabilityAccountTypes.includes(account.type)
         ? "liabilities"
         : "assets";
 
-      chartDataPoint[chartIndex] += (dataPoint[account.id] as number) ?? 0;
+      chartDataPoint[chartIndex] += accountValue;
     });
 
     chartDataPoint.net = chartDataPoint.assets + chartDataPoint.liabilities;
-
-    chartData.push(chartDataPoint);
+    return chartDataPoint;
   });
-
-  return chartData;
 };
 
 interface NetWorthChartProps {
@@ -85,81 +79,61 @@ const NetWorthChart = (props: NetWorthChartProps): React.ReactNode => {
   const { allAccountTypes } = useAccountTypes();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
 
-  const chartSeries: CompositeChartSeries[] = [
-    { name: "assets", label: t("assets"), color: "green.6", type: "bar" },
-    {
-      name: "liabilities",
-      label: t("liabilities"),
-      color: "red.6",
-      type: "bar",
-    },
-    { name: "net", label: t("net"), color: "gray.0", type: "line" },
-  ];
+  const liabilityAccountTypes = React.useMemo(
+    () =>
+      allAccountTypes
+        .filter(
+          (type) => type.classification === AccountTypeClassification.Liability,
+        )
+        .map((type) => type.value),
+    [allAccountTypes],
+  );
 
-  const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
-  };
+  const chartData = React.useMemo(() => {
+    if (props.accounts.length === 0 || props.balances.length === 0) {
+      return [];
+    }
 
-  const liabilityAccountTypes = allAccountTypes
-    .filter(
-      (type) => type.classification === AccountTypeClassification.Liability,
-    )
-    .map((type) => type.value);
-
-  if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
-  }
-
-  if (props.accounts?.length === 0 || props.balances?.length === 0) {
-    return (
-      <Group justify="center">
-        <BodyText tone="muted" size="sm">
-          {t("select_an_account_to_display_the_chart")}
-        </BodyText>
-      </Group>
+    return buildNetWorthChartData(
+      filterBalancesByDateRange(
+        props.balances,
+        props.dateRange[0]
+          ? dayjs(props.dateRange[0]).toDate()
+          : getDateFromMonthsAgo(1),
+        dayjs(props.dateRange[1]).isValid()
+          ? dayjs(props.dateRange[1]).toDate()
+          : dayjs().toDate(),
+      ),
+      props.accounts,
+      liabilityAccountTypes,
+      (date: DateString) => dayjs(date).format(dateFormat),
     );
-  }
+  }, [
+    dateFormat,
+    liabilityAccountTypes,
+    props.accounts,
+    props.balances,
+    props.dateRange,
+  ]);
+
+  const chartValueFormatter = React.useCallback(
+    (value: number) =>
+      formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0),
+    [formatSensitiveAmount],
+  );
 
   return (
-    <CompositeChart
-      h={400}
-      w="100%"
-      data={buildNetWorthChartData(
-        filterBalancesByDateRange(
-          props.balances,
-          props.dateRange[0]
-            ? dayjs(props.dateRange[0]).toDate()
-            : getDateFromMonthsAgo(1),
-          dayjs(props.dateRange[1]).isValid()
-            ? dayjs(props.dateRange[1]).toDate()
-            : dayjs().toDate(),
-        ),
-        props.accounts,
-        liabilityAccountTypes,
-        (date: DateString) => dayjs(date).format(dateFormat),
-      )}
-      series={chartSeries}
-      withLegend
-      dataKey="date"
-      composedChartProps={{ stackOffset: "sign" }}
-      barProps={{
-        stackId: "stack",
-        fillOpacity: 0.4,
-        strokeOpacity: 1,
+    <BBNetWorthChart
+      ariaLabel={t("net_worth")}
+      data={chartData}
+      emptyMessage={t("select_an_account_to_display_the_chart")}
+      formatValue={chartValueFormatter}
+      isLoading={props.isPending}
+      seriesLabels={{
+        assets: t("assets"),
+        liabilities: t("liabilities"),
+        net: t("net"),
       }}
-      lineProps={{ type: "linear" }}
-      tooltipAnimationDuration={200}
-      tooltipProps={{
-        content: ({ label, payload }) => (
-          <ChartTooltip
-            label={label}
-            payload={payload}
-            series={chartSeries}
-            valueFormatter={chartValueFormatter}
-          />
-        ),
-      }}
-      valueFormatter={chartValueFormatter}
     />
   );
 };

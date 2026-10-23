@@ -1,7 +1,7 @@
 .burger {
   align-self: flex-end;
   &:hover {
-    background-color: var(--elevated-color-input-background);
+    background-color: var(--bbui-color-surface-hover);
   }
 }
 
@@ -24,7 +24,6 @@
   width: 100%;
   padding: 0.625rem 0.25rem 0.25rem;
   margin-top: 0.5rem;
-  border-top: 1px solid var(--base-color-border);
 }
 
 .footerCollapsed {
@@ -38,45 +37,38 @@
   display: block;
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid
-    light-dark(var(--mantine-primary-color-3), var(--mantine-primary-color-7));
-  border-radius: var(--mantine-radius-sm);
-  color: var(--base-color-text-primary);
-  background-color: light-dark(
-    var(--mantine-primary-color-0),
-    var(--mantine-primary-color-9)
+  border: 1px solid var(--bbui-color-border);
+  border-radius: 4px;
+  color: var(--bbui-color-text-primary);
+  background-color: color-mix(
+    in srgb,
+    var(--bbui-color-primary) 12%,
+    var(--bbui-color-surface-elevated)
   );
   transition:
     background-color 150ms ease,
     border-color 150ms ease;
 
   &:hover {
-    border-color: var(--mantine-primary-color-filled);
-    background-color: light-dark(
-      var(--mantine-primary-color-1),
-      var(--mantine-primary-color-8)
-    );
+    border-color: var(--bbui-color-primary);
+    background-color: var(--bbui-color-surface-hover);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--mantine-primary-color-filled);
+    outline: 2px solid var(--bbui-color-primary);
     outline-offset: 2px;
   }
 }
 
 .updateGlyph {
   flex: 0 0 auto;
-  color: var(--base-color-text-primary);
+  color: var(--bbui-color-primary);
   stroke-width: 2.5;
 }
 
 .updateText {
   min-width: 0;
   flex: 1;
-}
-
-.updateTitle {
-  color: var(--base-color-text-primary);
 }
 
 .versionRow {
@@ -87,13 +79,18 @@
 
 .versionText {
   min-width: 0;
+  flex: 1;
+}
+
+.collapsedVersionTooltipTarget {
+  display: block;
+  width: 100%;
+  max-width: 100%;
 }
 
 .collapsedVersion {
   max-width: 100%;
   overflow: hidden;
-  font-size: 0.625rem;
-  color: var(--base-color-text-secondary);
   white-space: nowrap;
   text-overflow: ellipsis;
 }

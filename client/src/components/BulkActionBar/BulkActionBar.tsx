@@ -27,8 +27,8 @@ import { getCurrencySymbol } from "~/helpers/currency";
 import { getTagChanges, getUniqueTags } from "~/helpers/tags";
 import { ICategory } from "~/models/category";
 import { ITransaction, ITransactionUpdateRequest } from "~/models/transaction";
-import SplitTransaction from "~/components/core/TransactionCard/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
-import TransactionLinkDialog from "~/components/core/TransactionCard/TransactionCardDetails/TransactionLinkDialog/TransactionLinkDialog";
+import SplitTransaction from "~/components/TransactionCard/EditableTransactionCardContent/SplitTransaction/SplitTransaction";
+import TransactionLinkDialog from "~/components/TransactionCard/TransactionCardDetails/TransactionLinkDialog/TransactionLinkDialog";
 import RecurringRuleAction from "~/components/RecurringRuleAction/RecurringRuleAction";
 import BulkRecurringRuleAction from "~/components/BulkRecurringRuleAction/BulkRecurringRuleAction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -274,8 +274,8 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
               left: isMobile ? 0 : "var(--app-shell-navbar-width, 60px)",
               right: 0,
               zIndex: props.zIndex ?? 200,
-              backgroundColor: "var(--background-color-surface)",
-              borderTop: "2px solid var(--surface-color-border)",
+              backgroundColor: "var(--bbui-color-surface-sunken)",
+              borderTop: "2px solid var(--bbui-color-border)",
               boxShadow: "0 -4px 12px rgba(0, 0, 0, 0.1)",
             }}
           >

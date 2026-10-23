@@ -1,9 +1,10 @@
-import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Group, ScrollArea, Stack } from "@mantine/core";
 import {
   BodyText,
   Card,
   HeadingText,
   Pagination,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import {
   getTransactionsByCategory,
@@ -16,7 +17,7 @@ import { useTranslation } from "react-i18next";
 import { TagsIcon } from "lucide-react";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
-import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 const UncategorizedTransactionsWidget = (): React.ReactNode => {
   const itemsPerPage = 15;
@@ -63,7 +64,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
 
   const getWidgetContent = () => {
     if (transactionsQuery.isPending) {
-      return <Skeleton h="100%" radius="md" />;
+      return <Skeleton h="100%" />;
     }
 
     if (sortedFilteredTransactions.length === 0) {

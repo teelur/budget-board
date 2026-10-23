@@ -1,14 +1,14 @@
 import SpendingChart from "~/components/Charts/SpendingChart/SpendingChart";
 import { SignDisplay } from "~/helpers/currency";
 import { getRollingTotalSpendingForMonth } from "~/helpers/transactions";
-import { Box, Group, Skeleton, Stack } from "@mantine/core";
+import { Box, Group, Stack } from "@mantine/core";
 import React from "react";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { LineChartIcon } from "lucide-react";
 import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
-import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
+import { BodyText, Card, HeadingText, Skeleton } from "@teelur/budget-board-ui";
 
 const SpendingTrendsWidget = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -95,7 +95,7 @@ const SpendingTrendsWidget = (): React.ReactNode => {
         }}
       >
         {transactionsQuery.isPending ? (
-          <Skeleton height="100%" radius="md" />
+          <Skeleton height="100%" />
         ) : (
           <Stack gap={0} style={{ flex: "1 1 0", minHeight: 0 }}>
             <BodyText tone="secondary" size="sm" ta="right">

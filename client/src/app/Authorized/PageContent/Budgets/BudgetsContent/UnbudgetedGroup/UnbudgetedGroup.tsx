@@ -1,3 +1,5 @@
+import classes from "./UnbudgetedGroup.module.css";
+
 import { Group, Stack } from "@mantine/core";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
@@ -6,9 +8,13 @@ import { SignDisplay } from "~/helpers/currency";
 import React from "react";
 import UnbudgetedCard from "./UnbudgetedCard/UnbudgetedCard";
 import { CategoryNode, CategoryTypes, ICategoryNode } from "~/models/category";
-import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation } from "react-i18next";
-import { AmountText, BodyText } from "@teelur/budget-board-ui";
+import {
+  AmountText,
+  BodyText,
+  CollapsibleCard,
+  HeadingText,
+} from "@teelur/budget-board-ui";
 
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
@@ -77,39 +83,35 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
   const unbudgetedCards = getUnbudgetedCards();
 
   return (
-    <Accordion p="0.5rem" elevation={1}>
-      <Accordion.Item
-        defaultOpen={false}
-        slim
-        title={
-          <Group justify="space-between" align="center" w="100%" pr="0.25rem">
-            <BodyText tone="primary" size="lg" fw={500}>
-              {t("unbudgeted")}
-            </BodyText>
-            <AmountText
-              amount={total}
-              disableStatusColor
-              size="lg"
-              isSensitive={isPrivacyModeEnabled}
-              currency={preferredCurrency}
-              decimalPlaces={0}
-              locale={intlLocale}
-              signDisplay={SignDisplay.Auto}
-            />
-          </Group>
-        }
-      >
-        <Stack gap="0.5rem">
-          {unbudgetedCards.length > 0 ? (
-            unbudgetedCards
-          ) : (
-            <BodyText tone="muted" size="sm" ta="center">
-              {t("no_unbudgeted_categories")}
-            </BodyText>
-          )}
-        </Stack>
-      </Accordion.Item>
-    </Accordion>
+    <CollapsibleCard
+      title={
+        <Group justify="space-between" align="center" w="100%" pr="0.25rem">
+          <HeadingText tone="primary" className={classes.title}>
+            {t("unbudgeted")}
+          </HeadingText>
+          <AmountText
+            amount={total}
+            size="lg"
+            isSensitive={isPrivacyModeEnabled}
+            currency={preferredCurrency}
+            decimalPlaces={0}
+            locale={intlLocale}
+            signDisplay={SignDisplay.Auto}
+          />
+        </Group>
+      }
+      defaultExpanded={false}
+    >
+      <Stack gap="0.5rem">
+        {unbudgetedCards.length > 0 ? (
+          unbudgetedCards
+        ) : (
+          <BodyText tone="muted" size="sm" ta="center">
+            {t("no_unbudgeted_categories")}
+          </BodyText>
+        )}
+      </Stack>
+    </CollapsibleCard>
   );
 };
 

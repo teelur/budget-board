@@ -16,7 +16,7 @@ import { Filters } from "~/models/transaction";
 import React from "react";
 import { useTransactionFilters } from "~/providers/TransactionFiltersProvider/TransactionFiltersProvider";
 import { useTranslation } from "react-i18next";
-import AccountMultiSelect from "~/components/core/Select/AccountMultiSelect/AccountMultiSelect";
+import AccountMultiSelect from "~/components/AccountMultiSelect/AccountMultiSelect";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";

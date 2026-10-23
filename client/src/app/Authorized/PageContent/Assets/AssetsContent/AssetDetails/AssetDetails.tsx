@@ -1,9 +1,12 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   Button,
   AmountText,
   HeadingText,
   BodyText,
+  CollapsibleCard,
+  Drawer,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { MoveRightIcon } from "lucide-react";
@@ -13,8 +16,6 @@ import AddValue from "./AddValue/AddValue";
 import React from "react";
 import ValueItems from "./ValueItems/ValueItems";
 import ValueChart from "~/components/Charts/ValueChart/ValueChart";
-import Drawer from "~/components/core/Drawer/Drawer";
-import Accordion from "~/components/core/Accordion/Accordion";
 import { useTranslation, Trans } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useValuesQuery } from "~/hooks/queries/useValuesQuery";
@@ -58,10 +59,10 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
       onClose={props.close}
       position="right"
       size="md"
-      title={<HeadingText level={4}>{t("asset_details")}</HeadingText>}
+      title={t("asset_details")}
     >
       {!props.asset ? (
-        <Skeleton height={425} radius="lg" />
+        <Skeleton height={425} />
       ) : (
         <Stack gap="0.5rem">
           <Stack gap={0}>
@@ -138,8 +139,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                 </Stack>
               )}
           </Group>
-          <Accordion elevation={1}>
-            <Accordion.Item
+          <Stack gap="0.5rem">
+            <CollapsibleCard
               title={
                 <HeadingText tone="heading" level={5}>
                   {t("add_value")}
@@ -147,8 +148,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
               }
             >
               <AddValue assetId={props.asset.id} />
-            </Accordion.Item>
-            <Accordion.Item
+            </CollapsibleCard>
+            <CollapsibleCard
               title={
                 <HeadingText tone="heading" level={5}>
                   {t("value_trends")}
@@ -200,8 +201,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   dayjs().toString(),
                 ]}
               />
-            </Accordion.Item>
-            <Accordion.Item
+            </CollapsibleCard>
+            <CollapsibleCard
               title={
                 <HeadingText tone="heading" level={5}>
                   {t("value_history")}
@@ -209,7 +210,7 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
               }
             >
               <Stack gap="0.5rem">
-                {valuesQuery.isPending && <Skeleton height={20} radius="lg" />}
+                {valuesQuery.isPending && <Skeleton height={20} />}
                 {sortedValues.length === 0 ? (
                   <Group justify="center">
                     <BodyText tone="muted" size="sm">
@@ -220,8 +221,8 @@ const AssetDetails = (props: AssetDetailsProps): React.ReactNode => {
                   <ValueItems values={sortedValues} />
                 )}
               </Stack>
-            </Accordion.Item>
-          </Accordion>
+            </CollapsibleCard>
+          </Stack>
         </Stack>
       )}
     </Drawer>

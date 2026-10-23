@@ -1,5 +1,5 @@
-import { Group, Stepper } from "@mantine/core";
-import { BodyText, Button, Modal } from "@teelur/budget-board-ui";
+import { Group } from "@mantine/core";
+import { BodyText, Button, Modal, Stepper } from "@teelur/budget-board-ui";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 import { useDidUpdate, useDisclosure } from "@mantine/hooks";

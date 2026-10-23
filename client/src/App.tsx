@@ -4,14 +4,12 @@ import "@mantine/core/styles/FloatingWindow.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/notifications/styles.layer.css";
 import "@mantine/dates/styles.css";
-import "@mantine/charts/styles.css";
 
 import { BrowserRouter, Route, Routes } from "react-router";
 import {
   createTheme,
   CSSVariablesResolver,
   MantineProvider,
-  Notification,
 } from "@mantine/core";
 import {
   QueryCache,
@@ -23,7 +21,7 @@ import {
   Notifications,
   type NotificationData,
 } from "@mantine/notifications";
-import { budgetBoardColors } from "@teelur/budget-board-ui";
+import { budgetBoardColors, Notification } from "@teelur/budget-board-ui";
 import {
   AlertCircle,
   CircleCheckIcon,
@@ -40,18 +38,7 @@ import { AuthProvider } from "~/providers/AuthProvider/AuthProvider";
 import AuthorizedRoute from "~/providers/AuthProvider/AuthorizedRoute";
 import UnauthorizedRoute from "~/providers/AuthProvider/UnauthorizedRoute";
 import Authorized from "~/app/Authorized/Authorized";
-import {
-  backgroundGray,
-  backgroundEggshell,
-  textBlack,
-  textGray,
-  green,
-  blue,
-  orange,
-  red,
-  borderEggshell,
-  textEggshellDimmed,
-} from "./shared/colors";
+import { green, blue, orange, red } from "./shared/colors";
 import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
 import { LocaleProvider } from "./providers/LocaleProvider/LocaleProvider";
 import { PrivacyModeProvider } from "./providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -129,11 +116,8 @@ const theme = createTheme({
   fontFamily: "IBM Plex Sans Variable, sans-serif",
   headings: {
     fontFamily: "Plus Jakarta Sans Variable, sans-serif",
-    fontWeight: "600",
   },
-  cursorType: "pointer",
   defaultRadius: "xs",
-  primaryColor: "indigo",
   breakpoints: {
     xs: "30em", // 480px
     sm: "48em", // 768px
@@ -144,62 +128,10 @@ const theme = createTheme({
     editTransactionBreakpoint: "850px", // Custom breakpoint for edit transactions
   },
   colors: {
-    backgroundEggshell,
-    borderEggshell,
-    textEggshellDimmed,
-    backgroundGray,
-    textGray,
-    textBlack,
     green,
     blue,
     orange,
     red,
-  },
-  components: {
-    Notification: {
-      defaultProps: {
-        radius: "xs",
-        withBorder: true,
-      },
-      styles: {
-        root: {
-          backgroundColor:
-            "color-mix(in srgb, var(--notification-color) 15%, var(--background-color-elevated))",
-          borderColor:
-            "color-mix(in srgb, var(--notification-color) 35%, var(--elevated-color-border))",
-          boxShadow: "var(--mantine-shadow-lg)",
-          padding: "var(--mantine-spacing-sm)",
-        },
-        icon: {
-          width: 24,
-          height: 24,
-          marginInlineEnd: "var(--mantine-spacing-sm)",
-        },
-        loader: {
-          width: 24,
-          height: 24,
-          marginInlineEnd: "var(--mantine-spacing-sm)",
-        },
-        body: {
-          marginInlineEnd: "var(--mantine-spacing-xs)",
-        },
-        title: {
-          color: "var(--base-color-text-primary)",
-          fontFamily: "Plus Jakarta Sans Variable, sans-serif",
-          fontSize: "var(--mantine-font-size-xs)",
-          fontWeight: 600,
-        },
-        description: {
-          color: "var(--base-color-text-secondary)",
-          fontFamily: "IBM Plex Sans Variable, sans-serif",
-          overflowWrap: "anywhere",
-        },
-        closeButton: {
-          color: "var(--base-color-text-dimmed)",
-          flexShrink: 0,
-        },
-      },
-    },
   },
 });
 
@@ -207,93 +139,41 @@ const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {
     "--bbui-color-page": budgetBoardColors.light.page,
+    "--bbui-color-border": budgetBoardColors.light.border,
     "--bbui-color-surface": budgetBoardColors.light.surface,
+    "--bbui-color-surface-elevated": budgetBoardColors.light.surfaceElevated,
+    "--bbui-color-surface-sunken": budgetBoardColors.light.surfaceSunken,
+    "--bbui-color-surface-hover": budgetBoardColors.light.surfaceHover,
+
     "--bbui-color-text-primary": budgetBoardColors.light.textPrimary,
     "--bbui-color-text-secondary": budgetBoardColors.light.textSecondary,
     "--bbui-color-text-muted": budgetBoardColors.light.textMuted,
+    "--bbui-color-text-heading": budgetBoardColors.light.textHeading,
+
     "--bbui-color-primary": budgetBoardColors.light.primary,
+    "--bbui-color-warning": budgetBoardColors.light.warning,
     "--bbui-color-button-hover": budgetBoardColors.light.buttonHoverBorder,
-    // Base colors
-    "--background-color-base": backgroundEggshell[0],
-    "--base-color-border": backgroundEggshell[4],
-    "--base-color-text-primary": textBlack[1],
-    "--base-color-text-secondary": textEggshellDimmed[8],
-    "--base-color-text-dimmed": textEggshellDimmed[6],
-    "--base-color-input-background": backgroundEggshell[2],
-    "--base-color-input-border": backgroundEggshell[5],
-    // Surface colors
-    "--background-color-surface": backgroundEggshell[3],
-    "--surface-color-border": borderEggshell[3],
-    "--surface-color-text-primary": textBlack[1],
-    "--surface-color-text-secondary": textEggshellDimmed[8],
-    "--surface-color-text-dimmed": textEggshellDimmed[6],
-    "--surface-color-input-background": backgroundEggshell[5],
-    "--surface-color-input-border": backgroundEggshell[8],
-    // Elevated colors
-    "--background-color-elevated": backgroundEggshell[6],
-    "--elevated-color-border": borderEggshell[4],
-    "--elevated-color-text-primary": textBlack[1],
-    "--elevated-color-text-secondary": textEggshellDimmed[8],
-    "--elevated-color-text-dimmed": textEggshellDimmed[7],
-    "--elevated-color-input-background": backgroundEggshell[7],
-    "--elevated-color-input-border": backgroundEggshell[9],
-    // Text Status colors
-    "--text-color-status-good": green[9],
-    "--text-color-status-neutral": blue[7],
-    "--text-color-status-warning": orange[6],
-    "--text-color-status-bad": red[5],
-    "--bb-color-warning": budgetBoardColors.light.warning,
-    // Button colors
-    "--button-color-confirm": green[9],
-    "--button-color-warning": orange[6],
-    "--button-color-destructive": red[5],
-    // Other
-    "--light-color-off": backgroundEggshell[8],
+
+    "--bbui-color-selection": budgetBoardColors.light.selection,
   },
   dark: {
     "--bbui-color-page": budgetBoardColors.dark.page,
+    "--bbui-color-border": budgetBoardColors.dark.border,
     "--bbui-color-surface": budgetBoardColors.dark.surface,
+    "--bbui-color-surface-elevated": budgetBoardColors.dark.surfaceElevated,
+    "--bbui-color-surface-sunken": budgetBoardColors.dark.surfaceSunken,
+    "--bbui-color-surface-hover": budgetBoardColors.dark.surfaceHover,
+
     "--bbui-color-text-primary": budgetBoardColors.dark.textPrimary,
     "--bbui-color-text-secondary": budgetBoardColors.dark.textSecondary,
     "--bbui-color-text-muted": budgetBoardColors.dark.textMuted,
+    "--bbui-color-text-heading": budgetBoardColors.dark.textHeading,
+
     "--bbui-color-primary": budgetBoardColors.dark.primary,
+    "--bbui-color-warning": budgetBoardColors.dark.warning,
     "--bbui-color-button-hover": budgetBoardColors.dark.buttonHoverBorder,
-    // Base colors
-    "--background-color-base": backgroundGray[9],
-    "--base-color-border": backgroundGray[4],
-    "--base-color-text-primary": textGray[0],
-    "--base-color-text-secondary": textGray[3],
-    "--base-color-text-dimmed": textGray[8],
-    "--base-color-input-background": backgroundGray[7],
-    "--base-color-input-border": backgroundGray[4],
-    // Surface colors
-    "--background-color-surface": backgroundGray[7],
-    "--surface-color-border": backgroundGray[3],
-    "--surface-color-text-primary": textGray[0],
-    "--surface-color-text-secondary": textGray[3],
-    "--surface-color-text-dimmed": textGray[9],
-    "--surface-color-input-background": backgroundGray[5],
-    "--surface-color-input-border": backgroundGray[3],
-    // Elevated colors
-    "--background-color-elevated": backgroundGray[5],
-    "--elevated-color-border": backgroundGray[0],
-    "--elevated-color-text-primary": textGray[0],
-    "--elevated-color-text-secondary": textGray[3],
-    "--elevated-color-text-dimmed": textGray[9],
-    "--elevated-color-input-background": backgroundGray[3],
-    "--elevated-color-input-border": backgroundGray[0],
-    // Text Status colors
-    "--text-color-status-good": green[8],
-    "--text-color-status-neutral": blue[5],
-    "--text-color-status-warning": orange[5],
-    "--text-color-status-bad": red[4],
-    "--bb-color-warning": budgetBoardColors.dark.warning,
-    // Button colors
-    "--button-color-confirm": green[9],
-    "--button-color-warning": orange[5],
-    "--button-color-destructive": red[4],
-    // Other
-    "--light-color-off": backgroundGray[3],
+
+    "--bbui-color-selection": budgetBoardColors.dark.selection,
   },
 });
 

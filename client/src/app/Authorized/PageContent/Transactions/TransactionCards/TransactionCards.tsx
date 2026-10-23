@@ -1,18 +1,20 @@
+import classes from "./TransactionCards.module.css";
+
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ITransaction } from "~/models/transaction";
-import { Group, Skeleton, Stack } from "@mantine/core";
+
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
 import { InfoIcon } from "lucide-react";
-import classes from "./TransactionCards.module.css";
 import {
   getTransactionDisplayItems,
   TransactionDisplayItem,
 } from "~/helpers/transactions";
 import TransactionTransferGroup from "./TransactionTransferGroup";
-import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
-import { BodyText } from "@teelur/budget-board-ui";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   currentViewTransactions: ITransaction[];
@@ -51,7 +53,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
     <Stack gap="0.5rem" className={classes.container}>
       {props.isQueryPending && !hasTransactions ? (
         Array.from({ length: skeletonCount }).map((_, index) => (
-          <Skeleton key={index} height={40} radius="md" />
+          <Skeleton key={index} height={40} />
         ))
       ) : (
         <div

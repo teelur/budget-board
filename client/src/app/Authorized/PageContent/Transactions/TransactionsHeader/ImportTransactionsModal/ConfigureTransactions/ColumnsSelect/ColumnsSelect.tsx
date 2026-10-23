@@ -1,6 +1,6 @@
-import { Divider, SimpleGrid, Stack } from "@mantine/core";
+import { SimpleGrid, Stack } from "@mantine/core";
 import { useField } from "@mantine/form";
-import { Select, TextInput } from "@teelur/budget-board-ui";
+import { Divider, Select, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 

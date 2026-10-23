@@ -1,12 +1,11 @@
-import { Combobox, useCombobox } from "@mantine/core";
-import { BodyText, TextInput } from "@teelur/budget-board-ui";
+import { useCombobox } from "@mantine/core";
+import { BodyText, Combobox, TextInput } from "@teelur/budget-board-ui";
 import React from "react";
 import {
   METRIC_RANGE_ENDPOINTS,
   METRIC_RANGE_EXAMPLES,
   PERIOD_KEYWORDS,
 } from "~/helpers/metricWidget";
-import dropdownClasses from "~/styles/Dropdown.module.css";
 
 const SOURCE_METRICS: Record<string, string[]> = {
   transactions: ["sum", "count", "avg"],
@@ -486,13 +485,7 @@ const FormulaTextInput = ({
   };
 
   return (
-    <Combobox
-      classNames={{
-        dropdown: dropdownClasses.dropdown,
-      }}
-      onOptionSubmit={handleOptionSubmit}
-      store={combobox}
-    >
+    <Combobox onOptionSubmit={handleOptionSubmit} store={combobox}>
       <Combobox.Target>
         <TextInput
           inputWrapperOrder={["label", "input"]}
@@ -549,7 +542,6 @@ const FormulaTextInput = ({
           }}
         />
       </Combobox.Target>
-
       {filteredSuggestions.length > 0 && (
         <Combobox.Dropdown>
           <Combobox.Options mah={240} style={{ overflowY: "auto" }}>

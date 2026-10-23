@@ -1,5 +1,5 @@
-import { Group, LoadingOverlay, Skeleton, Stack } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, LoadingOverlay, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { IAssetIndexRequest, IAssetResponse } from "~/models/asset";
 import AssetItem from "./AssetItem/AssetItem";
@@ -69,9 +69,9 @@ const AssetsContent = (props: AssetsContentProps): React.ReactNode => {
       />
       {assetsQuery.isPending ? (
         <>
-          <Skeleton height={60} radius="md" />
-          <Skeleton height={60} radius="md" />
-          <Skeleton height={60} radius="md" />
+          <Skeleton height={60} />
+          <Skeleton height={60} />
+          <Skeleton height={60} />
         </>
       ) : sortedAssets.length === 0 ? (
         <Group justify="center" align="center" gap="0.5rem">

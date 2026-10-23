@@ -1,13 +1,7 @@
-import {
-  Group,
-  Popover as MantinePopover,
-  Skeleton,
-  Stack,
-} from "@mantine/core";
-import { BodyText, Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Button, Popover, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
-import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useAccountTypes } from "~/providers/AccountTypeProvider/AccountTypeProvider";
 import { defaultGuid } from "~/models/applicationUser";
@@ -24,7 +18,7 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
   const [isConfirmationOpen, setIsConfirmationOpen] = React.useState(false);
 
   if (accountsQuery.isPending) {
-    return <Skeleton height={75} radius="md" />;
+    return <Skeleton height={75} />;
   }
 
   const builtInTypeValues = new Set(
@@ -103,8 +97,8 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
           position="bottom-start"
           withArrow
         >
-          <MantinePopover.Target>{toggleButton}</MantinePopover.Target>
-          <MantinePopover.Dropdown maw={350}>
+          <Popover.Target>{toggleButton}</Popover.Target>
+          <Popover.Dropdown maw={350}>
             <Stack gap="0.5rem">
               <BodyText tone="primary" size="xs">
                 {t("disable_built_in_account_types_warning")}
@@ -139,7 +133,7 @@ const DisableBuiltInAccountTypes = (): React.ReactNode => {
                 </Button>
               </Group>
             </Stack>
-          </MantinePopover.Dropdown>
+          </Popover.Dropdown>
         </Popover>
       ) : (
         toggleButton

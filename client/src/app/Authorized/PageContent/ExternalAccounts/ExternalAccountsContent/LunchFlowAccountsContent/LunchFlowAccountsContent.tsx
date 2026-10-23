@@ -1,5 +1,5 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
-import { Badge, Button, HeadingText } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { Badge, Button, HeadingText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import LinkLunchFlow from "./LinkLunchFlow/LinkLunchFlow";
@@ -14,7 +14,7 @@ const LunchFlowAccountsContent = (): React.ReactNode => {
 
   const getContent = () => {
     if (applicationUserQuery.isPending) {
-      return <Skeleton height={150} radius="md" />;
+      return <Skeleton height={150} />;
     }
 
     if (applicationUserQuery.data?.lunchFlowApiKey) {

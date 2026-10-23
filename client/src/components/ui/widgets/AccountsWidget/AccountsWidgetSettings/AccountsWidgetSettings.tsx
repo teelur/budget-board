@@ -1,15 +1,16 @@
-import { Group, ScrollArea, Skeleton, Stack } from "@mantine/core";
+import { Group, ScrollArea, Stack } from "@mantine/core";
 import {
   BodyText,
   Button,
   Card,
   Checkbox,
+  Divider,
   Modal,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
-import Divider from "~/components/core/Divider/Divider";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -89,7 +90,7 @@ const AccountsWidgetSettings = ({
 
   const getAccountsWidgetSettingsContent = () => {
     if (institutionQuery.isPending) {
-      return <Skeleton height={200} radius="lg" />;
+      return <Skeleton height={200} />;
     }
 
     if (visibleInstitutions.length === 0) {
@@ -111,7 +112,7 @@ const AccountsWidgetSettings = ({
         >
           {t("show_all")}
         </Button>
-        <Divider size="sm" label={t("or")} elevation={1} />
+        <Divider label={t("or")} />
         <ScrollArea.Autosize
           mah={360}
           type="auto"

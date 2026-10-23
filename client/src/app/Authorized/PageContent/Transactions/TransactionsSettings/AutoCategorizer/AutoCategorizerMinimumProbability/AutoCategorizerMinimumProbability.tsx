@@ -1,5 +1,5 @@
-import { LoadingOverlay, Stack } from "@mantine/core";
-import { BodyText, NumberInput } from "@teelur/budget-board-ui";
+import { Stack } from "@mantine/core";
+import { BodyText, LoadingOverlay, NumberInput } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";

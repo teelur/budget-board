@@ -1,9 +1,11 @@
-import { Divider, Flex, Stack, Table } from "@mantine/core";
+import { Flex, Stack } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
   BodyText,
+  Divider,
   Pagination,
+  Table,
 } from "@teelur/budget-board-ui";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
 import { CornerDownRightIcon, Undo2Icon } from "lucide-react";

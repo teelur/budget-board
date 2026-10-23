@@ -1,6 +1,12 @@
-import { Code, Group, ScrollArea, Stack } from "@mantine/core";
-import { BodyText, Button, Modal, TextInput } from "@teelur/budget-board-ui";
-import Accordion from "~/components/core/Accordion/Accordion";
+import { Group, ScrollArea, Stack } from "@mantine/core";
+import {
+  BodyText,
+  Button,
+  Code,
+  CollapsibleCard,
+  Modal,
+  TextInput,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -165,43 +171,38 @@ const MetricWidgetSettings = ({
             accountNames={accountNames}
           />
         </Stack>
-        <Accordion elevation={1}>
-          <Accordion.Item
-            defaultOpen={false}
-            title={
-              <BodyText tone="secondary" size="sm" fw={500}>
-                {t("metric_widget_syntax_reference")}
+        <CollapsibleCard
+          title={
+            <BodyText tone="primary" size="sm" fw={500}>
+              {t("metric_widget_syntax_reference")}
+            </BodyText>
+          }
+          defaultExpanded={false}
+        >
+          <ScrollArea.Autosize mah={320} type="auto">
+            <Stack gap="0.5rem">
+              <Code block>{t("metric_widget_syntax_schema")}</Code>
+              <BodyText tone="secondary" size="xs">
+                {t("metric_widget_syntax_sources")}:{"  "}
+                <Code>transactions</Code>, <Code>budgets</Code>,{" "}
+                <Code>goals</Code>, <Code>accounts</Code>
               </BodyText>
-            }
-          >
-            <ScrollArea.Autosize mah={320} type="auto">
-              <Stack gap="0.5rem">
-                <Code block style={{ fontSize: "0.75rem" }}>
-                  {t("metric_widget_syntax_schema")}
-                </Code>
-                <BodyText tone="secondary" size="xs">
-                  {t("metric_widget_syntax_sources")}:{"  "}
-                  <Code>transactions</Code>, <Code>budgets</Code>,{" "}
-                  <Code>goals</Code>, <Code>accounts</Code>
-                </BodyText>
-                <BodyText tone="secondary" size="xs">
-                  {t("metric_widget_syntax_periods")}:{"  "}
-                  <Code>this_month</Code> <Code>last_month</Code>{" "}
-                  <Code>this_year</Code> <Code>last_3_months</Code>{" "}
-                  <Code>last_6_months</Code> <Code>last_12_months</Code>{" "}
-                  <Code>all_time</Code>
-                </BodyText>
-                <BodyText tone="secondary" size="xs" fw={500} mt="0.25rem">
-                  {t("metric_widget_syntax_examples")}:
-                </BodyText>
-                <Code block style={{ fontSize: "0.75rem", whiteSpace: "pre" }}>
-                  {SYNTAX_EXAMPLES}
-                </Code>
-              </Stack>
-            </ScrollArea.Autosize>
-          </Accordion.Item>
-        </Accordion>
-
+              <BodyText tone="secondary" size="xs">
+                {t("metric_widget_syntax_periods")}:{"  "}
+                <Code>this_month</Code> <Code>last_month</Code>{" "}
+                <Code>this_year</Code> <Code>last_3_months</Code>{" "}
+                <Code>last_6_months</Code> <Code>last_12_months</Code>{" "}
+                <Code>all_time</Code>
+              </BodyText>
+              <BodyText tone="secondary" size="xs" fw={500} mt="0.25rem">
+                {t("metric_widget_syntax_examples")}:
+              </BodyText>
+              <Code block style={{ whiteSpace: "pre" }}>
+                {SYNTAX_EXAMPLES}
+              </Code>
+            </Stack>
+          </ScrollArea.Autosize>
+        </CollapsibleCard>
         <Group gap="0.5rem">
           <Button
             variant="filled"

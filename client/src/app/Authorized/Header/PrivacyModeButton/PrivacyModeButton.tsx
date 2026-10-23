@@ -1,5 +1,4 @@
-import { Tooltip } from "@mantine/core";
-import { ActionIcon } from "@teelur/budget-board-ui";
+import { ActionIcon, Tooltip } from "@teelur/budget-board-ui";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";

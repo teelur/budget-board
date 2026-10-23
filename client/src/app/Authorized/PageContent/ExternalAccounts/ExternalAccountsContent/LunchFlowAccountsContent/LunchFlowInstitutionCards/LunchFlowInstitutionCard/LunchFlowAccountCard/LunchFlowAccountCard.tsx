@@ -1,4 +1,4 @@
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
@@ -7,6 +7,7 @@ import {
   Select,
   Card,
   BodyText,
+  LoadingOverlay,
 } from "@teelur/budget-board-ui";
 import { DateValue } from "@mantine/dates";
 import { useField } from "@mantine/form";

@@ -1,4 +1,4 @@
-import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   CategorySelect,
+  LoadingOverlay,
   SegmentedControl,
   TextInput,
 } from "@teelur/budget-board-ui";
@@ -94,7 +95,7 @@ const CustomAccountTypeCard = (
               </BodyText>
               <SegmentedControl
                 color="secondary"
-                size="compact-sm"
+                size="sm"
                 fullWidth
                 value={isChildType ? "child" : "parent"}
                 data={[
@@ -127,7 +128,7 @@ const CustomAccountTypeCard = (
                 </BodyText>
                 <SegmentedControl
                   color="secondary"
-                  size="compact-sm"
+                  size="sm"
                   fullWidth
                   value={classificationField.getValue()}
                   data={[

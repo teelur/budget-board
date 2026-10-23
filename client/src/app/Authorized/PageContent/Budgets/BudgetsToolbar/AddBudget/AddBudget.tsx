@@ -1,15 +1,15 @@
+import { Stack, Group } from "@mantine/core";
 import {
+  Button,
+  CategorySelect,
   LoadingOverlay,
-  Stack,
-  Popover as MantinePopover,
-  Group,
-} from "@mantine/core";
-import { Button, CategorySelect, NumberInput } from "@teelur/budget-board-ui";
+  NumberInput,
+  Popover,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import { PlusIcon, SendIcon } from "lucide-react";
 import React from "react";
 import { getCurrencySymbol } from "~/helpers/currency";
-import Popover from "~/components/core/Popover/Popover";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
@@ -36,12 +36,12 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
 
   return (
     <Popover>
-      <MantinePopover.Target>
+      <Popover.Target>
         <Button variant="filled" color="primary" size="compact-sm">
           <PlusIcon size={22} />
         </Button>
-      </MantinePopover.Target>
-      <MantinePopover.Dropdown p="0.5rem">
+      </Popover.Target>
+      <Popover.Dropdown p="0.5rem">
         <LoadingOverlay visible={createBudgetMutation.isPending} />
         <Group gap="0.5rem">
           <Stack gap="0.5rem">
@@ -90,7 +90,7 @@ const AddBudget = (props: AddBudgetProps): React.ReactNode => {
             </Button>
           </Stack>
         </Group>
-      </MantinePopover.Dropdown>
+      </Popover.Dropdown>
     </Popover>
   );
 };

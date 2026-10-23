@@ -1,3 +1,9 @@
+import type {
+  FlowsChartData,
+  FlowType,
+  SpendingChartData,
+  SpendingChartSeries,
+} from "@teelur/budget-board-ui";
 import {
   hiddenTransactionCategory,
   ITransaction,
@@ -12,6 +18,8 @@ import { getDaysInMonth } from "./datetime";
 import { areStringsEqual } from "./utils";
 import { getFormattedCategoryValue, getParentCategory } from "./category";
 import { ICategory } from "~/models/category";
+
+export type { FlowsChartData, FlowType } from "@teelur/budget-board-ui";
 
 export const chartColors = [
   "indigo.6",
@@ -35,9 +43,10 @@ export const buildTransactionChartData = (
   months: Date[],
   transactions: ITransaction[],
   formatDateString: (date: Date) => string,
-): any[] => {
-  const spendingTrendsChartData: any[] = [];
+): SpendingChartData[] => {
+  const spendingTrendsChartData: SpendingChartData[] = [];
   months.forEach((month) => {
+    const seriesKey = formatDateString(month);
     const transactionsForMonth = getTransactionsForMonth(transactions, month);
 
     // If it is the current month, we only want to show the data up to today's date.
@@ -62,13 +71,13 @@ export const buildTransactionChartData = (
 
         // On the very first loop, we need to create the data point.
         if (chartDay == null) {
-          const newChartDay: any = {
+          const newChartDay: SpendingChartData = {
             day: rollingTotalTransaction.day,
-            [formatDateString(month)]: rollingTotalTransaction.amount,
+            [seriesKey]: rollingTotalTransaction.amount,
           };
           spendingTrendsChartData.push(newChartDay);
         } else {
-          chartDay[formatDateString(month)] = rollingTotalTransaction.amount;
+          chartDay[seriesKey] = rollingTotalTransaction.amount;
         }
       },
     );
@@ -80,27 +89,26 @@ export const buildTransactionChartData = (
  * Builds the series for the transaction chart.
  *
  * @param months - An array of Date objects representing each month to include.
- * @returns An array of objects containing the name of the month and the color to use.
+ * @returns BBUI series definitions keyed and labeled by formatted month.
  */
 export const buildTransactionChartSeries = (
   months: Date[],
   formatDateString: (date: Date) => string,
-): { name: string; color: string }[] =>
-  months.map((month, i) => ({
-    name: formatDateString(month),
-    color: chartColors[i % chartColors.length] ?? "gray.6",
-  }));
+): SpendingChartSeries[] =>
+  months.map((month) => {
+    const label = formatDateString(month);
+    return { key: label, label };
+  });
 
 /**
- * Builds chart data for spending categories based on a list of transactions and categories.
+ * Builds chart data for net spending by category.
  *
- * Iterates through each transaction, determines its formatted category name,
- * and aggregates the transaction amounts by category. The result is an array
- * of objects, each representing a category and the total amount spent in that category.
+ * Expense transactions are signed so refunds reduce the category total. Categories
+ * with a non-positive net total are omitted because pie slices must be positive.
  *
  * @param transactions - An array of transaction objects to be aggregated.
  * @param categories - An array of category objects used to format and match transaction categories.
- * @returns An array of objects, each containing a `name` (category) and `value` (total amount spent).
+ * @returns Positive net totals grouped by category.
  */
 export const buildSpendingCategoryChartData = (
   transactions: ITransaction[],
@@ -125,23 +133,33 @@ export const buildSpendingCategoryChartData = (
     );
   });
 
-  return Array.from(totalsMap.entries()).map(([name, value], i) => ({
-    name,
-    value,
-    color: chartColors[i % chartColors.length] ?? "gray.6",
-  }));
+  return Array.from(totalsMap.entries())
+    .filter(([, value]) => value > 0)
+    .map(([name, value], i) => ({
+      name,
+      value,
+      color: chartColors[i % chartColors.length] ?? "gray.6",
+    }));
 };
+
+export interface ISpendingSubcategoryChartData {
+  name: string;
+  value: number;
+  color: string;
+  parent: string;
+}
 
 /**
  * Builds subcategory-level chart data for the outer ring of a two-ring pie chart.
- * Entries are ordered to align with the inner ring (grouped by parent).
+ * Non-positive net slices are omitted and remaining values are scaled to their
+ * parent's net total so the outer ring aligns with the inner ring.
  * Color shades are derived from the parent's color family.
  */
 export const buildSpendingSubcategoryChartData = (
   transactions: ITransaction[],
   categories: ICategory[],
-  innerChartData: { name: string; color: string }[],
-): any[] => {
+  innerChartData: { name: string; color: string; value: number }[],
+): ISpendingSubcategoryChartData[] => {
   const filteredTransactions = transactions.filter(
     (transaction) =>
       !areStringsEqual(transaction.category ?? "", hiddenTransactionCategory),
@@ -174,17 +192,25 @@ export const buildSpendingSubcategoryChartData = (
   });
 
   const shadeSteps = [4, 7, 3, 8, 2, 9, 5];
-  const result: any[] = [];
+  const result: ISpendingSubcategoryChartData[] = [];
 
   innerChartData.forEach((parent) => {
     const colorFamily = parent.color.split(".")[0] ?? "gray";
-    const subs = [...subMap.values()].filter((s) => s.parent === parent.name);
+    const subs = [...subMap.values()].filter(
+      (s) => s.parent === parent.name && s.value > 0,
+    );
+    const positiveTotal = subs.reduce((total, sub) => total + sub.value, 0);
+    if (positiveTotal === 0) {
+      return;
+    }
+    const scale = parent.value / positiveTotal;
+
     subs.forEach((sub, i) => {
       const shade =
         subs.length === 1 ? 6 : (shadeSteps[i % shadeSteps.length] ?? 6);
       result.push({
         name: sub.name,
-        value: sub.value,
+        value: sub.value * scale,
         color: `${colorFamily}.${shade}`,
         parent: sub.parent,
       });
@@ -193,33 +219,6 @@ export const buildSpendingSubcategoryChartData = (
 
   return result;
 };
-
-export type FlowType = "income" | "expense" | "surplus" | "deficit";
-
-export interface FlowsChartNode {
-  name: string;
-  color?: string;
-  flowType?: FlowType;
-  parentName?: string;
-  transactionCount?: number;
-  [key: string]: unknown;
-}
-
-export interface FlowsChartLink {
-  source: number;
-  target: number;
-  value: number;
-  transactionCount?: number;
-  flowType?: FlowType;
-  [key: string]: unknown;
-}
-
-export interface FlowsChartData {
-  nodes: FlowsChartNode[];
-  links: FlowsChartLink[];
-  totalIncome: number;
-  totalSpending: number;
-}
 
 interface FlowsChartLabels {
   cashAvailable: string;

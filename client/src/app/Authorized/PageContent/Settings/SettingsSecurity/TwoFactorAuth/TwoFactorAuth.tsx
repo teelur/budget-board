@@ -1,17 +1,14 @@
-import {
-  Group,
-  LoadingOverlay,
-  Stack,
-  CopyButton,
-  Skeleton,
-} from "@mantine/core";
+import { Group, Stack, CopyButton } from "@mantine/core";
 import {
   Badge,
   BodyText,
   Button,
   Card,
+  Code,
   HeadingText,
+  LoadingOverlay,
   PinInput,
+  Skeleton,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTwoFactorAuthenticationQuery } from "~/hooks/queries/useTwoFactorAuthenticationQuery";
@@ -19,7 +16,6 @@ import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useField } from "@mantine/form";
 import { QRCodeSVG } from "qrcode.react";
 import { useDisclosure } from "@mantine/hooks";
-import Code from "~/components/core/Code/Code";
 import { useTranslation } from "react-i18next";
 import { useSetTwoFactorAuthenticationMutation } from "~/hooks/mutations/auth/useSetTwoFactorAuthenticationMutation";
 import { TwoFactorAuthRequest } from "~/models/twoFactorAuth";
@@ -75,9 +71,7 @@ const TwoFactorAuth = (): React.ReactNode => {
               </BodyText>
               <Group gap="0.5rem" align="center" justify="center">
                 {recoveryCodes.map((code, index) => (
-                  <Code key={index} elevation={1}>
-                    {code}
-                  </Code>
+                  <Code key={index}>{code}</Code>
                 ))}
               </Group>
               <CopyButton value={recoveryCodes.join("\n")}>
@@ -148,13 +142,11 @@ const TwoFactorAuth = (): React.ReactNode => {
               value={buildAuthenticatorUrl(
                 twoFactorAuthQuery.data?.sharedKey ?? "",
               )}
-              bgColor="var(--background-color-surface)"
-              fgColor="var(--base-color-text-primary)"
+              bgColor="var(--bbui-color-surface)"
+              fgColor="var(--bbui-color-text-heading)"
             />
             <Group>
-              <Code elevation={1}>
-                {formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
-              </Code>
+              <Code>{formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}</Code>
               <CopyButton
                 value={formatKey(twoFactorAuthQuery.data?.sharedKey ?? "")}
               >
@@ -225,7 +217,7 @@ const TwoFactorAuth = (): React.ReactNode => {
   };
 
   if (twoFactorAuthQuery.isPending) {
-    return <Skeleton height={300} radius="md" />;
+    return <Skeleton height={300} />;
   }
 
   return (

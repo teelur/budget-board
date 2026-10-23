@@ -5,7 +5,7 @@ import { ICategory } from "~/models/category";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import BulkActionBar from "~/components/BulkActionBar/BulkActionBar";
-import TransactionCard from "~/components/core/TransactionCard/TransactionCard";
+import TransactionCard from "~/components/TransactionCard/TransactionCard";
 
 interface TransactionCardsProps {
   transactions: ITransaction[];
@@ -56,6 +56,7 @@ const TransactionCards = (props: TransactionCardsProps): React.ReactNode => {
         {paginatedItems.map((transaction) => (
           <TransactionCard
             key={transaction.id}
+            surface="sunken"
             transaction={transaction}
             categories={props.categories}
             selected={selectedIds.has(transaction.id)}

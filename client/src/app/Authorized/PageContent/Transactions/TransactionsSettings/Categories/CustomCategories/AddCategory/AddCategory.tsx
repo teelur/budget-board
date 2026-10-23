@@ -1,9 +1,10 @@
-import { LoadingOverlay, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import {
   BodyText,
   Button,
   Card,
   CategorySelect,
+  LoadingOverlay,
   SegmentedControl,
   TextInput,
 } from "@teelur/budget-board-ui";
@@ -58,7 +59,7 @@ const AddCategory = (): React.ReactNode => {
           </BodyText>
           <SegmentedControl
             color="secondary"
-            size="compact-sm"
+            size="sm"
             fullWidth
             value={isChildCategory ? "child" : "parent"}
             data={[
@@ -91,7 +92,7 @@ const AddCategory = (): React.ReactNode => {
             </BodyText>
             <SegmentedControl
               color="secondary"
-              size="compact-sm"
+              size="sm"
               fullWidth
               value={categoryTypeField.getValue()}
               data={[

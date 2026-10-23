@@ -1,5 +1,5 @@
-import { Skeleton, Stack } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Stack } from "@mantine/core";
+import { BodyText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { getDeletedTransactions } from "~/helpers/transactions";
 import DeletedTransactionCards from "./DeletedTransactionCards/DeletedTransactionCards";
@@ -22,7 +22,7 @@ const Deleted = (): React.ReactNode => {
 
   const getDeletedTransactionContent = (): React.ReactNode => {
     if (transactionsQuery.isPending) {
-      return <Skeleton height={63} radius="md" />;
+      return <Skeleton height={63} />;
     }
 
     if (deletedTransactions.length === 0) {

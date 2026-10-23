@@ -1,6 +1,6 @@
 import classes from "./EditableGoalCardContent.module.css";
 
-import { Flex, Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Flex, Group, Stack } from "@mantine/core";
 import {
   ActionIcon,
   Badge,
@@ -11,6 +11,7 @@ import {
   TextInput,
   DateInput,
   BodyText,
+  LoadingOverlay,
 } from "@teelur/budget-board-ui";
 import React from "react";
 import { sumAccountsTotalBalance } from "~/helpers/accounts";

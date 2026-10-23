@@ -7,12 +7,15 @@ export enum NotificationType {
   Information = "information",
 }
 
-const notificationColors: Record<NotificationType, string> = {
-  [NotificationType.Error]: "var(--button-color-destructive)",
-  [NotificationType.Success]: "var(--button-color-confirm)",
-  [NotificationType.Warning]: "var(--button-color-warning)",
-  [NotificationType.Information]: "var(--text-color-status-neutral)",
-};
+type NotificationSemanticColor = "error" | "success" | "warning" | "info";
+
+const notificationColors: Record<NotificationType, NotificationSemanticColor> =
+  {
+    [NotificationType.Error]: "error",
+    [NotificationType.Success]: "success",
+    [NotificationType.Warning]: "warning",
+    [NotificationType.Information]: "info",
+  };
 
 export interface INotificationOptions extends Omit<NotificationData, "color"> {
   type: NotificationType;

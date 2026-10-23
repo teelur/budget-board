@@ -1,6 +1,7 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
-import { BarChart } from "@mantine/charts";
-import { BodyText } from "@teelur/budget-board-ui";
+import {
+  MonthlySpendingChart as BBMonthlySpendingChart,
+  type MonthlySpendingChartData,
+} from "@teelur/budget-board-ui";
 import { ITransaction } from "~/models/transaction";
 import React from "react";
 import { buildMonthlySpendingChartData } from "~/helpers/charts";
@@ -8,7 +9,7 @@ import { SignDisplay } from "~/helpers/currency";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useTranslation } from "react-i18next";
 
-interface SpendingChartProps {
+interface MonthlySpendingChartProps {
   transactions: ITransaction[];
   months: Date[];
   isPending?: boolean;
@@ -17,7 +18,9 @@ interface SpendingChartProps {
   invertData?: boolean;
 }
 
-const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
+const MonthlySpendingChart = (
+  props: MonthlySpendingChartProps,
+): React.ReactNode => {
   const sortedMonths = [...props.months].sort(
     (a, b) => a.getTime() - b.getTime(),
   );
@@ -25,7 +28,7 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
   const { t } = useTranslation();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
 
-  const chartData = React.useMemo(
+  const chartData = React.useMemo<MonthlySpendingChartData[]>(
     () =>
       buildMonthlySpendingChartData(
         sortedMonths,
@@ -63,67 +66,27 @@ const MonthlySpendingChart = (props: SpendingChartProps): React.ReactNode => {
     return total / (chartData.length - 1);
   }, [chartData]);
 
-  if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
-  }
-
-  if (props.months.length === 0) {
-    return (
-      <Group justify="center">
-        <BodyText tone="muted" size="md">
-          {t("select_a_month_to_display_the_chart")}
-        </BodyText>
-      </Group>
-    );
-  }
-
-  const chartValueFormatter = (value: number | null | undefined): string => {
-    if (value == null) {
-      return "";
-    }
-
-    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
-  };
+  const chartValueFormatter = React.useCallback(
+    (value: number) =>
+      formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0),
+    [formatSensitiveAmount],
+  );
 
   return (
-    <Stack gap="1rem">
-      <Group justify="space-between" align="center">
-        <BodyText tone="secondary" size="sm">
-          {props.invertData ? t("average_spending") : t("average_income")}
-        </BodyText>
-        <BodyText tone="primary" size="sm" fw={500}>
-          {chartValueFormatter(average)}
-        </BodyText>
-      </Group>
-      <BarChart
-        h={400}
-        w="100%"
-        series={[
-          {
-            name: "total",
-            label: t("total"),
-            color: "blue.6",
-          },
-        ]}
-        data={chartData}
-        dataKey="month"
-        valueFormatter={chartValueFormatter}
-        referenceLines={[
-          {
-            y: average,
-            color: "red.5",
-            label: "Average",
-            labelPosition: "insideTopRight",
-          },
-        ]}
-        withTooltip={false}
-        tooltipAnimationDuration={200}
-        xAxisProps={{ angle: -20 }}
-        withBarValueLabel
-        withYAxis={props.includeYAxis}
-        gridAxis={props.includeGrid ? "xy" : "none"}
-      />
-    </Stack>
+    <BBMonthlySpendingChart
+      ariaLabel={t(props.invertData ? "expense_trends" : "income_trends")}
+      average={average}
+      averageLabel={
+        props.invertData ? t("average_spending") : t("average_income")
+      }
+      data={chartData}
+      emptyMessage={t("select_a_month_to_display_the_chart")}
+      formatValue={chartValueFormatter}
+      height={400}
+      includeGrid={props.includeGrid}
+      includeYAxis={props.includeYAxis}
+      isLoading={props.isPending}
+    />
   );
 };
 

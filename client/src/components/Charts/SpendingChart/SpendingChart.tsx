@@ -1,16 +1,14 @@
-import { BodyText } from "@teelur/budget-board-ui";
-import { ITransaction } from "~/models/transaction";
-import { AreaChart } from "@mantine/charts";
+import { useElementSize } from "@mantine/hooks";
+import { SpendingChart as BBSpendingChart } from "@teelur/budget-board-ui";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   buildTransactionChartData,
   buildTransactionChartSeries,
 } from "~/helpers/charts";
 import { SignDisplay } from "~/helpers/currency";
-import { Group, Skeleton } from "@mantine/core";
-import ChartTooltip from "../ChartTooltip/ChartTooltip";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
-import { useTranslation } from "react-i18next";
+import { ITransaction } from "~/models/transaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 
 interface SpendingChartProps {
@@ -19,17 +17,24 @@ interface SpendingChartProps {
   isPending?: boolean;
   includeGrid?: boolean;
   includeYAxis?: boolean;
-  h?: number | string;
+  height?: number;
 }
 
 const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
-  const sortedMonths = props.months.sort((a, b) => a.getTime() - b.getTime());
-
+  const sortedMonths = React.useMemo(
+    () => [...props.months].sort((a, b) => a.getTime() - b.getTime()),
+    [props.months],
+  );
+  const { ref: chartContainerRef, height: chartContainerHeight } =
+    useElementSize<HTMLDivElement>();
   const { t } = useTranslation();
   const { dayjs } = useLocale();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
 
-  const formatDateString = (date: Date) => dayjs(date).format("MMMM YYYY");
+  const formatDateString = React.useCallback(
+    (date: Date) => dayjs(date).format("MMMM YYYY"),
+    [dayjs],
+  );
 
   const chartData = React.useMemo(
     () =>
@@ -46,48 +51,39 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
     [sortedMonths, formatDateString],
   );
 
-  const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
-  };
-
-  if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
-  }
-
-  if (props.months.length === 0) {
-    return (
-      <Group justify="center">
-        <BodyText tone="muted" size="sm">
-          {t("select_a_month_to_display_the_chart")}
-        </BodyText>
-      </Group>
-    );
-  }
+  const chartValueFormatter = React.useCallback(
+    (value: number) =>
+      formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0),
+    [formatSensitiveAmount],
+  );
+  const chartHeight =
+    props.height ??
+    (chartContainerHeight > 0
+      ? Math.max(1, Math.floor(chartContainerHeight))
+      : 400);
 
   return (
-    <AreaChart
-      w="100%"
-      h={props.h ?? "100%"}
-      series={chartSeries}
-      data={chartData}
-      dataKey="day"
-      valueFormatter={chartValueFormatter}
-      withLegend
-      tooltipAnimationDuration={200}
-      tooltipProps={{
-        content: ({ label, payload }) => (
-          <ChartTooltip
-            label={label}
-            payload={payload}
-            series={chartSeries}
-            valueFormatter={chartValueFormatter}
-          />
-        ),
+    <div
+      ref={chartContainerRef}
+      style={{
+        height: props.height ?? "100%",
+        minHeight: 0,
+        width: "100%",
       }}
-      curveType="monotone"
-      withYAxis={props.includeYAxis}
-      gridAxis={props.includeGrid ? "xy" : "none"}
-    />
+    >
+      <BBSpendingChart
+        ariaLabel={t("spending_trends")}
+        data={chartData}
+        emptyMessage={t("select_a_month_to_display_the_chart")}
+        formatValue={chartValueFormatter}
+        height={chartHeight}
+        includeGrid={props.includeGrid}
+        includeYAxis={props.includeYAxis}
+        isLoading={props.isPending}
+        series={chartSeries}
+        style={{ height: "100%" }}
+      />
+    </div>
   );
 };
 

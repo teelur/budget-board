@@ -1,5 +1,5 @@
-import { Flex, Skeleton, Stack } from "@mantine/core";
-import { BodyText, Card, HeadingText } from "@teelur/budget-board-ui";
+import { Flex, Stack } from "@mantine/core";
+import { BodyText, Card, HeadingText, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import WidgetErrorMessage from "~/components/ui/widgets/shared/WidgetErrorMessage/WidgetErrorMessage";
@@ -205,7 +205,7 @@ const MetricWidget = ({
     if (isPending) {
       return (
         <Flex h="100%" w="100%" p="0.5rem">
-          <Skeleton flex={1} radius="md" />
+          <Skeleton flex={1} />
         </Flex>
       );
     }

@@ -1,9 +1,10 @@
-import { Group, LoadingOverlay, Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import {
   ActionIcon,
   AmountText,
   BodyText,
   Card,
+  LoadingOverlay,
 } from "@teelur/budget-board-ui";
 import { PlusIcon } from "lucide-react";
 import React from "react";
@@ -89,6 +90,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   return (
     <Stack gap="0.5rem" w="100%">
       <Card
+        surface="sunken"
         onClick={() => {
           if (props.selectedDate) {
             props.openDetails(props.categoryTree.value, props.selectedDate);
@@ -112,7 +114,6 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
                   props.categoryTree.value.toLocaleLowerCase(),
                 ) ?? 0
               }
-              disableStatusColor
               size="md"
               isSensitive={isPrivacyModeEnabled}
               currency={preferredCurrency}

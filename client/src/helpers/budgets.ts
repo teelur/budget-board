@@ -54,49 +54,6 @@ export enum StatusColorType {
   Target,
 }
 
-export const getStatusColor = (
-  amount: number,
-  total: number,
-  type: StatusColorType,
-  warningThreshold: number,
-): string => {
-  if (type === StatusColorType.Income) {
-    if (amount < total) {
-      return "var(--text-color-status-neutral)";
-    }
-    return "var(--text-color-status-good)";
-  }
-
-  if (type === StatusColorType.Expense) {
-    {
-      const invertedAmount = amount * -1;
-      if (invertedAmount > total) {
-        return "var(--text-color-status-bad)";
-      }
-      if (invertedAmount >= total * (warningThreshold / 100)) {
-        return "var(--text-color-status-warning)";
-      }
-      return "var(--text-color-status-good)";
-    }
-  }
-
-  if (type === StatusColorType.Total) {
-    if (amount < 0) {
-      return "var(--text-color-status-bad)";
-    } else if (amount >= 0) {
-      return "var(--text-color-status-good)";
-    }
-  }
-
-  if (type === StatusColorType.Target) {
-    return amount < total
-      ? "var(--text-color-status-bad)"
-      : "var(--text-color-status-good)";
-  }
-
-  return "var(--base-color-text-primary)";
-};
-
 /**
  * Retrieves the total amount for the specified budget category by summing the category's own total
  * with any child categories' totals (if the category is a parent).

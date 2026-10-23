@@ -1,5 +1,5 @@
-import { Stack, Tooltip } from "@mantine/core";
-import { Button, BodyText } from "@teelur/budget-board-ui";
+import { Stack } from "@mantine/core";
+import { Button, BodyText, Tooltip } from "@teelur/budget-board-ui";
 import React from "react";
 import { IUserSettingsUpdateRequest } from "~/models/userSettings";
 import { useTranslation } from "react-i18next";

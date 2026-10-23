@@ -1,30 +1,17 @@
-import { BodyText } from "@teelur/budget-board-ui";
+import { ValueChart as BBValueChart } from "@teelur/budget-board-ui";
 import { SignDisplay } from "~/helpers/currency";
-import { BarChart } from "@mantine/charts";
-import { Group, Skeleton } from "@mantine/core";
 import React from "react";
 import { DatesRangeValue } from "@mantine/dates";
-import ChartTooltip from "~/components/Charts/ChartTooltip/ChartTooltip";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
-import { chartColors } from "~/helpers/charts";
 import { DateString } from "~/helpers/datetime";
-import { buildValueChartData, IItem, IValue } from "./helpers/valueChart";
-
-/**
- * Builds the series for the value chart.
- * @param items
- * @returns An array of objects containing the item ID, name, and color to use.
- */
-const buildValueChartSeries = (items: IItem[]) =>
-  items.map((item: IItem) => {
-    return {
-      name: item.id,
-      label: item.name,
-      color: chartColors[items.indexOf(item) % chartColors.length] ?? "gray.6",
-    };
-  });
+import {
+  buildValueChartData,
+  buildValueChartSeries,
+  type IItem,
+  type IValue,
+} from "./helpers/valueChart";
 
 interface ValueChartProps {
   items: IItem[];
@@ -39,11 +26,15 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
   const { dayjs, dateFormat } = useLocale();
   const formatSensitiveAmount = useSensitiveAmountFormatter();
 
-  const chartSeries = buildValueChartSeries(props.items);
+  const chartSeries = React.useMemo(
+    () => buildValueChartSeries(props.items),
+    [props.items],
+  );
 
-  const chartValueFormatter = (value: number): string => {
-    return formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0);
-  };
+  const dateLabelFormatter = React.useCallback(
+    (date: DateString): string => dayjs(date).format(dateFormat),
+    [dayjs, dateFormat],
+  );
 
   const sortedChartValues = React.useMemo(() => {
     const startDate: Date = props.dateRange[0]
@@ -60,51 +51,31 @@ const ValueChart = (props: ValueChartProps): React.ReactNode => {
       .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
   }, [props.values, props.dateRange, dayjs]);
 
-  const dateLabelFormatter = React.useCallback(
-    (date: DateString): string => dayjs(date).format(dateFormat),
-    [dayjs, dateFormat],
-  );
-
-  if (props.isPending) {
-    return <Skeleton height={425} radius="lg" />;
-  }
-
-  if (props.items?.length === 0 || props.values?.length === 0) {
-    return (
-      <Group justify="center" p="0.5rem">
-        <BodyText tone="muted" size="sm">
-          {t("no_data_available")}
-        </BodyText>
-      </Group>
-    );
-  }
-
-  return (
-    <BarChart
-      h={400}
-      w="100%"
-      data={buildValueChartData(
+  const chartData = React.useMemo(
+    () =>
+      buildValueChartData(
         sortedChartValues,
         dateLabelFormatter,
         props.invertYAxis,
-      )}
+      ),
+    [dateLabelFormatter, props.invertYAxis, sortedChartValues],
+  );
+
+  const chartValueFormatter = React.useCallback(
+    (value: number) =>
+      formatSensitiveAmount(value, SignDisplay.Auto, undefined, 0),
+    [formatSensitiveAmount],
+  );
+
+  return (
+    <BBValueChart
+      ariaLabel={t("values")}
+      data={chartData}
+      emptyMessage={t("no_data_available")}
+      formatValue={chartValueFormatter}
+      isLoading={props.isPending}
       series={chartSeries}
-      dataKey="date"
-      type="stacked"
-      withLegend
-      tooltipAnimationDuration={200}
-      tooltipProps={{
-        content: ({ label, payload }) => (
-          <ChartTooltip
-            label={label}
-            payload={payload}
-            series={chartSeries}
-            valueFormatter={chartValueFormatter}
-            includeTotal
-          />
-        ),
-      }}
-      valueFormatter={chartValueFormatter}
+      totalLabel={t("total")}
     />
   );
 };
