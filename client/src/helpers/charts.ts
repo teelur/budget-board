@@ -22,14 +22,16 @@ import { ICategory } from "~/models/category";
 export type { FlowsChartData, FlowType } from "@teelur/budget-board-ui";
 
 export const chartColors = [
-  "indigo.6",
-  "teal.6",
-  "orange.6",
-  "red.6",
-  "yellow.6",
-  "lime.6",
-  "grape.6",
-  "pink.6",
+  "var(--bbui-color-data-1)",
+  "var(--bbui-color-data-2)",
+  "var(--bbui-color-data-3)",
+  "var(--bbui-color-data-4)",
+  "var(--bbui-color-data-5)",
+  "var(--bbui-color-data-6)",
+  "var(--bbui-color-data-7)",
+  "var(--bbui-color-data-8)",
+  "var(--bbui-color-data-9)",
+  "var(--bbui-color-data-10)",
 ];
 
 /**
@@ -138,7 +140,8 @@ export const buildSpendingCategoryChartData = (
     .map(([name, value], i) => ({
       name,
       value,
-      color: chartColors[i % chartColors.length] ?? "gray.6",
+      color:
+        chartColors[i % chartColors.length] ?? "var(--bbui-color-text-muted)",
     }));
 };
 

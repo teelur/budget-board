@@ -274,9 +274,6 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
               left: isMobile ? 0 : "var(--app-shell-navbar-width, 60px)",
               right: 0,
               zIndex: props.zIndex ?? 200,
-              backgroundColor: "var(--bbui-color-surface-sunken)",
-              borderTop: "2px solid var(--bbui-color-border)",
-              boxShadow: "0 -4px 12px rgba(0, 0, 0, 0.1)",
             }}
           >
             {/* Selection controls row */}

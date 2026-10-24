@@ -212,7 +212,11 @@ const TransactionImportJobPanel = () => {
                     })}
                   </BodyText>
                   {job?.errorMessage ? (
-                    <BodyText tone="secondary" size="sm" c="red">
+                    <BodyText
+                      tone="secondary"
+                      size="sm"
+                      c="var(--bbui-color-error)"
+                    >
                       {job.errorMessage}
                     </BodyText>
                   ) : null}

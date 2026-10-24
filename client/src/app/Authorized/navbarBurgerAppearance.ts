@@ -5,7 +5,9 @@ export const getNavbarBurgerColor = (
   isDarkMode: boolean,
 ) =>
   isNavbarOpen
-    ? "#ffffff"
+    ? isDarkMode
+      ? budgetBoardColors.dark.navigationTextPrimary
+      : budgetBoardColors.light.navigationTextPrimary
     : isDarkMode
       ? budgetBoardColors.dark.textPrimary
       : budgetBoardColors.light.textPrimary;
