@@ -41,7 +41,7 @@ const UnbudgetedChildCard = (
     <Group w="100%" align="center" wrap="nowrap" gap="0.5rem">
       <CornerDownRightIcon size={20} />
       <Card
-        surface="sunken"
+        surface="elevated"
         p="0.25rem"
         w="100%"
         onClick={() => {

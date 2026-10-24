@@ -84,7 +84,7 @@ const NetWorthGroupItem = (props: NetWorthGroupItemProps): React.ReactNode => {
   });
 
   return (
-    <Card ref={props.isSortable ? ref : undefined}>
+    <Card ref={props.isSortable ? ref : undefined} surface="sunken">
       <LoadingOverlay visible={reorderNetWorthWidgetLineMutation.isPending} />
       <Group gap="0.5rem">
         {props.isSortable && (

@@ -3,7 +3,7 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--bbui-color-text-primary);
   background-color: var(--bbui-color-page);
 
   font-synthesis: none;
@@ -14,11 +14,11 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--bbui-color-primary);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--bbui-color-button-hover);
 }
 
 html,
@@ -32,16 +32,4 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }

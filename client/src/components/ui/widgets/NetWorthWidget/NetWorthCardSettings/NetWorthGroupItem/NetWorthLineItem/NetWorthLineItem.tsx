@@ -55,7 +55,7 @@ const NetWorthLineItem = (props: INetWorthLineItemProps): React.ReactNode => {
   });
 
   return (
-    <Card ref={props.isSortable ? ref : undefined} surface="sunken">
+    <Card ref={props.isSortable ? ref : undefined}>
       <LoadingOverlay visible={updateNetWorthWidgetLineMutation.isPending} />
       <Group gap="0.5rem">
         {props.isSortable && (

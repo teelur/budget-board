@@ -7,6 +7,10 @@ import PrivacyModeButton from "./PrivacyModeButton/PrivacyModeButton";
 import SyncButton from "./SyncButton/SyncButton";
 import { areStringsEqual } from "~/helpers/utils";
 import { useNavigate } from "react-router";
+import {
+  getNavbarBurgerColor,
+  openNavbarBurgerStyles,
+} from "../navbarBurgerAppearance";
 
 interface HeaderProps {
   isNavbarOpen: boolean;
@@ -31,6 +35,11 @@ const Header = (props: HeaderProps): React.ReactNode => {
       <Group gap="0.5rem" wrap="nowrap" style={{ minWidth: 0 }}>
         <Burger
           opened={props.isNavbarOpen}
+          color={getNavbarBurgerColor(
+            props.isNavbarOpen,
+            computedColorScheme === "dark",
+          )}
+          styles={props.isNavbarOpen ? openNavbarBurgerStyles : undefined}
           className={classes.burger}
           onClick={props.toggleNavbar}
           hiddenFrom="xs"

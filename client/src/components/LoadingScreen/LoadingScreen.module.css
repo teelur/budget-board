@@ -16,8 +16,8 @@
 .loadingSpinner {
   width: 100px;
   height: 100px;
-  border: 15px solid #e0e0e0;
-  border-top: 15px solid #5c7cfa;
+  border: 15px solid var(--bbui-color-border, #e0e0e0);
+  border-top: 15px solid var(--bbui-color-primary, #5c7cfa);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -29,12 +29,5 @@
 
   100% {
     transform: rotate(360deg);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .loadingSpinner {
-    border-color: #343434;
-    border-top-color: #5c7cfa;
   }
 }

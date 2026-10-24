@@ -90,7 +90,7 @@ const UncategorizedTransactionsWidget = (): React.ReactNode => {
               categories={transactionCategories}
               selected={selectedIds.has(transaction.id)}
               onToggleSelect={onToggleSelect}
-              surface="sunken"
+              surface="elevated"
             />
           ))}
         </Stack>

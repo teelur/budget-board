@@ -21,7 +21,11 @@ import {
   Notifications,
   type NotificationData,
 } from "@mantine/notifications";
-import { budgetBoardColors, Notification } from "@teelur/budget-board-ui";
+import {
+  budgetBoardColors,
+  budgetBoardDataColors,
+  Notification,
+} from "@teelur/budget-board-ui";
 import {
   AlertCircle,
   CircleCheckIcon,
@@ -38,7 +42,6 @@ import { AuthProvider } from "~/providers/AuthProvider/AuthProvider";
 import AuthorizedRoute from "~/providers/AuthProvider/AuthorizedRoute";
 import UnauthorizedRoute from "~/providers/AuthProvider/UnauthorizedRoute";
 import Authorized from "~/app/Authorized/Authorized";
-import { green, blue, orange, red } from "./shared/colors";
 import { UserSettingsProvider } from "./providers/UserSettingsProvider/UserSettingsProvider";
 import { LocaleProvider } from "./providers/LocaleProvider/LocaleProvider";
 import { PrivacyModeProvider } from "./providers/PrivacyModeProvider/PrivacyModeProvider";
@@ -127,17 +130,22 @@ const theme = createTheme({
     transactionBreakpoint: "750px", // Custom breakpoint for transactions
     editTransactionBreakpoint: "850px", // Custom breakpoint for edit transactions
   },
-  colors: {
-    green,
-    blue,
-    orange,
-    red,
-  },
 });
+
+const getDataColorVariables = (
+  colors: readonly string[],
+): Record<string, string> => {
+  const variables: Record<string, string> = {};
+  colors.forEach((color, index) => {
+    variables[`--bbui-color-data-${index + 1}`] = color;
+  });
+  return variables;
+};
 
 const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {
+    ...getDataColorVariables(budgetBoardDataColors.light),
     "--bbui-color-page": budgetBoardColors.light.page,
     "--bbui-color-border": budgetBoardColors.light.border,
     "--bbui-color-surface": budgetBoardColors.light.surface,
@@ -152,11 +160,13 @@ const resolver: CSSVariablesResolver = () => ({
 
     "--bbui-color-primary": budgetBoardColors.light.primary,
     "--bbui-color-warning": budgetBoardColors.light.warning,
+    "--bbui-color-error": budgetBoardColors.light.error,
     "--bbui-color-button-hover": budgetBoardColors.light.buttonHoverBorder,
 
     "--bbui-color-selection": budgetBoardColors.light.selection,
   },
   dark: {
+    ...getDataColorVariables(budgetBoardDataColors.dark),
     "--bbui-color-page": budgetBoardColors.dark.page,
     "--bbui-color-border": budgetBoardColors.dark.border,
     "--bbui-color-surface": budgetBoardColors.dark.surface,
@@ -171,6 +181,7 @@ const resolver: CSSVariablesResolver = () => ({
 
     "--bbui-color-primary": budgetBoardColors.dark.primary,
     "--bbui-color-warning": budgetBoardColors.dark.warning,
+    "--bbui-color-error": budgetBoardColors.dark.error,
     "--bbui-color-button-hover": budgetBoardColors.dark.buttonHoverBorder,
 
     "--bbui-color-selection": budgetBoardColors.dark.selection,

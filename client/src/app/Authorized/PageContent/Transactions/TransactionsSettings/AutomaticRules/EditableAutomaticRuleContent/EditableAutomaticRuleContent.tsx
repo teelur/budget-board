@@ -20,7 +20,7 @@ interface EditableAutomaticRuleContentProps {
   actionItems: IRuleParameterEdit[];
   setConditionItems: React.Dispatch<React.SetStateAction<IRuleParameterEdit[]>>;
   setActionItems: React.Dispatch<React.SetStateAction<IRuleParameterEdit[]>>;
-  surface?: "sunken" | "default";
+  surface?: "sunken" | "elevated" | "default";
 }
 
 const EditableAutomaticRuleContent = (
