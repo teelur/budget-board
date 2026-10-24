@@ -22,14 +22,16 @@ import { ICategory } from "~/models/category";
 export type { FlowsChartData, FlowType } from "@teelur/budget-board-ui";
 
 export const chartColors = [
-  "indigo.6",
-  "teal.6",
-  "orange.6",
-  "red.6",
-  "yellow.6",
-  "lime.6",
-  "grape.6",
-  "pink.6",
+  "var(--bbui-color-data-1)",
+  "var(--bbui-color-data-2)",
+  "var(--bbui-color-data-3)",
+  "var(--bbui-color-data-4)",
+  "var(--bbui-color-data-5)",
+  "var(--bbui-color-data-6)",
+  "var(--bbui-color-data-7)",
+  "var(--bbui-color-data-8)",
+  "var(--bbui-color-data-9)",
+  "var(--bbui-color-data-10)",
 ];
 
 /**
@@ -138,7 +140,8 @@ export const buildSpendingCategoryChartData = (
     .map(([name, value], i) => ({
       name,
       value,
-      color: chartColors[i % chartColors.length] ?? "gray.6",
+      color:
+        chartColors[i % chartColors.length] ?? "var(--bbui-color-text-muted)",
     }));
 };
 
@@ -152,8 +155,8 @@ export interface ISpendingSubcategoryChartData {
 /**
  * Builds subcategory-level chart data for the outer ring of a two-ring pie chart.
  * Non-positive net slices are omitted and remaining values are scaled to their
- * parent's net total so the outer ring aligns with the inner ring.
- * Color shades are derived from the parent's color family.
+ * parent's net total so the outer ring aligns with the inner ring. Color
+ * variants mix the parent's BBUI color with the current surface.
  */
 export const buildSpendingSubcategoryChartData = (
   transactions: ITransaction[],
@@ -195,7 +198,6 @@ export const buildSpendingSubcategoryChartData = (
   const result: ISpendingSubcategoryChartData[] = [];
 
   innerChartData.forEach((parent) => {
-    const colorFamily = parent.color.split(".")[0] ?? "gray";
     const subs = [...subMap.values()].filter(
       (s) => s.parent === parent.name && s.value > 0,
     );
@@ -208,10 +210,11 @@ export const buildSpendingSubcategoryChartData = (
     subs.forEach((sub, i) => {
       const shade =
         subs.length === 1 ? 6 : (shadeSteps[i % shadeSteps.length] ?? 6);
+      const colorPercentage = shade * 10;
       result.push({
         name: sub.name,
         value: sub.value * scale,
-        color: `${colorFamily}.${shade}`,
+        color: `color-mix(in srgb, ${parent.color} ${colorPercentage}%, var(--bbui-color-surface))`,
         parent: sub.parent,
       });
     });

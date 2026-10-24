@@ -6,9 +6,11 @@ import { SiGithub } from "@icons-pack/react-simple-icons";
 import {
   ActionIcon,
   BodyText,
+  budgetBoardColors,
   Divider,
   Tooltip,
 } from "@teelur/budget-board-ui";
+import { darkContrastGhostActionIconStyle } from "../darkActionIconStyles";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { APP_REPOSITORY } from "~/helpers/appUpdates";
@@ -85,6 +87,7 @@ const NavbarFooter = ({
               className={classes.collapsedVersion}
               size="xs"
               ta="center"
+              c={budgetBoardColors.dark.textPrimary}
             >
               {version}
             </BodyText>
@@ -131,7 +134,13 @@ const NavbarFooter = ({
           disabled={!isVersionTruncated}
         >
           <div ref={versionTextRef} className={classes.versionText}>
-            <BodyText tone="primary" size="xs" fw={500} truncate>
+            <BodyText
+              tone="primary"
+              size="xs"
+              fw={500}
+              truncate
+              c={budgetBoardColors.dark.textPrimary}
+            >
               {currentVersionLabel}
             </BodyText>
           </div>
@@ -141,6 +150,7 @@ const NavbarFooter = ({
             variant="ghost"
             color="contrast"
             size="xs"
+            style={darkContrastGhostActionIconStyle}
             onClick={() => openExternalLink(repositoryUrl)}
             aria-label={t("github_repository")}
           >

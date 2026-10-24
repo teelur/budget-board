@@ -75,7 +75,7 @@ const WidgetShell = ({
             bottom: 6,
             right: 6,
             zIndex: 10,
-            color: "var(--mantine-color-dimmed)",
+            color: "var(--bbui-color-text-muted)",
             pointerEvents: "none",
             transform: "rotate(90deg)",
           }}

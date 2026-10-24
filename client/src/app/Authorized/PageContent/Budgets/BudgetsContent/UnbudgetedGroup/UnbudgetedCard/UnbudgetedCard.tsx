@@ -90,7 +90,7 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   return (
     <Stack gap="0.5rem" w="100%">
       <Card
-        surface="sunken"
+        surface="elevated"
         onClick={() => {
           if (props.selectedDate) {
             props.openDetails(props.categoryTree.value, props.selectedDate);

@@ -1,7 +1,18 @@
 import classes from "./Navbar.module.css";
 
-import { Burger, Flex, ScrollArea, Stack } from "@mantine/core";
+import {
+  Burger,
+  Flex,
+  ScrollArea,
+  Stack,
+  useComputedColorScheme,
+} from "@mantine/core";
 import { ActionIcon, NavbarLink, Tooltip } from "@teelur/budget-board-ui";
+import { darkTextPrimaryGhostActionIconStyle } from "./darkActionIconStyles";
+import {
+  getNavbarBurgerColor,
+  openNavbarBurgerStyles,
+} from "../navbarBurgerAppearance";
 import {
   ArrowLeftFromLineIcon,
   ArrowRightFromLineIcon,
@@ -48,6 +59,7 @@ const isPathActive = (pathname: string, path: string) =>
 
 const Navbar = (props: NavbarProps) => {
   const { t } = useTranslation();
+  const computedColorScheme = useComputedColorScheme();
   const navigate = useNavigate();
   const location = useLocation();
   const logoutMutation = useLogoutMutation();
@@ -191,6 +203,11 @@ const Navbar = (props: NavbarProps) => {
         <Stack justify="center" align="center" gap="0.0625rem" w="100%">
           <Burger
             opened={props.isNavbarOpen}
+            color={getNavbarBurgerColor(
+              props.isNavbarOpen,
+              computedColorScheme === "dark",
+            )}
+            styles={props.isNavbarOpen ? openNavbarBurgerStyles : undefined}
             className={classes.burger}
             m="0.25rem"
             onClick={props.toggleNavbar}
@@ -207,8 +224,9 @@ const Navbar = (props: NavbarProps) => {
           >
             <ActionIcon
               variant="ghost"
-              color="muted"
+              color="contrast"
               size="sm"
+              style={darkTextPrimaryGhostActionIconStyle}
               visibleFrom="xs"
               className={`${classes.sidebarToggle} ${props.isNavbarExpanded ? classes.sidebarToggleExpanded : ""}`}
               aria-label={

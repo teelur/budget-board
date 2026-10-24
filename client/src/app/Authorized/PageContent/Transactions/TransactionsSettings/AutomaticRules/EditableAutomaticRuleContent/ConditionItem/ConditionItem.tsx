@@ -32,7 +32,7 @@ export interface ConditionItemProps {
   doDelete?: (index: number) => void;
   index: number;
   categories: ICategory[];
-  surface?: "sunken" | "default";
+  surface?: "sunken" | "elevated" | "default";
 }
 
 const ConditionItem = (props: ConditionItemProps): React.ReactNode => {

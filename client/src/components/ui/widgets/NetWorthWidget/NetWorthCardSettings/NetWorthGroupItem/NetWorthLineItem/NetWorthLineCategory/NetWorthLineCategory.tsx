@@ -22,7 +22,7 @@ const NetWorthLineCategory = (
   const [isEditing, { open, close }] = useDisclosure(false);
 
   return (
-    <Card py="0.25rem" px="0.5rem">
+    <Card surface="elevated" py="0.25rem" px="0.5rem">
       {isEditing ? (
         <EditableNetWorthLineCategoryContent
           category={props.category}
