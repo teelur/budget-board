@@ -155,8 +155,8 @@ export interface ISpendingSubcategoryChartData {
 /**
  * Builds subcategory-level chart data for the outer ring of a two-ring pie chart.
  * Non-positive net slices are omitted and remaining values are scaled to their
- * parent's net total so the outer ring aligns with the inner ring.
- * Color shades are derived from the parent's color family.
+ * parent's net total so the outer ring aligns with the inner ring. Color
+ * variants mix the parent's BBUI color with the current surface.
  */
 export const buildSpendingSubcategoryChartData = (
   transactions: ITransaction[],
@@ -198,7 +198,6 @@ export const buildSpendingSubcategoryChartData = (
   const result: ISpendingSubcategoryChartData[] = [];
 
   innerChartData.forEach((parent) => {
-    const colorFamily = parent.color.split(".")[0] ?? "gray";
     const subs = [...subMap.values()].filter(
       (s) => s.parent === parent.name && s.value > 0,
     );
@@ -211,10 +210,11 @@ export const buildSpendingSubcategoryChartData = (
     subs.forEach((sub, i) => {
       const shade =
         subs.length === 1 ? 6 : (shadeSteps[i % shadeSteps.length] ?? 6);
+      const colorPercentage = shade * 10;
       result.push({
         name: sub.name,
         value: sub.value * scale,
-        color: `${colorFamily}.${shade}`,
+        color: `color-mix(in srgb, ${parent.color} ${colorPercentage}%, var(--bbui-color-surface))`,
         parent: sub.parent,
       });
     });
