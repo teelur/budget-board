@@ -55,7 +55,7 @@ const GoalDetails = (props: GoalDetailsProps): React.ReactNode => {
         >
           <Stack gap="0.5rem">
             {props.goal.accounts.map((account: IAccountResponse) => (
-              <Card surface="sunken" key={account.id}>
+              <Card surface="elevated" key={account.id}>
                 <AccountItem account={account} />
               </Card>
             ))}

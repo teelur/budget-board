@@ -34,7 +34,7 @@ export interface ActionItemProps {
   doDelete: (index: number) => void;
   index: number;
   categories: ICategory[];
-  surface?: "sunken" | "default";
+  surface?: "sunken" | "elevated" | "default";
 }
 
 const ActionItem = (props: ActionItemProps): React.ReactNode => {

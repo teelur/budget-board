@@ -11,7 +11,7 @@ interface BalanceItemProps {
 const BalanceItem = (props: BalanceItemProps) => {
   const [isSelected, { open, close }] = useDisclosure(false);
   return (
-    <Card surface="sunken" p="0.25rem">
+    <Card surface="elevated" p="0.25rem">
       {isSelected ? (
         <EditableBalanceItemContent
           balance={props.balance}
