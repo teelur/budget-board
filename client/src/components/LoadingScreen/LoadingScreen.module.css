@@ -16,8 +16,8 @@
 .loadingSpinner {
   width: 100px;
   height: 100px;
-  border: 15px solid var(--bbui-color-border);
-  border-top: 15px solid var(--bbui-color-primary);
+  border: 15px solid var(--bbui-color-border, #e0e0e0);
+  border-top: 15px solid var(--bbui-color-primary, #5c7cfa);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
