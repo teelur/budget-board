@@ -105,6 +105,7 @@ const Trends = (): React.ReactNode => {
               </BodyText>
               {section.links.map((link) => (
                 <NavbarLink
+                  mode="selection"
                   key={link.path}
                   label={link.label}
                   icon={link.icon}
