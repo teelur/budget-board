@@ -90,15 +90,7 @@ const PageContent = (): React.ReactNode => {
   const { envVariables } = getProjectEnvVariables();
   const isDemoMode = envVariables.VITE_DEMO_MODE?.toLowerCase() === "true";
 
-  const suspenseFallback = (
-    <Stack
-      h="calc(100dvh - var(--app-shell-header-offset, 60px))"
-      justify="center"
-      align="center"
-    >
-      <LoadingScreen fullScreen={false} />
-    </Stack>
-  );
+  const suspenseFallback = <LoadingScreen />;
 
   return (
     <ScrollArea

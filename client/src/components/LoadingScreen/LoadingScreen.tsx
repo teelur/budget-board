@@ -1,16 +1,10 @@
 import React from "react";
 import classes from "./LoadingScreen.module.css";
 
-interface LoadingScreenProps {
-  fullScreen?: boolean;
-}
-
-const LoadingScreen = ({
-  fullScreen = true,
-}: LoadingScreenProps): React.ReactNode => {
+const LoadingScreen = (): React.ReactNode => {
   return (
     <div
-      className={`${classes.loadingContainer} ${fullScreen ? classes.loadingContainerFullscreen : classes.loadingContainerContained}`}
+      className={`${classes.loadingContainer} ${classes.loadingContainerFullscreen}`}
     >
       <div className={classes.loadingSpinner} />
     </div>
