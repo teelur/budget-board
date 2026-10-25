@@ -40,7 +40,7 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     widgetType: TRANSACTION_TRENDS_WIDGET_TYPE,
     labelKey: "transaction_trends",
     descriptionKey: "transaction_trends_widget_description",
-    maxInstances: 1,
+    maxInstances: Infinity,
   },
   {
     widgetType: "Flows",

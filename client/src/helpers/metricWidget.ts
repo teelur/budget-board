@@ -500,6 +500,7 @@ function resolveTransactions(
 ): number {
   const type = params.type ?? "all";
   const category = params.category;
+  const account = params.account;
 
   let txs = getVisibleTransactions(ctx.transactions).filter((t) =>
     isInResolvedPeriod(getDateOnly(t.date), period),
@@ -521,6 +522,10 @@ function resolveTransactions(
         areStringsEqual(t.category ?? "", category) ||
         areStringsEqual(t.subcategory ?? "", category),
     );
+  }
+
+  if (account) {
+    txs = txs.filter((t) => areStringsEqual(t.accountName, account));
   }
 
   switch (metric) {

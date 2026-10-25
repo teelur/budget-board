@@ -29,7 +29,7 @@ const SOURCE_USES_PERIOD: Record<string, boolean> = {
 };
 
 const SOURCE_PARAM_KEYS: Record<string, string[]> = {
-  transactions: ["type", "category"],
+  transactions: ["type", "category", "account"],
   budgets: ["category"],
   goals: ["name"],
   accounts: ["type", "name"],
@@ -58,6 +58,7 @@ function getSourceParamValues(
     transactions: {
       ...SOURCE_PARAM_VALUES.transactions,
       category: suggestionData.transactionCategories,
+      account: suggestionData.accountNames,
     },
     budgets: {
       category: suggestionData.budgetCategories,
