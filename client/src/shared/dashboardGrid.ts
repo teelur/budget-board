@@ -5,7 +5,7 @@ export const GRID_BREAKPOINT = 768;
 export const TRANSACTION_TRENDS_WIDGET_TYPE = "TransactionTrends";
 export const LEGACY_SPENDING_TRENDS_WIDGET_TYPE = "SpendingTrends";
 
-// Spending trends was depricated and replaced by transaction trends
+// Spending trends was deprecated and replaced by transaction trends
 export const isTransactionTrendsWidgetType = (widgetType: string): boolean =>
   widgetType === TRANSACTION_TRENDS_WIDGET_TYPE ||
   widgetType === LEGACY_SPENDING_TRENDS_WIDGET_TYPE;
