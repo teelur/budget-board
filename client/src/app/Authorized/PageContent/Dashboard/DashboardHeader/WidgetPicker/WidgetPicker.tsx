@@ -2,7 +2,10 @@ import { Stack } from "@mantine/core";
 import { Drawer } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { WIDGET_REGISTRY } from "~/shared/dashboardGrid";
+import {
+  isTransactionTrendsWidgetType,
+  WIDGET_REGISTRY,
+} from "~/shared/dashboardGrid";
 import WidgetPickerItem from "./WidgetPickerItem/WidgetPickerItem";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useWidgetSettingsQuery } from "~/hooks/queries/useWidgetSettingsQuery";
@@ -65,7 +68,10 @@ const WidgetPicker = ({
       <Stack gap="0.5rem">
         {WIDGET_REGISTRY.map((entry) => {
           const instanceCount = existingWidgetTypes.filter(
-            (wt) => wt === entry.widgetType,
+            (widgetType) =>
+              isTransactionTrendsWidgetType(entry.widgetType)
+                ? isTransactionTrendsWidgetType(widgetType)
+                : widgetType === entry.widgetType,
           ).length;
           const isDisabled =
             entry.maxInstances !== Infinity &&

@@ -1,5 +1,7 @@
 import { useElementSize } from "@mantine/hooks";
-import { SpendingChart as BBSpendingChart } from "@teelur/budget-board-ui";
+import {
+  TransactionTrendsChart as BBTransactionTrendsChart,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,17 +12,21 @@ import { SignDisplay } from "~/helpers/currency";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { ITransaction } from "~/models/transaction";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import type { CategoryType } from "~/models/category";
 
-interface SpendingChartProps {
+interface TransactionTrendsChartProps {
   transactions: ITransaction[];
   months: Date[];
   isPending?: boolean;
   includeGrid?: boolean;
   includeYAxis?: boolean;
   height?: number;
+  getCategoryType?: (category: string) => CategoryType | "";
 }
 
-const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
+const TransactionTrendsChart = (
+  props: TransactionTrendsChartProps,
+): React.ReactNode => {
   const sortedMonths = React.useMemo(
     () => [...props.months].sort((a, b) => a.getTime() - b.getTime()),
     [props.months],
@@ -42,8 +48,9 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
         sortedMonths,
         props.transactions,
         formatDateString,
+        props.getCategoryType,
       ),
-    [sortedMonths, props.transactions, formatDateString],
+    [sortedMonths, props.transactions, formatDateString, props.getCategoryType],
   );
 
   const chartSeries = React.useMemo(
@@ -71,8 +78,8 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
         width: "100%",
       }}
     >
-      <BBSpendingChart
-        ariaLabel={t("spending_trends")}
+      <BBTransactionTrendsChart
+        ariaLabel={t("transaction_trends")}
         data={chartData}
         emptyMessage={t("select_a_month_to_display_the_chart")}
         formatValue={chartValueFormatter}
@@ -87,4 +94,4 @@ const SpendingChart = (props: SpendingChartProps): React.ReactNode => {
   );
 };
 
-export default SpendingChart;
+export default TransactionTrendsChart;
