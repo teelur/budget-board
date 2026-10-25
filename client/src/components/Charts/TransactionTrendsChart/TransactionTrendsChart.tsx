@@ -1,5 +1,7 @@
 import { useElementSize } from "@mantine/hooks";
-import { SpendingChart as BBSpendingChart } from "@teelur/budget-board-ui";
+import {
+  TransactionTrendsChart as BBTransactionTrendsChart,
+} from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -76,7 +78,7 @@ const TransactionTrendsChart = (
         width: "100%",
       }}
     >
-      <BBSpendingChart
+      <BBTransactionTrendsChart
         ariaLabel={t("transaction_trends")}
         data={chartData}
         emptyMessage={t("select_a_month_to_display_the_chart")}

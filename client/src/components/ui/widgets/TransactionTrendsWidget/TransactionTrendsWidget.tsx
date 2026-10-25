@@ -177,9 +177,14 @@ const TransactionTrendsWidget = ({
             <Skeleton height="100%" />
           ) : (
             <Stack gap={0} style={{ flex: "1 1 0", minHeight: 0 }}>
-              <BodyText tone="secondary" size="sm" ta="right">
+              <BodyText tone="primary" size="sm" ta="right">
                 {getTransactionComparisonString()}
               </BodyText>
+              {categoryValues.length > 0 && (
+                <BodyText tone="secondary" size="xs" ta="right">
+                  {t("categories")}: {categoryValues.join(", ")}
+                </BodyText>
+              )}
               <Box style={{ flex: "1 1 0", minHeight: 0 }}>
                 <TransactionTrendsChart
                   months={months}

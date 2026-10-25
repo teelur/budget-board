@@ -1,8 +1,8 @@
 import type {
   FlowsChartData,
   FlowType,
-  SpendingChartData,
-  SpendingChartSeries,
+  TransactionTrendsChartData,
+  TransactionTrendsChartSeries,
 } from "@teelur/budget-board-ui";
 import {
   hiddenTransactionCategory,
@@ -46,8 +46,8 @@ export const buildTransactionChartData = (
   transactions: ITransaction[],
   formatDateString: (date: Date) => string,
   getCategoryType?: (category: string) => CategoryType | "",
-): SpendingChartData[] => {
-  const transactionTrendsChartData: SpendingChartData[] = [];
+): TransactionTrendsChartData[] => {
+  const transactionTrendsChartData: TransactionTrendsChartData[] = [];
   months.forEach((month) => {
     const seriesKey = formatDateString(month);
     const transactionsForMonth = getTransactionsForMonth(transactions, month);
@@ -75,7 +75,7 @@ export const buildTransactionChartData = (
 
         // On the very first loop, we need to create the data point.
         if (chartDay == null) {
-          const newChartDay: SpendingChartData = {
+          const newChartDay: TransactionTrendsChartData = {
             day: rollingTotalTransaction.day,
             [seriesKey]: rollingTotalTransaction.amount,
           };
@@ -98,7 +98,7 @@ export const buildTransactionChartData = (
 export const buildTransactionChartSeries = (
   months: Date[],
   formatDateString: (date: Date) => string,
-): SpendingChartSeries[] =>
+): TransactionTrendsChartSeries[] =>
   months.map((month) => {
     const label = formatDateString(month);
     return { key: label, label };
