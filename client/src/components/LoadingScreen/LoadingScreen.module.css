@@ -1,7 +1,9 @@
 .loadingContainer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
   background-color: var(--bbui-color-page);
 }
 
@@ -18,6 +20,11 @@
   border-top: 15px solid var(--bbui-color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+.loadingMessage {
+  color: var(--bbui-color-text-primary, var(--bbui-color-primary));
+  text-align: center;
 }
 
 @keyframes spin {

@@ -10,12 +10,14 @@
         --bbui-color-page: __BBUI_PAGE_DARK__;
         --bbui-color-border: __BBUI_BORDER_DARK__;
         --bbui-color-primary: __BBUI_PRIMARY_DARK__;
+        --bbui-color-text-primary: __BBUI_TEXT_PRIMARY_DARK__;
         background-color: var(--bbui-color-page);
       }
       :root[data-mantine-color-scheme="light"] {
         --bbui-color-page: __BBUI_PAGE_LIGHT__;
         --bbui-color-border: __BBUI_BORDER_LIGHT__;
         --bbui-color-primary: __BBUI_PRIMARY_LIGHT__;
+        --bbui-color-text-primary: __BBUI_TEXT_PRIMARY_LIGHT__;
       }
       body {
         margin: 0;
@@ -47,7 +49,7 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" data-startup-message="__BBUI_STARTUP_MESSAGE__"></div>
     <!-- <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script> -->
     <script type="module" src="/src/main.tsx"></script>
   </body>

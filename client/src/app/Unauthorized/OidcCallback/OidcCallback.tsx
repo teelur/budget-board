@@ -145,7 +145,7 @@ const OidcCallback = (): React.ReactNode => {
     handleOidcCallback();
   }, []);
 
-  return <LoadingScreen />;
+  return <LoadingScreen message={t("completing_authentication")} />;
 };
 
 export default OidcCallback;
