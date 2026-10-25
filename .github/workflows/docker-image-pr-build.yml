@@ -12,11 +12,11 @@ jobs:
       skip_workflow: ${{ steps.changes.outputs.skip_workflow }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Determine if this PR should skip build/test jobs
         id: changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           predicate-quantifier: every
           filters: |
@@ -36,10 +36,10 @@ jobs:
     if: ${{ needs.changes.outputs.skip_workflow != 'true' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.0.x"
 
@@ -67,11 +67,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Determine changed paths
         id: changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             build:
@@ -141,11 +141,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Determine changed paths
         id: changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             build:
@@ -188,7 +188,7 @@ jobs:
       - name: Extract metadata (tags, labels) for Docker
         if: ${{ env.BUILD_CHANGED == 'true' }}
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/teelur/budget-board/server
 
