@@ -1,25 +1,30 @@
 .loadingContainer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.loadingContainerContained {
+  gap: 1rem;
+  background-color: var(--bbui-color-page);
 }
 
 .loadingContainerFullscreen {
   position: fixed;
   inset: 0;
-  background-color: var(--bbui-color-page);
+  z-index: var(--mantine-z-index-overlay, 400);
 }
 
 .loadingSpinner {
   width: 100px;
   height: 100px;
-  border: 15px solid var(--bbui-color-border, #e0e0e0);
-  border-top: 15px solid var(--bbui-color-primary, #5c7cfa);
+  border: 15px solid var(--bbui-color-border);
+  border-top: 15px solid var(--bbui-color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+.loadingMessage {
+  color: var(--bbui-color-text-primary, var(--bbui-color-primary));
+  text-align: center;
 }
 
 @keyframes spin {

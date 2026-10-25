@@ -68,6 +68,8 @@ export interface ITransactionCreateRequest {
   merchantName: string | null;
   source: string | null;
   accountID: string;
+  notes: string;
+  tags: string[];
 }
 
 export interface ITransactionUpdateRequest {

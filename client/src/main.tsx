@@ -11,9 +11,13 @@ import "~/shared/dayjs.ts";
 import "~/i18n/config.ts";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 
-createRoot(document.getElementById("root")!).render(
+const root = document.getElementById("root")!;
+
+createRoot(root).render(
   <StrictMode>
-    <Suspense fallback={<LoadingScreen />}>
+    <Suspense
+      fallback={<LoadingScreen message={root.dataset.startupMessage} />}
+    >
       <App />
     </Suspense>
   </StrictMode>,

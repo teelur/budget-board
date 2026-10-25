@@ -6,6 +6,8 @@ import {
   Modal,
   NumberInput,
   Select,
+  TagsInput,
+  Textarea,
   TextInput,
 } from "@teelur/budget-board-ui";
 import { useAccountsQuery } from "~/hooks/queries/useAccountsQuery";
@@ -22,9 +24,11 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateTransactionMutation } from "~/hooks/mutations/transactions/useCreateTransactionMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
+import { useTagSuggestionsQuery } from "~/hooks/queries/useTagSuggestionsQuery";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [tagSearch, setTagSearch] = React.useState("");
 
   const { t } = useTranslation();
   const {
@@ -38,6 +42,10 @@ const CreateTransactionModal = (): React.ReactNode => {
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const accountsQuery = useAccountsQuery();
+  const tagSuggestionsQuery = useTagSuggestionsQuery({
+    prefix: tagSearch,
+    enabled: opened,
+  });
   const createTransactionMutation = useCreateTransactionMutation();
 
   const dateField = useField<Date | null>({
@@ -57,6 +65,25 @@ const CreateTransactionModal = (): React.ReactNode => {
     initialValue: null,
     validate: (value) => (value ? null : t("account_is_required")),
   });
+  const notesField = useField<string>({
+    initialValue: "",
+  });
+  const tagsField = useField<string[]>({
+    initialValue: [],
+  });
+
+  const handleClose = () => {
+    dateField.reset();
+    dateField.setValue(dayjs().toDate());
+    merchantNameField.reset();
+    categoryField.reset();
+    amountField.reset();
+    accountIdField.reset();
+    notesField.reset();
+    tagsField.reset();
+    setTagSearch("");
+    close();
+  };
 
   const selectableAccounts =
     accountsQuery.data
@@ -89,15 +116,29 @@ const CreateTransactionModal = (): React.ReactNode => {
       accountID: accountIdField.getValue(),
       source: AccountSource.Manual,
       syncID: null,
+      notes: notesField.getValue(),
+      tags: tagsField.getValue(),
     } as ITransactionCreateRequest);
   };
 
   return (
     <>
-      <Button variant="filled" color="primary" size="compact-sm" onClick={open}>
+      <Button
+        variant="filled"
+        color="primary"
+        size="compact-sm"
+        onClick={() => {
+          setTagSearch("");
+          open();
+        }}
+      >
         <PlusIcon size={22} />
       </Button>
-      <Modal opened={opened} onClose={close} title={t("create_transaction")}>
+      <Modal
+        opened={opened}
+        onClose={handleClose}
+        title={t("create_transaction")}
+      >
         <Stack gap="1rem">
           <Stack gap="0.25rem">
             <DateInput
@@ -137,6 +178,24 @@ const CreateTransactionModal = (): React.ReactNode => {
                 })) ?? []
               }
               {...accountIdField.getInputProps()}
+            />
+            <Textarea
+              label={t("notes")}
+              placeholder={t("enter_notes")}
+              autosize
+              minRows={1}
+              maxRows={3}
+              {...notesField.getInputProps()}
+            />
+            <TagsInput
+              label={t("tags")}
+              placeholder={t("add_or_select_tags")}
+              value={tagsField.getValue()}
+              data={tagSuggestionsQuery.data ?? []}
+              onChange={(value) => tagsField.setValue(value)}
+              onSearchChange={setTagSearch}
+              comboboxProps={{ withinPortal: true }}
+              loading={tagSuggestionsQuery.isPending}
             />
           </Stack>
           <Button
