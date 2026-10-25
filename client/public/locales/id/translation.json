@@ -621,7 +621,6 @@
   "transaction_import_columns_required_message": "Setidaknya salah satu kolom Tanggal, Nama Pedagang, Kategori, atau Jumlah diperlukan.",
   "transaction_import_columns_required_split_amount_message": "Setidaknya salah satu kolom Tanggal, Nama Pedagang, Kategori, Jumlah Pemasukan, atau Jumlah Pengeluaran diperlukan.",
   "transaction_link_candidates_error": "Kandidat transfer tidak dapat dimuat.",
-  "transaction_trends": "Tren Pengeluaran",
   "transaction_trends_spending_less_than_last_month": "Pengeluaran Anda {{amount}} lebih sedikit daripada bulan lalu.",
   "transaction_trends_spending_more_than_last_month": "Pengeluaran Anda {{amount}} lebih banyak dibandingkan bulan lalu.",
   "transaction_trends_spending_same_as_last_month": "Pengeluaran Anda sama dengan bulan lalu.",
