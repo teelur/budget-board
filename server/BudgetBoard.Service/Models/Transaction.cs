@@ -11,6 +11,7 @@ public interface ITransactionCreateRequest
     string? Subcategory { get; }
     string? MerchantName { get; }
     string Notes { get; }
+    IEnumerable<string>? Tags { get; }
     string? Source { get; }
     Guid AccountID { get; }
 }
@@ -24,6 +25,7 @@ public class TransactionCreateRequest : ITransactionCreateRequest
     public string? Subcategory { get; set; } = null;
     public string? MerchantName { get; set; } = null;
     public string Notes { get; set; } = string.Empty;
+    public IEnumerable<string>? Tags { get; set; } = [];
     public string? Source { get; set; } = null;
     public Guid AccountID { get; set; } = Guid.Empty;
 }

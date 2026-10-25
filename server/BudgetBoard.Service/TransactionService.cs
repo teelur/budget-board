@@ -74,6 +74,11 @@ public class TransactionService(
         );
 
         userDataContext.Transactions.Add(newTransaction);
+        var tags = request.Tags?.ToArray();
+        if (tags != null && tags.Length > 0)
+        {
+            await tagService.ApplyTagChangesAsync(userData.Id, newTransaction, tags, null);
+        }
         await recurringRuleService.MatchTransactionAsync(userData.Id, newTransaction);
 
         // Manual accounts need to manually update the balance
