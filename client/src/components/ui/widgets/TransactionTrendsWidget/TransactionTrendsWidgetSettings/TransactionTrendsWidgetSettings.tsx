@@ -1,5 +1,10 @@
 import { Group, Stack } from "@mantine/core";
-import { Button, Modal, Select } from "@teelur/budget-board-ui";
+import {
+  Button,
+  CategoryMultiSelect,
+  Modal,
+  Select,
+} from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -7,7 +12,7 @@ import { parseTransactionTrendsConfiguration } from "~/helpers/widgets";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { CategoryTypes, type CategoryType } from "~/models/category";
-import CategoryMultiSelect from "~/components/CategoryMultiSelect/CategoryMultiSelect";
+import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 
 interface TransactionTrendsWidgetSettingsProps {
   widget: IWidgetSettingsResponse;
@@ -21,6 +26,7 @@ const TransactionTrendsWidgetSettings = ({
   onClose,
 }: TransactionTrendsWidgetSettingsProps): React.ReactNode => {
   const { t } = useTranslation();
+  const { allTransactionCategories } = useTransactionCategories();
   const updateWidgetSettingsMutation = useUpdateWidgetSettingsMutation();
   const categoryValuesField = useField<string[]>({ initialValue: [] });
   const transactionTypeField = useField<CategoryType>({
@@ -64,6 +70,7 @@ const TransactionTrendsWidgetSettings = ({
       <Stack gap="0.75rem">
         <CategoryMultiSelect
           label={t("categories")}
+          categories={allTransactionCategories}
           description={t("transaction_trends_widget_settings_message")}
           {...categoryValuesField.getInputProps()}
         />

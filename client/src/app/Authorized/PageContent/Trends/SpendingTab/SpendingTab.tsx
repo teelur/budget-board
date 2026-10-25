@@ -1,5 +1,9 @@
 import { Group, Stack } from "@mantine/core";
-import { MonthToolcards, Select } from "@teelur/budget-board-ui";
+import {
+  CategoryMultiSelect,
+  MonthToolcards,
+  Select,
+} from "@teelur/budget-board-ui";
 import TransactionTrendsChart from "~/components/Charts/TransactionTrendsChart/TransactionTrendsChart";
 import { getMonthToolcardStatus } from "~/helpers/monthToolcards";
 import {
@@ -14,7 +18,6 @@ import { useTransactionsQuery } from "~/hooks/queries/useTransactionsQuery";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
 import { CategoryTypes, type CategoryType } from "~/models/category";
-import CategoryMultiSelect from "~/components/CategoryMultiSelect/CategoryMultiSelect";
 
 const SpendingTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];
@@ -86,6 +89,7 @@ const SpendingTab = (): React.ReactNode => {
       <Group w="100%" justify="space-between" align="flex-end" wrap="wrap">
         <CategoryMultiSelect
           label={t("categories")}
+          categories={allTransactionCategories}
           miw={220}
           value={selectedCategoryValues}
           onChange={setSelectedCategoryValues}
