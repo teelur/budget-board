@@ -310,12 +310,15 @@ export interface RollingTransactionTotalPerDay {
 }
 
 /**
- * Calculates daily cumulative spending for a specified month, excluding "Income."
- * Transactions are sorted by date, their amounts are subtracted from a running total,
- * and missing days carry over the previous day's total.
+ * Calculates a daily cumulative transaction total for a specified month.
+ * When `getCategoryType` is provided, all transactions are included; income amounts
+ * are added and other transaction amounts are subtracted. Without it, transactions
+ * in the "Income" category are excluded and the remaining amounts are subtracted.
+ * Transactions are sorted by date, and missing days carry over the previous day's total.
  *
  * @param {ITransaction[]} transactionsForMonth - The month's transactions
  * @param {number} endDate - The last day of the month
+ * @param {(category: string) => CategoryType | ""} [getCategoryType] - Resolves a category's type, enabling income transactions to be included in the total
  * @returns {RollingTransactionTotalPerDay[]} Array of day-and-amount pairs
  */
 export const getRollingTransactionTotalForMonth = (
