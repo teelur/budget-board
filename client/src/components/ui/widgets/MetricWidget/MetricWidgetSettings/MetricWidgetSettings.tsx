@@ -21,6 +21,7 @@ import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { METRIC_RANGE_EXAMPLES } from "~/helpers/metricWidget";
 
 const SYNTAX_EXAMPLES = `@transactions.sum(this_month, type=expense)
+@transactions.sum(this_month, account=Checking)
 @transactions.sum(${METRIC_RANGE_EXAMPLES[0]}, type=expense)
 @transactions.sum(${METRIC_RANGE_EXAMPLES[1]}, type=expense)
 @transactions.sum(${METRIC_RANGE_EXAMPLES[2]}, type=expense)
