@@ -66,12 +66,7 @@ const FlowsWidget = ({
     <>
       <Card w="100%" h="100%">
         <Card.Section>
-          <Group
-            gap="0.5rem"
-            align="center"
-            justify="space-between"
-            wrap="wrap"
-          >
+          <Group gap="0.5rem" align="center" wrap="wrap">
             <Group gap="0.5rem" align="center">
               <GitBranchIcon
                 size="1.25rem"

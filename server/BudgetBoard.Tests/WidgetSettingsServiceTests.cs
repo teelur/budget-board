@@ -32,6 +32,8 @@ public class WidgetSettingsServiceTests
                 JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration),
             ],
             [WidgetTypes.Flows, "{\"monthCount\":1}"],
+            [WidgetTypes.TransactionTrends, "{\"categoryValues\":[],\"transactionType\":\"expense\"}"],
+            [WidgetTypes.SpendingTrends, "{\"categoryValues\":[],\"transactionType\":\"expense\"}"],
         ];
 
     private static WidgetSettingsService CreateService(TestHelper helper) =>
@@ -168,6 +170,35 @@ public class WidgetSettingsServiceTests
         settings.SmY.Should().Be(63);
         settings.SmH.Should().Be(24);
         settings.Configuration.Should().Be("{\"monthCount\":1}");
+    }
+
+    [Theory]
+    [InlineData(WidgetTypes.TransactionTrends)]
+    [InlineData(WidgetTypes.SpendingTrends)]
+    public async Task CreateWidgetSettingsAsync_WhenTransactionTrendsType_ShouldUseDefaults(
+        string widgetType
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+
+        // Act
+        await service.CreateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            new WidgetSettingsCreateRequest { WidgetType = widgetType }
+        );
+
+        // Assert
+        var settings = helper.UserDataContext.WidgetSettings.Single();
+        settings.WidgetType.Should().Be(widgetType);
+        settings.LgX.Should().Be(4);
+        settings.LgY.Should().Be(17);
+        settings.LgW.Should().Be(8);
+        settings.LgH.Should().Be(16);
+        settings.SmY.Should().Be(47);
+        settings.SmH.Should().Be(16);
+        settings.Configuration.Should().Be("{\"categoryValues\":[],\"transactionType\":\"expense\"}");
     }
 
     [Fact]
@@ -822,7 +853,7 @@ public class WidgetSettingsServiceTests
         var widget = new WidgetSettings
         {
             ID = Guid.NewGuid(),
-            WidgetType = WidgetTypes.SpendingTrends,
+            WidgetType = "CustomWidget",
             LgX = 0,
             LgY = 0,
             LgW = 4,
@@ -847,6 +878,54 @@ public class WidgetSettingsServiceTests
             .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
             .Configuration.Should()
             .Be(configuration.GetRawText());
+    }
+
+    [Theory]
+    [InlineData(WidgetTypes.TransactionTrends, "income", "income")]
+    [InlineData(WidgetTypes.SpendingTrends, "income", "income")]
+    [InlineData(WidgetTypes.TransactionTrends, "expense", "expense")]
+    [InlineData(WidgetTypes.SpendingTrends, "expense", "expense")]
+    public async Task UpdateWidgetSettingsAsync_WhenTransactionTrendsConfigurationIsValid_ShouldPreserveIt(
+        string widgetType,
+        string transactionType,
+        string expectedTransactionType
+    )
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = widgetType,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+        var configuration = JsonSerializer.SerializeToElement(
+            new { categoryValues = new[] { "Food" }, transactionType }
+        );
+
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        // Act
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [new WidgetSettingsUpdateRequest { ID = widget.ID, Configuration = configuration }]
+        );
+
+        // Assert
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be(
+                $"{{\"categoryValues\":[\"Food\"],\"transactionType\":\"{expectedTransactionType}\"}}"
+            );
     }
 
     [Theory]

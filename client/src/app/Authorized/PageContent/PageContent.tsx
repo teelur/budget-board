@@ -57,7 +57,9 @@ const BudgetsSettings = lazy(
 );
 const Goals = lazy(() => import("./Goals/Goals"));
 const Trends = lazy(() => import("./Trends/Trends"));
-const TrendsSpending = lazy(() => import("./Trends/SpendingTab/SpendingTab"));
+const TrendsTransactions = lazy(
+  () => import("./Trends/TransactionTrendsTab/TransactionTrendsTab"),
+);
 const TrendsSpendingCategories = lazy(
   () => import("./Trends/SpendingCategoriesTab/SpendingCategoriesTab"),
 );
@@ -174,8 +176,19 @@ const PageContent = (): React.ReactNode => {
             </Route>
             <Route path="/goals" element={<Goals />} />
             <Route path="/trends" element={<Trends />}>
-              <Route index element={<Navigate to="spending" replace />} />
-              <Route path="spending" element={<TrendsSpending />} />
+              <Route
+                index
+                element={<Navigate to="transaction-trends" replace />}
+              />
+              <Route
+                path="transaction-trends"
+                element={<TrendsTransactions />}
+              />
+              {/* Spending was updated to Transaction Trends in v3.9 */}
+              <Route
+                path="spending"
+                element={<Navigate to="../transaction-trends" replace />}
+              />
               <Route
                 path="spending-categories"
                 element={<TrendsSpendingCategories />}

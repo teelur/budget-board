@@ -297,7 +297,7 @@ public class DemoSeedServiceTests
             .Should()
             .BeEquivalentTo(WidgetSettingsHelpers.DefaultLayouts.Select(dl => dl.WidgetType));
 
-        // Widgets with configurations: Accounts, NetWorth, Metric, Flows
+        // Widgets with configurations: Accounts, NetWorth, Metric, Flows, TransactionTrends
         widgetSettings
             .Where(ws =>
                 ws.WidgetType
@@ -305,15 +305,14 @@ public class DemoSeedServiceTests
                         or WidgetTypes.NetWorth
                         or WidgetTypes.Metric
                         or WidgetTypes.Flows
+                        or WidgetTypes.TransactionTrends
             )
             .Should()
             .OnlyContain(ws => !string.IsNullOrWhiteSpace(ws.Configuration));
 
-        // Widgets without configurations: UncategorizedTransactions, SpendingTrends
+        // Widgets without configurations: UncategorizedTransactions
         widgetSettings
-            .Where(ws =>
-                ws.WidgetType is WidgetTypes.UncategorizedTransactions or WidgetTypes.SpendingTrends
-            )
+            .Where(ws => ws.WidgetType is WidgetTypes.UncategorizedTransactions)
             .Should()
             .OnlyContain(ws => ws.Configuration == null);
 

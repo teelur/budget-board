@@ -2,6 +2,14 @@ export const GRID_COLS = 12;
 export const GRID_ROW_HEIGHT = 20;
 export const GRID_BREAKPOINT = 768;
 
+export const TRANSACTION_TRENDS_WIDGET_TYPE = "TransactionTrends";
+export const LEGACY_SPENDING_TRENDS_WIDGET_TYPE = "SpendingTrends";
+
+// Spending trends was deprecated and replaced by transaction trends
+export const isTransactionTrendsWidgetType = (widgetType: string): boolean =>
+  widgetType === TRANSACTION_TRENDS_WIDGET_TYPE ||
+  widgetType === LEGACY_SPENDING_TRENDS_WIDGET_TYPE;
+
 export interface WidgetRegistryEntry {
   widgetType: string;
   labelKey: string;
@@ -29,9 +37,9 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
     maxInstances: 1,
   },
   {
-    widgetType: "SpendingTrends",
-    labelKey: "spending_trends",
-    descriptionKey: "spending_trends_widget_description",
+    widgetType: TRANSACTION_TRENDS_WIDGET_TYPE,
+    labelKey: "transaction_trends",
+    descriptionKey: "transaction_trends_widget_description",
     maxInstances: 1,
   },
   {

@@ -1,3 +1,5 @@
+import type { CategoryType } from "./category";
+
 export interface IWidgetSettingsResponse {
   id: string;
   widgetType: string;
@@ -38,6 +40,11 @@ export interface IAccountsWidgetConfiguration {
 
 export interface IFlowsWidgetConfiguration {
   monthCount: number;
+}
+
+export interface ITransactionTrendsWidgetConfiguration {
+  categoryValues: string[];
+  transactionType: CategoryType;
 }
 
 export interface INetWorthWidgetConfiguration {
