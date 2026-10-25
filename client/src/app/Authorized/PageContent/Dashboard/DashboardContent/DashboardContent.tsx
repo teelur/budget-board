@@ -20,8 +20,9 @@ import {
   GRID_BREAKPOINT,
   GRID_COLS,
   GRID_ROW_HEIGHT,
+  isTransactionTrendsWidgetType,
 } from "~/shared/dashboardGrid";
-import SpendingTrendsWidget from "../../../../../components/ui/widgets/SpendingTrendsWidget/SpendingTrendsWidget";
+import TransactionTrendsWidget from "~/components/ui/widgets/TransactionTrendsWidget/TransactionTrendsWidget";
 import UncategorizedTransactionsWidget from "~/components/ui/widgets/UncategorizedTransactionsWidget/UncategorizedTransactionsWidget";
 import MetricWidget from "~/components/ui/widgets/MetricWidget/MetricWidget";
 import FlowsWidget from "~/components/ui/widgets/FlowsWidget/FlowsWidget";
@@ -128,8 +129,15 @@ const DashboardContent = ({
             onSettingsClose={() => setSettingsOpenId(null)}
           />
         );
+      case "TransactionTrends":
       case "SpendingTrends":
-        return <SpendingTrendsWidget />;
+        return (
+          <TransactionTrendsWidget
+            widget={widget}
+            settingsOpened={settingsOpenId === widget.id}
+            onSettingsClose={() => setSettingsOpenId(null)}
+          />
+        );
       case "Flows":
         return (
           <FlowsWidget
@@ -212,7 +220,8 @@ const DashboardContent = ({
                     widget.widgetType === "NetWorth" ||
                     widget.widgetType === "Accounts" ||
                     widget.widgetType === "Metric" ||
-                    widget.widgetType === "Flows"
+                    widget.widgetType === "Flows" ||
+                    isTransactionTrendsWidgetType(widget.widgetType)
                       ? () => setSettingsOpenId(widget.id)
                       : undefined
                   }

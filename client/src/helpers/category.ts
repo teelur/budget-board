@@ -150,3 +150,42 @@ export const getSubCategories = (
   categories: ICategory[],
 ): ICategory[] =>
   categories.filter((c) => areStringsEqual(c.parent, categoryValue));
+
+export const getCategoryValuesWithDescendants = (
+  selectedCategoryValues: string[],
+  categories: ICategory[],
+): string[] => {
+  const values: string[] = [];
+  const pendingValues = [...selectedCategoryValues];
+
+  while (pendingValues.length > 0) {
+    const pendingValue = pendingValues.pop();
+    if (pendingValue == null) {
+      continue;
+    }
+
+    if (areStringsEqual(pendingValue, uncategorizedTransactionCategory)) {
+      if (!values.some((value) => areStringsEqual(value, pendingValue))) {
+        values.push(uncategorizedTransactionCategory);
+      }
+      continue;
+    }
+
+    const category = categories.find((item) =>
+      areStringsEqual(item.value, pendingValue),
+    );
+    if (
+      category == null ||
+      values.some((value) => areStringsEqual(value, category.value))
+    ) {
+      continue;
+    }
+
+    values.push(category.value);
+    categories
+      .filter((item) => areStringsEqual(item.parent, category.value))
+      .forEach((child) => pendingValues.push(child.value));
+  }
+
+  return values;
+};

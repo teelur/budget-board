@@ -10,14 +10,14 @@ import {
   uncategorizedTransactionCategory,
 } from "~/models/transaction";
 import {
-  getRollingTotalSpendingForMonth,
+  getRollingTransactionTotalForMonth,
   getTransactionsForMonth,
-  RollingTotalSpendingPerDay,
+  RollingTransactionTotalPerDay,
 } from "./transactions";
 import { getDaysInMonth } from "./datetime";
 import { areStringsEqual } from "./utils";
 import { getFormattedCategoryValue, getParentCategory } from "./category";
-import { ICategory } from "~/models/category";
+import type { CategoryType, ICategory } from "~/models/category";
 
 export type { FlowsChartData, FlowType } from "@teelur/budget-board-ui";
 
@@ -35,18 +35,19 @@ export const chartColors = [
 ];
 
 /**
- * Builds a dataset showing the cumulative spending trend for the given months.
+ * Builds a dataset showing the cumulative transaction trend for the given months.
  *
  * @param months - An array of Date objects representing each month to include.
- * @param transactions - A collection of transaction objects containing spending information.
- * @returns An array of objects containing day-by-day spending data across months.
+ * @param transactions - A collection of transactions to chart.
+ * @returns An array of objects containing day-by-day totals across months.
  */
 export const buildTransactionChartData = (
   months: Date[],
   transactions: ITransaction[],
   formatDateString: (date: Date) => string,
+  getCategoryType?: (category: string) => CategoryType | "",
 ): SpendingChartData[] => {
-  const spendingTrendsChartData: SpendingChartData[] = [];
+  const transactionTrendsChartData: SpendingChartData[] = [];
   months.forEach((month) => {
     const seriesKey = formatDateString(month);
     const transactionsForMonth = getTransactionsForMonth(transactions, month);
@@ -57,17 +58,18 @@ export const buildTransactionChartData = (
       month.getMonth() === today.getMonth() &&
       month.getFullYear() === today.getFullYear();
 
-    const rollingTotalTransactionsForMonth: RollingTotalSpendingPerDay[] =
-      getRollingTotalSpendingForMonth(
+    const rollingTotalTransactionsForMonth: RollingTransactionTotalPerDay[] =
+      getRollingTransactionTotalForMonth(
         transactionsForMonth,
         isThisMonth
           ? today.getDate()
           : getDaysInMonth(month.getMonth(), month.getFullYear()),
+        getCategoryType,
       );
 
     rollingTotalTransactionsForMonth.forEach(
-      (rollingTotalTransaction: RollingTotalSpendingPerDay) => {
-        const chartDay = spendingTrendsChartData.find(
+      (rollingTotalTransaction: RollingTransactionTotalPerDay) => {
+        const chartDay = transactionTrendsChartData.find(
           (data) => data.day === rollingTotalTransaction.day,
         );
 
@@ -77,14 +79,14 @@ export const buildTransactionChartData = (
             day: rollingTotalTransaction.day,
             [seriesKey]: rollingTotalTransaction.amount,
           };
-          spendingTrendsChartData.push(newChartDay);
+          transactionTrendsChartData.push(newChartDay);
         } else {
           chartDay[seriesKey] = rollingTotalTransaction.amount;
         }
       },
     );
   });
-  return spendingTrendsChartData;
+  return transactionTrendsChartData;
 };
 
 /**

@@ -6,6 +6,7 @@ import {
   INetWorthWidgetConfiguration,
   INetWorthWidgetGroup,
   INetWorthWidgetLine,
+  ITransactionTrendsWidgetConfiguration,
 } from "~/models/widgetSettings";
 import { getAssetsOfTypes, sumAssetsTotalValue } from "./assets";
 import { getAccountsOfTypes, sumAccountsTotalBalance } from "./accounts";
@@ -14,6 +15,7 @@ import { IAssetResponse } from "~/models/asset";
 import { ComboboxItem } from "@mantine/core";
 import { IAccountType } from "~/models/accountType";
 import { IAssetType } from "~/models/assetType";
+import { CategoryTypes, type CategoryType } from "~/models/category";
 
 /**
  * Return a string representation for the supplied value, defaulting to an empty string.
@@ -187,6 +189,25 @@ export const parseFlowsConfiguration = (
   return {
     monthCount: Math.min(12, Math.max(1, Math.round(monthCount || 1))),
   };
+};
+
+export const parseTransactionTrendsConfiguration = (
+  configuration?: string,
+): ITransactionTrendsWidgetConfiguration => {
+  const parsed = configuration ? safeParseJson(configuration) : undefined;
+  const rawCategoryValues = parsed?.categoryValues ?? parsed?.CategoryValues;
+  const categoryValues = Array.isArray(rawCategoryValues)
+    ? rawCategoryValues.filter((value): value is string => typeof value === "string")
+    : [];
+  const rawTransactionType =
+    parsed?.transactionType ?? parsed?.TransactionType;
+
+  const transactionType: CategoryType =
+    rawTransactionType === CategoryTypes.Income
+      ? CategoryTypes.Income
+      : CategoryTypes.Expense;
+
+  return { categoryValues, transactionType };
 };
 
 /**

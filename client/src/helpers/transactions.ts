@@ -6,9 +6,16 @@ import {
   uncategorizedTransactionCategory,
 } from "~/models/transaction";
 import { areStringsEqual } from "./utils";
-import { getIsParentCategory } from "./category";
+import {
+  getCategoryValuesWithDescendants,
+  getIsParentCategory,
+} from "./category";
 import dayjs from "~/shared/dayjs";
-import { ICategory } from "~/models/category";
+import {
+  CategoryTypes,
+  type CategoryType,
+  type ICategory,
+} from "~/models/category";
 import { normalizeTag } from "./tags";
 
 /**
@@ -297,7 +304,7 @@ export const getTransactionsForMonth = (
     dayjs(t.date).isSame(date, "month"),
   );
 
-export interface RollingTotalSpendingPerDay {
+export interface RollingTransactionTotalPerDay {
   day: number;
   amount: number;
 }
@@ -309,31 +316,38 @@ export interface RollingTotalSpendingPerDay {
  *
  * @param {ITransaction[]} transactionsForMonth - The month's transactions
  * @param {number} endDate - The last day of the month
- * @returns {RollingTotalSpendingPerDay[]} Array of day-and-amount pairs
+ * @returns {RollingTransactionTotalPerDay[]} Array of day-and-amount pairs
  */
-export const getRollingTotalSpendingForMonth = (
+export const getRollingTransactionTotalForMonth = (
   transactionsForMonth: ITransaction[],
   endDate: number,
-): RollingTotalSpendingPerDay[] => {
-  const rollingTotalSpendingPerDay: RollingTotalSpendingPerDay[] = [];
+  getCategoryType?: (category: string) => CategoryType | "",
+): RollingTransactionTotalPerDay[] => {
+  const rollingTransactionTotalsPerDay: RollingTransactionTotalPerDay[] = [];
 
-  const sortedSpending = transactionsForMonth
-    .filter((t) => !areStringsEqual(t.category ?? "", "Income"))
+  const sortedTransactions = transactionsForMonth
+    .filter(
+      (transaction) =>
+        getCategoryType != null ||
+        !areStringsEqual(transaction.category ?? "", "Income"),
+    )
     .sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
 
   let total = 0;
-  const summedTransactionsPerMonth = sortedSpending.reduce(
-    (result: RollingTotalSpendingPerDay[], transaction: ITransaction) => {
+  const summedTransactionsPerMonth = sortedTransactions.reduce(
+    (result: RollingTransactionTotalPerDay[], transaction: ITransaction) => {
       const foundDay = result.find(
         (t) => t.day === dayjs(transaction.date).date(),
       );
 
-      // Transactions are negative and we want spending to be positive,
-      // so instead of multiplying by a negative, just subtract from total.
-      total -= transaction.amount;
+      // Expense amounts are negative; income amounts are already positive.
+      total +=
+        getCategoryType?.(transaction.category ?? "") === CategoryTypes.Income
+          ? transaction.amount
+          : -transaction.amount;
 
       if (foundDay == null) {
-        const newDay: RollingTotalSpendingPerDay = {
+        const newDay: RollingTransactionTotalPerDay = {
           day: dayjs(transaction.date).date(),
           amount: total,
         };
@@ -349,22 +363,22 @@ export const getRollingTotalSpendingForMonth = (
   // If it is the current month, we need to continue the rolling total
   for (let dayItr = 1; dayItr <= endDate; dayItr++) {
     const amount = summedTransactionsPerMonth.find((t) => t.day === dayItr);
-    const dayAmount: RollingTotalSpendingPerDay = {
+    const dayAmount: RollingTransactionTotalPerDay = {
       day: dayItr,
       amount: 0,
     };
     if (!amount) {
       if (dayItr > 1) {
         // If there are no transactions for a day, we should just roll over the previous day.
-        dayAmount.amount = rollingTotalSpendingPerDay[dayItr - 2]!.amount;
+        dayAmount.amount = rollingTransactionTotalsPerDay[dayItr - 2]!.amount;
       }
-      rollingTotalSpendingPerDay.push(dayAmount);
+      rollingTransactionTotalsPerDay.push(dayAmount);
     } else {
-      rollingTotalSpendingPerDay.push(amount);
+      rollingTransactionTotalsPerDay.push(amount);
     }
   }
 
-  return rollingTotalSpendingPerDay;
+  return rollingTransactionTotalsPerDay;
 };
 
 /**
@@ -384,6 +398,52 @@ export const getTransactionsByCategory = (
   transactions.filter((t: ITransaction) =>
     areStringsEqual(t.category ?? "", categoryValue),
   );
+
+export const filterTransactionsByCategories = (
+  transactions: ITransaction[],
+  selectedCategoryValues: string[],
+  categories: ICategory[],
+): ITransaction[] => {
+  if (selectedCategoryValues.length === 0) {
+    return transactions;
+  }
+
+  const matchingCategoryValues = getCategoryValuesWithDescendants(
+    selectedCategoryValues,
+    categories,
+  );
+  const includesUncategorized = matchingCategoryValues.some((category) =>
+    areStringsEqual(category, uncategorizedTransactionCategory),
+  );
+
+  return transactions.filter((transaction) => {
+    const category = transaction.category ?? "";
+    if (
+      category.trim().length === 0 ||
+      areStringsEqual(category, uncategorizedTransactionCategory)
+    ) {
+      return includesUncategorized;
+    }
+
+    return [category, transaction.subcategory ?? ""].some((value) =>
+      matchingCategoryValues.some((selectedValue) =>
+        areStringsEqual(value, selectedValue),
+      ),
+    );
+  });
+};
+
+export const filterTransactionsByType = (
+  transactions: ITransaction[],
+  transactionType: CategoryType,
+  getCategoryType: (category: string) => CategoryType | "",
+): ITransaction[] =>
+  transactions.filter((transaction) => {
+    const isIncome =
+      getCategoryType(transaction.category ?? "") === CategoryTypes.Income;
+
+    return transactionType === CategoryTypes.Income ? isIncome : !isIncome;
+  });
 
 /**
  * Builds a map of total transaction amounts keyed by category or subcategory.
