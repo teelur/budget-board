@@ -50,7 +50,7 @@ public static class WidgetSettingsHelpers
             SmH: 10
         ),
         new DefaultWidgetLayout(
-            WidgetTypes.SpendingTrends,
+            WidgetTypes.TransactionTrends,
             LgX: 4,
             LgY: 17,
             LgW: 8,

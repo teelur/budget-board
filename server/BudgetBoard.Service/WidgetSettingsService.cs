@@ -8,6 +8,7 @@ using BudgetBoard.Service.Models.Widgets.AccountsWidget;
 using BudgetBoard.Service.Models.Widgets.FlowsWidget;
 using BudgetBoard.Service.Models.Widgets.MetricWidget;
 using BudgetBoard.Service.Models.Widgets.NetWorthWidget;
+using BudgetBoard.Service.Models.Widgets.TransactionTrendsWidget;
 using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -44,8 +45,13 @@ public class WidgetSettingsService(
         await userDataContext.SaveChangesAsync();
 
         static DefaultWidgetLayout GetDefaultWidgetLayout(string widgetType) =>
-            WidgetSettingsHelpers.DefaultLayouts.FirstOrDefault(dl => dl.WidgetType == widgetType)
-            ?? WidgetSettingsHelpers.GenericDefaultLayout;
+            WidgetSettingsHelpers.DefaultLayouts.FirstOrDefault(dl =>
+                dl.WidgetType == widgetType
+                || (
+                    widgetType == WidgetTypes.SpendingTrends
+                    && dl.WidgetType == WidgetTypes.TransactionTrends
+                )
+            ) ?? WidgetSettingsHelpers.GenericDefaultLayout;
     }
 
     public async Task<IEnumerable<IWidgetResponse>> ReadWidgetSettingsAsync(Guid userGuid)
@@ -222,6 +228,14 @@ public class WidgetSettingsService(
                             ?? throw new JsonException()
                     )
                 ),
+                WidgetTypes.TransactionTrends or WidgetTypes.SpendingTrends =>
+                    JsonSerializer.Serialize(
+                        ValidateTransactionTrendsConfiguration(
+                            JsonSerializer.Deserialize<TransactionTrendsWidgetConfiguration>(
+                                configuration
+                            ) ?? throw new JsonException()
+                        )
+                    ),
                 _ => configuration.GetRawText(),
             };
         }
@@ -246,6 +260,21 @@ public class WidgetSettingsService(
         return configuration;
     }
 
+    private static TransactionTrendsWidgetConfiguration ValidateTransactionTrendsConfiguration(
+        TransactionTrendsWidgetConfiguration configuration
+    )
+    {
+        if (
+            configuration.CategoryValues is null
+            || !TransactionCategoryTypes.AllTypes.Contains(configuration.TransactionType)
+        )
+        {
+            throw new JsonException();
+        }
+
+        return configuration;
+    }
+
     private static string? GetDefaultConfiguration(string widgetType)
     {
         return widgetType switch
@@ -258,6 +287,8 @@ public class WidgetSettingsService(
                 WidgetSettingsHelpers.DefaultMetricWidgetConfiguration
             ),
             WidgetTypes.Flows => JsonSerializer.Serialize(new FlowsWidgetConfiguration()),
+            WidgetTypes.TransactionTrends or WidgetTypes.SpendingTrends =>
+                JsonSerializer.Serialize(new TransactionTrendsWidgetConfiguration()),
             _ => null,
         };
     }
