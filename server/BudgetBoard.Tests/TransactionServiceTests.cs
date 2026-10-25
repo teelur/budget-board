@@ -46,6 +46,8 @@ public class TransactionServiceTests
             Category = "TestCategory",
             Subcategory = "TestSubcategory",
             MerchantName = "TestMerchant",
+            Notes = "Test notes",
+            Tags = ["Work", "Important"],
             Source = "manual",
             AccountID = account.ID,
         };
@@ -61,6 +63,14 @@ public class TransactionServiceTests
         createdTransaction
             .Should()
             .BeEquivalentTo(transaction, options => options.ExcludingMissingMembers());
+        helper
+            .UserDataContext.TransactionTags.Where(link =>
+                link.TransactionID == createdTransaction!.ID
+            )
+            .Select(link => link.Tag!.Value)
+            .ToList()
+            .Should()
+            .BeEquivalentTo(transaction.Tags);
     }
 
     [Fact]
