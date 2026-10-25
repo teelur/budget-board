@@ -184,6 +184,7 @@ const PageContent = (): React.ReactNode => {
                 path="transaction-trends"
                 element={<TrendsTransactions />}
               />
+              {/* Spending was updated to Transaction Trends in v3.9 */}
               <Route
                 path="spending"
                 element={<Navigate to="../transaction-trends" replace />}
