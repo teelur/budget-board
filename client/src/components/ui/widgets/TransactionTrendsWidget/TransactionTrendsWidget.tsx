@@ -163,6 +163,11 @@ const TransactionTrendsWidget = ({
           <Group gap="0.25rem">
             <LineChartIcon size="1.5rem" color="var(--bbui-color-primary)" />
             <HeadingText level={4}>{t("transaction_trends")}</HeadingText>
+            {categoryValues.length > 0 && (
+              <BodyText tone="secondary" size="xs" ta="right">
+                {t("categories")}: {categoryValues.join(", ")}
+              </BodyText>
+            )}
           </Group>
         </Card.Section>
         <Card.Section
@@ -180,11 +185,6 @@ const TransactionTrendsWidget = ({
               <BodyText tone="primary" size="sm" ta="right">
                 {getTransactionComparisonString()}
               </BodyText>
-              {categoryValues.length > 0 && (
-                <BodyText tone="secondary" size="xs" ta="right">
-                  {t("categories")}: {categoryValues.join(", ")}
-                </BodyText>
-              )}
               <Box style={{ flex: "1 1 0", minHeight: 0 }}>
                 <TransactionTrendsChart
                   months={months}

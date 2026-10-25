@@ -30,8 +30,8 @@ const Trends = (): React.ReactNode => {
       label: t("transactions"),
       links: [
         {
-          label: t("spending"),
-          path: "spending",
+          label: t("transaction_trends"),
+          path: "transaction-trends",
           icon: <LineChartIcon color="currentColor" />,
         },
         {

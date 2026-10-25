@@ -19,7 +19,7 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import { useTranslation } from "react-i18next";
 import { CategoryTypes, type CategoryType } from "~/models/category";
 
-const SpendingTab = (): React.ReactNode => {
+const TransactionTrendsTab = (): React.ReactNode => {
   const monthButtons = [3, 6, 12];
 
   const { t } = useTranslation();
@@ -139,4 +139,4 @@ const SpendingTab = (): React.ReactNode => {
   );
 };
 
-export default SpendingTab;
+export default TransactionTrendsTab;
