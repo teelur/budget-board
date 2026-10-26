@@ -12,6 +12,7 @@ interface FlowsChartProps {
   categories: ICategory[];
   isPending?: boolean;
   height?: number;
+  minScrollWidth?: number;
 }
 
 const FlowsChart = (props: FlowsChartProps): React.ReactNode => {
@@ -46,6 +47,7 @@ const FlowsChart = (props: FlowsChartProps): React.ReactNode => {
       emptyMessage={t("no_flow_data")}
       formatValue={valueFormatter}
       height={chartHeight}
+      minScrollWidth={props.minScrollWidth}
       isLoading={props.isPending ?? false}
       labels={{
         cashAvailable: t("cash_available"),
