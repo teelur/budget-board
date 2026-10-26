@@ -88,6 +88,7 @@ const FlowsWidget = ({
               transactions={transactionsQuery.data ?? []}
               categories={allTransactionCategories}
               height={480}
+              minScrollWidth={950}
             />
           )}
         </Card.Section>
