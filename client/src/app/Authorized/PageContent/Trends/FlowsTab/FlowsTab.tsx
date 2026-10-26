@@ -55,6 +55,7 @@ const FlowsTab = (): React.ReactNode => {
         transactions={transactionsQuery.data ?? []}
         categories={allTransactionCategories}
         isPending={transactionsQuery.isPending}
+        minScrollWidth={950}
       />
     </Stack>
   );
