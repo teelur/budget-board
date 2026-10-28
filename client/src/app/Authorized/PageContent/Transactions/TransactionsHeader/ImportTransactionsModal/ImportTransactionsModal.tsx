@@ -34,8 +34,9 @@ const ImportTransactionsModal = ({
   onClose,
   showTrigger = true,
 }: ImportTransactionsModalProps = {}) => {
-  const [internalOpened, { open, close }] = useDisclosure(false);
+  const [internalOpened, { open, close: internalClose }] = useDisclosure(false);
   const opened = controlledOpened ?? internalOpened;
+  const close = onClose ?? internalClose;
   const [activeStep, setActiveStep] = React.useState(0);
 
   const { t } = useTranslation();
