@@ -127,6 +127,7 @@ const CreateTransactionModal = (): React.ReactNode => {
         variant="filled"
         color="primary"
         size="compact-sm"
+        aria-label={t("create_transaction")}
         onClick={() => {
           setTagSearch("");
           open();

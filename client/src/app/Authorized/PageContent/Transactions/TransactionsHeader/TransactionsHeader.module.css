@@ -24,3 +24,21 @@
     align-self: flex-end;
   }
 }
+
+.mobileToolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(4, 2.5rem);
+  width: 100%;
+}
+
+.monthButton {
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.monthButtonLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
