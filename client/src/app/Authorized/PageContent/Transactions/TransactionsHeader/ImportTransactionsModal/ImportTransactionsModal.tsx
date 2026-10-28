@@ -21,8 +21,22 @@ import { useTransactionImportJob } from "~/providers/TransactionImportJobProvide
 import DuplicateReview from "./DuplicateReview/DuplicateReview";
 import { normalizeImportedAccountName } from "~/helpers/transactionImport";
 
-const ImportTransactionsModal = () => {
-  const [opened, { open, close }] = useDisclosure(false);
+interface ImportTransactionsModalProps {
+  opened?: boolean;
+  onOpen?: () => void;
+  onClose?: () => void;
+  showTrigger?: boolean;
+}
+
+const ImportTransactionsModal = ({
+  opened: controlledOpened,
+  onOpen,
+  onClose,
+  showTrigger = true,
+}: ImportTransactionsModalProps = {}) => {
+  const [internalOpened, { open, close: internalClose }] = useDisclosure(false);
+  const opened = controlledOpened ?? internalOpened;
+  const close = onClose ?? internalClose;
   const [activeStep, setActiveStep] = React.useState(0);
 
   const { t } = useTranslation();
@@ -72,7 +86,7 @@ const ImportTransactionsModal = () => {
   const [accountNameToAccountIdMap, setAccountNameToAccountIdMap] =
     React.useState<Map<string, string>>(new Map<string, string>());
 
-  const resetData = () => {
+  const resetData = React.useCallback(() => {
     setHeaders([]);
     setCsvData([]);
 
@@ -97,7 +111,7 @@ const ImportTransactionsModal = () => {
     });
 
     setAccountNameToAccountIdMap(new Map<string, string>());
-  };
+  }, []);
 
   React.useEffect(() => {
     if (
@@ -109,6 +123,22 @@ const ImportTransactionsModal = () => {
       setActiveStep(5);
     }
   }, [job]);
+
+  const wasOpened = React.useRef(false);
+  React.useEffect(() => {
+    if (opened && !wasOpened.current) {
+      resetData();
+      if (activeJobId && job?.id === activeJobId) {
+        trackedJobId.current = activeJobId;
+        setActiveStep(4);
+      } else {
+        trackedJobId.current = null;
+        setActiveStep(0);
+      }
+    }
+
+    wasOpened.current = opened;
+  }, [opened, activeJobId, job?.id, resetData]);
 
   /**
    * Handle CSV import data from the file loader component.
@@ -215,30 +245,25 @@ const ImportTransactionsModal = () => {
     setActiveStep(3);
   };
 
+  const handleOpen = () => (onOpen ? onOpen() : open());
+  const handleClose = () => (onClose ? onClose() : close());
+
   return (
     <>
-      <Button
-        variant="filled"
-        color="primary"
-        size="xs"
-        rightSection={<FileDownIcon size="1rem" />}
-        onClick={() => {
-          resetData();
-          if (activeJobId && job?.id === activeJobId) {
-            trackedJobId.current = activeJobId;
-            setActiveStep(4);
-          } else {
-            trackedJobId.current = null;
-            setActiveStep(0);
-          }
-          open();
-        }}
-      >
-        {t("import")}
-      </Button>
+      {showTrigger ? (
+        <Button
+          variant="filled"
+          color="primary"
+          size="xs"
+          rightSection={<FileDownIcon size="1rem" />}
+          onClick={handleOpen}
+        >
+          {t("import")}
+        </Button>
+      ) : null}
       <Modal
         opened={opened}
-        onClose={close}
+        onClose={handleClose}
         size="auto"
         title={t("import_transactions")}
       >

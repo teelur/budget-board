@@ -1,7 +1,13 @@
 import classes from "./SortMenu.module.css";
 
-import { Flex, Group } from "@mantine/core";
-import { BodyText } from "@teelur/budget-board-ui";
+import { Flex, Group, Menu } from "@mantine/core";
+import { BodyText, Button } from "@teelur/budget-board-ui";
+import {
+  ArrowDownIcon,
+  ArrowUpDownIcon,
+  ArrowUpIcon,
+  CheckIcon,
+} from "lucide-react";
 import SortButton, { SortDirection } from "~/components/SortButton";
 import React from "react";
 import { SortOption, Sorts } from "./SortMenuHelpers";
@@ -12,6 +18,7 @@ interface SortMenuProps {
   setCurrentSort: (newCurrentSort: Sorts) => void;
   sortDirection: SortDirection;
   setSortDirection: (newSortDirection: SortDirection) => void;
+  compact?: boolean;
 }
 
 const SortMenu = (props: SortMenuProps): React.ReactNode => {
@@ -47,6 +54,62 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
     }
   };
 
+  const handleSortClick = (sortOption: SortOption) => {
+    if (sortOption.value !== props.currentSort) {
+      props.setSortDirection(SortDirection.Decending);
+    } else {
+      props.setSortDirection(ToggleSortDirection(props.sortDirection));
+    }
+
+    props.setCurrentSort(sortOption.value);
+  };
+
+  if (props.compact) {
+    const currentSortLabel =
+      SortOptions.find((sortOption) => sortOption.value === props.currentSort)
+        ?.label ?? t("sort_by");
+
+    return (
+      <Menu withinPortal>
+        <Menu.Target>
+          <Button
+            variant="filled"
+            color="secondary"
+            size="compact-sm"
+            aria-label={`${t("sort_by")}: ${currentSortLabel}`}
+          >
+            <ArrowUpDownIcon size="1rem" />
+          </Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>{t("sort_by")}</Menu.Label>
+          {SortOptions.map((sortOption) => {
+            const isSelected = sortOption.value === props.currentSort;
+
+            return (
+              <Menu.Item
+                key={sortOption.value}
+                leftSection={isSelected ? <CheckIcon size="1rem" /> : null}
+                rightSection={
+                  !isSelected
+                    ? null
+                    : props.sortDirection === SortDirection.Ascending
+                      ? <ArrowUpIcon size="1rem" />
+                      : props.sortDirection === SortDirection.Decending
+                        ? <ArrowDownIcon size="1rem" />
+                        : <ArrowUpDownIcon size="1rem" />
+                }
+                onClick={() => handleSortClick(sortOption)}
+              >
+                {sortOption.label}
+              </Menu.Item>
+            );
+          })}
+        </Menu.Dropdown>
+      </Menu>
+    );
+  }
+
   return (
     <Flex
       className={classes.container}
@@ -70,17 +133,7 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
                 ? props.sortDirection
                 : SortDirection.None
             }
-            onClick={() => {
-              if (sortOption.value !== props.currentSort) {
-                // When selecting a new sort option, should always go to decending.
-                props.setSortDirection(SortDirection.Decending);
-              } else {
-                props.setSortDirection(
-                  ToggleSortDirection(props.sortDirection),
-                );
-              }
-              props.setCurrentSort(sortOption.value);
-            }}
+            onClick={() => handleSortClick(sortOption)}
           />
         ))}
       </Group>
