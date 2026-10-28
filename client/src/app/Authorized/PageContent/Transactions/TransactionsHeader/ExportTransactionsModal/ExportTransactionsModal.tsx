@@ -78,8 +78,23 @@ export const EXPORT_FIELDS: IExportField[] = [
 
 const DEFAULT_FIELDS = EXPORT_FIELDS.map((f) => f.key);
 
-const ExportTransactionsModal = (): React.ReactNode => {
-  const [opened, { open, close }] = useDisclosure(false);
+interface ExportTransactionsModalProps {
+  opened?: boolean;
+  onOpen?: () => void;
+  onClose?: () => void;
+  showTrigger?: boolean;
+}
+
+const ExportTransactionsModal = ({
+  opened: controlledOpened,
+  onOpen,
+  onClose,
+  showTrigger = true,
+}: ExportTransactionsModalProps = {}): React.ReactNode => {
+  const [internalOpened, { open, close }] = useDisclosure(false);
+  const opened = controlledOpened ?? internalOpened;
+  const handleOpen = () => (onOpen ? onOpen() : open());
+  const handleClose = () => (onClose ? onClose() : close());
   const [orderedFields, setOrderedFields] =
     React.useState<string[]>(DEFAULT_FIELDS);
 
@@ -150,18 +165,20 @@ const ExportTransactionsModal = (): React.ReactNode => {
 
   return (
     <>
-      <Button
-        variant="filled"
-        color="primary"
-        size="xs"
-        rightSection={<FileUpIcon size="1rem" />}
-        onClick={open}
-      >
-        {t("export")}
-      </Button>
+      {showTrigger ? (
+        <Button
+          variant="filled"
+          color="primary"
+          size="xs"
+          rightSection={<FileUpIcon size="1rem" />}
+          onClick={handleOpen}
+        >
+          {t("export")}
+        </Button>
+      ) : null}
       <Modal
         opened={opened}
-        onClose={close}
+        onClose={handleClose}
         fullScreen={isMobile}
         size="80rem"
         title={t("export_transactions")}
