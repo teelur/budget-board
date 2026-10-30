@@ -84,7 +84,7 @@
   "budget_breakdown_left": "Gauche",
   "budget_breakdown_rolled_over": "Report des mois précédents",
   "budget_details": "Détails du budget",
-  "budget_left_after_predictions_styled": "<0>{{amount}}</0> <1> de budget restant après les prédictions</1>",
+  "budget_left_after_predictions_styled": "<0/> <1>restant après prédictions</1>",
   "budget_left_now_styled": "<0>{{amount}}</0> <1> de budget restant</1>",
   "budget_left_styled": "<0/> <1>restant</1>",
   "budget_monthly_amount_fraction_editable_styled": "<0>{{amount}}</0> <1>de</1>",
