@@ -508,23 +508,24 @@ public class DemoSeedService(
     private void SeedBudgetData(ApplicationUser user)
     {
         var today = DateTime.UtcNow;
-        var budgets = new (string Category, decimal Limit)[]
+        var budgets = new (string Category, decimal Limit, bool Rollover)[]
         {
-            ("Food & Dining", 500m),
-            ("Shopping", 300m),
-            ("Auto & Transport", 200m),
-            ("Entertainment", 100m),
-            ("Bills & Utilities", 250m),
-            ("Health & Fitness", 150m),
-            ("Income", 5000m),
+            ("Food & Dining", 500m, false),
+            ("Shopping", 300m, true),
+            ("Auto & Transport", 200m, true),
+            ("Entertainment", 100m, false),
+            ("Bills & Utilities", 250m, false),
+            ("Health & Fitness", 150m, false),
+            ("Income", 5000m, false),
         };
 
         // Seed budgets for the past 3 months
+        var rolloverStartMonth = new DateOnly(today.Year, today.Month, 1).AddMonths(-2);
         for (int monthOffset = 0; monthOffset < 3; monthOffset++)
         {
             var budgetMonth = new DateOnly(today.Year, today.Month, 1).AddMonths(-monthOffset);
 
-            foreach (var (category, limit) in budgets)
+            foreach (var (category, limit, rollover) in budgets)
             {
                 userDataContext.Budgets.Add(
                     new Budget
@@ -532,6 +533,7 @@ public class DemoSeedService(
                         Month = budgetMonth,
                         Category = category,
                         Limit = limit,
+                        RolloverStartMonth = rollover ? rolloverStartMonth : null,
                         UserID = user.Id,
                     }
                 );
