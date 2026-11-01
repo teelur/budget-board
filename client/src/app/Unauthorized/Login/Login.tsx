@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "@teelur/budget-board-ui";
 import { Info } from "lucide-react";
-import { hasLength, isEmail, useField } from "@mantine/form";
+import { hasLength, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -47,9 +47,9 @@ const Login = (props: LoginProps): React.ReactNode => {
   const isOidcEnabled =
     envVariables.VITE_OIDC_ENABLED?.toLowerCase() === "true";
 
-  const emailField = useField<string>({
+  const identifierField = useField<string>({
     initialValue: isDemoMode ? "demo@example.com" : "",
-    validate: isEmail(t("invalid_email_message")),
+    validate: hasLength({ min: 1 }, t("username_or_email_required_message")),
   });
 
   const passwordMinLength = 3;
@@ -64,19 +64,19 @@ const Login = (props: LoginProps): React.ReactNode => {
   });
 
   const doLogin = (): void => {
-    emailField.validate();
+    identifierField.validate();
     passwordField.validate();
 
-    if (emailField.error || passwordField.error) {
+    if (identifierField.error || passwordField.error) {
       return;
     }
 
-    const email = emailField.getValue();
+    const identifier = identifierField.getValue();
     const password = passwordField.getValue();
 
     loginMutation.mutate(
       {
-        email,
+        identifier,
         password,
         rememberMe: props.rememberMe,
       },
@@ -84,7 +84,7 @@ const Login = (props: LoginProps): React.ReactNode => {
         onSuccess: (response) => {
           if (response.data === "RequiresTwoFactor") {
             props.setLoginCardState(LoginCardState.LoginWith2fa);
-            props.setUserEmail(email);
+            props.setUserEmail(identifier);
             props.setUserPassword(password);
             return;
           }
@@ -109,7 +109,7 @@ const Login = (props: LoginProps): React.ReactNode => {
                     size="xs"
                     loading={resendConfirmationEmailMutation.isPending}
                     onClick={() =>
-                      resendConfirmationEmailMutation.mutate(email)
+                      resendConfirmationEmailMutation.mutate(identifier)
                     }
                   >
                     {t("resend")}
@@ -168,8 +168,8 @@ const Login = (props: LoginProps): React.ReactNode => {
             gap="0.75rem"
           >
             <TextInput
-              {...emailField.getInputProps()}
-              label={t("email_address")}
+              {...identifierField.getInputProps()}
+              label={t("username_or_email")}
               w="100%"
             />
             <PasswordInput
@@ -194,11 +194,11 @@ const Login = (props: LoginProps): React.ReactNode => {
                 size="compact-sm"
                 loading={forgotPasswordMutation.isPending}
                 onClick={() => {
-                  if (emailField.getValue()) {
-                    forgotPasswordMutation.mutate(emailField.getValue(), {
+                  if (identifierField.getValue()) {
+                    forgotPasswordMutation.mutate(identifierField.getValue(), {
                       onSuccess: () => {
                         props.setLoginCardState(LoginCardState.ResetPassword);
-                        props.setUserEmail(emailField.getValue());
+                        props.setUserEmail(identifierField.getValue());
                       },
                     });
                   } else {
