@@ -41,7 +41,8 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 
 #### Security
 
-- **User Authentication**: Authenticate locally with two-factor authentication (2FA), or bring your own authentication provider with OIDC login.
+- **User Authentication**: Choose between local username/password authentication,
+  administrator-managed local accounts, or OIDC through an external identity provider.
 
 #### Internationalization
 
