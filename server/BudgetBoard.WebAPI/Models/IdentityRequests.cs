@@ -24,7 +24,7 @@ public sealed class LocalLoginRequest
     public string Password { get; set; } = string.Empty;
 
     public string? TwoFactorCode { get; set; }
-
+    [System.Text.Json.Serialization.JsonPropertyName("recoveryCode")]
     public string? TwoFactorRecoveryCode { get; set; }
 
     public string GetIdentifier() =>
