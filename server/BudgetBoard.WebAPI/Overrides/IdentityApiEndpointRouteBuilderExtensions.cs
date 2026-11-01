@@ -992,6 +992,24 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             );
                         }
 
+                        string? emailToConfirm = null;
+                        if (!string.IsNullOrEmpty(infoRequest.NewEmail))
+                        {
+                            var currentEmail = await userManager.GetEmailAsync(user);
+                            if (currentEmail != infoRequest.NewEmail)
+                            {
+                                if (confirmEmailEndpointName is null)
+                                {
+                                    return CreateValidationProblem(
+                                        "EmailConfirmationUnavailable",
+                                        localizer["NoEmailConfirmationEndpointError"].Value
+                                    );
+                                }
+
+                                emailToConfirm = infoRequest.NewEmail;
+                            }
+                        }
+
                         if (!string.IsNullOrEmpty(infoRequest.NewPassword))
                         {
                             var hasPassword = await userManager.HasPasswordAsync(user);
@@ -1050,20 +1068,15 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             }
                         }
 
-                        if (!string.IsNullOrEmpty(infoRequest.NewEmail))
+                        if (emailToConfirm is not null)
                         {
-                            var email = await userManager.GetEmailAsync(user);
-
-                            if (email != infoRequest.NewEmail)
-                            {
-                                await SendConfirmationEmailAsync(
-                                    user,
-                                    userManager,
-                                    context,
-                                    infoRequest.NewEmail,
-                                    isChange: true
-                                );
-                            }
+                            await SendConfirmationEmailAsync(
+                                user,
+                                userManager,
+                                context,
+                                emailToConfirm,
+                                isChange: true
+                            );
                         }
 
                         return TypedResults.Ok(

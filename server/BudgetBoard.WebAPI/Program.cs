@@ -502,12 +502,6 @@ else
     logger.LogInformation("{LogMessage}", logLocalizer["DatabaseAutomaticUpdatesDisabledLog"]);
 }
 
-using (var bootstrapScope = app.Services.CreateScope())
-{
-    var superuserService = bootstrapScope.ServiceProvider.GetRequiredService<ISuperuserService>();
-    await superuserService.EnsureRoleAndBootstrapAsync();
-}
-
 // Enabling demo mode will clear the database and seed demo data on startup.
 // THIS SHOULD NOT BE ENABLED IN TYPICAL DEPLOYMENTS!
 if (demoModeEnabled)
@@ -516,6 +510,12 @@ if (demoModeEnabled)
     using var seedScope = app.Services.CreateScope();
     var demoSeedService = seedScope.ServiceProvider.GetRequiredService<IDemoSeedService>();
     await demoSeedService.ResetAndSeedAsync();
+}
+
+using (var bootstrapScope = app.Services.CreateScope())
+{
+    var superuserService = bootstrapScope.ServiceProvider.GetRequiredService<ISuperuserService>();
+    await superuserService.EnsureRoleAndBootstrapAsync();
 }
 
 app.Run();
