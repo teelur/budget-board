@@ -20,6 +20,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     private const int INV_READ = 0x00040000;
 
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    public DbSet<AuthenticationAdminAuditEvent> AuthenticationAdminAuditEvents { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<AccountType> AccountTypes { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
@@ -91,6 +92,16 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
                 .IsRequired();
 
             u.ToTable("User");
+        });
+
+        modelBuilder.Entity<AuthenticationAdminAuditEvent>(audit =>
+        {
+            audit.Property(e => e.Action).HasMaxLength(64).IsRequired();
+            audit.Property(e => e.RequestIpAddress).HasMaxLength(64);
+            audit.Property(e => e.Details).HasMaxLength(256);
+            audit.HasIndex(e => e.CreatedAt);
+            audit.HasIndex(e => e.TargetUserId);
+            audit.ToTable("AuthenticationAdminAuditEvent");
         });
 
         modelBuilder.Entity<Account>(
