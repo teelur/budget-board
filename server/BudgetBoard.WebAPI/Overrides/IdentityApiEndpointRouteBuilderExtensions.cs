@@ -578,14 +578,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         }
                         else
                         {
-                            // As with Identity UI, email and user name are one and the same. So when we update the email,
-                            // we need to update the user name.
                             result = await userManager.ChangeEmailAsync(user, changedEmail, code);
-
-                            if (result.Succeeded)
-                            {
-                                result = await userManager.SetUserNameAsync(user, changedEmail);
-                            }
                         }
 
                         if (!result.Succeeded)
@@ -617,7 +610,16 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 ) =>
                 {
                     var userManager = sp.GetRequiredService<UserManager<TUser>>();
-                    if (await userManager.FindByEmailAsync(resendRequest.Email) is not { } user)
+                    var user =
+                        await userManager.FindByEmailAsync(resendRequest.Email)
+                        ?? await userManager.FindByNameAsync(resendRequest.Email);
+                    if (user is null)
+                    {
+                        return TypedResults.Ok();
+                    }
+
+                    var email = await userManager.GetEmailAsync(user);
+                    if (string.IsNullOrWhiteSpace(email))
                     {
                         return TypedResults.Ok();
                     }
@@ -626,7 +628,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         user,
                         userManager,
                         context,
-                        resendRequest.Email
+                        email
                     );
                     return TypedResults.Ok();
                 }

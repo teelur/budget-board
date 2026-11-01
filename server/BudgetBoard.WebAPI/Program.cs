@@ -457,13 +457,11 @@ app.MyMapIdentityApi<ApplicationUser>(
 // Activate the CORS policy
 app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
-app.UseRateLimiter();
 
-// Enable authentication and authorization after CORS Middleware
-// processing (UseCors) in case the Authorization Middleware tries
-// to initiate a challenge before the CORS Middleware has a chance
-// to set the appropriate headers.
+// Authenticate after CORS so later authorization challenges retain CORS headers.
+// Rate limiting follows authentication because some partitions use the authenticated user.
 app.UseAuthentication();
+app.UseRateLimiter();
 
 // Add localization after authentication so the user language provider can access the identity.
 var supportedCultures = SupportedLanguages.SupportedCultureNames.ToArray();

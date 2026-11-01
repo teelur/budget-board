@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Npgsql;
 
 namespace BudgetBoard.IntegrationTests;
 
@@ -205,7 +207,7 @@ public sealed class SuperuserServiceTests
     }
 
     [PostgreSqlFact]
-    public async Task ExecuteFirstUserBootstrapAsync_WrapsPostgresTransactionInRetryStrategy()
+    public async Task ExecuteFirstUserBootstrapAsync_DoesNotRetryPostgresOperation()
     {
         var connectionString = Environment.GetEnvironmentVariable(
             "BUDGET_BOARD_TEST_POSTGRES_CONNECTION_STRING"
@@ -229,6 +231,24 @@ public sealed class SuperuserServiceTests
             null!,
             null!
         );
+
+        var operationAttempts = 0;
+        var transientException = new NpgsqlException(
+            "Simulated transient network failure.",
+            new SocketException((int)SocketError.ConnectionReset)
+        );
+        transientException.IsTransient.Should().BeTrue();
+        var exception = await Assert.ThrowsAsync<NpgsqlException>(() =>
+            service.ExecuteFirstUserBootstrapAsync<int>(async () =>
+            {
+                operationAttempts++;
+                await dbContext.Database.ExecuteSqlRawAsync("SELECT 1");
+                throw transientException;
+            })
+        );
+
+        exception.Should().BeSameAs(transientException);
+        operationAttempts.Should().Be(1);
 
         var operationRan = false;
         var result = await service.ExecuteFirstUserBootstrapAsync(async () =>

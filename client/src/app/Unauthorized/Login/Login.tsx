@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "@teelur/budget-board-ui";
 import { Info } from "lucide-react";
-import { hasLength, useField } from "@mantine/form";
+import { hasLength, isEmail, useField } from "@mantine/form";
 import React from "react";
 import { LoginCardState } from "../Welcome";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
@@ -194,11 +194,23 @@ const Login = (props: LoginProps): React.ReactNode => {
                 size="compact-sm"
                 loading={forgotPasswordMutation.isPending}
                 onClick={() => {
-                  if (identifierField.getValue()) {
-                    forgotPasswordMutation.mutate(identifierField.getValue(), {
+                  const email = identifierField.getValue().trim();
+                  if (email) {
+                    const emailError = isEmail(t("invalid_email_message"))(
+                      email,
+                    );
+                    if (emailError) {
+                      showNotification({
+                        type: NotificationType.Error,
+                        message: emailError,
+                      });
+                      return;
+                    }
+
+                    forgotPasswordMutation.mutate(email, {
                       onSuccess: () => {
                         props.setLoginCardState(LoginCardState.ResetPassword);
-                        props.setUserEmail(identifierField.getValue());
+                        props.setUserEmail(email);
                       },
                     });
                   } else {

@@ -63,6 +63,30 @@ public sealed class MustChangePasswordMiddlewareTests
         nextCalled.Should().BeTrue();
     }
 
+    [Fact]
+    public async Task InvokeAsync_AllowsTheAccountCapabilityRead()
+    {
+        await using var provider = CreateProvider();
+        var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
+        var user = new ApplicationUser { UserName = "temporary", MustChangePassword = true };
+        (await userManager.CreateAsync(user, "password")).Succeeded.Should().BeTrue();
+
+        var context = CreateContext(provider, user.Id, "/api/applicationUser", HttpMethods.Get);
+        var nextCalled = false;
+        var middleware = new MustChangePasswordMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        }, provider.GetRequiredService<IStringLocalizer<ApiResponseStrings>>());
+
+        await middleware.InvokeAsync(
+            context,
+            provider.GetRequiredService<UserManager<ApplicationUser>>()
+        );
+
+        nextCalled.Should().BeTrue();
+    }
+
     private static DefaultHttpContext CreateContext(
         IServiceProvider provider,
         Guid userId,

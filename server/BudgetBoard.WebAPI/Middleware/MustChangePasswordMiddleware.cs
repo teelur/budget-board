@@ -51,6 +51,10 @@ public sealed class MustChangePasswordMiddleware(
                 && HttpMethods.IsPost(context.Request.Method)
             )
             || path.Equals("/api/logout", StringComparison.OrdinalIgnoreCase)
-            || path.Equals("/api/isAuthenticated", StringComparison.OrdinalIgnoreCase);
+            || path.Equals("/api/isAuthenticated", StringComparison.OrdinalIgnoreCase)
+            || (
+                path.Equals("/api/applicationUser", StringComparison.OrdinalIgnoreCase)
+                && HttpMethods.IsGet(context.Request.Method)
+            );
     }
 }

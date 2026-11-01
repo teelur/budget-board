@@ -6,7 +6,8 @@ namespace BudgetBoard.WebAPI.Services;
 public interface ISuperuserService
 {
     /// <summary>
-    /// Executes an operation as part of first-user bootstrap, serializing concurrent calls on PostgreSQL.
+    /// Executes an operation once as part of first-user bootstrap, serializing concurrent calls on
+    /// PostgreSQL without retrying the operation.
     /// </summary>
     /// <typeparam name="TResult">The type of result returned by the operation.</typeparam>
     /// <param name="operation">The operation to execute.</param>

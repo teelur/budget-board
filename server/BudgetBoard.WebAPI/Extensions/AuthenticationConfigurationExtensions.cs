@@ -45,13 +45,11 @@ public static class AuthenticationConfigurationExtensions
                             if (
                                 user is null
                                 || user.IsDisabled
-                                || (
-                                    principalSecurityStamp is not null
-                                    && !string.Equals(
-                                        principalSecurityStamp,
-                                        securityStamp,
-                                        StringComparison.Ordinal
-                                    )
+                                || string.IsNullOrEmpty(principalSecurityStamp)
+                                || !string.Equals(
+                                    principalSecurityStamp,
+                                    securityStamp,
+                                    StringComparison.Ordinal
                                 )
                             )
                             {

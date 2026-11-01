@@ -9,6 +9,7 @@ using BudgetBoard.WebAPI.Models;
 using BudgetBoard.WebAPI.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.WebAPI.Services;
@@ -26,7 +27,7 @@ public sealed class SuperuserService(
 ) : ISuperuserService
 {
     private const int TemporaryPasswordByteLength = 18;
-    private const long FirstUserBootstrapLockKey = 0x4242555341464555L;
+    private const long SuperuserStateLockKey = 0x4242555341464555L;
 
     /// <inheritdoc />
     public async Task<TResult> ExecuteFirstUserBootstrapAsync<TResult>(
@@ -41,15 +42,11 @@ public sealed class SuperuserService(
             return await operation();
         }
 
-        var executionStrategy = dbContext.Database.CreateExecutionStrategy();
+        var executionStrategy = new NonRetryingExecutionStrategy(dbContext);
         return await executionStrategy.ExecuteAsync(
             async executionCancellationToken =>
             {
-                await using var transaction = await dbContext.Database.BeginTransactionAsync(
-                    executionCancellationToken
-                );
-                await dbContext.Database.ExecuteSqlInterpolatedAsync(
-                    $"SELECT pg_advisory_xact_lock({FirstUserBootstrapLockKey})",
+                await using var transaction = await BeginSuperuserStateTransactionAsync(
                     executionCancellationToken
                 );
                 var result = await operation();
@@ -85,6 +82,18 @@ public sealed class SuperuserService(
 
     /// <inheritdoc />
     public async Task EnsureRoleAndBootstrapAsync(CancellationToken cancellationToken = default)
+    {
+        await ExecuteFirstUserBootstrapAsync(
+            async () =>
+            {
+                await EnsureRoleAndBootstrapCoreAsync(cancellationToken);
+                return true;
+            },
+            cancellationToken
+        );
+    }
+
+    private async Task EnsureRoleAndBootstrapCoreAsync(CancellationToken cancellationToken)
     {
         await EnsureRoleAsync(cancellationToken);
 
@@ -346,29 +355,43 @@ public sealed class SuperuserService(
         CancellationToken cancellationToken = default
     )
     {
+        await using var transaction = await BeginSuperuserStateTransactionAsync(
+            cancellationToken
+        );
         var target = await userManager.FindByIdAsync(targetUserId.ToString());
         if (target is null)
         {
-            return await FailureAsync("UserNotFound", "set-disabled", targetUserId, actorUserId);
+            return await FailureAfterRollbackAsync(
+                transaction,
+                "UserNotFound",
+                "set-disabled",
+                targetUserId,
+                actorUserId,
+                cancellationToken
+            );
         }
 
         if (target.Id == actorUserId)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "SelfDisableNotAllowed",
                 "set-disabled",
                 target.Id,
-                actorUserId
+                actorUserId,
+                cancellationToken
             );
         }
 
         if (await userManager.IsInRoleAsync(target, SuperuserConstants.RoleName))
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "SuperuserDisableNotAllowed",
                 "set-disabled",
                 target.Id,
-                actorUserId
+                actorUserId,
+                cancellationToken
             );
         }
 
@@ -376,10 +399,18 @@ public sealed class SuperuserService(
         var updateResult = await userManager.UpdateAsync(target);
         if (!updateResult.Succeeded)
         {
-            return await FailureAsync("UserUpdateFailed", "set-disabled", target.Id, actorUserId);
+            return await FailureAfterRollbackAsync(
+                transaction,
+                "UserUpdateFailed",
+                "set-disabled",
+                target.Id,
+                actorUserId,
+                cancellationToken
+            );
         }
 
         await userManager.UpdateSecurityStampAsync(target);
+        await transaction.CommitAsync(cancellationToken);
         await AuditAsync(
             actorUserId,
             target.Id,
@@ -403,57 +434,66 @@ public sealed class SuperuserService(
         CancellationToken cancellationToken = default
     )
     {
+        await using var transaction = await BeginSuperuserStateTransactionAsync(
+            cancellationToken
+        );
         var target = await userManager.FindByIdAsync(targetUserId.ToString());
         if (target is null)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "UserNotFound",
                 "transfer-superuser",
                 targetUserId,
-                actorUserId
+                actorUserId,
+                cancellationToken
             );
         }
 
         if (target.IsDisabled)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "DisabledUserCannotBeSuperuser",
                 "transfer-superuser",
                 target.Id,
-                actorUserId
+                actorUserId,
+                cancellationToken
             );
         }
 
         var currentSuperusers = await userManager.GetUsersInRoleAsync(SuperuserConstants.RoleName);
         if (currentSuperusers.Count != 1)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "SuperuserInvariantViolation",
                 "transfer-superuser",
                 target.Id,
-                actorUserId
+                actorUserId,
+                cancellationToken
             );
         }
 
         var current = currentSuperusers.SingleOrDefault(user => user.Id == actorUserId);
         if (current is null)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "CurrentSuperuserNotFound",
                 "transfer-superuser",
                 target.Id,
-                actorUserId
+                actorUserId,
+                cancellationToken
             );
         }
 
         if (current.Id == target.Id)
         {
+            await transaction.CommitAsync(cancellationToken);
             return SuperuserOperationResult.Success(await ToResponseAsync(target, true));
         }
 
-        await using var transaction = await dbContext.Database.BeginTransactionAsync(
-            cancellationToken
-        );
         var removeResult = await userManager.RemoveFromRoleAsync(
             current,
             SuperuserConstants.RoleName
@@ -464,12 +504,13 @@ public sealed class SuperuserService(
 
         if (!removeResult.Succeeded || !addResult.Succeeded)
         {
-            await transaction.RollbackAsync(cancellationToken);
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "SuperuserTransferFailed",
                 "transfer-superuser",
                 target.Id,
-                actorUserId
+                actorUserId,
+                cancellationToken
             );
         }
 
@@ -662,6 +703,35 @@ public sealed class SuperuserService(
             user.MustChangePassword,
             isSuperuser
         );
+    }
+
+    private async Task<IDbContextTransaction> BeginSuperuserStateTransactionAsync(
+        CancellationToken cancellationToken
+    )
+    {
+        var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        if (dbContext.Database.IsNpgsql())
+        {
+            await dbContext.Database.ExecuteSqlInterpolatedAsync(
+                $"SELECT pg_advisory_xact_lock({SuperuserStateLockKey})",
+                cancellationToken
+            );
+        }
+
+        return transaction;
+    }
+
+    private async Task<SuperuserOperationResult> FailureAfterRollbackAsync(
+        IDbContextTransaction transaction,
+        string errorCode,
+        string action,
+        Guid? targetUserId,
+        Guid? actorUserId,
+        CancellationToken cancellationToken
+    )
+    {
+        await transaction.RollbackAsync(cancellationToken);
+        return await FailureAsync(errorCode, action, targetUserId, actorUserId);
     }
 
     private async Task<SuperuserOperationResult> FailureAsync(
