@@ -113,7 +113,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                     {
                         return CreateValidationProblem(
                             "UsernameRequired",
-                            "A username or email address is required."
+                            localizer["UsernameOrEmailRequired"].Value
                         );
                     }
 
@@ -443,7 +443,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             var loginInfo = new UserLoginInfo(
                                 IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
                                 userId,
-                                "Local Account"
+                                localizer["LocalAccountProviderName"].Value
                             );
                             var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
                             if (!addLoginResult.Succeeded)
@@ -931,7 +931,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         {
                             return CreateValidationProblem(
                                 "PasswordChangeRequired",
-                                "A new password is required before this account can be used."
+                                localizer["PasswordChangeRequiredForAccount"].Value
                             );
                         }
 
@@ -939,7 +939,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         {
                             return CreateValidationProblem(
                                 "PasswordChangeRequired",
-                                "Change the password before changing other account settings."
+                                localizer["PasswordChangeRequiredForSettings"].Value
                             );
                         }
 
@@ -962,7 +962,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             {
                                 return CreateValidationProblem(
                                     "OldPasswordRequired",
-                                    "The old password is required to set a new password. If the old password is forgotten, use /resetPassword."
+                                    localizer["OldPasswordRequired"].Value
                                 );
                             }
 
@@ -980,7 +980,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                                     var loginInfo = new UserLoginInfo(
                                         IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
                                         userId,
-                                        "Local Account"
+                                        localizer["LocalAccountProviderName"].Value
                                     );
                                     await userManager.AddLoginAsync(user, loginInfo);
                                 }
