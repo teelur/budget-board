@@ -10,6 +10,7 @@ using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Extensions;
 using BudgetBoard.WebAPI.Jobs;
 using BudgetBoard.WebAPI.Middleware;
+using BudgetBoard.WebAPI.Resources;
 using BudgetBoard.WebAPI.Services;
 using BudgetBoard.WebAPI.Utils;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -373,8 +374,19 @@ if (args.Length > 0 && string.Equals(args[0], "admin", StringComparison.OrdinalI
     {
         app.Services
             .GetRequiredService<ILogger<Program>>()
-            .LogError(exception, "The offline administrator command failed.");
-        Console.Error.WriteLine("The offline administrator command failed.");
+            .LogError(
+                exception,
+                "{LogMessage}",
+                app.Services
+                    .GetRequiredService<IStringLocalizer<ApiLogStrings>>()
+                    ["OfflineAdministratorCommandFailedLog"]
+            );
+        Console.Error.WriteLine(
+            app.Services
+                .GetRequiredService<IStringLocalizer<ApiResponseStrings>>()
+                ["OfflineAdminCommandFailed"]
+                .Value
+        );
         Environment.ExitCode = 1;
     }
 
@@ -452,10 +464,8 @@ app.UseRateLimiter();
 // to initiate a challenge before the CORS Middleware has a chance
 // to set the appropriate headers.
 app.UseAuthentication();
-app.UseMiddleware<MustChangePasswordMiddleware>();
-app.UseAuthorization();
 
-// Add localization support after authentication so user identity is available
+// Add localization after authentication so the user language provider can access the identity.
 var supportedCultures = SupportedLanguages.SupportedCultureNames.ToArray();
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
@@ -467,6 +477,8 @@ var localizationOptions = new RequestLocalizationOptions()
 localizationOptions.RequestCultureProviders.Insert(0, new UserLanguageCultureProvider());
 
 app.UseRequestLocalization(localizationOptions);
+app.UseMiddleware<MustChangePasswordMiddleware>();
+app.UseAuthorization();
 
 app.MapHealthChecks("/health").AllowAnonymous();
 app.MapControllers();
