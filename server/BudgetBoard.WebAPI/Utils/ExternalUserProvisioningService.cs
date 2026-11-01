@@ -4,6 +4,7 @@ using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.WebAPI.Resources;
+using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Localization;
@@ -14,6 +15,7 @@ namespace BudgetBoard.Utils
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
         IWidgetSettingsService widgetSettingsService,
+        ISuperuserService superuserService,
         ILogger<ExternalUserProvisioningService> logger,
         IStringLocalizer<ApiLogStrings> logLocalizer
     ) : IExternalUserProvisioningService
@@ -24,6 +26,8 @@ namespace BudgetBoard.Utils
             configuration ?? throw new ArgumentNullException(nameof(configuration));
         private readonly IWidgetSettingsService _widgetSettingsService =
             widgetSettingsService ?? throw new ArgumentNullException(nameof(widgetSettingsService));
+        private readonly ISuperuserService _superuserService =
+            superuserService ?? throw new ArgumentNullException(nameof(superuserService));
         private readonly ILogger<ExternalUserProvisioningService> _logger =
             logger ?? throw new ArgumentNullException(nameof(logger));
         private readonly IStringLocalizer<ApiLogStrings> _logLocalizer = logLocalizer;
@@ -55,9 +59,9 @@ namespace BudgetBoard.Utils
                 return ExternalUserProvisioningResult.Failed();
             }
 
-            // Find or create local user
+            // Find or create local user. A missing user is re-checked inside the
+            // transaction-scoped bootstrap lock to coordinate with local registration.
             var user = await _userManager.FindByEmailAsync(email);
-            var wasUserCreated = false;
             if (user == null)
             {
                 // Check if new user creation is disabled
@@ -67,7 +71,82 @@ namespace BudgetBoard.Utils
                     _logger.LogWarning("{LogMessage}", _logLocalizer["NewUserCreationDisabledLog"]);
                     return ExternalUserProvisioningResult.Failed();
                 }
+                var provisioningState =
+                    await _superuserService.ExecuteFirstUserBootstrapAsync(
+                        () =>
+                            CreateOrCompleteUserAsync(
+                                email,
+                                providerKey,
+                                schemeName
+                            ),
+                        httpContext.RequestAborted
+                    );
+                if (!provisioningState.Result.Succeeded)
+                {
+                    return provisioningState.Result;
+                }
 
+                user = provisioningState.User!;
+            }
+            else
+            {
+                var provisioningState = await CompleteUserProvisioningAsync(
+                    user,
+                    false,
+                    providerKey,
+                    schemeName
+                );
+                if (!provisioningState.Result.Succeeded)
+                {
+                    return provisioningState.Result;
+                }
+
+                user = provisioningState.User!;
+            }
+
+            // Sign into application cookie
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Name, user.UserName ?? email),
+                new(ClaimTypes.Email, user.Email ?? email),
+            };
+            var securityStamp = await _userManager.GetSecurityStampAsync(user);
+            if (!string.IsNullOrEmpty(securityStamp))
+            {
+                claims.Add(
+                    new Claim(
+                        new IdentityOptions().ClaimsIdentity.SecurityStampClaimType,
+                        securityStamp
+                    )
+                );
+            }
+            claims.AddRange(
+                (await _userManager.GetRolesAsync(user)).Select(role => new Claim(
+                    ClaimTypes.Role,
+                    role
+                ))
+            );
+
+            var identity = new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme);
+            await httpContext.SignInAsync(
+                IdentityConstants.ApplicationScheme,
+                new ClaimsPrincipal(identity),
+                new AuthenticationProperties { IsPersistent = isPersistent }
+            );
+
+            return ExternalUserProvisioningResult.Success();
+        }
+
+        private async Task<ProvisioningState> CreateOrCompleteUserAsync(
+            string email,
+            string providerKey,
+            string schemeName
+        )
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null)
+            {
                 user = new ApplicationUser
                 {
                     UserName = email,
@@ -85,10 +164,8 @@ namespace BudgetBoard.Utils
                             string.Join(", ", createResult.Errors.Select(e => e.Description))
                         ]
                     );
-                    return ExternalUserProvisioningResult.Failed();
+                    return ProvisioningState.Failed();
                 }
-
-                wasUserCreated = true;
 
                 try
                 {
@@ -117,62 +194,87 @@ namespace BudgetBoard.Utils
                     );
                 }
 
+                await _superuserService.EnsureFirstUserSuperuserAsync(user);
                 _logger.LogInformation("{LogMessage}", _logLocalizer["UserProvisionedLog"]);
+                return await CompleteUserProvisioningAsync(
+                    user,
+                    true,
+                    providerKey,
+                    schemeName
+                );
             }
-            else
+
+            return await CompleteUserProvisioningAsync(user, false, providerKey, schemeName);
+        }
+
+        private async Task<ProvisioningState> CompleteUserProvisioningAsync(
+            ApplicationUser user,
+            bool wasUserCreated,
+            string providerKey,
+            string schemeName
+        )
+        {
+            if (user.IsDisabled)
+            {
+                _logger.LogWarning("OIDC login rejected for disabled user {UserId}.", user.Id);
+                return ProvisioningState.Failed();
+            }
+
+            if (!wasUserCreated)
             {
                 _logger.LogInformation("{LogMessage}", _logLocalizer["UserFoundLog"]);
             }
 
-            // Ensure external login association exists
             var userLogins = await _userManager.GetLoginsAsync(user);
             var hasLogin = userLogins.Any(l =>
                 l.LoginProvider == schemeName && l.ProviderKey == providerKey
             );
-            if (!hasLogin)
+            if (hasLogin)
             {
-                // Existing local accounts must link OIDC explicitly through the authenticated settings flow.
-                if (!wasUserCreated)
-                {
-                    _logger.LogInformation(
-                        "{LogMessage}",
-                        _logLocalizer["OidcExplicitLinkRequiredLog", user.Id]
-                    );
-                    return ExternalUserProvisioningResult.ExplicitLinkingRequired();
-                }
-
-                var loginInfo = new UserLoginInfo(schemeName, providerKey, schemeName);
-                var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
-                if (!addLoginResult.Succeeded)
-                {
-                    _logger.LogWarning(
-                        "{LogMessage}",
-                        _logLocalizer[
-                            "AddingLoginErrorLog",
-                            user.Id,
-                            string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
-                        ]
-                    );
-                    return ExternalUserProvisioningResult.Failed();
-                }
+                return ProvisioningState.Succeeded(user);
             }
 
-            // Sign into application cookie
-            var claims = new List<Claim>
+            // Existing local accounts must link OIDC explicitly through the authenticated settings flow.
+            if (!wasUserCreated)
             {
-                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name, user.UserName ?? email),
-                new(ClaimTypes.Email, user.Email ?? email),
-            };
+                _logger.LogInformation(
+                    "{LogMessage}",
+                    _logLocalizer["OidcExplicitLinkRequiredLog", user.Id]
+                );
+                return ProvisioningState.ExplicitLinkingRequired();
+            }
 
-            var identity = new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme);
-            await httpContext.SignInAsync(
-                IdentityConstants.ApplicationScheme,
-                new ClaimsPrincipal(identity),
-                new AuthenticationProperties { IsPersistent = isPersistent }
-            );
+            var loginInfo = new UserLoginInfo(schemeName, providerKey, schemeName);
+            var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
+            if (!addLoginResult.Succeeded)
+            {
+                _logger.LogWarning(
+                    "{LogMessage}",
+                    _logLocalizer[
+                        "AddingLoginErrorLog",
+                        user.Id,
+                        string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
+                    ]
+                );
+                return ProvisioningState.Failed();
+            }
 
-            return ExternalUserProvisioningResult.Success();
+            return ProvisioningState.Succeeded(user);
+        }
+
+        private sealed record ProvisioningState(
+            ApplicationUser? User,
+            ExternalUserProvisioningResult Result
+        )
+        {
+            public static ProvisioningState Succeeded(ApplicationUser user) =>
+                new(user, ExternalUserProvisioningResult.Success());
+
+            public static ProvisioningState Failed() =>
+                new(null, ExternalUserProvisioningResult.Failed());
+
+            public static ProvisioningState ExplicitLinkingRequired() =>
+                new(null, ExternalUserProvisioningResult.ExplicitLinkingRequired());
         }
     }
 }
