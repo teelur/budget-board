@@ -184,6 +184,9 @@
     <data name="SuperuserBootstrapUserNotFound" xml:space="preserve">
         <value>No existing user matches {0}.</value>
     </data>
+    <data name="SuperuserBootstrapUserDisabled" xml:space="preserve">
+        <value>The superuser bootstrap account is disabled. Enable it or configure another enabled user before restarting.</value>
+    </data>
     <data name="SuperuserPromotionFailed" xml:space="preserve">
         <value>Unable to promote the selected user: {0}</value>
     </data>

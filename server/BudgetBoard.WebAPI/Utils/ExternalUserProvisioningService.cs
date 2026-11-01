@@ -7,6 +7,7 @@ using BudgetBoard.WebAPI.Resources;
 using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
 namespace BudgetBoard.Utils
@@ -71,16 +72,23 @@ namespace BudgetBoard.Utils
                     _logger.LogWarning("{LogMessage}", _logLocalizer["NewUserCreationDisabledLog"]);
                     return ExternalUserProvisioningResult.Failed();
                 }
-                var provisioningState =
-                    await _superuserService.ExecuteFirstUserBootstrapAsync(
-                        () =>
-                            CreateOrCompleteUserAsync(
-                                email,
-                                providerKey,
-                                schemeName
-                            ),
+                ProvisioningState provisioningState;
+                try
+                {
+                    provisioningState = await _superuserService.ExecuteFirstUserBootstrapAsync(
+                        () => CreateOrCompleteUserAsync(email, providerKey, schemeName),
                         httpContext.RequestAborted
                     );
+                }
+                catch (DbUpdateException exception)
+                    when (IdentityEmailUniqueness.IsDuplicateEmailViolation(exception))
+                {
+                    _logger.LogWarning(
+                        "External user provisioning rejected because the email is already in use."
+                    );
+                    return ExternalUserProvisioningResult.Failed();
+                }
+
                 if (!provisioningState.Result.Succeeded)
                 {
                     return provisioningState.Result;

@@ -124,7 +124,7 @@ public sealed class SuperuserController(
             var statusCode = result.ErrorCode switch
             {
                 "UserNotFound" => StatusCodes.Status404NotFound,
-                "UsernameAlreadyTaken" => StatusCodes.Status409Conflict,
+                "UsernameAlreadyTaken" or "EmailAlreadyTaken" => StatusCodes.Status409Conflict,
                 _ => StatusCodes.Status400BadRequest,
             };
             return Problem(

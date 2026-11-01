@@ -147,6 +147,13 @@ public sealed class SuperuserService(
                 );
         }
 
+        if (target.IsDisabled)
+        {
+            throw new InvalidOperationException(
+                localizer["SuperuserBootstrapUserDisabled"].Value
+            );
+        }
+
         var result = await userManager.AddToRoleAsync(target, SuperuserConstants.RoleName);
         if (!result.Succeeded)
         {
@@ -262,10 +269,23 @@ public sealed class SuperuserService(
             MustChangePassword = true,
         };
 
-        var createResult = await userManager.CreateAsync(user, temporaryPassword);
+        IdentityResult createResult;
+        try
+        {
+            createResult = await userManager.CreateAsync(user, temporaryPassword);
+        }
+        catch (DbUpdateException exception)
+            when (IdentityEmailUniqueness.IsDuplicateEmailViolation(exception))
+        {
+            return await FailureAsync("EmailAlreadyTaken", "create-user", null, actorUserId);
+        }
+
         if (!createResult.Succeeded)
         {
-            return await FailureAsync("UserCreationFailed", "create-user", null, actorUserId);
+            var errorCode = createResult.Errors.Any(error => error.Code == "DuplicateEmail")
+                ? "EmailAlreadyTaken"
+                : "UserCreationFailed";
+            return await FailureAsync(errorCode, "create-user", null, actorUserId);
         }
 
         var addLoginResult = await userManager.AddLoginAsync(
@@ -577,55 +597,74 @@ public sealed class SuperuserService(
     )
     {
         await EnsureRoleAsync(cancellationToken);
+        await using var transaction = await BeginSuperuserStateTransactionAsync(
+            cancellationToken
+        );
         var existingSuperusers = await userManager.GetUsersInRoleAsync(SuperuserConstants.RoleName);
         if (existingSuperusers.Count > 1)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "SuperuserInvariantViolation",
                 "offline-bootstrap-superuser",
                 null,
-                null
+                null,
+                cancellationToken
             );
         }
 
         if (existingSuperusers.Count == 1)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "SuperuserAlreadyExists",
                 "offline-bootstrap-superuser",
                 null,
-                null
+                null,
+                cancellationToken
             );
         }
 
         var target = await userManager.FindByNameAsync(username);
         if (target is null)
         {
-            return await FailureAsync("UserNotFound", "offline-bootstrap-superuser", null, null);
+            return await FailureAfterRollbackAsync(
+                transaction,
+                "UserNotFound",
+                "offline-bootstrap-superuser",
+                null,
+                null,
+                cancellationToken
+            );
         }
 
         if (target.IsDisabled)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "DisabledUserCannotBeSuperuser",
                 "offline-bootstrap-superuser",
                 target.Id,
-                null
+                null,
+                cancellationToken
             );
         }
 
         var result = await userManager.AddToRoleAsync(target, SuperuserConstants.RoleName);
         if (!result.Succeeded)
         {
-            return await FailureAsync(
+            return await FailureAfterRollbackAsync(
+                transaction,
                 "SuperuserBootstrapFailed",
                 "offline-bootstrap-superuser",
                 target.Id,
-                null
+                null,
+                cancellationToken
             );
         }
 
         await userManager.UpdateSecurityStampAsync(target);
+        await transaction.CommitAsync(cancellationToken);
         await AuditAsync(
             null,
             target.Id,
@@ -644,12 +683,21 @@ public sealed class SuperuserService(
         CancellationToken cancellationToken
     )
     {
+        await using var transaction = await BeginSuperuserStateTransactionAsync(
+            cancellationToken
+        );
         var temporaryPassword = GenerateTemporaryPassword();
         var token = await userManager.GeneratePasswordResetTokenAsync(target);
         var resetResult = await userManager.ResetPasswordAsync(target, token, temporaryPassword);
         if (!resetResult.Succeeded)
         {
-            return await FailureAsync("PasswordResetFailed", action, target.Id, actorUserId);
+            return await PasswordResetFailureAfterRollbackAsync(
+                transaction,
+                target,
+                action,
+                actorUserId,
+                cancellationToken
+            );
         }
 
         var logins = await userManager.GetLoginsAsync(target);
@@ -676,18 +724,36 @@ public sealed class SuperuserService(
         var updateResult = await userManager.UpdateAsync(target);
         if (!updateResult.Succeeded)
         {
-            return await FailureAsync("PasswordResetFailed", action, target.Id, actorUserId);
+            return await PasswordResetFailureAfterRollbackAsync(
+                transaction,
+                target,
+                action,
+                actorUserId,
+                cancellationToken
+            );
         }
 
         await userManager.UpdateSecurityStampAsync(target);
-        await AuditAsync(actorUserId, target.Id, action, true, null, cancellationToken);
-        return SuperuserOperationResult.Success(
-            await ToResponseAsync(
-                target,
-                await userManager.IsInRoleAsync(target, SuperuserConstants.RoleName)
-            ),
-            temporaryPassword
+        var response = await ToResponseAsync(
+            target,
+            await userManager.IsInRoleAsync(target, SuperuserConstants.RoleName)
         );
+        await AuditAsync(actorUserId, target.Id, action, true, null, cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return SuperuserOperationResult.Success(response, temporaryPassword);
+    }
+
+    private async Task<SuperuserOperationResult> PasswordResetFailureAfterRollbackAsync(
+        IDbContextTransaction transaction,
+        ApplicationUser target,
+        string action,
+        Guid? actorUserId,
+        CancellationToken cancellationToken
+    )
+    {
+        await transaction.RollbackAsync(cancellationToken);
+        await dbContext.Entry(target).ReloadAsync(cancellationToken);
+        return await FailureAsync("PasswordResetFailed", action, target.Id, actorUserId);
     }
 
     private async Task<ManagedUserResponse> ToResponseAsync(ApplicationUser user, bool isSuperuser)

@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
@@ -248,10 +249,24 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             );
                         };
 
-                    var registrationResult = await superuserService.ExecuteFirstUserBootstrapAsync(
-                        registerOperation,
-                        context.RequestAborted
-                    );
+                    Results<Ok<RegisterResponse>, ValidationProblem> registrationResult;
+                    try
+                    {
+                        registrationResult =
+                            await superuserService.ExecuteFirstUserBootstrapAsync(
+                                registerOperation,
+                                context.RequestAborted
+                            );
+                    }
+                    catch (DbUpdateException exception)
+                        when (IdentityEmailUniqueness.IsDuplicateEmailViolation(exception))
+                    {
+                        return CreateValidationProblem(
+                            IdentityResult.Failed(
+                                userManager.ErrorDescriber.DuplicateEmail(email ?? string.Empty)
+                            )
+                        );
+                    }
 
                     if (
                         userForConfirmation is not null
@@ -547,7 +562,9 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             routeGroup
                 .MapGet(
                     "/confirmEmail",
-                    async Task<Results<ContentHttpResult, UnauthorizedHttpResult>> (
+                    async Task<
+                        Results<ContentHttpResult, UnauthorizedHttpResult, ValidationProblem>
+                    > (
                         [FromQuery] string userId,
                         [FromQuery] string code,
                         [FromQuery] string? changedEmail,
@@ -578,7 +595,25 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         }
                         else
                         {
-                            result = await userManager.ChangeEmailAsync(user, changedEmail, code);
+                            try
+                            {
+                                result = await userManager.ChangeEmailAsync(
+                                    user,
+                                    changedEmail,
+                                    code
+                                );
+                            }
+                            catch (DbUpdateException exception)
+                                when (
+                                    IdentityEmailUniqueness.IsDuplicateEmailViolation(exception)
+                                )
+                            {
+                                return CreateValidationProblem(
+                                    IdentityResult.Failed(
+                                        userManager.ErrorDescriber.DuplicateEmail(changedEmail)
+                                    )
+                                );
+                            }
                         }
 
                         if (!result.Succeeded)

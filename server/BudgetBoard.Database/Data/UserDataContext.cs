@@ -14,6 +14,8 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options),
         ILargeObjectStore
 {
+    public const string NormalizedEmailIndexName = "EmailIndex";
+
     // Constants needed for handling Postgres Large Objects
     // https://github.com/postgres/postgres/blob/master/src/include/libpq/libpq-fs.h
     private const int INV_WRITE = 0x00020000;
@@ -54,6 +56,10 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
 
         modelBuilder.Entity<ApplicationUser>(u =>
         {
+            u.HasIndex(e => e.NormalizedEmail)
+                .IsUnique()
+                .HasDatabaseName(NormalizedEmailIndexName);
+
             u.HasMany(e => e.Accounts)
                 .WithOne(e => e.User)
                 .HasForeignKey(e => e.UserID)

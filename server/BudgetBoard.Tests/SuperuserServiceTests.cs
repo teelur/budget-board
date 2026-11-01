@@ -65,6 +65,44 @@ public sealed class SuperuserServiceTests
     }
 
     [Fact]
+    public async Task EnsureRoleAndBootstrapAsync_RejectsADisabledOnlyUser()
+    {
+        await using var harness = CreateHarness();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var user = new ApplicationUser { UserName = "disabled", IsDisabled = true };
+        (await userManager.CreateAsync(user, "password")).Succeeded.Should().BeTrue();
+
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.EnsureRoleAndBootstrapAsync()
+        );
+
+        (await userManager.IsInRoleAsync(user, SuperuserConstants.RoleName)).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task EnsureRoleAndBootstrapAsync_RejectsAConfiguredDisabledUser()
+    {
+        await using var harness = CreateHarness();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var enabledUser = new ApplicationUser { UserName = "enabled" };
+        var disabledUser = new ApplicationUser { UserName = "disabled", IsDisabled = true };
+        (await userManager.CreateAsync(enabledUser, "password")).Succeeded.Should().BeTrue();
+        (await userManager.CreateAsync(disabledUser, "password")).Succeeded.Should().BeTrue();
+        harness.Services.GetRequiredService<IConfiguration>()[
+            SuperuserConstants.BootstrapUsernameConfigurationKey
+        ] = disabledUser.UserName;
+
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.EnsureRoleAndBootstrapAsync()
+        );
+
+        (await userManager.IsInRoleAsync(enabledUser, SuperuserConstants.RoleName)).Should().BeFalse();
+        (await userManager.IsInRoleAsync(disabledUser, SuperuserConstants.RoleName)).Should().BeFalse();
+    }
+
+    [Fact]
     public async Task CreateUserAsync_GeneratesAForcedChangePassword()
     {
         await using var harness = CreateHarness();
@@ -104,6 +142,77 @@ public sealed class SuperuserServiceTests
         (await userManager.CheckPasswordAsync(actor, "password")).Should().BeFalse();
         (await userManager.CheckPasswordAsync(actor, result.TemporaryPassword!)).Should().BeTrue();
         actor.MustChangePassword.Should().BeTrue();
+    }
+
+    [PostgreSqlFact]
+    public async Task ResetPasswordAsync_WhenPasswordChangeFlagUpdateFails_RollsBackTheReset()
+    {
+        var baseConnectionString =
+            Environment.GetEnvironmentVariable("BUDGET_BOARD_TEST_POSTGRES_CONNECTION_STRING")
+            ?? throw new InvalidOperationException(
+                "The PostgreSQL test connection string is required."
+            );
+        var schemaName = $"superuser_test_{Guid.NewGuid():N}";
+        await using (var connection = new NpgsqlConnection(baseConnectionString))
+        {
+            await connection.OpenAsync();
+            await using var createSchemaCommand = new NpgsqlCommand(
+                $"CREATE SCHEMA {schemaName}",
+                connection
+            );
+            await createSchemaCommand.ExecuteNonQueryAsync();
+        }
+
+        try
+        {
+            var connectionString = new NpgsqlConnectionStringBuilder(baseConnectionString)
+            {
+                SearchPath = schemaName,
+            }.ConnectionString;
+            await using var harness = CreateHarness(
+                connectionString,
+                new RejectPasswordChangeValidator()
+            );
+            var dbContext = harness.Services.GetRequiredService<UserDataContext>();
+            await dbContext.Database.EnsureCreatedAsync();
+            var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+            var actor = new ApplicationUser { UserName = "owner" };
+            (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+
+            var service = harness.Services.GetRequiredService<ISuperuserService>();
+            await service.EnsureRoleAndBootstrapAsync();
+            var result = await service.ResetPasswordAsync(actor.Id, actor.Id);
+
+            result.Succeeded.Should().BeFalse();
+            result.TemporaryPassword.Should().BeNull();
+            dbContext.ChangeTracker.Clear();
+            var persistedActor = (await userManager.FindByIdAsync(actor.Id.ToString()))!;
+            (await userManager.CheckPasswordAsync(persistedActor, "password")).Should().BeTrue();
+            persistedActor.MustChangePassword.Should().BeFalse();
+            (
+                await userManager.GetLoginsAsync(persistedActor)
+            ).Should()
+                .NotContain(login =>
+                    login.LoginProvider == SuperuserConstants.LocalLoginProvider
+                );
+            (
+                await dbContext.AuthenticationAdminAuditEvents
+                    .Where(audit =>
+                        audit.TargetUserId == actor.Id && audit.Action == "reset-password"
+                    )
+                    .ToListAsync()
+            ).Should().ContainSingle(audit => !audit.Succeeded);
+        }
+        finally
+        {
+            await using var connection = new NpgsqlConnection(baseConnectionString);
+            await connection.OpenAsync();
+            await using var dropSchemaCommand = new NpgsqlCommand(
+                $"DROP SCHEMA {schemaName} CASCADE",
+                connection
+            );
+            await dropSchemaCommand.ExecuteNonQueryAsync();
+        }
     }
 
     [Fact]
@@ -262,7 +371,10 @@ public sealed class SuperuserServiceTests
         operationRan.Should().BeTrue();
     }
 
-    private static ServiceProviderHarness CreateHarness()
+    private static ServiceProviderHarness CreateHarness(
+        string? postgresConnectionString = null,
+        IUserValidator<ApplicationUser>? additionalUserValidator = null
+    )
     {
         var services = new ServiceCollection();
         var widgetSettingsService = new Mock<IWidgetSettingsService>();
@@ -275,12 +387,20 @@ public sealed class SuperuserServiceTests
             new ConfigurationBuilder().AddInMemoryCollection().Build()
         );
         services.AddDbContext<UserDataContext>(options =>
-            options
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .ConfigureWarnings(warnings =>
-                    warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning)
-                )
-        );
+        {
+            if (postgresConnectionString is null)
+            {
+                options
+                    .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                    .ConfigureWarnings(warnings =>
+                        warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning)
+                    );
+            }
+            else
+            {
+                options.UseNpgsql(postgresConnectionString);
+            }
+        });
         services
             .AddIdentityCore<ApplicationUser>(options =>
             {
@@ -296,8 +416,27 @@ public sealed class SuperuserServiceTests
             .AddEntityFrameworkStores<UserDataContext>()
             .AddUserValidator<OptionalEmailUserValidator>()
             .AddDefaultTokenProviders();
+        if (additionalUserValidator is not null)
+        {
+            services.AddSingleton(additionalUserValidator);
+        }
         services.AddScoped<ISuperuserService, SuperuserService>();
         return new ServiceProviderHarness(services.BuildServiceProvider());
+    }
+
+    private sealed class RejectPasswordChangeValidator : IUserValidator<ApplicationUser>
+    {
+        public Task<IdentityResult> ValidateAsync(
+            UserManager<ApplicationUser> manager,
+            ApplicationUser user
+        ) =>
+            Task.FromResult(
+                user.MustChangePassword
+                    ? IdentityResult.Failed(
+                        new IdentityError { Code = "PasswordChangeNotAllowed" }
+                    )
+                    : IdentityResult.Success
+            );
     }
 
     private sealed class ServiceProviderHarness : IAsyncDisposable
