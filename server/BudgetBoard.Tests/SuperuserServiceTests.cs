@@ -301,6 +301,61 @@ public sealed class SuperuserServiceTests
     }
 
     [Fact]
+    public async Task AdminMutations_WhenAuditWriteFails_RollBackTheirChanges()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        await using var harness = CreateHarness(connection);
+        var dbContext = harness.Services.GetRequiredService<UserDataContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        var createResult = await service.CreateUserAsync(
+            new CreateManagedUserRequest { Username = "managed" },
+            actor.Id
+        );
+        var managedId = createResult.User!.Id;
+
+        await dbContext.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TRIGGER reject_admin_audit_insert
+            BEFORE INSERT ON "AuthenticationAdminAuditEvent"
+            BEGIN
+                SELECT RAISE(ABORT, 'audit insert rejected');
+            END;
+            """
+        );
+
+        await Assert.ThrowsAsync<DbUpdateException>(() =>
+            service.SetDisabledAsync(managedId, actor.Id, true)
+        );
+
+        dbContext.ChangeTracker.Clear();
+        (await userManager.FindByIdAsync(managedId.ToString()))!.IsDisabled.Should().BeFalse();
+        (
+            await dbContext.AuthenticationAdminAuditEvents
+                .Where(audit =>
+                    audit.TargetUserId == managedId && audit.Action == "disable-user"
+                )
+                .ToListAsync()
+        ).Should().BeEmpty();
+
+        await Assert.ThrowsAsync<DbUpdateException>(() =>
+            service.CreateUserAsync(
+                new CreateManagedUserRequest { Username = "audit-failed" },
+                actor.Id
+            )
+        );
+
+        dbContext.ChangeTracker.Clear();
+        (await userManager.FindByNameAsync("audit-failed")).Should().BeNull();
+    }
+
+    [Fact]
     public async Task TransferSuperuserAsync_LeavesExactlyOneSuperuser()
     {
         await using var harness = CreateHarness();
@@ -453,7 +508,7 @@ public sealed class SuperuserServiceTests
         operationAttempts.Should().Be(1);
 
         var operationRan = false;
-        var result = await service.ExecuteFirstUserBootstrapAsync(async () =>
+        var result = await service.ExecuteWithUserIdentityLockAsync(async () =>
         {
             operationRan = true;
             await dbContext.Database.ExecuteSqlRawAsync("SELECT 1");

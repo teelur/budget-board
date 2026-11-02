@@ -568,7 +568,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         [FromQuery] string userId,
                         [FromQuery] string code,
                         [FromQuery] string? changedEmail,
-                        [FromServices] IServiceProvider sp
+                        [FromServices] IServiceProvider sp,
+                        CancellationToken cancellationToken
                     ) =>
                     {
                         var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -595,12 +596,13 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         }
                         else
                         {
+                            var superuserService = sp.GetRequiredService<ISuperuserService>();
                             try
                             {
-                                result = await userManager.ChangeEmailAsync(
-                                    user,
-                                    changedEmail,
-                                    code
+                                result = await superuserService.ExecuteWithUserIdentityLockAsync(
+                                    () =>
+                                        userManager.ChangeEmailAsync(user, changedEmail, code),
+                                    cancellationToken
                                 );
                             }
                             catch (DbUpdateException exception)

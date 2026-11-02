@@ -19,6 +19,18 @@ public interface ISuperuserService
     );
 
     /// <summary>
+    /// Executes a user identity mutation while serialized with user bootstrap on PostgreSQL.
+    /// </summary>
+    /// <typeparam name="TResult">The type of result returned by the operation.</typeparam>
+    /// <param name="operation">The operation to execute.</param>
+    /// <param name="cancellationToken">A token that can cancel the database operations.</param>
+    /// <returns>The result returned by <paramref name="operation"/>.</returns>
+    Task<TResult> ExecuteWithUserIdentityLockAsync<TResult>(
+        Func<Task<TResult>> operation,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// Ensures that the superuser role exists.
     /// </summary>
     /// <param name="cancellationToken">A token that can cancel the operation.</param>
