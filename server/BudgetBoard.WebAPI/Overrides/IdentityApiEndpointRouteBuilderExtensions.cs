@@ -320,14 +320,14 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
                     // Check if user exists and verify password manually first
                     // This allows us to differentiate between wrong password vs unverified email
-                    var user = await userManager.FindByNameAsync(identifier);
-                    if (
-                        user is null
-                        && !string.IsNullOrWhiteSpace(identifier)
+                    var user =
+                        !string.IsNullOrWhiteSpace(identifier)
                         && _emailAddressAttribute.IsValid(identifier)
-                    )
+                            ? await userManager.FindByEmailAsync(identifier)
+                            : null;
+                    if (user is null)
                     {
-                        user = await userManager.FindByEmailAsync(identifier);
+                        user = await userManager.FindByNameAsync(identifier);
                     }
                     if (user != null)
                     {

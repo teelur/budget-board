@@ -18,7 +18,11 @@ public sealed class MustChangePasswordMiddleware(
     {
         if (context.User.Identity?.IsAuthenticated == true)
         {
-            var user = await userManager.GetUserAsync(context.User);
+            var user = context.Items.TryGetValue(typeof(ApplicationUser), out var cachedUser)
+                ? cachedUser as ApplicationUser
+                : null;
+            user ??= await userManager.GetUserAsync(context.User);
+
             if (user is null || user.IsDisabled)
             {
                 await context.SignOutAsync(IdentityConstants.ApplicationScheme);

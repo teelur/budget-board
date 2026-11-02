@@ -54,7 +54,10 @@ public static class AuthenticationConfigurationExtensions
                             )
                             {
                                 context.RejectPrincipal();
+                                return;
                             }
+
+                            context.HttpContext.Items[typeof(ApplicationUser)] = user;
                         },
                     };
                 }

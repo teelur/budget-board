@@ -6,6 +6,7 @@ using BudgetBoard.WebAPI.Models;
 using BudgetBoard.WebAPI.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -25,11 +26,13 @@ public sealed class SuperuserServiceTests
         var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
 
         var usernameOnlyResult = await userManager.CreateAsync(
-            new ApplicationUser { UserName = "username-only" },
+            new ApplicationUser { UserName = "username-only@example.test" },
             "password"
         );
         usernameOnlyResult.Succeeded.Should().BeTrue();
-        (await userManager.FindByNameAsync("username-only"))!.EmailConfirmed.Should().BeFalse();
+        (
+            await userManager.FindByNameAsync("username-only@example.test")
+        )!.EmailConfirmed.Should().BeFalse();
 
         var firstEmailUser = new ApplicationUser
         {
@@ -48,6 +51,28 @@ public sealed class SuperuserServiceTests
         );
         duplicateEmailResult.Succeeded.Should().BeFalse();
         duplicateEmailResult.Errors.Should().Contain(error => error.Code == "DuplicateEmail");
+
+        var usernameEmailCollisionResult = await userManager.CreateAsync(
+            new ApplicationUser { UserName = "shared@example.test" },
+            "password"
+        );
+        usernameEmailCollisionResult.Succeeded.Should().BeFalse();
+        usernameEmailCollisionResult.Errors.Should().Contain(error =>
+            error.Code == "DuplicateUserName"
+        );
+
+        var emailUsernameCollisionResult = await userManager.CreateAsync(
+            new ApplicationUser
+            {
+                UserName = "email-username-collision",
+                Email = "username-only@example.test",
+            },
+            "password"
+        );
+        emailUsernameCollisionResult.Succeeded.Should().BeFalse();
+        emailUsernameCollisionResult.Errors.Should().Contain(error =>
+            error.Code == "DuplicateEmail"
+        );
     }
 
     [Fact]
@@ -126,6 +151,44 @@ public sealed class SuperuserServiceTests
     }
 
     [Fact]
+    public async Task CreateUserAsync_RejectsUsernameEmailIdentifierCollisions()
+    {
+        await using var harness = CreateHarness();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        (await userManager.CreateAsync(
+            new ApplicationUser { UserName = "email-owner", Email = "reserved@example.test" },
+            "password"
+        )).Succeeded.Should().BeTrue();
+        (await userManager.CreateAsync(
+            new ApplicationUser { UserName = "username@example.test" },
+            "password"
+        )).Succeeded.Should().BeTrue();
+
+        var usernameCollision = await service.CreateUserAsync(
+            new CreateManagedUserRequest { Username = "reserved@example.test" },
+            actor.Id
+        );
+        usernameCollision.Succeeded.Should().BeFalse();
+        usernameCollision.ErrorCode.Should().Be("UsernameAlreadyTaken");
+
+        var emailCollision = await service.CreateUserAsync(
+            new CreateManagedUserRequest
+            {
+                Username = "new-email-user",
+                Email = "username@example.test",
+            },
+            actor.Id
+        );
+        emailCollision.Succeeded.Should().BeFalse();
+        emailCollision.ErrorCode.Should().Be("EmailAlreadyTaken");
+    }
+
+    [Fact]
     public async Task ResetPasswordAsync_InvalidatesTheOldPasswordAndRequiresChange()
     {
         await using var harness = CreateHarness();
@@ -144,75 +207,44 @@ public sealed class SuperuserServiceTests
         actor.MustChangePassword.Should().BeTrue();
     }
 
-    [PostgreSqlFact]
+    [Fact]
     public async Task ResetPasswordAsync_WhenPasswordChangeFlagUpdateFails_RollsBackTheReset()
     {
-        var baseConnectionString =
-            Environment.GetEnvironmentVariable("BUDGET_BOARD_TEST_POSTGRES_CONNECTION_STRING")
-            ?? throw new InvalidOperationException(
-                "The PostgreSQL test connection string is required."
-            );
-        var schemaName = $"superuser_test_{Guid.NewGuid():N}";
-        await using (var connection = new NpgsqlConnection(baseConnectionString))
-        {
-            await connection.OpenAsync();
-            await using var createSchemaCommand = new NpgsqlCommand(
-                $"CREATE SCHEMA {schemaName}",
-                connection
-            );
-            await createSchemaCommand.ExecuteNonQueryAsync();
-        }
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        await using var harness = CreateHarness(
+            connection,
+            new RejectPasswordChangeValidator()
+        );
+        var dbContext = harness.Services.GetRequiredService<UserDataContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
 
-        try
-        {
-            var connectionString = new NpgsqlConnectionStringBuilder(baseConnectionString)
-            {
-                SearchPath = schemaName,
-            }.ConnectionString;
-            await using var harness = CreateHarness(
-                connectionString,
-                new RejectPasswordChangeValidator()
-            );
-            var dbContext = harness.Services.GetRequiredService<UserDataContext>();
-            await dbContext.Database.EnsureCreatedAsync();
-            var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
-            var actor = new ApplicationUser { UserName = "owner" };
-            (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        var result = await service.ResetPasswordAsync(actor.Id, actor.Id);
 
-            var service = harness.Services.GetRequiredService<ISuperuserService>();
-            await service.EnsureRoleAndBootstrapAsync();
-            var result = await service.ResetPasswordAsync(actor.Id, actor.Id);
-
-            result.Succeeded.Should().BeFalse();
-            result.TemporaryPassword.Should().BeNull();
-            dbContext.ChangeTracker.Clear();
-            var persistedActor = (await userManager.FindByIdAsync(actor.Id.ToString()))!;
-            (await userManager.CheckPasswordAsync(persistedActor, "password")).Should().BeTrue();
-            persistedActor.MustChangePassword.Should().BeFalse();
-            (
-                await userManager.GetLoginsAsync(persistedActor)
-            ).Should()
-                .NotContain(login =>
-                    login.LoginProvider == SuperuserConstants.LocalLoginProvider
-                );
-            (
-                await dbContext.AuthenticationAdminAuditEvents
-                    .Where(audit =>
-                        audit.TargetUserId == actor.Id && audit.Action == "reset-password"
-                    )
-                    .ToListAsync()
-            ).Should().ContainSingle(audit => !audit.Succeeded);
-        }
-        finally
-        {
-            await using var connection = new NpgsqlConnection(baseConnectionString);
-            await connection.OpenAsync();
-            await using var dropSchemaCommand = new NpgsqlCommand(
-                $"DROP SCHEMA {schemaName} CASCADE",
-                connection
+        result.Succeeded.Should().BeFalse();
+        result.TemporaryPassword.Should().BeNull();
+        dbContext.ChangeTracker.Clear();
+        var persistedActor = (await userManager.FindByIdAsync(actor.Id.ToString()))!;
+        (await userManager.CheckPasswordAsync(persistedActor, "password")).Should().BeTrue();
+        persistedActor.MustChangePassword.Should().BeFalse();
+        (
+            await userManager.GetLoginsAsync(persistedActor)
+        ).Should()
+            .NotContain(login =>
+                login.LoginProvider == SuperuserConstants.LocalLoginProvider
             );
-            await dropSchemaCommand.ExecuteNonQueryAsync();
-        }
+        (
+            await dbContext.AuthenticationAdminAuditEvents
+                .Where(audit =>
+                    audit.TargetUserId == actor.Id && audit.Action == "reset-password"
+                )
+                .ToListAsync()
+        ).Should().ContainSingle(audit => !audit.Succeeded);
     }
 
     [Fact]
@@ -298,6 +330,67 @@ public sealed class SuperuserServiceTests
     }
 
     [Fact]
+    public async Task TransferSuperuserAsync_WhenSecurityStampUpdateFails_RollsBackTransfer()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var validator = new RejectUserUpdateValidator();
+        await using var harness = CreateHarness(connection, validator);
+        var dbContext = harness.Services.GetRequiredService<UserDataContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        var target = new ApplicationUser { UserName = "target" };
+        (await userManager.CreateAsync(target, "password")).Succeeded.Should().BeTrue();
+        var actorSecurityStamp = await userManager.GetSecurityStampAsync(actor);
+        var targetSecurityStamp = await userManager.GetSecurityStampAsync(target);
+
+        validator.RejectedUsername = actor.UserName;
+        validator.OriginalSecurityStamp = actorSecurityStamp;
+        var currentStampFailure = await service.TransferSuperuserAsync(target.Id, actor.Id);
+
+        currentStampFailure.Succeeded.Should().BeFalse();
+        currentStampFailure.ErrorCode.Should().Be("SuperuserTransferFailed");
+        dbContext.ChangeTracker.Clear();
+        var persistedActor = (await userManager.FindByIdAsync(actor.Id.ToString()))!;
+        var persistedTarget = (await userManager.FindByIdAsync(target.Id.ToString()))!;
+        (await userManager.IsInRoleAsync(persistedActor, SuperuserConstants.RoleName)).Should()
+            .BeTrue();
+        (await userManager.IsInRoleAsync(persistedTarget, SuperuserConstants.RoleName)).Should()
+            .BeFalse();
+        (await userManager.GetSecurityStampAsync(persistedActor)).Should().Be(actorSecurityStamp);
+
+        validator.RejectedUsername = target.UserName;
+        validator.OriginalSecurityStamp = targetSecurityStamp;
+        var targetStampFailure = await service.TransferSuperuserAsync(target.Id, actor.Id);
+
+        targetStampFailure.Succeeded.Should().BeFalse();
+        targetStampFailure.ErrorCode.Should().Be("SuperuserTransferFailed");
+        dbContext.ChangeTracker.Clear();
+        persistedActor = (await userManager.FindByIdAsync(actor.Id.ToString()))!;
+        persistedTarget = (await userManager.FindByIdAsync(target.Id.ToString()))!;
+        (await userManager.IsInRoleAsync(persistedActor, SuperuserConstants.RoleName)).Should()
+            .BeTrue();
+        (await userManager.IsInRoleAsync(persistedTarget, SuperuserConstants.RoleName)).Should()
+            .BeFalse();
+        (await userManager.GetSecurityStampAsync(persistedActor)).Should().Be(actorSecurityStamp);
+        (await userManager.GetSecurityStampAsync(persistedTarget)).Should().Be(targetSecurityStamp);
+        (
+            await dbContext.AuthenticationAdminAuditEvents
+                .Where(audit =>
+                    audit.TargetUserId == target.Id && audit.Action == "transfer-superuser"
+                )
+                .ToListAsync()
+        ).Should()
+            .HaveCount(2)
+            .And.OnlyContain(audit => !audit.Succeeded);
+    }
+
+    [Fact]
     public async Task BootstrapSuperuserFromCommandAsync_PromotesTheNamedExistingUser()
     {
         await using var harness = CreateHarness();
@@ -372,7 +465,7 @@ public sealed class SuperuserServiceTests
     }
 
     private static ServiceProviderHarness CreateHarness(
-        string? postgresConnectionString = null,
+        SqliteConnection? sqliteConnection = null,
         IUserValidator<ApplicationUser>? additionalUserValidator = null
     )
     {
@@ -388,7 +481,7 @@ public sealed class SuperuserServiceTests
         );
         services.AddDbContext<UserDataContext>(options =>
         {
-            if (postgresConnectionString is null)
+            if (sqliteConnection is null)
             {
                 options
                     .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -398,7 +491,7 @@ public sealed class SuperuserServiceTests
             }
             else
             {
-                options.UseNpgsql(postgresConnectionString);
+                options.UseSqlite(sqliteConnection);
             }
         });
         services
@@ -435,6 +528,22 @@ public sealed class SuperuserServiceTests
                     ? IdentityResult.Failed(
                         new IdentityError { Code = "PasswordChangeNotAllowed" }
                     )
+                    : IdentityResult.Success
+            );
+    }
+
+    private sealed class RejectUserUpdateValidator : IUserValidator<ApplicationUser>
+    {
+        public string? RejectedUsername { get; set; }
+        public string? OriginalSecurityStamp { get; set; }
+
+        public Task<IdentityResult> ValidateAsync(
+            UserManager<ApplicationUser> manager,
+            ApplicationUser user
+        ) =>
+            Task.FromResult(
+                user.UserName == RejectedUsername && user.SecurityStamp != OriginalSecurityStamp
+                    ? IdentityResult.Failed(new IdentityError { Code = "UserUpdateRejected" })
                     : IdentityResult.Success
             );
     }

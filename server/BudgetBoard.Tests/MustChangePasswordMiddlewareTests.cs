@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Moq;
 
 namespace BudgetBoard.IntegrationTests;
 
@@ -87,6 +90,28 @@ public sealed class MustChangePasswordMiddlewareTests
         nextCalled.Should().BeTrue();
     }
 
+    [Fact]
+    public async Task InvokeAsync_UsesUserLoadedDuringAuthentication()
+    {
+        await using var provider = CreateProvider();
+        var userManager = CreateUserManagerMock();
+        var user = new ApplicationUser { UserName = "temporary", MustChangePassword = true };
+        var context = CreateContext(provider, user.Id, "/api/accounts", HttpMethods.Get);
+        context.Items[typeof(ApplicationUser)] = user;
+        var nextCalled = false;
+        var middleware = new MustChangePasswordMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        }, provider.GetRequiredService<IStringLocalizer<ApiResponseStrings>>());
+
+        await middleware.InvokeAsync(context, userManager.Object);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        nextCalled.Should().BeFalse();
+        userManager.Verify(manager => manager.GetUserAsync(It.IsAny<ClaimsPrincipal>()), Times.Never);
+    }
+
     private static DefaultHttpContext CreateContext(
         IServiceProvider provider,
         Guid userId,
@@ -128,4 +153,17 @@ public sealed class MustChangePasswordMiddlewareTests
             .AddEntityFrameworkStores<UserDataContext>();
         return services.BuildServiceProvider();
     }
+
+    private static Mock<UserManager<ApplicationUser>> CreateUserManagerMock() =>
+        new(
+            Mock.Of<IUserStore<ApplicationUser>>(),
+            Options.Create(new IdentityOptions()),
+            Mock.Of<IPasswordHasher<ApplicationUser>>(),
+            Array.Empty<IUserValidator<ApplicationUser>>(),
+            Array.Empty<IPasswordValidator<ApplicationUser>>(),
+            Mock.Of<ILookupNormalizer>(),
+            new IdentityErrorDescriber(),
+            Mock.Of<IServiceProvider>(),
+            NullLogger<UserManager<ApplicationUser>>.Instance
+        );
 }

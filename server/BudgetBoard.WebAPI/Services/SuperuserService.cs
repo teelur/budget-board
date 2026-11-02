@@ -284,7 +284,9 @@ public sealed class SuperuserService(
         {
             var errorCode = createResult.Errors.Any(error => error.Code == "DuplicateEmail")
                 ? "EmailAlreadyTaken"
-                : "UserCreationFailed";
+                : createResult.Errors.Any(error => error.Code == "DuplicateUserName")
+                    ? "UsernameAlreadyTaken"
+                    : "UserCreationFailed";
             return await FailureAsync(errorCode, "create-user", null, actorUserId);
         }
 
@@ -534,8 +536,32 @@ public sealed class SuperuserService(
             );
         }
 
-        await userManager.UpdateSecurityStampAsync(current);
-        await userManager.UpdateSecurityStampAsync(target);
+        var currentStampResult = await userManager.UpdateSecurityStampAsync(current);
+        if (!currentStampResult.Succeeded)
+        {
+            return await FailureAfterRollbackAsync(
+                transaction,
+                "SuperuserTransferFailed",
+                "transfer-superuser",
+                target.Id,
+                actorUserId,
+                cancellationToken
+            );
+        }
+
+        var targetStampResult = await userManager.UpdateSecurityStampAsync(target);
+        if (!targetStampResult.Succeeded)
+        {
+            return await FailureAfterRollbackAsync(
+                transaction,
+                "SuperuserTransferFailed",
+                "transfer-superuser",
+                target.Id,
+                actorUserId,
+                cancellationToken
+            );
+        }
+
         await transaction.CommitAsync(cancellationToken);
         await AuditAsync(
             actorUserId,
@@ -797,6 +823,7 @@ public sealed class SuperuserService(
     )
     {
         await transaction.RollbackAsync(cancellationToken);
+        dbContext.ChangeTracker.Clear();
         return await FailureAsync(errorCode, action, targetUserId, actorUserId);
     }
 
