@@ -883,7 +883,8 @@ public sealed class SuperuserService(
 
         if (dbContext.Database.IsNpgsql())
         {
-            return await new NonRetryingExecutionStrategy(dbContext).ExecuteAsync(
+            // Keep nested EF operations in this scope without replaying the transaction.
+            return await new SingleAttemptExecutionStrategy(dbContext).ExecuteAsync(
                 ExecuteOperationAsync,
                 cancellationToken
             );
@@ -950,5 +951,13 @@ public sealed class SuperuserService(
             .Replace('+', '-')
             .Replace('/', '_');
         return password;
+    }
+
+    private sealed class SingleAttemptExecutionStrategy : ExecutionStrategy
+    {
+        public SingleAttemptExecutionStrategy(DbContext context)
+            : base(context, maxRetryCount: 0, maxRetryDelay: TimeSpan.Zero) { }
+
+        protected override bool ShouldRetryOn(Exception exception) => false;
     }
 }

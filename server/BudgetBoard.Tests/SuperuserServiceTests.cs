@@ -464,7 +464,7 @@ public sealed class SuperuserServiceTests
     }
 
     [PostgreSqlFact]
-    public async Task ExecuteFirstUserBootstrapAsync_DoesNotRetryPostgresOperation()
+    public async Task ExecuteFirstUserBootstrapAsync_ExecutesQueriesWithoutRetryingTransaction()
     {
         var connectionString = Environment.GetEnvironmentVariable(
             "BUDGET_BOARD_TEST_POSTGRES_CONNECTION_STRING"
@@ -499,7 +499,7 @@ public sealed class SuperuserServiceTests
             service.ExecuteFirstUserBootstrapAsync<int>(async () =>
             {
                 operationAttempts++;
-                await dbContext.Database.ExecuteSqlRawAsync("SELECT 1");
+                await dbContext.Database.SqlQuery<int>($"SELECT 1 AS \"Value\"").SingleAsync();
                 throw transientException;
             })
         );
@@ -511,11 +511,10 @@ public sealed class SuperuserServiceTests
         var result = await service.ExecuteWithUserIdentityLockAsync(async () =>
         {
             operationRan = true;
-            await dbContext.Database.ExecuteSqlRawAsync("SELECT 1");
-            return 42;
+            return await dbContext.Database.SqlQuery<int>($"SELECT 1 AS \"Value\"").SingleAsync();
         });
 
-        result.Should().Be(42);
+        result.Should().Be(1);
         operationRan.Should().BeTrue();
     }
 
