@@ -19,9 +19,14 @@ const Register = (props: RegisterProps): React.ReactNode => {
   const { t } = useTranslation();
   const registerMutation = useRegisterMutation();
 
+  const usernameField = useField<string>({
+    initialValue: "",
+    validate: hasLength({ min: 1 }, t("username_required_message")),
+  });
   const emailField = useField<string>({
     initialValue: "",
-    validate: isEmail(t("invalid_email_message")),
+    validate: (value) =>
+      value.trim() === "" ? null : isEmail(t("invalid_email_message"))(value),
   });
 
   const passwordMinLength = 3;
@@ -45,7 +50,12 @@ const Register = (props: RegisterProps): React.ReactNode => {
       <Stack align="center" gap="1rem" w="100%">
         <Stack gap="0.5rem" w="100%">
           <TextInput
-            label={t("email_address")}
+            label={t("username")}
+            w="100%"
+            {...usernameField.getInputProps()}
+          />
+          <TextInput
+            label={t("email_address_optional")}
             w="100%"
             {...emailField.getInputProps()}
           />
@@ -77,11 +87,13 @@ const Register = (props: RegisterProps): React.ReactNode => {
             flex="1 1 0"
             loading={registerMutation.isPending}
             onClick={() => {
+              usernameField.validate();
               emailField.validate();
               passwordField.validate();
               confirmPasswordField.validate();
 
               if (
+                usernameField.error ||
                 emailField.error ||
                 passwordField.error ||
                 confirmPasswordField.error
@@ -91,7 +103,8 @@ const Register = (props: RegisterProps): React.ReactNode => {
 
               registerMutation.mutate(
                 {
-                  email: emailField.getValue(),
+                  username: usernameField.getValue(),
+                  email: emailField.getValue() || undefined,
                   password: passwordField.getValue(),
                 },
                 {
