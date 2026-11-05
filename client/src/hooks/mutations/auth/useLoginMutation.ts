@@ -2,7 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 
 export type LoginData = {
-  email: string;
+  identifier?: string;
+  email?: string;
   password: string;
   rememberMe: boolean;
   twoFactorCode?: string;
@@ -18,7 +19,8 @@ export const useLoginMutation = () => {
         url: "/api/login",
         method: "POST",
         data: {
-          email: loginData.email,
+          identifier: loginData.identifier,
+          email: loginData.email ?? loginData.identifier,
           password: loginData.password,
           twoFactorCode: loginData.twoFactorCode,
           recoveryCode: loginData.recoveryCode,

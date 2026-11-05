@@ -115,6 +115,12 @@
     <data name="LocalRegistrationUserRollbackFailedLog" xml:space="preserve">
         <value>Failed to rollback newly registered local user {0} after widget seeding failure: {1}</value>
     </data>
+    <data name="ManagedUserInitializationFailedLog" xml:space="preserve">
+        <value>Could not initialize managed user {0}.</value>
+    </data>
+    <data name="ManagedUserLocalLoginMetadataWarningLog" xml:space="preserve">
+        <value>Could not add the local login metadata for managed user {0}.</value>
+    </data>
     <data name="NewUserCreationDisabledLog" xml:space="preserve">
         <value>New user creation is disabled.</value>
     </data>
@@ -175,11 +181,17 @@
     <data name="OidcTokenExchangeFailedLog" xml:space="preserve">
         <value>The token exchange failed or no ID token was received.</value>
     </data>
+    <data name="OfflineAdministratorCommandFailedLog" xml:space="preserve">
+        <value>The offline administrator command failed.</value>
+    </data>
     <data name="SettingCurrentLocaleErrorLog" xml:space="preserve">
         <value>Error setting current locale to '{0}'</value>
     </data>
     <data name="SettingCurrentLocaleLog" xml:space="preserve">
         <value>Setting current locale to '{0}'</value>
+    </data>
+    <data name="SuperuserBootstrapPromotionLog" xml:space="preserve">
+        <value>Promoted existing user {0} to the {1} role during bootstrap.</value>
     </data>
     <data name="SigningKeysFetchErrorLog" xml:space="preserve">
         <value>Failed to get signing keys from {0}</value>

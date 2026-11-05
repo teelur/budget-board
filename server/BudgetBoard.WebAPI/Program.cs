@@ -9,6 +9,8 @@ using BudgetBoard.Service.Resources;
 using BudgetBoard.Utils;
 using BudgetBoard.WebAPI.Extensions;
 using BudgetBoard.WebAPI.Jobs;
+using BudgetBoard.WebAPI.Middleware;
+using BudgetBoard.WebAPI.Resources;
 using BudgetBoard.WebAPI.Services;
 using BudgetBoard.WebAPI.Utils;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -19,6 +21,7 @@ using Microsoft.Extensions.Localization;
 using Npgsql;
 using Quartz;
 using Serilog;
+using System.Threading.RateLimiting;
 
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -100,6 +103,7 @@ builder.Services.AddScoped<DatabaseMigrationRunner>();
 
 builder.Services.AddLocalization();
 builder.Services.AddHealthChecks();
+builder.Services.AddHttpContextAccessor();
 
 var oidcEnabled = builder.Configuration.GetValue<bool>("OIDC_ENABLED");
 var disableLocalAuth = builder.Configuration.GetValue<bool>("DISABLE_LOCAL_AUTH");
@@ -140,7 +144,47 @@ if (oidcEnabled)
 // Configure Identity with cookie authentication
 // Same configuration whether OIDC is enabled or not since frontend handles OIDC flow
 builder.Services.AddBudgetBoardAuthentication();
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(
+        SuperuserConstants.PolicyName,
+        policy => policy.RequireRole(SuperuserConstants.RoleName)
+    );
+});
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy(
+        "auth",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 20,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }
+            )
+    );
+    options.AddPolicy(
+        "superuser-management",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                    ?? context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 30,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }
+            )
+    );
+});
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
 var emailSender = builder.Configuration.GetValue<string>("EMAIL_SENDER");
@@ -155,10 +199,16 @@ builder
         opt.Password.RequireUppercase = false;
         opt.Password.RequireLowercase = false;
 
-        opt.User.RequireUniqueEmail = true;
-        opt.SignIn.RequireConfirmedEmail = !string.IsNullOrEmpty(emailSender) && !disableLocalAuth;
+        // The custom validator keeps email addresses unique when supplied while allowing
+        // username-only local accounts.
+        opt.User.RequireUniqueEmail = false;
+        // Email is optional for username-based accounts. The endpoint enforces confirmation
+        // for accounts that actually have an email when complete SMTP configuration is present.
+        opt.SignIn.RequireConfirmedEmail = false;
     })
+    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<UserDataContext>()
+    .AddUserValidator<OptionalEmailUserValidator>()
     .AddApiEndpoints();
 
 // Configure email sender only when local auth is enabled (for email confirmation)
@@ -260,6 +310,8 @@ builder.Services.AddScoped<ISyncService, SyncService>();
 builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<ILunchFlowService, LunchFlowService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
+builder.Services.AddScoped<ISuperuserService, SuperuserService>();
+builder.Services.AddScoped<SuperuserMaintenanceCommand>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAutomaticRuleService, AutomaticRuleService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
@@ -308,6 +360,39 @@ if (demoModeEnabled)
 
 var app = builder.Build();
 
+if (args.Length > 0 && string.Equals(args[0], "admin", StringComparison.OrdinalIgnoreCase))
+{
+    try
+    {
+        using var commandScope = app.Services.CreateScope();
+        var commandDbContext = commandScope.ServiceProvider.GetRequiredService<UserDataContext>();
+        await commandDbContext.Database.MigrateAsync();
+        var command = commandScope.ServiceProvider.GetRequiredService<SuperuserMaintenanceCommand>();
+        Environment.ExitCode = await command.RunAsync(args.Skip(1).ToArray());
+    }
+    catch (Exception exception)
+    {
+        app.Services
+            .GetRequiredService<ILogger<Program>>()
+            .LogError(
+                exception,
+                "{LogMessage}",
+                app.Services
+                    .GetRequiredService<IStringLocalizer<ApiLogStrings>>()
+                    ["OfflineAdministratorCommandFailedLog"]
+            );
+        Console.Error.WriteLine(
+            app.Services
+                .GetRequiredService<IStringLocalizer<ApiResponseStrings>>()
+                ["OfflineAdminCommandFailed"]
+                .Value
+        );
+        Environment.ExitCode = 1;
+    }
+
+    return;
+}
+
 // Log authentication configuration
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 var logLocalizer = app.Services.GetRequiredService<IStringLocalizer<LogStrings>>();
@@ -352,6 +437,9 @@ app.UseForwardedHeaders();
 app.UseSerilogRequestLogging();
 
 // Create routes for the identity endpoints
+var smtpConfigured =
+    !string.IsNullOrWhiteSpace(emailSender)
+    && !string.IsNullOrWhiteSpace(builder.Configuration["EMAIL_SMTP_HOST"]);
 app.MyMapIdentityApi<ApplicationUser>(
     new BudgetBoard.Overrides.IdentityApiEndpointRouteBuilderOptions()
     {
@@ -360,22 +448,22 @@ app.MyMapIdentityApi<ApplicationUser>(
         ExcludeLoginPost = disableLocalAuth,
         ExcludeLogoutPost = false, // Keep logout available even with OIDC
         ExcludeForgotPasswordPost = disableLocalAuth,
-        ExcludeResetPasswordPost = disableLocalAuth,
-        ExcludeResendConfirmationEmailPost = disableLocalAuth,
+        ExcludeResetPasswordPost = disableLocalAuth || !smtpConfigured,
+        ExcludeConfirmEmailGet = disableLocalAuth || !smtpConfigured,
+        ExcludeResendConfirmationEmailPost = disableLocalAuth || !smtpConfigured,
     }
 );
 
 // Activate the CORS policy
+app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
 
-// Enable authentication and authorization after CORS Middleware
-// processing (UseCors) in case the Authorization Middleware tries
-// to initiate a challenge before the CORS Middleware has a chance
-// to set the appropriate headers.
+// Authenticate after CORS so later authorization challenges retain CORS headers.
+// Rate limiting follows authentication because some partitions use the authenticated user.
 app.UseAuthentication();
-app.UseAuthorization();
+app.UseRateLimiter();
 
-// Add localization support after authentication so user identity is available
+// Add localization after authentication so the user language provider can access the identity.
 var supportedCultures = SupportedLanguages.SupportedCultureNames.ToArray();
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
@@ -387,6 +475,8 @@ var localizationOptions = new RequestLocalizationOptions()
 localizationOptions.RequestCultureProviders.Insert(0, new UserLanguageCultureProvider());
 
 app.UseRequestLocalization(localizationOptions);
+app.UseMiddleware<MustChangePasswordMiddleware>();
+app.UseAuthorization();
 
 app.MapHealthChecks("/health").AllowAnonymous();
 app.MapControllers();
@@ -420,6 +510,12 @@ if (demoModeEnabled)
     using var seedScope = app.Services.CreateScope();
     var demoSeedService = seedScope.ServiceProvider.GetRequiredService<IDemoSeedService>();
     await demoSeedService.ResetAndSeedAsync();
+}
+
+using (var bootstrapScope = app.Services.CreateScope())
+{
+    var superuserService = bootstrapScope.ServiceProvider.GetRequiredService<ISuperuserService>();
+    await superuserService.EnsureRoleAndBootstrapAsync();
 }
 
 app.Run();
