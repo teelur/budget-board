@@ -98,6 +98,30 @@ public class ApplicationUserServiceTests
     }
 
     [Fact]
+    public async Task ReadApplicationUserAsync_WhenUserIsSuperuser_ReturnsSuperuserStatus()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var applicationUserService = new ApplicationUserService(
+            Mock.Of<ILogger<IApplicationUserService>>(),
+            helper.UserDataContext,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var mockUserManager = MockUserManager(helper.demoUser, isSuperuser: true);
+
+        // Act
+        var result = await applicationUserService.ReadApplicationUserAsync(
+            helper.demoUser.Id,
+            mockUserManager.Object
+        );
+
+        // Assert
+        result.IsSuperuser.Should().BeTrue();
+    }
+
+    [Fact]
     public async Task ReadApplicationUserAsync_WhenUserDoesNotExist_ThrowsInvalidUserError()
     {
         // Arrange
@@ -429,7 +453,8 @@ public class ApplicationUserServiceTests
         IList<UserLoginInfo>? logins = null,
         bool hasPassword = true,
         IdentityResult? addLoginResult = null,
-        IdentityResult? removeLoginResult = null
+        IdentityResult? removeLoginResult = null,
+        bool isSuperuser = false
     )
     {
         var store = new Mock<IUserStore<ApplicationUser>>();
@@ -447,6 +472,9 @@ public class ApplicationUserServiceTests
 
         mockUserManager.Setup(um => um.GetLoginsAsync(user)).ReturnsAsync(logins ?? []);
         mockUserManager.Setup(um => um.HasPasswordAsync(user)).ReturnsAsync(hasPassword);
+        mockUserManager
+            .Setup(um => um.IsInRoleAsync(user, "Superuser"))
+            .ReturnsAsync(isSuperuser);
         mockUserManager
             .Setup(um => um.AddLoginAsync(user, It.IsAny<UserLoginInfo>()))
             .ReturnsAsync(addLoginResult ?? IdentityResult.Success);
