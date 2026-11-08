@@ -20,6 +20,7 @@ import ImportProgress from "./ImportProgress/ImportProgress";
 import { useTransactionImportJob } from "~/providers/TransactionImportJobProvider/TransactionImportJobProvider";
 import DuplicateReview from "./DuplicateReview/DuplicateReview";
 import { normalizeImportedAccountName } from "~/helpers/transactionImport";
+import { generateUuid } from "~/helpers/uuid";
 
 interface ImportTransactionsModalProps {
   opened?: boolean;
@@ -215,7 +216,7 @@ const ImportTransactionsModal = ({
     importTransactionsMutation.mutate(
       {
         importedTransactions: transactionImportRequest,
-        idempotencyKey: crypto.randomUUID(),
+        idempotencyKey: generateUuid(),
       },
       {
         onSuccess: (response) => {
