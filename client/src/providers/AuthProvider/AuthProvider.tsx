@@ -1,4 +1,5 @@
 import { getProjectEnvVariables } from "~/shared/projectEnvVariables";
+import { generateUuid } from "~/helpers/uuid";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React, { createContext, useState } from "react";
 import { NotificationType, showNotification } from "~/helpers/notifications";
@@ -119,7 +120,7 @@ export const AuthProvider = ({
       }
 
       // These are stored in sessionStorage to be retrieved after the OIDC callback
-      const state = crypto.randomUUID();
+      const state = generateUuid();
       sessionStorage.setItem(`oidc_state_${state}`, state);
       sessionStorage.setItem(`oidc_remember_me_${state}`, String(rememberMe));
       sessionStorage.setItem(`oidc_flow_${state}`, flow);
