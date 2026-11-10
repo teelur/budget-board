@@ -65,6 +65,17 @@ public interface ISuperuserService
     );
 
     /// <summary>
+    /// Gets a filtered, paginated list of authentication-management audit events.
+    /// </summary>
+    /// <param name="query">The filters and paging options to apply.</param>
+    /// <param name="cancellationToken">A token that can cancel the database operations.</param>
+    /// <returns>The matching events and available action filters.</returns>
+    Task<AdminAuditEventsPageResponse> ListAuditEventsAsync(
+        AdminAuditEventsQuery query,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// Creates a user account that must change its generated temporary password at the next login.
     /// </summary>
     /// <param name="request">The username and optional email address for the new account.</param>
