@@ -27,6 +27,15 @@ public sealed class SuperuserController(
         return Ok(await superuserService.ListUsersAsync(cancellationToken));
     }
 
+    [HttpGet("audit-events")]
+    public async Task<ActionResult<AdminAuditEventsPageResponse>> ListAuditEvents(
+        [FromQuery] AdminAuditEventsQuery query,
+        CancellationToken cancellationToken
+    )
+    {
+        return Ok(await superuserService.ListAuditEventsAsync(query, cancellationToken));
+    }
+
     [HttpPost("users")]
     public async Task<IActionResult> CreateUser(
         [FromBody] CreateManagedUserRequest request,

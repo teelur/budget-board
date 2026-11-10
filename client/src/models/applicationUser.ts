@@ -6,6 +6,7 @@ export interface IApplicationUserResponse {
   twoFactorEnabled: boolean;
   hasOidcLogin: boolean;
   hasLocalLogin: boolean;
+  isSuperuser: boolean;
 }
 
 export const defaultGuid: string = "00000000-0000-0000-0000-000000000000";

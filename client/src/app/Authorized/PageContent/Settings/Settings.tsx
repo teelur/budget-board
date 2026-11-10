@@ -4,15 +4,23 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation } from "react-router";
 import { ChevronRightIcon } from "lucide-react";
+import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
 
 const Settings = (): React.ReactNode => {
   const { t } = useTranslation();
   const location = useLocation();
+  const applicationUserQuery = useApplicationUserQuery();
 
   const navItems = [
     { path: "user", label: t("user_settings") },
     { path: "security", label: t("security") },
     { path: "advanced", label: t("advanced_settings") },
+    ...(applicationUserQuery.data?.isSuperuser
+      ? [
+          { path: "user-management", label: t("user_management") },
+          { path: "admin-history", label: t("admin_history") },
+        ]
+      : []),
   ];
 
   const activeItem = navItems.find((item) =>
