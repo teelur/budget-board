@@ -4,6 +4,7 @@ export const accountsQueryKey: string = "accounts";
 export const accountTypesQueryKey: string = "accountTypes";
 export const appUpdateQueryKey: string = "appUpdate";
 export const applicationUserQueryKey: string = "applicationUser";
+export const managedUsersQueryKey: string = "managedUsers";
 export const assetsQueryKey: string = "assets";
 export const assetTypesQueryKey: string = "assetTypes";
 export const automaticRulesQueryKey: string = "automaticRules";
