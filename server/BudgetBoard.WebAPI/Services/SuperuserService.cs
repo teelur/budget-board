@@ -269,7 +269,8 @@ public sealed class SuperuserService(
 
         var totalCount = await auditQuery.CountAsync(cancellationToken);
         var events = await auditQuery
-            .OrderByDescending(audit => audit.Id)
+            .OrderByDescending(audit => audit.CreatedAt)
+            .ThenByDescending(audit => audit.Id)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync(cancellationToken);
