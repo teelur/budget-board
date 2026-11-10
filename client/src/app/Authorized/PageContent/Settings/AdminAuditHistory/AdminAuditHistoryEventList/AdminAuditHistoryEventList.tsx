@@ -1,4 +1,4 @@
-import { Group, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { BodyText, Pagination, Skeleton } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
