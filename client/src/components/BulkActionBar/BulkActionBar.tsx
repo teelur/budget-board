@@ -275,6 +275,7 @@ const BulkActionBar = (props: BulkActionBarProps): React.ReactNode => {
               right: 0,
               zIndex: props.zIndex ?? 200,
               borderTop: "1px solid var(--bbui-color-border)",
+              backgroundColor: "var(--bbui-color-surface)",
             }}
           >
             {/* Selection controls row */}

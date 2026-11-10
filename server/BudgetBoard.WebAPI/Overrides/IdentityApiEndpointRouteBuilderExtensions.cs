@@ -12,14 +12,17 @@ using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Utils;
+using BudgetBoard.WebAPI.Models;
 using BudgetBoard.WebAPI.Overrides;
 using BudgetBoard.WebAPI.Resources;
+using BudgetBoard.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
@@ -30,7 +33,7 @@ namespace Microsoft.AspNetCore.Routing;
 /// </summary>
 public static class IdentityApiEndpointRouteBuilderExtensions
 {
-    // Validate the email address using DataAnnotations like the UserValidator does when RequireUniqueEmail = true.
+    // Validate supplied email addresses using the same DataAnnotations rule as Identity.
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
 
     /// <summary>
@@ -67,6 +70,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         string? confirmEmailEndpointName = null;
 
         var routeGroup = endpoints.MapGroup("/api");
+        routeGroup.RequireRateLimiting("auth");
 
         if (!configureOptions.ExcludeRegisterPost)
         {
@@ -75,12 +79,16 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             routeGroup.MapPost(
                 "/register",
                 async Task<Results<Ok<RegisterResponse>, ValidationProblem>> (
-                    [FromBody] RegisterRequest registration,
+                    [FromBody] LocalRegisterRequest registration,
                     HttpContext context,
                     [FromServices] IServiceProvider sp
                 ) =>
                 {
                     var userManager = sp.GetRequiredService<UserManager<TUser>>();
+                    var configuration = sp.GetRequiredService<IConfiguration>();
+                    var smtpConfigured =
+                        !string.IsNullOrWhiteSpace(configuration["EMAIL_SENDER"])
+                        && !string.IsNullOrWhiteSpace(configuration["EMAIL_SMTP_HOST"]);
 
                     if (!userManager.SupportsUserEmail)
                     {
@@ -91,123 +99,190 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
                     var userStore = sp.GetRequiredService<IUserStore<TUser>>();
                     var emailStore = (IUserEmailStore<TUser>)userStore;
-                    var email = registration.Email;
+                    var email = registration.Email?.Trim();
+                    if (string.IsNullOrWhiteSpace(email))
+                    {
+                        email = null;
+                    }
+                    var username = registration.Username?.Trim();
+                    if (string.IsNullOrWhiteSpace(username))
+                    {
+                        username = email;
+                    }
 
-                    if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
+                    if (string.IsNullOrWhiteSpace(username))
+                    {
+                        return CreateValidationProblem(
+                            "UsernameRequired",
+                            localizer["UsernameOrEmailRequired"].Value
+                        );
+                    }
+
+                    if (!string.IsNullOrEmpty(email) && !_emailAddressAttribute.IsValid(email))
                     {
                         return CreateValidationProblem(
                             IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email))
                         );
                     }
 
-                    var user = new TUser();
-                    await userStore.SetUserNameAsync(user, email, CancellationToken.None);
-                    await emailStore.SetEmailAsync(user, email, CancellationToken.None);
-                    var result = await userManager.CreateAsync(user, registration.Password);
-
-                    if (!result.Succeeded)
-                    {
-                        return CreateValidationProblem(result);
-                    }
-
-                    // New users get the default dashboard widget layout.
-                    if (user is ApplicationUser appUser)
-                    {
-                        var widgetSettingsService = sp.GetRequiredService<IWidgetSettingsService>();
-                        var logger = sp.GetRequiredService<ILoggerFactory>()
-                            .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
-
-                        try
+                    var superuserService = sp.GetRequiredService<ISuperuserService>();
+                    TUser? userForConfirmation = null;
+                    Func<Task<Results<Ok<RegisterResponse>, ValidationProblem>>> registerOperation =
+                        async () =>
                         {
-                            foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
+                            var user = new TUser();
+                            await userStore.SetUserNameAsync(user, username, CancellationToken.None);
+                            await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+                            var result = await userManager.CreateAsync(user, registration.Password);
+
+                            if (!result.Succeeded)
                             {
-                                await widgetSettingsService.CreateWidgetSettingsAsync(
-                                    appUser.Id,
-                                    new WidgetSettingsCreateRequest
-                                    {
-                                        WidgetType = layout.WidgetType,
-                                        LgX = layout.LgX,
-                                        LgY = layout.LgY,
-                                        LgW = layout.LgW,
-                                        LgH = layout.LgH,
-                                        SmY = layout.SmY,
-                                        SmH = layout.SmH,
-                                    }
-                                );
+                                return CreateValidationProblem(result);
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(
-                                ex,
-                                "{LogMessage}",
-                                logLocalizer[
-                                    "LocalRegistrationDefaultWidgetSeedingFailedLog",
-                                    appUser.Id,
-                                    ex.Message
-                                ]
-                            );
 
-                            // Best-effort rollback to avoid partially initialized accounts.
-                            var deleteResult = await userManager.DeleteAsync(user);
-                            if (!deleteResult.Succeeded)
+                            // New users get the default dashboard widget layout.
+                            if (user is ApplicationUser appUser)
                             {
-                                logger.LogError(
-                                    "{LogMessage}",
-                                    logLocalizer[
-                                        "LocalRegistrationUserRollbackFailedLog",
-                                        appUser.Id,
-                                        string.Join(
-                                            ", ",
-                                            deleteResult.Errors.Select(e => e.Description)
+                                var widgetSettingsService =
+                                    sp.GetRequiredService<IWidgetSettingsService>();
+                                var logger = sp.GetRequiredService<ILoggerFactory>()
+                                    .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
+
+                                try
+                                {
+                                    foreach (var layout in WidgetSettingsHelpers.DefaultLayouts)
+                                    {
+                                        await widgetSettingsService.CreateWidgetSettingsAsync(
+                                            appUser.Id,
+                                            new WidgetSettingsCreateRequest
+                                            {
+                                                WidgetType = layout.WidgetType,
+                                                LgX = layout.LgX,
+                                                LgY = layout.LgY,
+                                                LgW = layout.LgW,
+                                                LgH = layout.LgH,
+                                                SmY = layout.SmY,
+                                                SmH = layout.SmH,
+                                            }
+                                        );
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.LogError(
+                                        ex,
+                                        "{LogMessage}",
+                                        logLocalizer[
+                                            "LocalRegistrationDefaultWidgetSeedingFailedLog",
+                                            appUser.Id,
+                                            ex.Message
+                                        ]
+                                    );
+
+                                    // Best-effort rollback to avoid partially initialized accounts.
+                                    var deleteResult = await userManager.DeleteAsync(user);
+                                    if (!deleteResult.Succeeded)
+                                    {
+                                        logger.LogError(
+                                            "{LogMessage}",
+                                            logLocalizer[
+                                                "LocalRegistrationUserRollbackFailedLog",
+                                                appUser.Id,
+                                                string.Join(
+                                                    ", ",
+                                                    deleteResult.Errors.Select(e => e.Description)
+                                                )
+                                            ]
+                                        );
+                                    }
+
+                                    return CreateValidationProblem(
+                                        IdentityResult.Failed(
+                                            new IdentityError
+                                            {
+                                                Code = "DefaultWidgetSeedingFailed",
+                                                Description = localizer[
+                                                    "DefaultWidgetSeedingFailedError"
+                                                ],
+                                            }
                                         )
-                                    ]
+                                    );
+                                }
+                            }
+
+                            // Add local login provider
+                            var userId = await userManager.GetUserIdAsync(user);
+                            var loginInfo = new UserLoginInfo(
+                                IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
+                                userId,
+                                localizer["LocalAccountProviderName"]
+                            );
+                            var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
+                            if (!addLoginResult.Succeeded)
+                            {
+                                // I don't think we need to block login here. It'll just retry the next time they try to login.
+                                var logger = sp.GetRequiredService<ILoggerFactory>()
+                                    .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
+                                logger.LogWarning(
+                                    "Failed to add login to user {UserId}: {Errors}",
+                                    userId,
+                                    string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
                                 );
                             }
 
-                            return CreateValidationProblem(
-                                IdentityResult.Failed(
-                                    new IdentityError
-                                    {
-                                        Code = "DefaultWidgetSeedingFailed",
-                                        Description = localizer["DefaultWidgetSeedingFailedError"],
-                                    }
-                                )
-                            );
-                        }
-                    }
+                            if (user is ApplicationUser applicationUserForBootstrap)
+                            {
+                                await superuserService.EnsureFirstUserSuperuserAsync(
+                                    applicationUserForBootstrap,
+                                    context.RequestAborted
+                                );
+                            }
 
-                    // Add local login provider
-                    var userId = await userManager.GetUserIdAsync(user);
-                    var loginInfo = new UserLoginInfo(
-                        IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
-                        userId,
-                        localizer["LocalAccountProviderName"]
-                    );
-                    var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
-                    if (!addLoginResult.Succeeded)
+                            userForConfirmation = user;
+                            return TypedResults.Ok(
+                                new RegisterResponse
+                                {
+                                    EmailConfirmationRequired = userManager
+                                        .Options.SignIn.RequireConfirmedEmail
+                                        || (!string.IsNullOrEmpty(email) && smtpConfigured),
+                                }
+                            );
+                        };
+
+                    Results<Ok<RegisterResponse>, ValidationProblem> registrationResult;
+                    try
                     {
-                        // I don't think we need to block login here. It'll just retry the next time they try to login.
-                        var logger = sp.GetRequiredService<ILoggerFactory>()
-                            .CreateLogger("IdentityApiEndpointRouteBuilderExtensions");
-                        logger.LogWarning(
-                            "Failed to add login to user {UserId}: {Errors}",
-                            userId,
-                            string.Join(", ", addLoginResult.Errors.Select(e => e.Description))
+                        registrationResult =
+                            await superuserService.ExecuteFirstUserBootstrapAsync(
+                                registerOperation,
+                                context.RequestAborted
+                            );
+                    }
+                    catch (DbUpdateException exception)
+                        when (IdentityEmailUniqueness.IsDuplicateEmailViolation(exception))
+                    {
+                        return CreateValidationProblem(
+                            IdentityResult.Failed(
+                                userManager.ErrorDescriber.DuplicateEmail(email ?? string.Empty)
+                            )
                         );
                     }
 
-                    await SendConfirmationEmailAsync(user, userManager, context, email);
+                    if (
+                        userForConfirmation is not null
+                        && !string.IsNullOrEmpty(email)
+                        && smtpConfigured
+                    )
+                    {
+                        await SendConfirmationEmailAsync(
+                            userForConfirmation,
+                            userManager,
+                            context,
+                            email
+                        );
+                    }
 
-                    return TypedResults.Ok(
-                        new RegisterResponse
-                        {
-                            EmailConfirmationRequired = userManager
-                                .Options
-                                .SignIn
-                                .RequireConfirmedEmail,
-                        }
-                    );
+                    return registrationResult;
                 }
             );
         }
@@ -227,7 +302,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 async Task<
                     Results<Ok<AccessTokenResponse>, Ok<string>, EmptyHttpResult, ProblemHttpResult>
                 > (
-                    [FromBody] LoginRequest login,
+                    [FromBody] LocalLoginRequest login,
                     [FromQuery] bool? rememberMe,
                     [FromServices] IServiceProvider sp
                 ) =>
@@ -235,14 +310,35 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                     var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
                     var userManager = signInManager.UserManager;
                     var basicEmailSender = sp.GetService<Identity.UI.Services.IEmailSender>();
+                    var configuration = sp.GetRequiredService<IConfiguration>();
+                    var requiresEmailConfirmation =
+                        !string.IsNullOrWhiteSpace(configuration["EMAIL_SENDER"])
+                        && !string.IsNullOrWhiteSpace(configuration["EMAIL_SMTP_HOST"]);
 
                     var isPersistent = rememberMe ?? false;
+                    var identifier = login.GetIdentifier();
 
                     // Check if user exists and verify password manually first
                     // This allows us to differentiate between wrong password vs unverified email
-                    var user = await userManager.FindByEmailAsync(login.Email);
+                    var user =
+                        !string.IsNullOrWhiteSpace(identifier)
+                        && _emailAddressAttribute.IsValid(identifier)
+                            ? await userManager.FindByEmailAsync(identifier)
+                            : null;
+                    if (user is null)
+                    {
+                        user = await userManager.FindByNameAsync(identifier);
+                    }
                     if (user != null)
                     {
+                        if (user is ApplicationUser { IsDisabled: true })
+                        {
+                            return TypedResults.Problem(
+                                "InvalidEmailOrPasswordError",
+                                statusCode: StatusCodes.Status401Unauthorized
+                            );
+                        }
+
                         // Check lockout BEFORE password verification to prevent infinite attempts on locked accounts
                         if (await userManager.IsLockedOutAsync(user))
                         {
@@ -283,7 +379,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
                         if (
                             !await userManager.IsEmailConfirmedAsync(user)
-                            && userManager.Options.SignIn.RequireConfirmedEmail
+                            && requiresEmailConfirmation
+                            && !string.IsNullOrEmpty(await userManager.GetEmailAsync(user))
                         )
                         {
                             return TypedResults.Problem(
@@ -293,9 +390,17 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         }
                     }
 
-                    // Proceed with normal sign-in flow
+                    // Proceed with normal sign-in flow.
+                    if (user is null)
+                    {
+                        return TypedResults.Problem(
+                            "InvalidEmailOrPasswordError",
+                            statusCode: StatusCodes.Status401Unauthorized
+                        );
+                    }
+
                     var result = await signInManager.PasswordSignInAsync(
-                        login.Email,
+                        user,
                         login.Password,
                         isPersistent,
                         lockoutOnFailure: true
@@ -353,7 +458,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             var loginInfo = new UserLoginInfo(
                                 IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
                                 userId,
-                                "Local Account"
+                                localizer["LocalAccountProviderName"].Value
                             );
                             var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
                             if (!addLoginResult.Succeeded)
@@ -457,11 +562,14 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             routeGroup
                 .MapGet(
                     "/confirmEmail",
-                    async Task<Results<ContentHttpResult, UnauthorizedHttpResult>> (
+                    async Task<
+                        Results<ContentHttpResult, UnauthorizedHttpResult, ValidationProblem>
+                    > (
                         [FromQuery] string userId,
                         [FromQuery] string code,
                         [FromQuery] string? changedEmail,
-                        [FromServices] IServiceProvider sp
+                        [FromServices] IServiceProvider sp,
+                        CancellationToken cancellationToken
                     ) =>
                     {
                         var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -488,13 +596,25 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         }
                         else
                         {
-                            // As with Identity UI, email and user name are one and the same. So when we update the email,
-                            // we need to update the user name.
-                            result = await userManager.ChangeEmailAsync(user, changedEmail, code);
-
-                            if (result.Succeeded)
+                            var superuserService = sp.GetRequiredService<ISuperuserService>();
+                            try
                             {
-                                result = await userManager.SetUserNameAsync(user, changedEmail);
+                                result = await superuserService.ExecuteWithUserIdentityLockAsync(
+                                    () =>
+                                        userManager.ChangeEmailAsync(user, changedEmail, code),
+                                    cancellationToken
+                                );
+                            }
+                            catch (DbUpdateException exception)
+                                when (
+                                    IdentityEmailUniqueness.IsDuplicateEmailViolation(exception)
+                                )
+                            {
+                                return CreateValidationProblem(
+                                    IdentityResult.Failed(
+                                        userManager.ErrorDescriber.DuplicateEmail(changedEmail)
+                                    )
+                                );
                             }
                         }
 
@@ -527,7 +647,16 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 ) =>
                 {
                     var userManager = sp.GetRequiredService<UserManager<TUser>>();
-                    if (await userManager.FindByEmailAsync(resendRequest.Email) is not { } user)
+                    var user =
+                        await userManager.FindByEmailAsync(resendRequest.Email)
+                        ?? await userManager.FindByNameAsync(resendRequest.Email);
+                    if (user is null)
+                    {
+                        return TypedResults.Ok();
+                    }
+
+                    var email = await userManager.GetEmailAsync(user);
+                    if (string.IsNullOrWhiteSpace(email))
                     {
                         return TypedResults.Ok();
                     }
@@ -536,7 +665,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                         user,
                         userManager,
                         context,
-                        resendRequest.Email
+                        email
                     );
                     return TypedResults.Ok();
                 }
@@ -547,11 +676,23 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         {
             routeGroup.MapPost(
                 "/forgotPassword",
-                async Task<Results<Ok, ValidationProblem>> (
+                async Task<Results<Ok, ValidationProblem, ProblemHttpResult>> (
                     [FromBody] ForgotPasswordRequest resetRequest,
                     [FromServices] IServiceProvider sp
                 ) =>
                 {
+                    var configuration = sp.GetRequiredService<IConfiguration>();
+                    if (
+                        string.IsNullOrWhiteSpace(configuration["EMAIL_SENDER"])
+                        || string.IsNullOrWhiteSpace(configuration["EMAIL_SMTP_HOST"])
+                    )
+                    {
+                        return TypedResults.Problem(
+                            "AdministratorResetRequired",
+                            statusCode: StatusCodes.Status409Conflict
+                        );
+                    }
+
                     var userManager = sp.GetRequiredService<UserManager<TUser>>();
                     var user = await userManager.FindByEmailAsync(resetRequest.Email);
 
@@ -820,6 +961,27 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             return TypedResults.NotFound();
                         }
 
+                        var mustChangePassword =
+                            user is ApplicationUser
+                            {
+                                MustChangePassword: true
+                            };
+                        if (mustChangePassword && string.IsNullOrEmpty(infoRequest.NewPassword))
+                        {
+                            return CreateValidationProblem(
+                                "PasswordChangeRequired",
+                                localizer["PasswordChangeRequiredForAccount"].Value
+                            );
+                        }
+
+                        if (mustChangePassword && !string.IsNullOrEmpty(infoRequest.NewEmail))
+                        {
+                            return CreateValidationProblem(
+                                "PasswordChangeRequired",
+                                localizer["PasswordChangeRequiredForSettings"].Value
+                            );
+                        }
+
                         if (
                             !string.IsNullOrEmpty(infoRequest.NewEmail)
                             && !_emailAddressAttribute.IsValid(infoRequest.NewEmail)
@@ -832,6 +994,24 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             );
                         }
 
+                        string? emailToConfirm = null;
+                        if (!string.IsNullOrEmpty(infoRequest.NewEmail))
+                        {
+                            var currentEmail = await userManager.GetEmailAsync(user);
+                            if (currentEmail != infoRequest.NewEmail)
+                            {
+                                if (confirmEmailEndpointName is null)
+                                {
+                                    return CreateValidationProblem(
+                                        "EmailConfirmationUnavailable",
+                                        localizer["NoEmailConfirmationEndpointError"].Value
+                                    );
+                                }
+
+                                emailToConfirm = infoRequest.NewEmail;
+                            }
+                        }
+
                         if (!string.IsNullOrEmpty(infoRequest.NewPassword))
                         {
                             var hasPassword = await userManager.HasPasswordAsync(user);
@@ -839,7 +1019,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             {
                                 return CreateValidationProblem(
                                     "OldPasswordRequired",
-                                    "The old password is required to set a new password. If the old password is forgotten, use /resetPassword."
+                                    localizer["OldPasswordRequired"].Value
                                 );
                             }
 
@@ -857,7 +1037,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                                     var loginInfo = new UserLoginInfo(
                                         IdentityApiEndpointRouteBuilderConstants.LocalLoginProvider,
                                         userId,
-                                        "Local Account"
+                                        localizer["LocalAccountProviderName"].Value
                                     );
                                     await userManager.AddLoginAsync(user, loginInfo);
                                 }
@@ -875,22 +1055,30 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                             {
                                 return CreateValidationProblem(changePasswordResult);
                             }
+
+                            if (user is ApplicationUser applicationUser)
+                            {
+                                applicationUser.MustChangePassword = false;
+                                var updateResult = await userManager.UpdateAsync(user);
+                                if (!updateResult.Succeeded)
+                                {
+                                    return CreateValidationProblem(updateResult);
+                                }
+
+                                await sp.GetRequiredService<SignInManager<TUser>>()
+                                    .RefreshSignInAsync(user);
+                            }
                         }
 
-                        if (!string.IsNullOrEmpty(infoRequest.NewEmail))
+                        if (emailToConfirm is not null)
                         {
-                            var email = await userManager.GetEmailAsync(user);
-
-                            if (email != infoRequest.NewEmail)
-                            {
-                                await SendConfirmationEmailAsync(
-                                    user,
-                                    userManager,
-                                    context,
-                                    infoRequest.NewEmail,
-                                    isChange: true
-                                );
-                            }
+                            await SendConfirmationEmailAsync(
+                                user,
+                                userManager,
+                                context,
+                                emailToConfirm,
+                                isChange: true
+                            );
                         }
 
                         return TypedResults.Ok(
@@ -995,9 +1183,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
     {
         return new()
         {
-            Email =
-                await userManager.GetEmailAsync(user)
-                ?? throw new NotSupportedException(localizer["UserEmailRequiredError"]),
+            Email = await userManager.GetEmailAsync(user) ?? string.Empty,
             IsEmailConfirmed = await userManager.IsEmailConfirmedAsync(user),
         };
     }

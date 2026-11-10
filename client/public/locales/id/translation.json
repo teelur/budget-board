@@ -421,7 +421,7 @@
   "no_deleted_assets": "Tidak ada aset yang dihapus",
   "no_deleted_transactions": "Tidak ada transaksi yang dihapus",
   "no_flow_data": "Tidak ada data aliran untuk bulan yang dipilih.",
-  "no_goals": "Tidak ada tujuan yang ditemukan.",
+  "no_goals": "Tidak ada tujuan yang ditemukan. Tambahkan tujuan untuk memulai.",
   "no_groups_found": "Tidak ada kelompok yang ditemukan.",
   "no_institutions": "Tidak ada institusi yang ditemukan. Tambahkan sebuah akun untuk memulai.",
   "no_lunchflow_accounts_found": "Tidak ada akun LunchFlow yang ditemukan.",

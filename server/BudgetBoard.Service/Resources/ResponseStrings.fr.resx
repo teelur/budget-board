@@ -521,9 +521,9 @@
     <value>L'icône de la catégorie d'opération est trop longue.</value>
   </data>
   <data name="BudgetRolloverConflictError" xml:space="preserve">
-    <value>Rollover can be turned on for a category or its subcategories, but not both.</value>
+    <value>Le report peut être activé pour une catégorie ou pour ses sous-catégories, mais pas pour les deux.</value>
   </data>
   <data name="InvalidDecimalPlacesError" xml:space="preserve">
-    <value>The number of decimal places must be between 0 and 3.</value>
+    <value>Le nombre de décimales doit être compris entre 0 et 3.</value>
   </data>
 </root>

@@ -11,6 +11,16 @@ namespace BudgetBoard.Database.Models;
 public class ApplicationUser : IdentityUser<Guid>
 {
     /// <summary>
+    /// Indicates that the user must replace a temporary or administrator-issued password before using the application.
+    /// </summary>
+    public bool MustChangePassword { get; set; }
+
+    /// <summary>
+    /// Indicates that the account is disabled by an administrator.
+    /// </summary>
+    public bool IsDisabled { get; set; }
+
+    /// <summary>
     /// Access token for SimpleFIN service integration.
     /// </summary>
     public string SimpleFinAccessToken { get; set; } = string.Empty;

@@ -203,6 +203,20 @@ public class DemoSeedServiceTests
                     "Income",
                 ]
             );
+
+        var rolloverBudgets = budgets.Where(b => b.RolloverStartMonth.HasValue).ToList();
+        rolloverBudgets
+            .Select(b => b.Category)
+            .Distinct()
+            .Should()
+            .BeEquivalentTo(["Shopping", "Auto & Transport"]);
+        rolloverBudgets
+            .Select(b => b.RolloverStartMonth)
+            .Distinct()
+            .Should()
+            .ContainSingle()
+            .Which.Should()
+            .Be(new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1).AddMonths(-2));
     }
 
     [Fact]

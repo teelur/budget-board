@@ -7,7 +7,8 @@ import { useTranslation } from "react-i18next";
 import { RegisterResponse } from "~/models/auth";
 
 export type RegisterData = {
-  email: string;
+  username: string;
+  email?: string;
   password: string;
 };
 
@@ -21,6 +22,7 @@ export const useRegisterMutation = () => {
         url: "/api/register",
         method: "POST",
         data: {
+          username: registerData.username,
           email: registerData.email,
           password: registerData.password,
         },
