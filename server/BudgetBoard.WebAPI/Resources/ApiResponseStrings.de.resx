@@ -136,4 +136,61 @@
   <data name="UpdateChannelNotSupported" xml:space="preserve">
     <value>The update channel is not supported.</value>
   </data>
+  <data name="AdminCommandFailed" xml:space="preserve">
+    <value>Admin command failed: {0}</value>
+  </data>
+  <data name="AdminCommandUsage" xml:space="preserve">
+    <value>Usage: admin reset-superuser --username &lt;name&gt; | admin bootstrap-superuser --username &lt;name&gt;</value>
+  </data>
+  <data name="AuthenticationManagementOperationFailed" xml:space="preserve">
+    <value>Authentication management operation failed.</value>
+  </data>
+  <data name="OldPasswordRequired" xml:space="preserve">
+    <value>The current password is required to set a new password. If it has been forgotten, use /resetPassword.</value>
+  </data>
+  <data name="OfflineAdminCommandFailed" xml:space="preserve">
+    <value>The offline administrator command failed.</value>
+  </data>
+  <data name="PasswordChangeRequired" xml:space="preserve">
+    <value>A password change is required before accessing this resource.</value>
+  </data>
+  <data name="PasswordChangeRequiredForAccount" xml:space="preserve">
+    <value>A new password is required before this account can be used.</value>
+  </data>
+  <data name="PasswordChangeRequiredForSettings" xml:space="preserve">
+    <value>Change the password before changing other account settings.</value>
+  </data>
+  <data name="PasswordMustBeChangedNextSignIn" xml:space="preserve">
+    <value>The password must be changed at the next sign-in.</value>
+  </data>
+  <data name="SuperuserBootstrapped" xml:space="preserve">
+    <value>Superuser bootstrapped: {0}</value>
+  </data>
+  <data name="TemporaryPassword" xml:space="preserve">
+    <value>Temporary password: {0}</value>
+  </data>
+  <data name="UsernameOrEmailRequired" xml:space="preserve">
+    <value>A username or email address is required.</value>
+  </data>
+  <data name="FirstUserPromotionFailed" xml:space="preserve">
+    <value>Unable to promote the first user: {0}</value>
+  </data>
+  <data name="MultipleSuperusersDetected" xml:space="preserve">
+    <value>The database contains more than one {0} account.</value>
+  </data>
+  <data name="SuperuserBootstrapSelectionRequired" xml:space="preserve">
+    <value>Multiple existing users were found without a superuser. Set {0} to the exact username of the account that should become the superuser, then restart.</value>
+  </data>
+  <data name="SuperuserBootstrapUserNotFound" xml:space="preserve">
+    <value>No existing user matches {0}.</value>
+  </data>
+  <data name="SuperuserBootstrapUserDisabled" xml:space="preserve">
+    <value>The superuser bootstrap account is disabled. Enable it or configure another enabled user before restarting.</value>
+  </data>
+  <data name="SuperuserPromotionFailed" xml:space="preserve">
+    <value>Unable to promote the selected user: {0}</value>
+  </data>
+  <data name="SuperuserRoleCreationFailed" xml:space="preserve">
+    <value>Unable to create the {0} role: {1}</value>
+  </data>
 </root>
