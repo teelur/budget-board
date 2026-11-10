@@ -268,8 +268,11 @@ public sealed class SuperuserService(
         }
 
         var totalCount = await auditQuery.CountAsync(cancellationToken);
-        var events = await auditQuery
-            .OrderByDescending(audit => audit.CreatedAt)
+        // SQLite cannot order DateTimeOffset directly; these UTC values are stored as sortable text.
+        var orderedAuditQuery = dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite"
+            ? auditQuery.OrderByDescending(audit => audit.CreatedAt.ToString())
+            : auditQuery.OrderByDescending(audit => audit.CreatedAt);
+        var events = await orderedAuditQuery
             .ThenByDescending(audit => audit.Id)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)

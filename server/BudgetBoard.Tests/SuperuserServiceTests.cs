@@ -92,6 +92,7 @@ public sealed class SuperuserServiceTests
         var now = DateTimeOffset.UtcNow;
         var oldestEvent = new AuthenticationAdminAuditEvent
         {
+            Id = 3,
             ActorUserId = actor.Id,
             TargetUserId = target.Id,
             Action = "create-user",
@@ -100,6 +101,7 @@ public sealed class SuperuserServiceTests
         };
         var failedEvent = new AuthenticationAdminAuditEvent
         {
+            Id = 2,
             ActorUserId = actor.Id,
             TargetUserId = target.Id,
             Action = "disable-user",
@@ -109,6 +111,7 @@ public sealed class SuperuserServiceTests
         };
         var newestEvent = new AuthenticationAdminAuditEvent
         {
+            Id = 1,
             ActorUserId = actor.Id,
             TargetUserId = target.Id,
             Action = "reset-password",
