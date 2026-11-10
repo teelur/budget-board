@@ -16,7 +16,7 @@ import type {
   IManagedUserResponse,
 } from "~/models/managedUser";
 import { NotificationType, showNotification } from "~/helpers/notifications";
-import CreateManagedUserModal from "./CreateManagedUserModal";
+import CreateManagedUserModal from "./CreateManagedUserModal/CreateManagedUserModal";
 import ManagedUserConfirmationModal, {
   type ManagedUserConfirmation,
 } from "./ManagedUserConfirmationModal";

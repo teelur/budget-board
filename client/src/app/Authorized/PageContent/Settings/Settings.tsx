@@ -16,7 +16,10 @@ const Settings = (): React.ReactNode => {
     { path: "security", label: t("security") },
     { path: "advanced", label: t("advanced_settings") },
     ...(applicationUserQuery.data?.isSuperuser
-      ? [{ path: "user-management", label: t("user_management") }]
+      ? [
+          { path: "user-management", label: t("user_management") },
+          { path: "admin-history", label: t("admin_history") },
+        ]
       : []),
   ];
 
