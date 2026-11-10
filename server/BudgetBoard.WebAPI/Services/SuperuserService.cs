@@ -268,10 +268,11 @@ public sealed class SuperuserService(
         }
 
         var totalCount = await auditQuery.CountAsync(cancellationToken);
-        // SQLite cannot order DateTimeOffset directly; these UTC values are stored as sortable text.
-        var orderedAuditQuery = dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite"
-            ? auditQuery.OrderByDescending(audit => audit.CreatedAt.ToString())
-            : auditQuery.OrderByDescending(audit => audit.CreatedAt);
+        // SQLite (used by unit tests) cannot order DateTimeOffset directly; these UTC values are stored as sortable text.
+        var orderedAuditQuery =
+            dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite"
+                ? auditQuery.OrderByDescending(audit => audit.CreatedAt.ToString())
+                : auditQuery.OrderByDescending(audit => audit.CreatedAt);
         var events = await orderedAuditQuery
             .ThenByDescending(audit => audit.Id)
             .Skip((query.Page - 1) * query.PageSize)
@@ -303,9 +304,7 @@ public sealed class SuperuserService(
             .Select(audit => new AdminAuditEventResponse(
                 audit.Id,
                 audit.ActorUserId,
-                audit.ActorUserId is Guid actorId
-                    ? userNamesById.GetValueOrDefault(actorId)
-                    : null,
+                audit.ActorUserId is Guid actorId ? userNamesById.GetValueOrDefault(actorId) : null,
                 audit.TargetUserId,
                 audit.TargetUserId is Guid targetId
                     ? userNamesById.GetValueOrDefault(targetId)
