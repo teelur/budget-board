@@ -1,4 +1,4 @@
-﻿using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Models;
 
 namespace BudgetBoard.Service.Interfaces;
 
@@ -40,4 +40,20 @@ public interface IBudgetService
     /// <param name="userGuid">The unique identifier of the user.</param>
     /// <param name="budgetGuid">The unique identifier of the budget to delete.</param>
     Task DeleteBudgetAsync(Guid userGuid, Guid budgetGuid);
+
+    /// <summary>
+    /// Exports the budget for a specific month as a structured template.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="month">The month to export.</param>
+    /// <returns>A template containing hierarchical categories, limits, rollover flags, and icons.</returns>
+    Task<BudgetTemplateExport> ExportBudgetAsync(Guid userGuid, DateOnly month);
+
+    /// <summary>
+    /// Imports a budget template into a specified month.
+    /// </summary>
+    /// <param name="userGuid">The unique identifier of the user.</param>
+    /// <param name="request">The import payload containing budget items and any new categories to create.</param>
+    Task ImportBudgetAsync(Guid userGuid, BudgetImportRequest request);
 }
+

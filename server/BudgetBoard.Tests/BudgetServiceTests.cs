@@ -1,4 +1,4 @@
-﻿using Bogus;
+using Bogus;
 using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
@@ -1802,4 +1802,177 @@ public class BudgetServiceTests
         helper.UserDataContext.Budgets.Should().NotContain(b => b.ID == childBudget1.ID);
     }
     #endregion
+
+    #region ExportBudgetAsync
+    [Fact]
+    public async Task ExportBudgetAsync_WhenCalled_ShouldExportHierarchyAndRollover()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var month = new DateOnly(2026, 10, 1);
+
+        // Add parent and child categories with an icon
+        helper.UserDataContext.TransactionCategories.Add(
+            new Category
+            {
+                Value = "Food",
+                Parent = string.Empty,
+                CategoryType = TransactionCategoryTypes.Expense,
+                UserID = helper.demoUser.Id,
+            }
+        );
+        helper.UserDataContext.TransactionCategories.Add(
+            new Category
+            {
+                Value = "Groceries",
+                Parent = "Food",
+                CategoryType = TransactionCategoryTypes.Expense,
+                UserID = helper.demoUser.Id,
+            }
+        );
+        helper.UserDataContext.TransactionCategoryIcons.Add(
+            new CategoryIcon
+            {
+                Category = "Groceries",
+                Icon = "🛒",
+                UserID = helper.demoUser.Id,
+            }
+        );
+
+        helper.UserDataContext.Budgets.Add(
+            new Budget
+            {
+                Category = "Food",
+                Limit = 800,
+                Month = month,
+                UserID = helper.demoUser.Id,
+            }
+        );
+        helper.UserDataContext.Budgets.Add(
+            new Budget
+            {
+                Category = "Groceries",
+                Limit = 600,
+                Month = month,
+                RolloverStartMonth = new DateOnly(2026, 1, 1),
+                UserID = helper.demoUser.Id,
+            }
+        );
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        var export = await budgetService.ExportBudgetAsync(helper.demoUser.Id, month);
+
+        // Assert
+        export.Should().NotBeNull();
+        export.Categories.Should().Contain(c => c.Name.Equals("Food", StringComparison.OrdinalIgnoreCase));
+
+        var parent = export.Categories.First(c => c.Name.Equals("Food", StringComparison.OrdinalIgnoreCase));
+        parent.Subcategories.Should().Contain(c => c.Name.Equals("Groceries", StringComparison.OrdinalIgnoreCase));
+
+        var child = parent.Subcategories.First(c => c.Name.Equals("Groceries", StringComparison.OrdinalIgnoreCase));
+        child.Limit.Should().Be(600);
+        child.RolloverEnabled.Should().BeTrue();
+        child.Icon.Should().Be("🛒");
+    }
+    #endregion
+
+    #region ImportBudgetAsync
+    [Fact]
+    public async Task ImportBudgetAsync_WhenCalledWithNewCategories_ShouldCreateCategoriesAndBudgets()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var targetMonth = new DateOnly(2026, 11, 1);
+
+        var request = new BudgetImportRequest
+        {
+            Month = targetMonth,
+            OverwriteExisting = true,
+            NewCategories =
+            [
+                new BudgetImportCategoryCreateRequest
+                {
+                    Name = "CustomHobbies",
+                    CategoryType = TransactionCategoryTypes.Expense,
+                    Icon = "🎨",
+                },
+            ],
+            Items =
+            [
+                new BudgetImportItemRequest
+                {
+                    Category = "CustomHobbies",
+                    Limit = 1200,
+                    RolloverEnabled = true,
+                },
+            ],
+        };
+
+        // Act
+        await budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+
+        // Assert
+        helper.UserDataContext.TransactionCategories.Should().Contain(c => c.Value == "CustomHobbies");
+        helper.UserDataContext.TransactionCategoryIcons.Should().Contain(i => i.Category == "CustomHobbies" && i.Icon == "🎨");
+
+        var createdBudget = helper.UserDataContext.Budgets.FirstOrDefault(b => b.Category == "CustomHobbies" && b.Month == targetMonth);
+        createdBudget.Should().NotBeNull();
+        createdBudget!.Limit.Should().Be(1200);
+        createdBudget.RolloverStartMonth.Should().Be(targetMonth);
+    }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenRolloverAlreadyActive_ShouldPreserveRolloverStartMonth()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var priorMonth = new DateOnly(2026, 1, 1);
+        var targetMonth = new DateOnly(2026, 11, 1);
+
+        helper.UserDataContext.Budgets.Add(
+            new Budget
+            {
+                Category = "Utilities",
+                Limit = 200,
+                Month = priorMonth,
+                RolloverStartMonth = priorMonth,
+                UserID = helper.demoUser.Id,
+            }
+        );
+        helper.UserDataContext.SaveChanges();
+
+        var request = new BudgetImportRequest
+        {
+            Month = targetMonth,
+            OverwriteExisting = true,
+            Items =
+            [
+                new BudgetImportItemRequest
+                {
+                    Category = "Utilities",
+                    Limit = 250,
+                    RolloverEnabled = true,
+                },
+            ],
+        };
+
+        // Act
+        await budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+
+        // Assert
+        var importedBudget = helper.UserDataContext.Budgets.FirstOrDefault(b => b.Category == "Utilities" && b.Month == targetMonth);
+        importedBudget.Should().NotBeNull();
+        importedBudget!.Limit.Should().Be(250);
+        // Preserves earlier start month (priorMonth)
+        importedBudget.RolloverStartMonth.Should().Be(priorMonth);
+    }
+    #endregion
 }
+

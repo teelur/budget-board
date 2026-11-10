@@ -1,4 +1,4 @@
-﻿using BudgetBoard.Database.Models;
+using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.WebAPI.Resources;
@@ -93,4 +93,41 @@ public class BudgetController(
             return Ok();
         });
     }
+
+    [HttpGet("export")]
+    [Authorize]
+    public async Task<IActionResult> Export([FromQuery] DateOnly month)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            var export = await budgetService.ExportBudgetAsync(parsedUserId, month);
+            return Ok(export);
+        });
+    }
+
+    [HttpPost("import")]
+    [Authorize]
+    public async Task<IActionResult> Import([FromBody] BudgetImportRequest request)
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            await budgetService.ImportBudgetAsync(parsedUserId, request);
+            return Ok();
+        });
+    }
 }
+
