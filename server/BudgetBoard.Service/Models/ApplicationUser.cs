@@ -28,12 +28,14 @@ public interface IApplicationUserResponse
     bool TwoFactorEnabled { get; }
     bool HasOidcLogin { get; }
     bool HasLocalLogin { get; }
+    bool IsSuperuser { get; }
 }
 
 public class ApplicationUserResponse(
     ApplicationUser user,
     bool hasOidcLogin = false,
-    bool hasLocalLogin = false
+    bool hasLocalLogin = false,
+    bool isSuperuser = false
 ) : IApplicationUserResponse
 {
     public Guid ID { get; set; } = user.Id;
@@ -43,4 +45,5 @@ public class ApplicationUserResponse(
     public bool TwoFactorEnabled { get; set; } = user.TwoFactorEnabled;
     public bool HasOidcLogin { get; set; } = hasOidcLogin;
     public bool HasLocalLogin { get; set; } = hasLocalLogin;
+    public bool IsSuperuser { get; set; } = isSuperuser;
 }

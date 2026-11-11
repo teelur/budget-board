@@ -31,6 +31,7 @@ import NavbarFooter from "./NavbarFooter/NavbarFooter";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router";
 import { useLogoutMutation } from "~/hooks/mutations/auth/useLogoutMutation";
+import { useApplicationUserQuery } from "~/hooks/queries/useApplicationUserQuery";
 import React from "react";
 
 interface NavbarProps {
@@ -63,6 +64,7 @@ const Navbar = (props: NavbarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const logoutMutation = useLogoutMutation();
+  const applicationUserQuery = useApplicationUserQuery();
 
   const sidebarItems: NavbarItem[] = [
     {
@@ -135,6 +137,12 @@ const Navbar = (props: NavbarProps) => {
       { path: "/settings/user", label: t("user_settings") },
       { path: "/settings/security", label: t("security") },
       { path: "/settings/advanced", label: t("advanced_settings") },
+      ...(applicationUserQuery.data?.isSuperuser
+        ? [
+            { path: "/settings/user-management", label: t("user_management") },
+            { path: "/settings/admin-history", label: t("admin_history") },
+          ]
+        : []),
     ],
   };
   const activeSettingsGroupPath = [...sidebarItems, settingsItem].find(

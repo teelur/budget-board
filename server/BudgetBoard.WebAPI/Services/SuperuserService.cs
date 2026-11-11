@@ -229,6 +229,104 @@ public sealed class SuperuserService(
     }
 
     /// <inheritdoc />
+    public async Task<AdminAuditEventsPageResponse> ListAuditEventsAsync(
+        AdminAuditEventsQuery query,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ArgumentNullException.ThrowIfNull(query);
+
+        var auditQuery = dbContext.AuthenticationAdminAuditEvents.AsNoTracking();
+        var action = query.Action?.Trim();
+        if (!string.IsNullOrEmpty(action))
+        {
+            auditQuery = auditQuery.Where(audit => audit.Action == action);
+        }
+
+        if (query.Succeeded.HasValue)
+        {
+            auditQuery = auditQuery.Where(audit => audit.Succeeded == query.Succeeded.Value);
+        }
+
+        var userName = query.UserName?.Trim().ToUpperInvariant();
+        if (!string.IsNullOrEmpty(userName))
+        {
+            auditQuery = auditQuery.Where(audit =>
+                userManager.Users.Any(user =>
+                    audit.ActorUserId.HasValue
+                    && user.Id == audit.ActorUserId.Value
+                    && user.NormalizedUserName != null
+                    && user.NormalizedUserName.Contains(userName)
+                )
+                || userManager.Users.Any(user =>
+                    audit.TargetUserId.HasValue
+                    && user.Id == audit.TargetUserId.Value
+                    && user.NormalizedUserName != null
+                    && user.NormalizedUserName.Contains(userName)
+                )
+            );
+        }
+
+        var totalCount = await auditQuery.CountAsync(cancellationToken);
+        // SQLite (used by unit tests) cannot order DateTimeOffset directly; these UTC values are stored as sortable text.
+        var orderedAuditQuery =
+            dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite"
+                ? auditQuery.OrderByDescending(audit => audit.CreatedAt.ToString())
+                : auditQuery.OrderByDescending(audit => audit.CreatedAt);
+        var events = await orderedAuditQuery
+            .ThenByDescending(audit => audit.Id)
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(cancellationToken);
+
+        var userIds = events
+            .SelectMany(audit => new[] { audit.ActorUserId, audit.TargetUserId })
+            .Where(userId => userId.HasValue)
+            .Select(userId => userId.GetValueOrDefault())
+            .Distinct()
+            .ToArray();
+        var userNamesById =
+            userIds.Length == 0
+                ? new Dictionary<Guid, string?>()
+                : await userManager
+                    .Users.Where(user => userIds.Contains(user.Id))
+                    .Select(user => new { user.Id, user.UserName })
+                    .ToDictionaryAsync(user => user.Id, user => user.UserName, cancellationToken);
+
+        var actions = await dbContext
+            .AuthenticationAdminAuditEvents.AsNoTracking()
+            .Select(audit => audit.Action)
+            .Distinct()
+            .OrderBy(actionName => actionName)
+            .ToListAsync(cancellationToken);
+
+        var responseEvents = events
+            .Select(audit => new AdminAuditEventResponse(
+                audit.Id,
+                audit.ActorUserId,
+                audit.ActorUserId is Guid actorId ? userNamesById.GetValueOrDefault(actorId) : null,
+                audit.TargetUserId,
+                audit.TargetUserId is Guid targetId
+                    ? userNamesById.GetValueOrDefault(targetId)
+                    : null,
+                audit.Action,
+                audit.Succeeded,
+                audit.CreatedAt,
+                audit.RequestIpAddress,
+                audit.Details
+            ))
+            .ToArray();
+
+        return new AdminAuditEventsPageResponse(
+            responseEvents,
+            actions,
+            query.Page,
+            query.PageSize,
+            totalCount
+        );
+    }
+
+    /// <inheritdoc />
     public async Task<SuperuserOperationResult> CreateUserAsync(
         CreateManagedUserRequest request,
         Guid actorUserId,

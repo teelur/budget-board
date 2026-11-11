@@ -76,6 +76,83 @@ public sealed class SuperuserServiceTests
     }
 
     [Fact]
+    public async Task ListAuditEventsAsync_FiltersByActionResultAndUserAndPaginatesNewestFirst()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        await using var harness = CreateHarness(connection);
+        var dbContext = harness.Services.GetRequiredService<UserDataContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        var target = new ApplicationUser { UserName = "managed-user" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+        (await userManager.CreateAsync(target, "password")).Succeeded.Should().BeTrue();
+
+        var now = DateTimeOffset.UtcNow;
+        var oldestEvent = new AuthenticationAdminAuditEvent
+        {
+            Id = 3,
+            ActorUserId = actor.Id,
+            TargetUserId = target.Id,
+            Action = "create-user",
+            Succeeded = true,
+            CreatedAt = now.AddMinutes(-2),
+        };
+        var failedEvent = new AuthenticationAdminAuditEvent
+        {
+            Id = 2,
+            ActorUserId = actor.Id,
+            TargetUserId = target.Id,
+            Action = "disable-user",
+            Succeeded = false,
+            CreatedAt = now.AddMinutes(-1),
+            Details = "SuperuserDisableNotAllowed",
+        };
+        var newestEvent = new AuthenticationAdminAuditEvent
+        {
+            Id = 1,
+            ActorUserId = actor.Id,
+            TargetUserId = target.Id,
+            Action = "reset-password",
+            Succeeded = true,
+            CreatedAt = now,
+        };
+        dbContext.AuthenticationAdminAuditEvents.AddRange(
+            oldestEvent,
+            failedEvent,
+            newestEvent
+        );
+        await dbContext.SaveChangesAsync();
+
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        var filtered = await service.ListAuditEventsAsync(
+            new AdminAuditEventsQuery
+            {
+                Action = "disable-user",
+                Succeeded = false,
+                UserName = "managed",
+            }
+        );
+
+        filtered.TotalCount.Should().Be(1);
+        filtered.Events.Should().ContainSingle();
+        filtered.Events[0].Id.Should().Be(failedEvent.Id);
+        filtered.Events[0].ActorUserName.Should().Be(actor.UserName);
+        filtered.Events[0].TargetUserName.Should().Be(target.UserName);
+        filtered.Events[0].Details.Should().Be("SuperuserDisableNotAllowed");
+        filtered.Actions.Should().Contain(["create-user", "disable-user", "reset-password"]);
+
+        var secondPage = await service.ListAuditEventsAsync(
+            new AdminAuditEventsQuery { Page = 2, PageSize = 2 }
+        );
+
+        secondPage.TotalCount.Should().Be(3);
+        secondPage.Events.Should().ContainSingle();
+        secondPage.Events[0].Id.Should().Be(oldestEvent.Id);
+    }
+
+    [Fact]
     public async Task EnsureRoleAndBootstrapAsync_PromotesTheOnlyExistingUser()
     {
         await using var harness = CreateHarness();

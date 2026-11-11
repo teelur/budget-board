@@ -84,6 +84,10 @@ const SettingsSecurity = lazy(
 const SettingsAdvanced = lazy(
   () => import("./Settings/AdvancedSettings/AdvancedSettings"),
 );
+const ManagedUsers = lazy(() => import("./Settings/ManagedUsers/ManagedUsers"));
+const AdminAuditHistory = lazy(
+  () => import("./Settings/AdminAuditHistory/AdminAuditHistory"),
+);
 
 const PageContent = (): React.ReactNode => {
   const { t } = useTranslation();
@@ -198,6 +202,8 @@ const PageContent = (): React.ReactNode => {
               <Route path="user" element={<SettingsUser />} />
               <Route path="security" element={<SettingsSecurity />} />
               <Route path="advanced" element={<SettingsAdvanced />} />
+              <Route path="user-management" element={<ManagedUsers />} />
+              <Route path="admin-history" element={<AdminAuditHistory />} />
             </Route>
           </Routes>
         </Suspense>

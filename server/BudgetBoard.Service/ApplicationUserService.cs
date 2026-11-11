@@ -30,8 +30,14 @@ public class ApplicationUserService(
         var logins = await userManager.GetLoginsAsync(userData);
         var hasOidcLogin = logins.Any(l => l.LoginProvider == "oidc");
         var hasLocalLogin = logins.Any(l => l.LoginProvider == "local");
+        var isSuperuser = await userManager.IsInRoleAsync(userData, "Superuser");
 
-        return new ApplicationUserResponse(userData, hasOidcLogin, hasLocalLogin);
+        return new ApplicationUserResponse(
+            userData,
+            hasOidcLogin,
+            hasLocalLogin,
+            isSuperuser
+        );
     }
 
     /// <inheritdoc />
