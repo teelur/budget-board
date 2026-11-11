@@ -31,6 +31,7 @@ public class BudgetImportItemRequest
     public string Category { get; set; } = string.Empty;
     public decimal Limit { get; set; }
     public bool RolloverEnabled { get; set; }
+    public string? Icon { get; set; }
 }
 
 public class BudgetImportRequest

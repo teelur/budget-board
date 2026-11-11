@@ -1973,6 +1973,117 @@ public class BudgetServiceTests
         // Preserves earlier start month (priorMonth)
         importedBudget.RolloverStartMonth.Should().Be(priorMonth);
     }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenExistingCategoryHasIconInImport_ShouldSetOrUpdateIcon()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var targetMonth = new DateOnly(2026, 11, 1);
+
+        // Pre-existing icon on Utilities
+        helper.UserDataContext.TransactionCategoryIcons.Add(
+            new CategoryIcon
+            {
+                Category = "Utilities",
+                Icon = "💡",
+                UserID = helper.demoUser.Id,
+            }
+        );
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var request = new BudgetImportRequest
+        {
+            Month = targetMonth,
+            OverwriteExisting = true,
+            Items =
+            [
+                new BudgetImportItemRequest
+                {
+                    Category = "Utilities",
+                    Limit = 300,
+                    Icon = "⚡",
+                },
+                new BudgetImportItemRequest
+                {
+                    Category = "Auto & Transport",
+                    Limit = 400,
+                    Icon = "🚗",
+                },
+            ],
+        };
+
+        // Act
+        await budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+
+        // Assert: Utilities icon updated to ⚡ and Auto & Transport icon added as 🚗
+        helper.UserDataContext.TransactionCategoryIcons
+            .Should()
+            .Contain(i => i.Category == "Utilities" && i.Icon == "⚡");
+
+        helper.UserDataContext.TransactionCategoryIcons
+            .Should()
+            .Contain(i => i.Category == "Auto & Transport" && i.Icon == "🚗");
+    }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenImportingHierarchicalBudgets_ShouldNotDoubleCountChildLimitsForParent()
+    {
+        // Arrange: User has Income parent (default category) with children Interest Income and Paycheck
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var targetMonth = new DateOnly(2026, 11, 1);
+
+        var request = new BudgetImportRequest
+        {
+            Month = targetMonth,
+            OverwriteExisting = true,
+            Items =
+            [
+                new BudgetImportItemRequest
+                {
+                    Category = "Income",
+                    Limit = 4050,
+                },
+                new BudgetImportItemRequest
+                {
+                    Category = "Interest Income",
+                    Limit = 50,
+                },
+                new BudgetImportItemRequest
+                {
+                    Category = "Paycheck",
+                    Limit = 3700,
+                },
+            ],
+        };
+
+        // Act
+        await budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+
+        // Assert: Children sum is 3750 (50 + 3700). Parent limit was 4050 in request.
+        // It should NOT be inflated to 7500 (which occurred when children were added twice).
+        var parentBudget = helper.UserDataContext.Budgets.FirstOrDefault(b =>
+            b.Category == "Income" && b.Month == targetMonth
+        );
+        parentBudget.Should().NotBeNull();
+        parentBudget!.Limit.Should().Be(4050);
+
+        var interestBudget = helper.UserDataContext.Budgets.FirstOrDefault(b =>
+            b.Category == "Interest Income" && b.Month == targetMonth
+        );
+        interestBudget.Should().NotBeNull();
+        interestBudget!.Limit.Should().Be(50);
+
+        var paycheckBudget = helper.UserDataContext.Budgets.FirstOrDefault(b =>
+            b.Category == "Paycheck" && b.Month == targetMonth
+        );
+        paycheckBudget.Should().NotBeNull();
+        paycheckBudget!.Limit.Should().Be(3700);
+    }
     #endregion
 }
 

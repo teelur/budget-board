@@ -25,6 +25,7 @@ export interface IBudgetImportItemRequest {
   category: string;
   limit: number;
   rolloverEnabled: boolean;
+  icon?: string | null;
 }
 
 export interface IBudgetImportRequest {

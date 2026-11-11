@@ -1,4 +1,4 @@
-import { Group, Stack } from "@mantine/core";
+import { Group, Menu, Stack } from "@mantine/core";
 import { Button, MonthToolcards } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
-import { FileDownIcon, ListChecksIcon } from "lucide-react";
+import { ArrowUpDownIcon, FileDownIcon, FileUpIcon, ListChecksIcon } from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { downloadBudgetTemplateJson } from "~/helpers/budgetExport";
@@ -29,6 +29,7 @@ interface BudgetsToolbarProps {
 const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   const [canSelectMultiple, { toggle }] = useDisclosure(false);
   const [isExporting, setIsExporting] = React.useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
 
   const { t } = useTranslation();
   const { dayjs, dayjsLocale } = useLocale();
@@ -163,17 +164,39 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         )}
         {props.selectedDates.length === 1 && (
           <>
-            <Button
-              variant="filled"
-              color="primary"
-              size="xs"
-              rightSection={<FileDownIcon size="1rem" />}
-              onClick={onExportBudget}
-              loading={isExporting}
-            >
-              {t("export_budget")}
-            </Button>
-            <ImportBudgetModal currentDate={props.selectedDates[0]!} />
+            <Menu shadow="md" width={220} position="bottom-end">
+              <Menu.Target>
+                <Button
+                  variant="filled"
+                  color="primary"
+                  size="xs"
+                  rightSection={<ArrowUpDownIcon size="1rem" />}
+                >
+                  {t("import_export")}
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>{t("which_action_prompt")}</Menu.Label>
+                <Menu.Item
+                  leftSection={<FileUpIcon size="1rem" />}
+                  onClick={() => setIsImportModalOpen(true)}
+                >
+                  {t("import_a_budget")}
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<FileDownIcon size="1rem" />}
+                  onClick={onExportBudget}
+                  disabled={isExporting}
+                >
+                  {t("export_this_budget")}
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+            <ImportBudgetModal
+              opened={isImportModalOpen}
+              onClose={() => setIsImportModalOpen(false)}
+              currentDate={props.selectedDates[0]!}
+            />
             <AddBudget date={props.selectedDates[0]!} />
           </>
         )}

@@ -21,12 +21,23 @@ import PreviewBudget from "./PreviewBudget/PreviewBudget";
 
 interface ImportBudgetModalProps {
   currentDate: Date;
+  opened?: boolean;
+  onOpen?: () => void;
+  onClose?: () => void;
+  showTrigger?: boolean;
 }
 
 const ImportBudgetModal = ({
   currentDate,
+  opened: externalOpened,
+  onOpen,
+  onClose,
+  showTrigger = false,
 }: ImportBudgetModalProps): React.ReactNode => {
-  const [opened, { open, close }] = useDisclosure(false);
+  const [internalOpened, { open: openInternal, close: closeInternal }] =
+    useDisclosure(false);
+  const isControlled = externalOpened !== undefined;
+  const isOpened = isControlled ? externalOpened : internalOpened;
   const [activeStep, setActiveStep] = React.useState(0);
 
   const { t } = useTranslation();
@@ -58,9 +69,22 @@ const ImportBudgetModal = ({
     setImportedResult({ itemsCount: 0, newCategoriesCount: 0 });
   };
 
+  const handleOpen = () => {
+    resetState();
+    if (isControlled) {
+      onOpen?.();
+    } else {
+      openInternal();
+    }
+  };
+
   const handleClose = () => {
     resetState();
-    close();
+    if (isControlled) {
+      onClose?.();
+    } else {
+      closeInternal();
+    }
   };
 
   const handleTemplateLoaded = (template: IBudgetTemplateExport) => {
@@ -100,10 +124,14 @@ const ImportBudgetModal = ({
             ? resolution.mappedCategory
             : cat.name;
 
+        const effectiveIcon =
+          resolution && resolution.action === "map" ? null : (cat.icon ?? null);
+
         items.push({
           category: effectiveCategoryName,
           limit: cat.limit,
           rolloverEnabled: cat.rolloverEnabled,
+          icon: effectiveIcon,
         });
       }
 
@@ -132,21 +160,20 @@ const ImportBudgetModal = ({
 
   return (
     <>
-      <Button
-        variant="filled"
-        color="primary"
-        size="xs"
-        rightSection={<FileUpIcon size="1rem" />}
-        onClick={() => {
-          resetState();
-          open();
-        }}
-      >
-        {t("import_budget")}
-      </Button>
+      {showTrigger && (
+        <Button
+          variant="filled"
+          color="primary"
+          size="xs"
+          rightSection={<FileUpIcon size="1rem" />}
+          onClick={handleOpen}
+        >
+          {t("import_budget")}
+        </Button>
+      )}
 
       <Modal
-        opened={opened}
+        opened={isOpened}
         onClose={handleClose}
         size="lg"
         title={t("import_budget")}
@@ -181,7 +208,7 @@ const ImportBudgetModal = ({
 
           <Stepper.Step
             label={t("step_3")}
-            description={t("budget_import_categories")}
+            description={t("import")}
           >
             {loadedTemplate && (
               <CategoryMapping

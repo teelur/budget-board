@@ -4,13 +4,12 @@ import {
   Checkbox,
   Group,
   ScrollArea,
-  Select,
   SimpleGrid,
   Stack,
   Table,
   Text,
 } from "@mantine/core";
-import { AmountText, Button } from "@teelur/budget-board-ui";
+import { AmountText, Button, MonthPickerInput } from "@teelur/budget-board-ui";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -42,25 +41,9 @@ const PreviewBudget = ({
   advanceToNext,
 }: PreviewBudgetProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { dayjs, intlLocale } = useLocale();
+  const { dayjs, dayjsLocale, intlLocale } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
-
-  // Generate a list of available months (last 6 months to next 12 months)
-  const monthOptions = React.useMemo(() => {
-    const options: { value: string; label: string }[] = [];
-    const base = dayjs().startOf("month").subtract(6, "month");
-
-    for (let i = 0; i <= 24; i++) {
-      const monthDate = base.add(i, "month");
-      options.push({
-        value: monthDate.format("YYYY-MM-01"),
-        label: monthDate.format("MMMM YYYY"),
-      });
-    }
-
-    return options;
-  }, [dayjs]);
 
   // Calculate totals
   const { totalIncome, totalExpense, totalCategoriesCount } =
@@ -147,16 +130,17 @@ const PreviewBudget = ({
       </SimpleGrid>
 
       <Group justify="space-between" align="flex-end">
-        <Select
+        <MonthPickerInput
           label={t("target_month")}
           description={t("budget_import_target_month_description")}
-          data={monthOptions}
-          value={dayjs(targetMonth).format("YYYY-MM-01")}
+          value={targetMonth}
           onChange={(val) => {
             if (val) {
-              setTargetMonth(dayjs(val).toDate());
+              setTargetMonth(dayjs(val).startOf("month").toDate());
             }
           }}
+          locale={dayjsLocale}
+          valueFormat="MMMM YYYY"
           w={240}
         />
 

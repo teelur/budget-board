@@ -465,6 +465,43 @@ public class BudgetService(
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
         var targetMonth = StartOfMonth(request.Month);
 
+        void ApplyCategoryIcon(string categoryName, string? icon)
+        {
+            if (string.IsNullOrWhiteSpace(icon))
+            {
+                return;
+            }
+
+            var iconValue = icon.Trim();
+            if (iconValue.Length > CategoryIcon.MaxIconLength)
+            {
+                iconValue = iconValue[..CategoryIcon.MaxIconLength];
+            }
+
+            var existingIcon = userData.TransactionCategoryIcons.FirstOrDefault(i =>
+                i.Category.Equals(categoryName, StringComparison.OrdinalIgnoreCase)
+            );
+
+            if (existingIcon != null)
+            {
+                existingIcon.Icon = iconValue;
+            }
+            else
+            {
+                var newIcon = new CategoryIcon
+                {
+                    Category = categoryName,
+                    Icon = iconValue,
+                    UserID = userData.Id,
+                };
+                userDataContext.TransactionCategoryIcons.Add(newIcon);
+                if (!userData.TransactionCategoryIcons.Contains(newIcon))
+                {
+                    userData.TransactionCategoryIcons.Add(newIcon);
+                }
+            }
+        }
+
         // 1. Create any requested new categories that don't exist yet
         if (request.NewCategories != null && request.NewCategories.Count > 0)
         {
@@ -501,24 +538,14 @@ public class BudgetService(
                         UserID = userData.Id,
                     };
                     userDataContext.TransactionCategories.Add(category);
-                    userData.TransactionCategories.Add(category);
+                    if (!userData.TransactionCategories.Contains(category))
+                    {
+                        userData.TransactionCategories.Add(category);
+                    }
 
                     if (!string.IsNullOrWhiteSpace(newCat.Icon))
                     {
-                        var iconValue = newCat.Icon.Trim();
-                        if (iconValue.Length > CategoryIcon.MaxIconLength)
-                        {
-                            iconValue = iconValue[..CategoryIcon.MaxIconLength];
-                        }
-
-                        var icon = new CategoryIcon
-                        {
-                            Category = category.Value,
-                            Icon = iconValue,
-                            UserID = userData.Id,
-                        };
-                        userDataContext.TransactionCategoryIcons.Add(icon);
-                        userData.TransactionCategoryIcons.Add(icon);
+                        ApplyCategoryIcon(category.Value, newCat.Icon);
                     }
                 }
             }
@@ -551,6 +578,11 @@ public class BudgetService(
             )
             {
                 continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(item.Icon))
+            {
+                ApplyCategoryIcon(categoryName, item.Icon);
             }
 
             DateOnly? resolvedRolloverStartMonth = null;
@@ -588,7 +620,11 @@ public class BudgetService(
                     UserID = userData.Id,
                 };
                 userDataContext.Budgets.Add(newBudget);
-                userData.Budgets.Add(newBudget);
+                if (!userData.Budgets.Contains(newBudget))
+                {
+                    userData.Budgets.Add(newBudget);
+                }
+                existingBudgetsForMonth[categoryKey] = newBudget;
             }
         }
 
@@ -605,12 +641,28 @@ public class BudgetService(
                 && b.Month.Year == targetMonth.Year
             );
 
+            var childTotal = GetBudgetChildrenLimit(parent.Value, targetMonth, userData);
+
             if (parentBudget != null)
             {
-                var childTotal = GetBudgetChildrenLimit(parent.Value, targetMonth, userData);
                 if (childTotal > parentBudget.Limit)
                 {
                     parentBudget.Limit = childTotal;
+                }
+            }
+            else if (childTotal > 0)
+            {
+                var newParentBudget = new Budget
+                {
+                    Month = targetMonth,
+                    Category = parent.Value,
+                    Limit = childTotal,
+                    UserID = userData.Id,
+                };
+                userDataContext.Budgets.Add(newParentBudget);
+                if (!userData.Budgets.Contains(newParentBudget))
+                {
+                    userData.Budgets.Add(newParentBudget);
                 }
             }
         }
@@ -729,9 +781,9 @@ public class BudgetService(
 
         List<Budget> childBudgetsForMonth =
         [
-            .. childBudgets.Where(b =>
-                b.Month.Month == monthDate.Month && b.Month.Year == monthDate.Year
-            ),
+            .. childBudgets
+                .Where(b => b.Month.Month == monthDate.Month && b.Month.Year == monthDate.Year)
+                .DistinctBy(b => b.Category.ToLowerInvariant()),
         ];
 
         return childBudgetsForMonth;
