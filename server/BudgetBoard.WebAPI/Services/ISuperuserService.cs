@@ -89,6 +89,21 @@ public interface ISuperuserService
     );
 
     /// <summary>
+    /// Changes the username of the acting superuser or a non-superuser account.
+    /// </summary>
+    /// <param name="targetUserId">The ID of the account whose username to change.</param>
+    /// <param name="request">The new username.</param>
+    /// <param name="actorUserId">The ID of the user performing the operation, for auditing.</param>
+    /// <param name="cancellationToken">A token that can cancel the database operations.</param>
+    /// <returns>The operation result, including the updated user on success.</returns>
+    Task<SuperuserOperationResult> UpdateUsernameAsync(
+        Guid targetUserId,
+        UpdateManagedUserUsernameRequest request,
+        Guid actorUserId,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// Resets the specified user's password and generates a temporary password.
     /// </summary>
     /// <param name="targetUserId">The ID of the user whose password to reset.</param>

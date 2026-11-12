@@ -471,6 +471,108 @@ public sealed class SuperuserService(
     }
 
     /// <inheritdoc />
+    public async Task<SuperuserOperationResult> UpdateUsernameAsync(
+        Guid targetUserId,
+        UpdateManagedUserUsernameRequest request,
+        Guid actorUserId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var username = request.Username?.Trim();
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            return await FailureAsync(
+                "UsernameRequired",
+                "update-username",
+                targetUserId,
+                actorUserId
+            );
+        }
+
+        return await ExecuteInSuperuserStateTransactionAsync(
+            async (transaction, transactionCancellationToken) =>
+            {
+                var target = await userManager.FindByIdAsync(targetUserId.ToString());
+                if (target is null)
+                {
+                    return await FailureAfterRollbackAsync(
+                        transaction,
+                        "UserNotFound",
+                        "update-username",
+                        targetUserId,
+                        actorUserId,
+                        transactionCancellationToken
+                    );
+                }
+
+                var isSuperuser = await userManager.IsInRoleAsync(
+                    target,
+                    SuperuserConstants.RoleName
+                );
+                if (isSuperuser && target.Id != actorUserId)
+                {
+                    return await FailureAfterRollbackAsync(
+                        transaction,
+                        "SuperuserUsernameChangeNotAllowed",
+                        "update-username",
+                        target.Id,
+                        actorUserId,
+                        transactionCancellationToken
+                    );
+                }
+
+                IdentityResult updateResult;
+                try
+                {
+                    updateResult = await userManager.SetUserNameAsync(target, username);
+                }
+                catch (DbUpdateException exception)
+                    when (IdentityUserNameUniqueness.IsDuplicateUserNameViolation(exception))
+                {
+                    return await FailureAfterRollbackAsync(
+                        transaction,
+                        "UsernameAlreadyTaken",
+                        "update-username",
+                        target.Id,
+                        actorUserId,
+                        transactionCancellationToken
+                    );
+                }
+
+                if (!updateResult.Succeeded)
+                {
+                    var errorCode = updateResult.Errors.Any(error =>
+                        error.Code == "DuplicateUserName"
+                    )
+                        ? "UsernameAlreadyTaken"
+                        : "UserUpdateFailed";
+                    return await FailureAfterRollbackAsync(
+                        transaction,
+                        errorCode,
+                        "update-username",
+                        target.Id,
+                        actorUserId,
+                        transactionCancellationToken
+                    );
+                }
+
+                var response = await ToResponseAsync(target, isSuperuser);
+                await AuditAsync(
+                    actorUserId,
+                    target.Id,
+                    "update-username",
+                    true,
+                    null,
+                    transactionCancellationToken
+                );
+                await transaction.CommitAsync(transactionCancellationToken);
+                return SuperuserOperationResult.Success(response);
+            },
+            cancellationToken
+        );
+    }
+
+    /// <inheritdoc />
     public async Task<SuperuserOperationResult> ResetPasswordAsync(
         Guid targetUserId,
         Guid actorUserId,
