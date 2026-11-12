@@ -56,6 +56,29 @@ public sealed class SuperuserController(
         return ToActionResult(result, StatusCodes.Status201Created);
     }
 
+    [HttpPut("users/{userId:guid}/username")]
+    public async Task<IActionResult> UpdateUsername(
+        Guid userId,
+        [FromBody] UpdateManagedUserUsernameRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        var actorId = GetActorId();
+        if (actorId is null)
+        {
+            return Unauthorized();
+        }
+
+        return ToActionResult(
+            await superuserService.UpdateUsernameAsync(
+                userId,
+                request,
+                actorId.Value,
+                cancellationToken
+            )
+        );
+    }
+
     [HttpPost("users/{userId:guid}/reset-password")]
     public async Task<IActionResult> ResetPassword(Guid userId, CancellationToken cancellationToken)
     {
@@ -134,6 +157,7 @@ public sealed class SuperuserController(
             {
                 "UserNotFound" => StatusCodes.Status404NotFound,
                 "UsernameAlreadyTaken" or "EmailAlreadyTaken" => StatusCodes.Status409Conflict,
+                "SuperuserUsernameChangeNotAllowed" => StatusCodes.Status403Forbidden,
                 _ => StatusCodes.Status400BadRequest,
             };
             return Problem(
