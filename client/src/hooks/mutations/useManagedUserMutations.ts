@@ -81,6 +81,19 @@ export const useUpdateManagedUserUsernameMutation = () => {
         return;
       }
 
+      if (
+        typeof responseData === "object" &&
+        responseData !== null &&
+        "detail" in responseData &&
+        responseData.detail === "UsernameTooLong"
+      ) {
+        showNotification({
+          type: NotificationType.Error,
+          message: t("username_too_long"),
+        });
+        return;
+      }
+
       notifyError(error);
     },
   });

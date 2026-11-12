@@ -298,6 +298,29 @@ public sealed class SuperuserServiceTests
     }
 
     [Fact]
+    public async Task UpdateUsernameAsync_RejectsUsernamesLongerThanIdentityLimit()
+    {
+        await using var harness = CreateHarness();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        var target = new ApplicationUser { UserName = "managed" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        (await userManager.CreateAsync(target, "password")).Succeeded.Should().BeTrue();
+
+        var result = await service.UpdateUsernameAsync(
+            target.Id,
+            new UpdateManagedUserUsernameRequest { Username = new string('a', 257) },
+            actor.Id
+        );
+
+        result.Succeeded.Should().BeFalse();
+        result.ErrorCode.Should().Be("UsernameTooLong");
+        (await userManager.FindByNameAsync("managed"))!.Id.Should().Be(target.Id);
+    }
+
+    [Fact]
     public async Task UpdateUsernameAsync_RejectsDuplicateUsernames()
     {
         await using var harness = CreateHarness();

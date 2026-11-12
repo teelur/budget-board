@@ -27,6 +27,7 @@ public sealed class SuperuserService(
 ) : ISuperuserService
 {
     private const int TemporaryPasswordByteLength = 18;
+    private const int MaxUsernameLength = 256;
     private const long SuperuserStateLockKey = 0x4242555341464555L;
 
     /// <inheritdoc />
@@ -483,6 +484,16 @@ public sealed class SuperuserService(
         {
             return await FailureAsync(
                 "UsernameRequired",
+                "update-username",
+                targetUserId,
+                actorUserId
+            );
+        }
+
+        if (username.Length > MaxUsernameLength)
+        {
+            return await FailureAsync(
+                "UsernameTooLong",
                 "update-username",
                 targetUserId,
                 actorUserId

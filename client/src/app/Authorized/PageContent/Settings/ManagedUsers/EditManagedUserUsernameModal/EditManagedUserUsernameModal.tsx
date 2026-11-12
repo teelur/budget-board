@@ -53,6 +53,7 @@ const EditManagedUserUsernameModal = ({
         <TextInput
           {...usernameField.getInputProps()}
           label={t("username")}
+          maxLength={256}
           autoComplete="off"
         />
         <Button

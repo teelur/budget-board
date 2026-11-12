@@ -818,6 +818,7 @@
   "username_or_email": "Username or Email",
   "username_or_email_required_message": "Username or email is required.",
   "username_required_message": "Username is required.",
+  "username_too_long": "Username must be 256 characters or fewer.",
   "validation_code_is_required": "Validation code is required.",
   "validation_errors_occurred_message": "One or more validation errors occurred. Please check your input and try again.",
   "value_history": "Value History",
