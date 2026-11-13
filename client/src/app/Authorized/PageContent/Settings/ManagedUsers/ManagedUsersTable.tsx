@@ -6,7 +6,9 @@ import ManagedUserRow from "./ManagedUserRow";
 
 interface ManagedUsersTableProps {
   users: IManagedUserResponse[];
+  currentUserId?: string;
   isEnablePending: boolean;
+  onEditUsername: (user: IManagedUserResponse) => void;
   onResetPassword: (user: IManagedUserResponse) => void;
   onEnable: (user: IManagedUserResponse) => void;
   onDisable: (user: IManagedUserResponse) => void;
@@ -15,7 +17,9 @@ interface ManagedUsersTableProps {
 
 const ManagedUsersTable = ({
   users,
+  currentUserId,
   isEnablePending,
+  onEditUsername,
   onResetPassword,
   onEnable,
   onDisable,
@@ -39,7 +43,9 @@ const ManagedUsersTable = ({
             <ManagedUserRow
               key={user.id}
               user={user}
+              canEditUsername={user.id === currentUserId || !user.isSuperuser}
               isEnablePending={isEnablePending}
+              onEditUsername={onEditUsername}
               onResetPassword={onResetPassword}
               onEnable={onEnable}
               onDisable={onDisable}

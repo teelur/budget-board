@@ -266,6 +266,131 @@ public sealed class SuperuserServiceTests
     }
 
     [Fact]
+    public async Task UpdateUsernameAsync_UpdatesNonSuperuserUsernameAndAuditsTheChange()
+    {
+        await using var harness = CreateHarness();
+        var dbContext = harness.Services.GetRequiredService<UserDataContext>();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        var target = new ApplicationUser { UserName = "managed" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        (await userManager.CreateAsync(target, "password")).Succeeded.Should().BeTrue();
+
+        var result = await service.UpdateUsernameAsync(
+            target.Id,
+            new UpdateManagedUserUsernameRequest { Username = "renamed-managed" },
+            actor.Id
+        );
+
+        result.Succeeded.Should().BeTrue();
+        result.User!.Username.Should().Be("renamed-managed");
+        (await userManager.FindByNameAsync("managed")).Should().BeNull();
+        (await userManager.FindByNameAsync("renamed-managed"))!.Id.Should().Be(target.Id);
+        (
+            await dbContext.AuthenticationAdminAuditEvents
+                .Where(audit =>
+                    audit.TargetUserId == target.Id && audit.Action == "update-username"
+                )
+                .ToListAsync()
+        ).Should().ContainSingle(audit => audit.Succeeded);
+    }
+
+    [Fact]
+    public async Task UpdateUsernameAsync_RejectsUsernamesLongerThanIdentityLimit()
+    {
+        await using var harness = CreateHarness();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        var target = new ApplicationUser { UserName = "managed" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        (await userManager.CreateAsync(target, "password")).Succeeded.Should().BeTrue();
+
+        var result = await service.UpdateUsernameAsync(
+            target.Id,
+            new UpdateManagedUserUsernameRequest { Username = new string('a', 257) },
+            actor.Id
+        );
+
+        result.Succeeded.Should().BeFalse();
+        result.ErrorCode.Should().Be("UsernameTooLong");
+        (await userManager.FindByNameAsync("managed"))!.Id.Should().Be(target.Id);
+    }
+
+    [Fact]
+    public async Task UpdateUsernameAsync_RejectsDuplicateUsernames()
+    {
+        await using var harness = CreateHarness();
+        var dbContext = harness.Services.GetRequiredService<UserDataContext>();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        var target = new ApplicationUser { UserName = "managed" };
+        var existing = new ApplicationUser { UserName = "existing" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        (await userManager.CreateAsync(target, "password")).Succeeded.Should().BeTrue();
+        (await userManager.CreateAsync(existing, "password")).Succeeded.Should().BeTrue();
+
+        var result = await service.UpdateUsernameAsync(
+            target.Id,
+            new UpdateManagedUserUsernameRequest { Username = "EXISTING" },
+            actor.Id
+        );
+
+        result.Succeeded.Should().BeFalse();
+        result.ErrorCode.Should().Be("UsernameAlreadyTaken");
+        dbContext.ChangeTracker.Clear();
+        (await userManager.FindByIdAsync(target.Id.ToString()))!.UserName.Should().Be("managed");
+        (
+            await dbContext.AuthenticationAdminAuditEvents
+                .Where(audit =>
+                    audit.TargetUserId == target.Id && audit.Action == "update-username"
+                )
+                .ToListAsync()
+        ).Should().ContainSingle(audit => !audit.Succeeded);
+    }
+
+    [Fact]
+    public async Task UpdateUsernameAsync_AllowsSelfButNotAnotherSuperuser()
+    {
+        await using var harness = CreateHarness();
+        var userManager = harness.Services.GetRequiredService<UserManager<ApplicationUser>>();
+        var actor = new ApplicationUser { UserName = "owner" };
+        var otherSuperuser = new ApplicationUser { UserName = "other-owner" };
+        (await userManager.CreateAsync(actor, "password")).Succeeded.Should().BeTrue();
+        var service = harness.Services.GetRequiredService<ISuperuserService>();
+        await service.EnsureRoleAndBootstrapAsync();
+        (await userManager.CreateAsync(otherSuperuser, "password")).Succeeded.Should().BeTrue();
+        (
+            await userManager.AddToRoleAsync(otherSuperuser, SuperuserConstants.RoleName)
+        ).Succeeded.Should().BeTrue();
+
+        var rejectedResult = await service.UpdateUsernameAsync(
+            otherSuperuser.Id,
+            new UpdateManagedUserUsernameRequest { Username = "renamed-other-owner" },
+            actor.Id
+        );
+
+        rejectedResult.Succeeded.Should().BeFalse();
+        rejectedResult.ErrorCode.Should().Be("SuperuserUsernameChangeNotAllowed");
+        (await userManager.FindByNameAsync("other-owner"))!.Id.Should().Be(otherSuperuser.Id);
+
+        var selfResult = await service.UpdateUsernameAsync(
+            actor.Id,
+            new UpdateManagedUserUsernameRequest { Username = "renamed-owner" },
+            actor.Id
+        );
+
+        selfResult.Succeeded.Should().BeTrue();
+        selfResult.User!.IsSuperuser.Should().BeTrue();
+        (await userManager.FindByNameAsync("renamed-owner"))!.Id.Should().Be(actor.Id);
+    }
+
+    [Fact]
     public async Task ResetPasswordAsync_InvalidatesTheOldPasswordAndRequiresChange()
     {
         await using var harness = CreateHarness();
