@@ -48,6 +48,12 @@ public sealed class CreateManagedUserRequest
     public string? Email { get; set; }
 }
 
+public sealed class UpdateManagedUserUsernameRequest
+{
+    [Required]
+    public string Username { get; set; } = string.Empty;
+}
+
 public sealed record ManagedUserResponse(
     Guid Id,
     string Username,
