@@ -17,10 +17,8 @@ const RolloverControl = (props: RolloverControlProps): React.ReactNode => {
   const { t } = useTranslation();
   const { dayjs, dayjsLocale } = useLocale();
 
-  // Rollover accumulates from prior months, so it can never start on the budget's own month.
-  const latestStartMonth = dayjs(props.budgetMonth)
-    .startOf("month")
-    .subtract(1, "month");
+  // Rollover can start on the budget's own month or any prior month.
+  const latestStartMonth = dayjs(props.budgetMonth).startOf("month");
 
   const handleToggle = (checked: boolean) =>
     props.onChange(checked ? latestStartMonth.format("YYYY-MM-DD") : null);
@@ -46,7 +44,9 @@ const RolloverControl = (props: RolloverControlProps): React.ReactNode => {
       {props.rolloverStartMonth !== null && (
         <MonthPickerInput
           value={props.rolloverStartMonth}
-          onChange={(month) => props.onChange(month)}
+          onChange={(month) =>
+            props.onChange(month ? dayjs(month).format("YYYY-MM-DD") : null)
+          }
           maxDate={latestStartMonth.format("YYYY-MM-DD")}
           label={t("roll_over_money_since")}
           locale={dayjsLocale}
