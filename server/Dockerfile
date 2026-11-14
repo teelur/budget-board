@@ -8,8 +8,10 @@ RUN dotnet publish "BudgetBoard.WebAPI/BudgetBoard.WebAPI.csproj" -c $configurat
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends curl \
+RUN for i in 1 2 3; do \
+		apt-get update -o Acquire::ForceIPv4=true -o Acquire::Retries=3 && break || sleep 2; \
+	done \
+	&& apt-get install -y --no-install-recommends -o Acquire::ForceIPv4=true -o Acquire::Retries=3 curl \
 	&& rm -rf /var/lib/apt/lists/*
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "BudgetBoard.WebAPI.dll"]
