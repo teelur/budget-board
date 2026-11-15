@@ -563,7 +563,7 @@
   "recurring_cadence_per_unit": "{{count}} par {{unit}}",
   "recurring_cadence_unsupported": "Fréquence non prise en charge",
   "recurring_cadence_unsupported_edit": "Cette fréquence ne peut pas être modifiée.",
-  "recurring_cadence_week": "Toutes les semaine",
+  "recurring_cadence_week": "Chaque semaine",
   "recurring_cadence_year": "Chaque année",
   "recurring_interval": "Intervalle",
   "recurring_interval_required": "L'intervalle doit être un nombre entier positif.",
