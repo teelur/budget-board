@@ -86,7 +86,7 @@
   "budget_breakdown_received": "Reçu",
   "budget_breakdown_rolled_over": "Report des mois précédents",
   "budget_breakdown_spent": "Dépensé",
-  "budget_breakdown_this_month": "",
+  "budget_breakdown_this_month": "Budget du mois en cours",
   "budget_details": "Détails du budget",
   "budget_left_after_predictions_styled": "<0/> <1>restant après prédictions</1>",
   "budget_left_now_styled": "<0>{{amount}}</0> <1> de budget restant</1>",
