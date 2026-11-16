@@ -6,7 +6,9 @@ import type { IManagedUserResponse } from "~/models/managedUser";
 
 interface ManagedUserRowProps {
   user: IManagedUserResponse;
+  canEditUsername: boolean;
   isEnablePending: boolean;
+  onEditUsername: (user: IManagedUserResponse) => void;
   onResetPassword: (user: IManagedUserResponse) => void;
   onEnable: (user: IManagedUserResponse) => void;
   onDisable: (user: IManagedUserResponse) => void;
@@ -15,7 +17,9 @@ interface ManagedUserRowProps {
 
 const ManagedUserRow = ({
   user,
+  canEditUsername,
   isEnablePending,
+  onEditUsername,
   onResetPassword,
   onEnable,
   onDisable,
@@ -65,6 +69,15 @@ const ManagedUserRow = ({
       </Table.Td>
       <Table.Td>
         <Group gap="0.25rem" wrap="wrap">
+          {canEditUsername && (
+            <Button
+              variant="ghost"
+              size="compact-xs"
+              onClick={() => onEditUsername(user)}
+            >
+              {t("edit_managed_user_username")}
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="compact-xs"

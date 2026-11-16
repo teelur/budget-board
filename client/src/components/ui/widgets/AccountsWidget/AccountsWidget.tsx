@@ -87,6 +87,8 @@ const AccountsWidget = ({
       p={0}
       style={{
         containerType: "inline-size",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Card.Section>
@@ -97,7 +99,19 @@ const AccountsWidget = ({
           </HeadingText>
         </Group>
       </Card.Section>
-      {getAccountsContent()}
+      <Flex
+        w="100%"
+        p={0}
+        direction="column"
+        align="stretch"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
+        }}
+      >
+        {getAccountsContent()}
+      </Flex>
       {settingsOpened !== undefined && onSettingsClose && (
         <AccountsWidgetSettings
           widget={widget}

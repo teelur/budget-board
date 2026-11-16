@@ -75,7 +75,15 @@ const NetWorthWidget = ({
   };
 
   return (
-    <Card w="100%" h="100%" p={0}>
+    <Card
+      w="100%"
+      h="100%"
+      p={0}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Card.Section separatorThickness="thick">
         <Group w="100%" justify="space-between">
           <Group gap="0.25rem">
@@ -86,7 +94,19 @@ const NetWorthWidget = ({
           </Group>
         </Group>
       </Card.Section>
-      {getNetWorthGroups()}
+      <Flex
+        w="100%"
+        p={0}
+        direction="column"
+        align="stretch"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
+        }}
+      >
+        {getNetWorthGroups()}
+      </Flex>
       {settingsOpened !== undefined && onSettingsClose && (
         <NetWorthCardSettings
           widget={widget}

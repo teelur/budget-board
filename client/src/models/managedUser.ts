@@ -3,6 +3,10 @@ export interface ICreateManagedUserRequest {
   email: string | null;
 }
 
+export interface IUpdateManagedUserUsernameRequest {
+  username: string;
+}
+
 export interface IManagedUserResponse {
   id: string;
   username: string;

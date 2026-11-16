@@ -21,6 +21,7 @@ import ManagedUserConfirmationModal, {
   type ManagedUserConfirmation,
 } from "./ManagedUserConfirmationModal";
 import ManagedUsersTable from "./ManagedUsersTable";
+import EditManagedUserUsernameModal from "./EditManagedUserUsernameModal/EditManagedUserUsernameModal";
 import TemporaryPasswordModal, {
   type TemporaryPassword,
 } from "./TemporaryPasswordModal";
@@ -36,6 +37,8 @@ const ManagedUsers = (): React.ReactNode => {
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
   const [confirmation, setConfirmation] =
     React.useState<ManagedUserConfirmation | null>(null);
+  const [editingUser, setEditingUser] =
+    React.useState<IManagedUserResponse | null>(null);
   const [temporaryPassword, setTemporaryPassword] =
     React.useState<TemporaryPassword | null>(null);
 
@@ -119,7 +122,9 @@ const ManagedUsers = (): React.ReactNode => {
       ) : managedUsersQuery.data?.length ? (
         <ManagedUsersTable
           users={managedUsersQuery.data}
+          currentUserId={applicationUserQuery.data?.id}
           isEnablePending={setDisabledMutation.isPending}
+          onEditUsername={setEditingUser}
           onResetPassword={(user: IManagedUserResponse) =>
             setConfirmation({ action: "reset_password", user })
           }
@@ -137,6 +142,13 @@ const ManagedUsers = (): React.ReactNode => {
         <BodyText>{t("no_managed_users")}</BodyText>
       )}
 
+      {editingUser && (
+        <EditManagedUserUsernameModal
+          opened
+          user={editingUser}
+          onClose={() => setEditingUser(null)}
+        />
+      )}
       <CreateManagedUserModal
         opened={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
