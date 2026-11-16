@@ -195,7 +195,7 @@ const CategoryMapping = ({
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>{t("missing_category")}</Table.Th>
-                  <Table.Th>{t("action")}</Table.Th>
+                  <Table.Th>{t("action", "Action")}</Table.Th>
                   <Table.Th>{t("destination")}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -228,9 +228,18 @@ const CategoryMapping = ({
                           )
                         }
                         data={[
-                          { label: t("create_new"), value: "create" },
-                          { label: t("map_existing"), value: "map" },
-                          { label: t("skip"), value: "skip" },
+                          {
+                            label: t("create_new", "Create new"),
+                            value: "create",
+                          },
+                          {
+                            label: t("map_existing", "Map existing"),
+                            value: "map",
+                          },
+                          {
+                            label: t("skip", "Skip"),
+                            value: "skip",
+                          },
                         ]}
                       />
                     </Table.Td>

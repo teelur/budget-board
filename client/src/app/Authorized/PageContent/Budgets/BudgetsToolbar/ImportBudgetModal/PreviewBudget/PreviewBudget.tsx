@@ -52,21 +52,20 @@ const PreviewBudget = ({
       let expense = 0;
       let count = 0;
 
-      const processCategory = (cat: IBudgetTemplateCategoryItem) => {
+      const countCategory = (cat: IBudgetTemplateCategoryItem) => {
         count++;
-        // If it has subcategories, we don't double count if parent limit matches child sum
-        if (cat.subcategories && cat.subcategories.length > 0) {
-          cat.subcategories.forEach(processCategory);
-        } else {
-          if (cat.categoryType.toLowerCase() === "income") {
-            income += cat.limit;
-          } else {
-            expense += cat.limit;
-          }
-        }
+        cat.subcategories?.forEach(countCategory);
       };
 
-      template.categories.forEach(processCategory);
+      template.categories.forEach((cat) => {
+        countCategory(cat);
+
+        if (cat.categoryType.toLowerCase() === "income") {
+          income += cat.limit;
+        } else {
+          expense += cat.limit;
+        }
+      });
 
       return {
         totalIncome: income,

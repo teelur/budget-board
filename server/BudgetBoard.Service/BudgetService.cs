@@ -505,7 +505,11 @@ public class BudgetService(
         // 1. Create any requested new categories that don't exist yet
         if (request.NewCategories != null && request.NewCategories.Count > 0)
         {
-            foreach (var newCat in request.NewCategories)
+            var orderedNewCategories = request
+                .NewCategories.OrderBy(c => string.IsNullOrWhiteSpace(c.Parent) ? 0 : 1)
+                .ToList();
+
+            foreach (var newCat in orderedNewCategories)
             {
                 if (string.IsNullOrWhiteSpace(newCat.Name))
                 {
@@ -524,17 +528,41 @@ public class BudgetService(
                         parentName = string.Empty;
                     }
 
-                    var category = new Category
+                    string resolvedType;
+                    if (!string.IsNullOrEmpty(parentName))
                     {
-                        Value = trimmedName,
-                        Parent = parentName,
-                        CategoryType = string.Equals(
+                        var parentCategory = allCategories.FirstOrDefault(c =>
+                            c.Value.Equals(parentName, StringComparison.OrdinalIgnoreCase)
+                        );
+                        if (parentCategory == null)
+                        {
+                            logger.LogError(
+                                "{LogMessage}",
+                                logLocalizer["TransactionCategoryParentNotFoundLog"]
+                            );
+                            throw new BudgetBoardServiceException(
+                                responseLocalizer["TransactionCategoryParentNotFoundError"]
+                            );
+                        }
+
+                        resolvedType = parentCategory.CategoryType;
+                    }
+                    else
+                    {
+                        resolvedType = string.Equals(
                             newCat.CategoryType,
                             TransactionCategoryTypes.Income,
                             StringComparison.InvariantCultureIgnoreCase
                         )
                             ? TransactionCategoryTypes.Income
-                            : TransactionCategoryTypes.Expense,
+                            : TransactionCategoryTypes.Expense;
+                    }
+
+                    var category = new Category
+                    {
+                        Value = trimmedName,
+                        Parent = parentName,
+                        CategoryType = resolvedType,
                         UserID = userData.Id,
                     };
                     userDataContext.TransactionCategories.Add(category);
@@ -547,6 +575,8 @@ public class BudgetService(
                     {
                         ApplyCategoryIcon(category.Value, newCat.Icon);
                     }
+
+                    allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
                 }
             }
 

@@ -88,7 +88,14 @@ export const validateBudgetTemplateJson = (
 
     const rawType = typeof cat.categoryType === "string" ? cat.categoryType.toLowerCase() : "expense";
     const categoryType = rawType === "income" ? "income" : "expense";
-    const rolloverEnabled = Boolean(cat.rolloverEnabled);
+    let rolloverEnabled = false;
+    if (cat.rolloverEnabled !== undefined) {
+      if (typeof cat.rolloverEnabled !== "boolean") {
+        errors.push(`${path}: 'rolloverEnabled' must be a boolean.`);
+      } else {
+        rolloverEnabled = cat.rolloverEnabled;
+      }
+    }
     const icon = typeof cat.icon === "string" && cat.icon.trim() ? cat.icon.trim() : null;
 
     const subcategories: IBudgetTemplateCategoryItem[] = [];

@@ -2084,6 +2084,73 @@ public class BudgetServiceTests
         paycheckBudget.Should().NotBeNull();
         paycheckBudget!.Limit.Should().Be(3700);
     }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenNewCategoryHasNonexistentParent_ShouldThrowParentNotFoundError()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var targetMonth = new DateOnly(2026, 11, 1);
+        var request = new BudgetImportRequest
+        {
+            Month = targetMonth,
+            OverwriteExisting = true,
+            NewCategories =
+            [
+                new BudgetImportCategoryCreateRequest
+                {
+                    Name = "OrphanChild",
+                    Parent = "NonExistentParentCategory",
+                    CategoryType = TransactionCategoryTypes.Expense,
+                },
+            ],
+            Items = [],
+        };
+
+        // Act & Assert
+        var act = () => budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionCategoryParentNotFoundError");
+    }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenNewCategoryHasValidParent_ShouldInheritParentCategoryType()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+
+        var targetMonth = new DateOnly(2026, 11, 1);
+        var request = new BudgetImportRequest
+        {
+            Month = targetMonth,
+            OverwriteExisting = true,
+            NewCategories =
+            [
+                new BudgetImportCategoryCreateRequest
+                {
+                    Name = "CustomChildIncome",
+                    Parent = "Income", // "Income" is built-in with CategoryType = Income
+                    CategoryType = TransactionCategoryTypes.Expense, // Template says Expense, should be overridden by parent
+                },
+            ],
+            Items = [],
+        };
+
+        // Act
+        await budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+
+        // Assert
+        var createdCategory = helper.UserDataContext.TransactionCategories.FirstOrDefault(c =>
+            c.Value == "CustomChildIncome"
+        );
+        createdCategory.Should().NotBeNull();
+        createdCategory!.Parent.Should().Be("Income");
+        createdCategory.CategoryType.Should().Be(TransactionCategoryTypes.Income);
+    }
     #endregion
 }
 

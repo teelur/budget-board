@@ -100,45 +100,86 @@ const ImportBudgetModal = ({
     const newCategories: IBudgetImportCategoryCreateRequest[] = [];
     const items: IBudgetImportItemRequest[] = [];
 
-    // Collect new categories to create
-    resolutions.forEach((res) => {
-      if (res.action === "create") {
-        newCategories.push({
-          name: res.categoryName,
-          parent: res.parentName,
-          categoryType: res.categoryType,
-          icon: res.icon,
-        });
-      }
-    });
-
-    const processCategory = (cat: IBudgetTemplateCategoryItem) => {
+    const processCategoryNode = (
+      cat: IBudgetTemplateCategoryItem,
+      effectiveParentName: string | null,
+      isAncestorSkipped: boolean,
+    ) => {
       const lower = cat.name.toLowerCase();
       const resolution = resolutions.get(lower);
 
-      if (resolution && resolution.action === "skip") {
-        // Skip this category and its budget limit
+      let currentEffectiveName: string | null = null;
+      let isCurrentSkipped = isAncestorSkipped;
+
+      if (isAncestorSkipped) {
+        // Ancestor was skipped:
+        // Descendants cannot be created under a non-existent parent, so action="create" is skipped.
+        // If explicitly mapped to an existing category, we still import its budget item.
+        if (
+          resolution &&
+          resolution.action === "map" &&
+          resolution.mappedCategory
+        ) {
+          items.push({
+            category: resolution.mappedCategory,
+            limit: cat.limit,
+            rolloverEnabled: cat.rolloverEnabled,
+            icon: null,
+          });
+          currentEffectiveName = resolution.mappedCategory;
+          isCurrentSkipped = false;
+        } else {
+          isCurrentSkipped = true;
+        }
+      } else if (resolution) {
+        if (resolution.action === "skip") {
+          isCurrentSkipped = true;
+        } else if (resolution.action === "map" && resolution.mappedCategory) {
+          items.push({
+            category: resolution.mappedCategory,
+            limit: cat.limit,
+            rolloverEnabled: cat.rolloverEnabled,
+            icon: null,
+          });
+          currentEffectiveName = resolution.mappedCategory;
+        } else if (resolution.action === "create") {
+          newCategories.push({
+            name: resolution.categoryName,
+            parent: effectiveParentName,
+            categoryType: resolution.categoryType,
+            icon: resolution.icon,
+          });
+
+          items.push({
+            category: resolution.categoryName,
+            limit: cat.limit,
+            rolloverEnabled: cat.rolloverEnabled,
+            icon: resolution.icon ?? cat.icon ?? null,
+          });
+          currentEffectiveName = resolution.categoryName;
+        }
       } else {
-        const effectiveCategoryName =
-          resolution && resolution.action === "map" && resolution.mappedCategory
-            ? resolution.mappedCategory
-            : cat.name;
-
-        const effectiveIcon =
-          resolution && resolution.action === "map" ? null : (cat.icon ?? null);
-
+        // Category already exists in the system
         items.push({
-          category: effectiveCategoryName,
+          category: cat.name,
           limit: cat.limit,
           rolloverEnabled: cat.rolloverEnabled,
-          icon: effectiveIcon,
+          icon: cat.icon ?? null,
         });
+        currentEffectiveName = cat.name;
       }
 
-      cat.subcategories?.forEach(processCategory);
+      const nextParentSkipped =
+        isCurrentSkipped && currentEffectiveName === null;
+
+      cat.subcategories?.forEach((sub) => {
+        processCategoryNode(sub, currentEffectiveName, nextParentSkipped);
+      });
     };
 
-    loadedTemplate.categories.forEach(processCategory);
+    loadedTemplate.categories.forEach((cat) => {
+      processCategoryNode(cat, null, false);
+    });
 
     const payload: IBudgetImportRequest = {
       month: dayjs(targetMonth).format("YYYY-MM-01"),
