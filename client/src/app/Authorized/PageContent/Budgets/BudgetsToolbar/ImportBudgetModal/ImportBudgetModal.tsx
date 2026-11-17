@@ -14,6 +14,7 @@ import {
   IMissingCategoryResolution,
 } from "~/models/budgetTemplate";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import CategoryMapping from "./CategoryMapping/CategoryMapping";
 import ImportCompleted from "./ImportCompleted/ImportCompleted";
 import LoadJson from "./LoadJson/LoadJson";
@@ -111,7 +112,17 @@ const ImportBudgetModal = ({
       let currentEffectiveName: string | null = null;
       let isCurrentSkipped = isAncestorSkipped;
 
-      if (isAncestorSkipped) {
+      if (!resolution) {
+        // Existing categories can still be imported even when their template parent is skipped.
+        items.push({
+          category: cat.name,
+          limit: cat.limit,
+          rolloverEnabled: cat.rolloverEnabled,
+          icon: cat.icon ?? null,
+        });
+        currentEffectiveName = cat.name;
+        isCurrentSkipped = false;
+      } else if (isAncestorSkipped) {
         // Ancestor was skipped:
         // Descendants cannot be created under a non-existent parent, so action="create" is skipped.
         // If explicitly mapped to an existing category, we still import its budget item.
@@ -158,15 +169,6 @@ const ImportBudgetModal = ({
           });
           currentEffectiveName = resolution.categoryName;
         }
-      } else {
-        // Category already exists in the system
-        items.push({
-          category: cat.name,
-          limit: cat.limit,
-          rolloverEnabled: cat.rolloverEnabled,
-          icon: cat.icon ?? null,
-        });
-        currentEffectiveName = cat.name;
       }
 
       const nextParentSkipped =
@@ -180,6 +182,25 @@ const ImportBudgetModal = ({
     loadedTemplate.categories.forEach((cat) => {
       processCategoryNode(cat, null, false);
     });
+
+    const seenCategories = new Set<string>();
+    const duplicateCategories = new Set<string>();
+    items.forEach((item) => {
+      const key = item.category.toLowerCase();
+      if (seenCategories.has(key)) {
+        duplicateCategories.add(item.category);
+      }
+      seenCategories.add(key);
+    });
+    if (duplicateCategories.size > 0) {
+      showNotification({
+        message: t("budget_import_duplicate_mapping", {
+          categories: Array.from(duplicateCategories).join(", "),
+        }),
+        type: NotificationType.Error,
+      });
+      return;
+    }
 
     const payload: IBudgetImportRequest = {
       month: dayjs(targetMonth).format("YYYY-MM-01"),

@@ -91,6 +91,15 @@ const CategoryMapping = ({
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [allTransactionCategories]);
 
+  const parentCategoryOptions = React.useMemo(
+    () =>
+      allTransactionCategories
+        .filter((category) => !category.parent)
+        .map((category) => ({ value: category.value, label: category.value }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [allTransactionCategories],
+  );
+
   const missingList = Array.from(resolutions.values());
 
   const handleActionChange = (
@@ -195,7 +204,7 @@ const CategoryMapping = ({
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>{t("missing_category")}</Table.Th>
-                  <Table.Th>{t("action", "Action")}</Table.Th>
+                  <Table.Th>{t("action")}</Table.Th>
                   <Table.Th>{t("destination")}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -229,11 +238,11 @@ const CategoryMapping = ({
                         }
                         data={[
                           {
-                            label: t("create_new", "Create new"),
+                            label: t("create_new"),
                             value: "create",
                           },
                           {
-                            label: t("map_existing", "Map existing"),
+                            label: t("map_existing"),
                             value: "map",
                           },
                           {
@@ -247,8 +256,12 @@ const CategoryMapping = ({
                       {item.action === "map" ? (
                         <Select
                           size="xs"
-                          placeholder={t("select_category")}
-                          data={existingCategoryOptions}
+                          placeholder={t("select_a_category")}
+                          data={
+                            item.parentName
+                              ? existingCategoryOptions
+                              : parentCategoryOptions
+                          }
                           value={item.mappedCategory}
                           onChange={(val) =>
                             handleMappedCategoryChange(

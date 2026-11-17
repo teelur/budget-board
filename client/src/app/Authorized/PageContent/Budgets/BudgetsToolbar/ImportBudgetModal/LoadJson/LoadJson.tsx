@@ -39,13 +39,13 @@ const LoadJson = ({
 
     const maxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
     if (file.size > maxFileSizeBytes) {
-      setErrors(["File size exceeds the 5 MB limit."]);
+      setErrors([t("budget_import_file_too_large")]);
       return;
     }
 
     try {
       const text = await file.text();
-      const result = validateBudgetTemplateJson(text);
+      const result = validateBudgetTemplateJson(text, t);
 
       if (!result.isValid || !result.template) {
         setErrors(result.errors);

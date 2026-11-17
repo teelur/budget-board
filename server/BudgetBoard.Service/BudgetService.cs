@@ -544,6 +544,21 @@ public class BudgetService(
                                 responseLocalizer["TransactionCategoryParentNotFoundError"]
                             );
                         }
+                        if (
+                            !TransactionCategoriesHelpers.GetIsParentCategory(
+                                parentName,
+                                allCategories
+                            )
+                        )
+                        {
+                            logger.LogError(
+                                "{LogMessage}",
+                                logLocalizer["TransactionCategoryParentNotFoundLog"]
+                            );
+                            throw new BudgetBoardServiceException(
+                                responseLocalizer["TransactionCategoryParentNotFoundError"]
+                            );
+                        }
 
                         resolvedType = parentCategory.CategoryType;
                     }
@@ -636,7 +651,18 @@ public class BudgetService(
                 if (request.OverwriteExisting)
                 {
                     existingBudget.Limit = limit;
-                    existingBudget.RolloverStartMonth = resolvedRolloverStartMonth;
+                    foreach (
+                        var categoryBudget in userData.Budgets.Where(b =>
+                            b.Category.Equals(
+                                categoryName,
+                                StringComparison.InvariantCultureIgnoreCase
+                            )
+                            && NormalizeToMonth(b.Month) >= targetMonth
+                        )
+                    )
+                    {
+                        categoryBudget.RolloverStartMonth = resolvedRolloverStartMonth;
+                    }
                 }
             }
             else
@@ -655,6 +681,19 @@ public class BudgetService(
                     userData.Budgets.Add(newBudget);
                 }
                 existingBudgetsForMonth[categoryKey] = newBudget;
+                foreach (
+                    var categoryBudget in userData.Budgets.Where(b =>
+                        !ReferenceEquals(b, newBudget)
+                        && b.Category.Equals(
+                            categoryName,
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                        && NormalizeToMonth(b.Month) >= targetMonth
+                    )
+                )
+                {
+                    categoryBudget.RolloverStartMonth = resolvedRolloverStartMonth;
+                }
             }
         }
 
