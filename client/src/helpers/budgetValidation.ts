@@ -85,8 +85,15 @@ export const validateBudgetTemplateJson = (
       } else {
         limit = cat.limit;
       }
-    } else if (typeof cat.limit === "string" && !isNaN(Number(cat.limit))) {
-      limit = Math.max(0, Number(cat.limit));
+    } else if (typeof cat.limit === "string") {
+      const parsedLimit = Number(cat.limit);
+      if (!Number.isFinite(parsedLimit)) {
+        errors.push(t("budget_import_validation_limit_number", { path }));
+      } else if (parsedLimit < 0) {
+        errors.push(t("budget_import_validation_limit_nonnegative", { path }));
+      } else {
+        limit = parsedLimit;
+      }
     } else if (cat.limit !== undefined) {
       errors.push(t("budget_import_validation_limit_number", { path }));
     }
