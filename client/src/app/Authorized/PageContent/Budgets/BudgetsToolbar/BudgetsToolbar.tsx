@@ -1,4 +1,4 @@
-import { Group, Stack } from "@mantine/core";
+import { Group, Menu, Stack } from "@mantine/core";
 import { Button, MonthToolcards } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
@@ -11,7 +11,12 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
-import { ListChecksIcon } from "lucide-react";
+import { ArrowUpDownIcon, FileDownIcon, FileUpIcon, ListChecksIcon } from "lucide-react";
+import { useAuth } from "~/providers/AuthProvider/AuthProvider";
+import { translateAxiosError } from "~/helpers/requests";
+import { downloadBudgetTemplateJson } from "~/helpers/budgetExport";
+import { IBudgetTemplateExport } from "~/models/budgetTemplate";
+import ImportBudgetModal from "./ImportBudgetModal/ImportBudgetModal";
 
 interface BudgetsToolbarProps {
   selectedDates: Date[];
@@ -23,10 +28,43 @@ interface BudgetsToolbarProps {
 
 const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
   const [canSelectMultiple, { toggle }] = useDisclosure(false);
+  const [isExporting, setIsExporting] = React.useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
 
   const { t } = useTranslation();
   const { dayjs, dayjsLocale } = useLocale();
+  const { request } = useAuth();
   const createBudgetMutation = useCreateBudgetMutation({ isCopying: true });
+
+  const onExportBudget = async (): Promise<void> => {
+    if (props.selectedDates.length !== 1) {
+      return;
+    }
+
+    const monthDate = props.selectedDates[0]!;
+    const monthStr = dayjs(monthDate).format("YYYY-MM-01");
+
+    try {
+      setIsExporting(true);
+      const response = await request({
+        url: "/api/budget/export",
+        method: "GET",
+        params: { month: monthStr },
+      });
+
+      downloadBudgetTemplateJson(
+        response.data as IBudgetTemplateExport,
+        dayjs(monthDate).format("YYYY-MM"),
+      );
+    } catch (error) {
+      showNotification({
+        message: translateAxiosError(error as import("axios").AxiosError),
+        type: NotificationType.Error,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const getMonthStatus = React.useCallback(
     (date: Date) => getMonthToolcardStatus(props.timeToMonthlyTotalsMap, date),
@@ -125,11 +163,47 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
           </Button>
         )}
         {props.selectedDates.length === 1 && (
-          <AddBudget date={props.selectedDates[0]!} />
+          <>
+            <Menu shadow="md" width={220} position="bottom-end">
+              <Menu.Target>
+                <Button
+                  variant="filled"
+                  color="primary"
+                  size="xs"
+                  rightSection={<ArrowUpDownIcon size="1rem" />}
+                >
+                  {t("import_export")}
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>{t("which_action_prompt")}</Menu.Label>
+                <Menu.Item
+                  leftSection={<FileUpIcon size="1rem" />}
+                  onClick={() => setIsImportModalOpen(true)}
+                >
+                  {t("import_a_budget")}
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<FileDownIcon size="1rem" />}
+                  onClick={onExportBudget}
+                  disabled={isExporting}
+                >
+                  {t("export_this_budget")}
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+            <ImportBudgetModal
+              opened={isImportModalOpen}
+              onClose={() => setIsImportModalOpen(false)}
+              currentDate={props.selectedDates[0]!}
+            />
+            <AddBudget date={props.selectedDates[0]!} />
+          </>
         )}
       </Group>
     </Stack>
   );
 };
+
 
 export default BudgetsToolbar;
