@@ -1,5 +1,4 @@
-import { Modal, Stepper } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, Modal, Stepper } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { FileUpIcon } from "lucide-react";
 import React from "react";
@@ -48,7 +47,8 @@ const ImportBudgetModal = ({
   const [loadedTemplate, setLoadedTemplate] =
     React.useState<IBudgetTemplateExport | null>(null);
   const [targetMonth, setTargetMonth] = React.useState<Date>(currentDate);
-  const [overwriteExisting, setOverwriteExisting] = React.useState<boolean>(true);
+  const [overwriteExisting, setOverwriteExisting] =
+    React.useState<boolean>(true);
   const [resolutions, setResolutions] = React.useState<
     Map<string, IMissingCategoryResolution>
   >(new Map());
@@ -233,7 +233,6 @@ const ImportBudgetModal = ({
           {t("import_budget")}
         </Button>
       )}
-
       <Modal
         opened={isOpened}
         onClose={handleClose}
@@ -250,7 +249,6 @@ const ImportBudgetModal = ({
               launchNextDialog={() => setActiveStep(1)}
             />
           </Stepper.Step>
-
           <Stepper.Step
             label={t("step_2")}
             description={t("budget_import_preview")}
@@ -267,11 +265,7 @@ const ImportBudgetModal = ({
               />
             )}
           </Stepper.Step>
-
-          <Stepper.Step
-            label={t("step_3")}
-            description={t("import")}
-          >
+          <Stepper.Step label={t("step_3")} description={t("import")}>
             {loadedTemplate && (
               <CategoryMapping
                 template={loadedTemplate}
@@ -283,7 +277,6 @@ const ImportBudgetModal = ({
               />
             )}
           </Stepper.Step>
-
           <Stepper.Completed>
             <ImportCompleted
               importedCount={importedResult.itemsCount}

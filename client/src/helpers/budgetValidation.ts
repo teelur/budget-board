@@ -99,6 +99,15 @@ export const validateBudgetTemplateJson = (
     }
 
     const rawType = typeof cat.categoryType === "string" ? cat.categoryType.toLowerCase() : "expense";
+    if (
+      typeof cat.categoryType === "string" &&
+      rawType !== "income" &&
+      rawType !== "expense"
+    ) {
+      warnings.push(
+        t("budget_import_validation_category_type_defaulted", { path }),
+      );
+    }
     const categoryType = rawType === "income" ? "income" : "expense";
     let rolloverEnabled = false;
     if (cat.rolloverEnabled !== undefined) {

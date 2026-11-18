@@ -1,19 +1,18 @@
+import { Group, ScrollArea, Stack } from "@mantine/core";
 import {
   Alert,
-  Group,
-  ScrollArea,
+  BodyText,
+  Button,
   SegmentedControl,
   Select,
-  Stack,
   Table,
-  Text,
-} from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+} from "@teelur/budget-board-ui";
 import {
   AlertCircleIcon,
-  ArrowLeftIcon,
   CheckCircle2Icon,
   CheckIcon,
+  MoveLeftIcon,
+  TagIcon,
 } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -148,41 +147,36 @@ const CategoryMapping = ({
   );
 
   return (
-    <Stack gap="1rem" w={780} maw="100%" mx="auto" pt="0.5rem">
+    <Stack gap="1rem">
       {missingList.length === 0 ? (
         <Alert
           icon={<CheckCircle2Icon size={16} />}
           title={t("budget_import_all_categories_exist_title")}
-          color="green"
+          color="success"
           variant="light"
         >
-          <Text size="sm">
-            {t("budget_import_all_categories_exist_message")}
-          </Text>
+          {t("budget_import_all_categories_exist_message")}
         </Alert>
       ) : (
         <>
           <Alert
             icon={<AlertCircleIcon size={16} />}
             title={t("budget_import_missing_categories_title")}
-            color="yellow"
+            color="warning"
             variant="light"
           >
-            <Text size="sm">
-              {t("budget_import_missing_categories_description", {
-                count: missingList.length,
-              })}
-            </Text>
+            {t("budget_import_missing_categories_description", {
+              count: missingList.length,
+            })}
           </Alert>
-
           <Group justify="space-between" align="center">
-            <Text size="xs" c="dimmed">
+            <BodyText tone="secondary" size="xs">
               {t("budget_import_quick_actions")}:
-            </Text>
+            </BodyText>
             <Group gap="0.5rem">
               <Button
                 variant="outline"
-                color="secondary"
+                color="primary"
                 size="compact-xs"
                 onClick={() => setAllActions("create")}
               >
@@ -190,7 +184,7 @@ const CategoryMapping = ({
               </Button>
               <Button
                 variant="outline"
-                color="secondary"
+                color="muted"
                 size="compact-xs"
                 onClick={() => setAllActions("skip")}
               >
@@ -213,15 +207,19 @@ const CategoryMapping = ({
                   <Table.Tr key={item.categoryName}>
                     <Table.Td>
                       <Group gap="0.35rem">
-                        <span>{item.icon || "🏷️"}</span>
+                        {item.icon ? (
+                          <span>{item.icon}</span>
+                        ) : (
+                          <TagIcon size={16} aria-hidden="true" />
+                        )}
                         <Stack gap={0}>
-                          <Text size="sm" fw={500}>
+                          <BodyText size="xs" fw={500}>
                             {item.categoryName}
-                          </Text>
+                          </BodyText>
                           {item.parentName && (
-                            <Text size="xs" c="dimmed">
+                            <BodyText tone="secondary" size="xs">
                               {t("parent")}: {item.parentName}
-                            </Text>
+                            </BodyText>
                           )}
                         </Stack>
                       </Group>
@@ -246,10 +244,11 @@ const CategoryMapping = ({
                             value: "map",
                           },
                           {
-                            label: t("skip", "Skip"),
+                            label: t("skip"),
                             value: "skip",
                           },
                         ]}
+                        aria-label={t("select_action")}
                       />
                     </Table.Td>
                     <Table.Td>
@@ -273,13 +272,13 @@ const CategoryMapping = ({
                           error={!item.mappedCategory}
                         />
                       ) : item.action === "create" ? (
-                        <Text size="xs" c="green">
+                        <BodyText tone="primary" size="xs">
                           {t("will_be_created")}
-                        </Text>
+                        </BodyText>
                       ) : (
-                        <Text size="xs" c="dimmed">
+                        <BodyText tone="secondary" size="xs">
                           {t("will_be_skipped")}
-                        </Text>
+                        </BodyText>
                       )}
                     </Table.Td>
                   </Table.Tr>
@@ -289,12 +288,13 @@ const CategoryMapping = ({
           </ScrollArea>
         </>
       )}
-
-      <Group justify="space-between" mt="1rem">
+      <Group w="100%">
         <Button
-          variant="outline"
-          color="secondary"
-          leftSection={<ArrowLeftIcon size={16} />}
+          variant="filled"
+          color="primary"
+          size="compact-sm"
+          flex="1 1 auto"
+          leftSection={<MoveLeftIcon size={16} />}
           onClick={goBack}
           disabled={isSubmitting}
         >
@@ -303,6 +303,8 @@ const CategoryMapping = ({
         <Button
           variant="filled"
           color="primary"
+          size="compact-sm"
+          flex="1 1 auto"
           leftSection={<CheckIcon size={16} />}
           onClick={onSubmit}
           loading={isSubmitting}
