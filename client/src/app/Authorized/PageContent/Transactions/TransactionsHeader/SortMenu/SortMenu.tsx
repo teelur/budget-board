@@ -1,7 +1,7 @@
 import classes from "./SortMenu.module.css";
 
-import { Flex, Group, Menu } from "@mantine/core";
-import { BodyText, Button } from "@teelur/budget-board-ui";
+import { Flex, Group } from "@mantine/core";
+import { BodyText, Button, Menu } from "@teelur/budget-board-ui";
 import {
   ArrowDownIcon,
   ArrowUpDownIcon,
@@ -91,13 +91,14 @@ const SortMenu = (props: SortMenuProps): React.ReactNode => {
                 key={sortOption.value}
                 leftSection={isSelected ? <CheckIcon size="1rem" /> : null}
                 rightSection={
-                  !isSelected
-                    ? null
-                    : props.sortDirection === SortDirection.Ascending
-                      ? <ArrowUpIcon size="1rem" />
-                      : props.sortDirection === SortDirection.Decending
-                        ? <ArrowDownIcon size="1rem" />
-                        : <ArrowUpDownIcon size="1rem" />
+                  !isSelected ? null : props.sortDirection ===
+                    SortDirection.Ascending ? (
+                    <ArrowUpIcon size="1rem" />
+                  ) : props.sortDirection === SortDirection.Decending ? (
+                    <ArrowDownIcon size="1rem" />
+                  ) : (
+                    <ArrowUpDownIcon size="1rem" />
+                  )
                 }
                 onClick={() => handleSortClick(sortOption)}
               >
