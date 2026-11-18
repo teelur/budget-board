@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import {
   IBudgetTemplateCategoryItem,
   IBudgetTemplateExport,
@@ -6,6 +7,7 @@ import {
 
 export const validateBudgetTemplateJson = (
   jsonText: string,
+  t: TFunction,
 ): IBudgetValidationResult => {
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -18,8 +20,8 @@ export const validateBudgetTemplateJson = (
       isValid: false,
       errors: [
         err instanceof Error
-          ? `Invalid JSON syntax: ${err.message}`
-          : "Invalid JSON syntax.",
+          ? t("budget_import_validation_invalid_json", { message: err.message })
+          : t("budget_import_validation_invalid_json_generic"),
       ],
       warnings: [],
     };
@@ -28,7 +30,7 @@ export const validateBudgetTemplateJson = (
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
     return {
       isValid: false,
-      errors: ["JSON root must be an object containing a 'categories' list."],
+      errors: [t("budget_import_validation_root_object")],
       warnings: [],
     };
   }
@@ -38,13 +40,13 @@ export const validateBudgetTemplateJson = (
   if (!Array.isArray(root.categories)) {
     return {
       isValid: false,
-      errors: ["Missing or invalid 'categories' array in budget template."],
+      errors: [t("budget_import_validation_categories_array")],
       warnings: [],
     };
   }
 
   if (root.categories.length === 0) {
-    warnings.push("The imported template contains no categories.");
+    warnings.push(t("budget_import_validation_empty_categories"));
   }
 
   const seenCategoryNames = new Set<string>();
@@ -55,7 +57,7 @@ export const validateBudgetTemplateJson = (
     isSubcategory: boolean,
   ): IBudgetTemplateCategoryItem | null => {
     if (typeof item !== "object" || item === null || Array.isArray(item)) {
-      errors.push(`${path}: Category entry must be an object.`);
+      errors.push(t("budget_import_validation_category_object", { path }));
       return null;
     }
 
@@ -63,35 +65,54 @@ export const validateBudgetTemplateJson = (
     const name = typeof cat.name === "string" ? cat.name.trim() : "";
 
     if (!name) {
-      errors.push(`${path}: 'name' is required and cannot be empty.`);
+      errors.push(t("budget_import_validation_name_required", { path }));
     } else {
       const lowerName = name.toLowerCase();
       if (seenCategoryNames.has(lowerName)) {
-        errors.push(`${path}: Duplicate category name '${name}' found in template.`);
+        errors.push(
+          t("budget_import_validation_duplicate_category", { path, name }),
+        );
       } else {
         seenCategoryNames.add(lowerName);
       }
     }
 
     let limit = 0;
+    const limitWasOmitted = cat.limit === undefined;
     if (typeof cat.limit === "number") {
       if (isNaN(cat.limit) || cat.limit < 0) {
-        errors.push(`${path}: 'limit' must be a non-negative number.`);
+        errors.push(t("budget_import_validation_limit_nonnegative", { path }));
       } else {
         limit = cat.limit;
       }
-    } else if (typeof cat.limit === "string" && !isNaN(Number(cat.limit))) {
-      limit = Math.max(0, Number(cat.limit));
+    } else if (typeof cat.limit === "string") {
+      const parsedLimit = Number(cat.limit);
+      if (!Number.isFinite(parsedLimit)) {
+        errors.push(t("budget_import_validation_limit_number", { path }));
+      } else if (parsedLimit < 0) {
+        errors.push(t("budget_import_validation_limit_nonnegative", { path }));
+      } else {
+        limit = parsedLimit;
+      }
     } else if (cat.limit !== undefined) {
-      errors.push(`${path}: 'limit' must be a valid number.`);
+      errors.push(t("budget_import_validation_limit_number", { path }));
     }
 
     const rawType = typeof cat.categoryType === "string" ? cat.categoryType.toLowerCase() : "expense";
+    if (
+      typeof cat.categoryType === "string" &&
+      rawType !== "income" &&
+      rawType !== "expense"
+    ) {
+      warnings.push(
+        t("budget_import_validation_category_type_defaulted", { path }),
+      );
+    }
     const categoryType = rawType === "income" ? "income" : "expense";
     let rolloverEnabled = false;
     if (cat.rolloverEnabled !== undefined) {
       if (typeof cat.rolloverEnabled !== "boolean") {
-        errors.push(`${path}: 'rolloverEnabled' must be a boolean.`);
+        errors.push(t("budget_import_validation_rollover_boolean", { path }));
       } else {
         rolloverEnabled = cat.rolloverEnabled;
       }
@@ -101,7 +122,7 @@ export const validateBudgetTemplateJson = (
     const subcategories: IBudgetTemplateCategoryItem[] = [];
     if (Array.isArray(cat.subcategories)) {
       if (isSubcategory && cat.subcategories.length > 0) {
-        errors.push(`${path}: Nested subcategories beyond 1 level are not supported.`);
+        errors.push(t("budget_import_validation_nested_subcategories", { path }));
       } else {
         cat.subcategories.forEach((sub, idx) => {
           const validSub = validateCategoryItem(
@@ -114,6 +135,9 @@ export const validateBudgetTemplateJson = (
           }
         });
       }
+    }
+    if (limitWasOmitted) {
+      limit = subcategories.reduce((total, subcategory) => total + subcategory.limit, 0);
     }
 
     return {
@@ -136,7 +160,10 @@ export const validateBudgetTemplateJson = (
 
   const template: IBudgetTemplateExport = {
     version: typeof root.version === "number" ? root.version : 1,
-    name: typeof root.name === "string" && root.name.trim() ? root.name.trim() : "Imported Budget",
+    name:
+      typeof root.name === "string" && root.name.trim()
+        ? root.name.trim()
+        : t("budget_import_default_template_name"),
     exportedAt:
       typeof root.exportedAt === "string" && root.exportedAt.trim()
         ? root.exportedAt

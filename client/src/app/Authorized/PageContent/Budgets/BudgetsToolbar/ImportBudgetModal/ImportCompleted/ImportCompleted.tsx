@@ -1,6 +1,5 @@
-import { Group, Stack, Text, ThemeIcon } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
-import { CheckCircle2Icon } from "lucide-react";
+import { Group, Stack } from "@mantine/core";
+import { BodyText, Button } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -22,33 +21,34 @@ const ImportCompleted = ({
   const { dayjs } = useLocale();
 
   return (
-    <Stack align="center" gap="1rem" py="2rem" w={500} maw="100%" mx="auto">
-      <ThemeIcon color="green" size={60} radius="xl" variant="light">
-        <CheckCircle2Icon size={36} />
-      </ThemeIcon>
-
+    <Stack align="center" gap="1rem" maw="100%">
       <Stack align="center" gap="0.25rem">
-        <Text size="lg" fw={600}>
+        <BodyText size="lg" fw={600}>
           {t("budget_import_success_title")}
-        </Text>
-        <Text size="sm" c="dimmed" ta="center">
+        </BodyText>
+        <BodyText size="sm" tone="secondary" ta="center">
           {t("budget_import_success_description", {
             count: importedCount,
             month: dayjs(targetMonth).format("MMMM YYYY"),
           })}
-        </Text>
+        </BodyText>
         {newCategoriesCount > 0 && (
-          <Text size="xs" c="dimmed" ta="center">
+          <BodyText size="xs" tone="secondary" ta="center">
             {t("budget_import_new_categories_created", {
               count: newCategoriesCount,
             })}
-          </Text>
+          </BodyText>
         )}
       </Stack>
-
-      <Group justify="center" mt="1rem">
-        <Button variant="filled" color="primary" onClick={closeModal}>
-          {t("done")}
+      <Group w="100%">
+        <Button
+          variant="filled"
+          color="primary"
+          size="compact-sm"
+          flex="1 1 auto"
+          onClick={closeModal}
+        >
+          {t("close")}
         </Button>
       </Group>
     </Stack>
