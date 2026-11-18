@@ -37,6 +37,7 @@ public class BudgetImportItemRequest
 public class BudgetImportRequest
 {
     public DateOnly Month { get; set; }
+    [System.ComponentModel.DataAnnotations.Required]
     public List<BudgetImportItemRequest> Items { get; set; } = [];
     public List<BudgetImportCategoryCreateRequest> NewCategories { get; set; } = [];
     public bool OverwriteExisting { get; set; } = true;
