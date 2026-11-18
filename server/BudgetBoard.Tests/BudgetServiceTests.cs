@@ -1927,6 +1927,87 @@ public class BudgetServiceTests
     }
 
     [Fact]
+    public async Task ImportBudgetAsync_WhenItemsContainNull_ShouldRejectBeforeSavingCategories()
+    {
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+        var request = new BudgetImportRequest
+        {
+            Month = new DateOnly(2026, 11, 1),
+            NewCategories =
+            [
+                new BudgetImportCategoryCreateRequest
+                {
+                    Name = "UnsavedCategory",
+                    CategoryType = TransactionCategoryTypes.Expense,
+                },
+            ],
+            Items = [null!],
+        };
+
+        var act = () => budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+
+        await act.Should().ThrowAsync<BudgetBoardServiceException>();
+        helper.UserDataContext.TransactionCategories.Should()
+            .NotContain(category => category.Value == "UnsavedCategory");
+    }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenNewCategoriesContainNull_ShouldRejectRequest()
+    {
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+        var request = new BudgetImportRequest
+        {
+            Month = new DateOnly(2026, 11, 1),
+            NewCategories = [null!],
+            Items = [],
+        };
+
+        var act = () => budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+
+        await act.Should().ThrowAsync<BudgetBoardServiceException>();
+    }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenItemCategoryIsUnknown_ShouldRejectBeforeSavingCategories()
+    {
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+        var request = new BudgetImportRequest
+        {
+            Month = new DateOnly(2026, 11, 1),
+            NewCategories =
+            [
+                new BudgetImportCategoryCreateRequest
+                {
+                    Name = "ValidNewCategory",
+                    CategoryType = TransactionCategoryTypes.Expense,
+                },
+            ],
+            Items =
+            [
+                new BudgetImportItemRequest
+                {
+                    Category = "UnknownCategory",
+                    Limit = 100,
+                },
+            ],
+        };
+
+        var act = () => budgetService.ImportBudgetAsync(helper.demoUser.Id, request);
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("BudgetCreateCategoryNotFoundError [UnknownCategory]");
+        helper.UserDataContext.TransactionCategories.Should()
+            .NotContain(category => category.Value == "ValidNewCategory");
+        helper.UserDataContext.Budgets.Should().NotContain(budget =>
+            budget.Category == "UnknownCategory"
+        );
+    }
+
+    [Fact]
     public async Task ImportBudgetAsync_WhenRolloverAlreadyActive_ShouldPreserveRolloverStartMonth()
     {
         // Arrange
@@ -2083,6 +2164,83 @@ public class BudgetServiceTests
         );
         paycheckBudget.Should().NotBeNull();
         paycheckBudget!.Limit.Should().Be(3700);
+    }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenNotOverwriting_ShouldPreserveExistingParentLimit()
+    {
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+        var targetMonth = new DateOnly(2026, 11, 1);
+        helper.UserDataContext.Budgets.AddRange(
+            new Budget
+            {
+                Category = "Income",
+                Limit = 100,
+                Month = targetMonth,
+                UserID = helper.demoUser.Id,
+            },
+            new Budget
+            {
+                Category = "Paycheck",
+                Limit = 75,
+                Month = targetMonth,
+                UserID = helper.demoUser.Id,
+            }
+        );
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await budgetService.ImportBudgetAsync(
+            helper.demoUser.Id,
+            new BudgetImportRequest
+            {
+                Month = targetMonth,
+                OverwriteExisting = false,
+                Items =
+                [
+                    new BudgetImportItemRequest
+                    {
+                        Category = "Bonus",
+                        Limit = 75,
+                    },
+                ],
+            }
+        );
+
+        helper.UserDataContext.Budgets
+            .Single(b => b.Category == "Income" && b.Month == targetMonth)
+            .Limit.Should()
+            .Be(100);
+    }
+
+    [Fact]
+    public async Task ImportBudgetAsync_WhenNotOverwritingAndParentIsMissing_ShouldCreateParentBudget()
+    {
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+        var targetMonth = new DateOnly(2026, 11, 1);
+
+        await budgetService.ImportBudgetAsync(
+            helper.demoUser.Id,
+            new BudgetImportRequest
+            {
+                Month = targetMonth,
+                OverwriteExisting = false,
+                Items =
+                [
+                    new BudgetImportItemRequest
+                    {
+                        Category = "Paycheck",
+                        Limit = 200,
+                    },
+                ],
+            }
+        );
+
+        helper.UserDataContext.Budgets
+            .Single(b => b.Category == "Income" && b.Month == targetMonth)
+            .Limit.Should()
+            .Be(200);
     }
 
     [Fact]

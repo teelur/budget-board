@@ -5,6 +5,7 @@ import {
   Button,
   SegmentedControl,
   Select,
+  Skeleton,
   Table,
 } from "@teelur/budget-board-ui";
 import {
@@ -44,10 +45,15 @@ const CategoryMapping = ({
   isSubmitting,
 }: CategoryMappingProps): React.ReactNode => {
   const { t } = useTranslation();
-  const { allTransactionCategories } = useTransactionCategories();
+  const { allTransactionCategories, isPending: areCategoriesPending } =
+    useTransactionCategories();
 
   // Find all categories in template that do not exist in allTransactionCategories
   React.useEffect(() => {
+    if (areCategoriesPending) {
+      return;
+    }
+
     const existingCategoryNames = new Set(
       allTransactionCategories.map((c) => c.value.toLowerCase()),
     );
@@ -79,7 +85,13 @@ const CategoryMapping = ({
     if (resolutions.size === 0 && initialResolutions.size > 0) {
       setResolutions(initialResolutions);
     }
-  }, [allTransactionCategories, template, resolutions.size, setResolutions]);
+  }, [
+    allTransactionCategories,
+    areCategoriesPending,
+    template,
+    resolutions.size,
+    setResolutions,
+  ]);
 
   const existingCategoryOptions = React.useMemo(() => {
     return allTransactionCategories
@@ -148,7 +160,9 @@ const CategoryMapping = ({
 
   return (
     <Stack gap="1rem">
-      {missingList.length === 0 ? (
+      {areCategoriesPending ? (
+        <Skeleton h={280} />
+      ) : missingList.length === 0 ? (
         <Alert
           icon={<CheckCircle2Icon size={16} />}
           title={t("budget_import_all_categories_exist_title")}
@@ -308,7 +322,7 @@ const CategoryMapping = ({
           leftSection={<CheckIcon size={16} />}
           onClick={onSubmit}
           loading={isSubmitting}
-          disabled={!isMappingValid}
+          disabled={areCategoriesPending || !isMappingValid}
         >
           {t("import_budget")}
         </Button>
