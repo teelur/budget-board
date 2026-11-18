@@ -130,7 +130,7 @@ const PreviewBudget = ({
         <MonthPickerInput
           label={t("target_month")}
           description={t("budget_import_target_month_description")}
-          value={targetMonth}
+          value={dayjs(targetMonth).format("YYYY-MM-DD")}
           onChange={(val) => {
             if (val) {
               setTargetMonth(dayjs(val).startOf("month").toDate());

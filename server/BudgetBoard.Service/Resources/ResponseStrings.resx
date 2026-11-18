@@ -190,6 +190,12 @@
     <data name="BudgetCreateDuplicateError" xml:space="preserve">
         <value>A budget with the category '{0}' and date '{1}' already exists.</value>
     </data>
+    <data name="BudgetImportItemsNullError" xml:space="preserve">
+        <value>Budget import items cannot contain null entries.</value>
+    </data>
+    <data name="BudgetImportNewCategoriesNullError" xml:space="preserve">
+        <value>Budget import new categories cannot contain null entries.</value>
+    </data>
     <data name="BudgetNotFoundError" xml:space="preserve">
         <value>The budget you are trying to access does not exist.</value>
     </data>
