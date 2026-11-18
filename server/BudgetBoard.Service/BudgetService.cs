@@ -681,18 +681,21 @@ public class BudgetService(
                     userData.Budgets.Add(newBudget);
                 }
                 existingBudgetsForMonth[categoryKey] = newBudget;
-                foreach (
-                    var categoryBudget in userData.Budgets.Where(b =>
-                        !ReferenceEquals(b, newBudget)
-                        && b.Category.Equals(
-                            categoryName,
-                            StringComparison.InvariantCultureIgnoreCase
-                        )
-                        && NormalizeToMonth(b.Month) >= targetMonth
-                    )
-                )
+                if (request.OverwriteExisting)
                 {
-                    categoryBudget.RolloverStartMonth = resolvedRolloverStartMonth;
+                    foreach (
+                        var categoryBudget in userData.Budgets.Where(b =>
+                            !ReferenceEquals(b, newBudget)
+                            && b.Category.Equals(
+                                categoryName,
+                                StringComparison.InvariantCultureIgnoreCase
+                            )
+                            && NormalizeToMonth(b.Month) >= targetMonth
+                        )
+                    )
+                    {
+                        categoryBudget.RolloverStartMonth = resolvedRolloverStartMonth;
+                    }
                 }
             }
         }

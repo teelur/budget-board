@@ -2200,6 +2200,56 @@ public class BudgetServiceTests
             .NotContain(category => category.Value == "NestedChild");
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ImportBudgetAsync_WhenCreatingTargetBudgetWithoutOverwrite_ShouldNotUpdateLaterMonths(
+        bool rolloverEnabled
+    )
+    {
+        var helper = new TestHelper();
+        var budgetService = CreateBudgetService(helper);
+        var targetMonth = new DateOnly(2026, 11, 1);
+        var futureMonth = new DateOnly(2026, 12, 1);
+        var originalRolloverStartMonth = rolloverEnabled ? (DateOnly?)null : targetMonth;
+        var futureBudget = new Budget
+        {
+            Category = "Utilities",
+            Limit = 200,
+            Month = futureMonth,
+            RolloverStartMonth = originalRolloverStartMonth,
+            UserID = helper.demoUser.Id,
+        };
+        helper.UserDataContext.Budgets.Add(futureBudget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await budgetService.ImportBudgetAsync(
+            helper.demoUser.Id,
+            new BudgetImportRequest
+            {
+                Month = targetMonth,
+                OverwriteExisting = false,
+                Items =
+                [
+                    new BudgetImportItemRequest
+                    {
+                        Category = "Utilities",
+                        Limit = 250,
+                        RolloverEnabled = rolloverEnabled,
+                    },
+                ],
+            }
+        );
+
+        futureBudget.RolloverStartMonth.Should().Be(originalRolloverStartMonth);
+        helper
+            .UserDataContext.Budgets.Single(b =>
+                b.Category == "Utilities" && b.Month == targetMonth
+            )
+            .RolloverStartMonth.Should()
+            .Be(rolloverEnabled ? targetMonth : null);
+    }
+
     [Fact]
     public async Task ImportBudgetAsync_WhenOverwritingRollover_ShouldUpdateLaterMonths()
     {
