@@ -1,16 +1,15 @@
+import { Group, ScrollArea, SimpleGrid, Stack } from "@mantine/core";
 import {
+  AmountText,
   Badge,
+  BodyText,
+  Button,
   Card,
   Checkbox,
-  Group,
-  ScrollArea,
-  SimpleGrid,
-  Stack,
+  MonthPickerInput,
   Table,
-  Text,
-} from "@mantine/core";
-import { AmountText, Button, MonthPickerInput } from "@teelur/budget-board-ui";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+} from "@teelur/budget-board-ui";
+import { FolderIcon, MoveLeftIcon, MoveRightIcon, TagIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -77,20 +76,20 @@ const PreviewBudget = ({
   const netBudget = totalIncome - totalExpense;
 
   return (
-    <Stack gap="1rem" w={780} maw="100%" mx="auto" pt="0.5rem">
+    <Stack gap="1rem" maw="100%" mx="auto">
       <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs">
-        <Card withBorder padding="xs" radius="md">
-          <Text size="xs" c="dimmed">
+        <Card>
+          <BodyText tone="secondary" size="xs">
             {t("categories")}
-          </Text>
-          <Text size="lg" fw={600}>
+          </BodyText>
+          <BodyText tone="primary" size="md" fw={600}>
             {totalCategoriesCount}
-          </Text>
+          </BodyText>
         </Card>
-        <Card withBorder padding="xs" radius="md">
-          <Text size="xs" c="dimmed">
+        <Card>
+          <BodyText tone="secondary" size="xs">
             {t("income")}
-          </Text>
+          </BodyText>
           <AmountText
             amount={totalIncome}
             size="md"
@@ -100,10 +99,10 @@ const PreviewBudget = ({
             locale={intlLocale}
           />
         </Card>
-        <Card withBorder padding="xs" radius="md">
-          <Text size="xs" c="dimmed">
+        <Card>
+          <BodyText tone="secondary" size="xs">
             {t("expense")}
-          </Text>
+          </BodyText>
           <AmountText
             amount={totalExpense}
             size="md"
@@ -113,10 +112,10 @@ const PreviewBudget = ({
             locale={intlLocale}
           />
         </Card>
-        <Card withBorder padding="xs" radius="md">
-          <Text size="xs" c="dimmed">
+        <Card>
+          <BodyText tone="secondary" size="xs">
             {t("net")}
-          </Text>
+          </BodyText>
           <AmountText
             amount={netBudget}
             size="md"
@@ -127,7 +126,6 @@ const PreviewBudget = ({
           />
         </Card>
       </SimpleGrid>
-
       <Group justify="space-between" align="flex-end">
         <MonthPickerInput
           label={t("target_month")}
@@ -148,15 +146,12 @@ const PreviewBudget = ({
           description={t("budget_import_overwrite_description")}
           checked={overwriteExisting}
           onChange={(e) => setOverwriteExisting(e.currentTarget.checked)}
-          mb="0.25rem"
         />
       </Group>
-
-      <Text size="sm" fw={500} mt="0.25rem">
+      <BodyText size="sm" fw={500} mt="0.25rem">
         {t("budget_import_preview_categories")}
-      </Text>
-
-      <ScrollArea h={280} type="auto">
+      </BodyText>
+      <ScrollArea h={250} type="auto">
         <Table striped highlightOnHover withTableBorder>
           <Table.Thead>
             <Table.Tr>
@@ -174,7 +169,11 @@ const PreviewBudget = ({
                 <Table.Tr fw={500}>
                   <Table.Td>
                     <Group gap="0.35rem" wrap="nowrap">
-                      <span>{parent.icon || "📁"}</span>
+                      {parent.icon ? (
+                        <span>{parent.icon}</span>
+                      ) : (
+                        <FolderIcon size={16} aria-hidden="true" />
+                      )}
                       <span>{parent.name}</span>
                     </Group>
                   </Table.Td>
@@ -183,10 +182,10 @@ const PreviewBudget = ({
                       size="sm"
                       variant="light"
                       color={
-                        parent.categoryType === "income" ? "green" : "blue"
+                        parent.categoryType === "income" ? "success" : "info"
                       }
                     >
-                      {parent.categoryType}
+                      {t(parent.categoryType)}
                     </Badge>
                   </Table.Td>
                   <Table.Td style={{ textAlign: "right" }}>
@@ -201,7 +200,7 @@ const PreviewBudget = ({
                   </Table.Td>
                   <Table.Td style={{ textAlign: "center" }}>
                     {parent.rolloverEnabled && (
-                      <Badge size="xs" color="teal" variant="outline">
+                      <Badge size="xs" color="primary" variant="outline">
                         {t("rollover")}
                       </Badge>
                     )}
@@ -211,19 +210,23 @@ const PreviewBudget = ({
                   <Table.Tr key={child.name}>
                     <Table.Td pl="2rem">
                       <Group gap="0.35rem" wrap="nowrap">
-                        <span>{child.icon || "🏷️"}</span>
-                        <Text size="sm">{child.name}</Text>
+                        {child.icon ? (
+                          <span>{child.icon}</span>
+                        ) : (
+                          <TagIcon size={14} aria-hidden="true" />
+                        )}
+                        <BodyText size="sm">{child.name}</BodyText>
                       </Group>
                     </Table.Td>
                     <Table.Td>
                       <Badge
                         size="xs"
-                        variant="subtle"
+                        variant="light"
                         color={
-                          child.categoryType === "income" ? "green" : "blue"
+                          child.categoryType === "income" ? "success" : "info"
                         }
                       >
-                        {child.categoryType}
+                        {t(child.categoryType)}
                       </Badge>
                     </Table.Td>
                     <Table.Td style={{ textAlign: "right" }}>
@@ -238,7 +241,7 @@ const PreviewBudget = ({
                     </Table.Td>
                     <Table.Td style={{ textAlign: "center" }}>
                       {child.rolloverEnabled && (
-                        <Badge size="xs" color="teal" variant="outline">
+                        <Badge size="xs" color="primary" variant="outline">
                           {t("rollover")}
                         </Badge>
                       )}
@@ -250,12 +253,13 @@ const PreviewBudget = ({
           </Table.Tbody>
         </Table>
       </ScrollArea>
-
-      <Group justify="space-between" mt="1rem">
+      <Group w="100%">
         <Button
-          variant="outline"
-          color="secondary"
-          leftSection={<ArrowLeftIcon size={16} />}
+          variant="filled"
+          color="primary"
+          size="compact-sm"
+          flex="1 1 auto"
+          leftSection={<MoveLeftIcon size={16} />}
           onClick={goBack}
         >
           {t("back")}
@@ -263,7 +267,9 @@ const PreviewBudget = ({
         <Button
           variant="filled"
           color="primary"
-          rightSection={<ArrowRightIcon size={16} />}
+          size="compact-sm"
+          flex="1 1 auto"
+          rightSection={<MoveRightIcon size={16} />}
           onClick={advanceToNext}
         >
           {t("next")}

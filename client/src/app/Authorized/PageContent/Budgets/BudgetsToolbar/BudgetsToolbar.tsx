@@ -1,5 +1,5 @@
-import { Group, Menu, Stack } from "@mantine/core";
-import { Button, MonthToolcards } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { Button, Menu, MonthToolcards } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import React from "react";
 import { initCurrentMonth } from "~/helpers/datetime";
@@ -11,7 +11,12 @@ import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateBudgetMutation } from "~/hooks/mutations/budgets/useCreateBudgetMutation";
 import { useBudgetsQuery } from "~/hooks/queries/useBudgetsQuery";
-import { ArrowUpDownIcon, FileDownIcon, FileUpIcon, ListChecksIcon } from "lucide-react";
+import {
+  ArrowUpDownIcon,
+  FileDownIcon,
+  FileUpIcon,
+  ListChecksIcon,
+} from "lucide-react";
 import { useAuth } from "~/providers/AuthProvider/AuthProvider";
 import { translateAxiosError } from "~/helpers/requests";
 import { downloadBudgetTemplateJson } from "~/helpers/budgetExport";
@@ -164,7 +169,7 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
         )}
         {props.selectedDates.length === 1 && (
           <>
-            <Menu shadow="md" width={220} position="bottom-end">
+            <Menu position="bottom-end">
               <Menu.Target>
                 <Button
                   variant="filled"
@@ -204,6 +209,5 @@ const BudgetsToolbar = (props: BudgetsToolbarProps): React.ReactNode => {
     </Stack>
   );
 };
-
 
 export default BudgetsToolbar;

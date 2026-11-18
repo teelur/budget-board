@@ -1,5 +1,4 @@
-import { Modal, Stepper } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Button, Modal, Stepper } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import { FileUpIcon } from "lucide-react";
 import React from "react";
@@ -14,6 +13,7 @@ import {
   IMissingCategoryResolution,
 } from "~/models/budgetTemplate";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { NotificationType, showNotification } from "~/helpers/notifications";
 import CategoryMapping from "./CategoryMapping/CategoryMapping";
 import ImportCompleted from "./ImportCompleted/ImportCompleted";
 import LoadJson from "./LoadJson/LoadJson";
@@ -47,7 +47,8 @@ const ImportBudgetModal = ({
   const [loadedTemplate, setLoadedTemplate] =
     React.useState<IBudgetTemplateExport | null>(null);
   const [targetMonth, setTargetMonth] = React.useState<Date>(currentDate);
-  const [overwriteExisting, setOverwriteExisting] = React.useState<boolean>(true);
+  const [overwriteExisting, setOverwriteExisting] =
+    React.useState<boolean>(true);
   const [resolutions, setResolutions] = React.useState<
     Map<string, IMissingCategoryResolution>
   >(new Map());
@@ -111,7 +112,17 @@ const ImportBudgetModal = ({
       let currentEffectiveName: string | null = null;
       let isCurrentSkipped = isAncestorSkipped;
 
-      if (isAncestorSkipped) {
+      if (!resolution) {
+        // Existing categories can still be imported even when their template parent is skipped.
+        items.push({
+          category: cat.name,
+          limit: cat.limit,
+          rolloverEnabled: cat.rolloverEnabled,
+          icon: cat.icon ?? null,
+        });
+        currentEffectiveName = cat.name;
+        isCurrentSkipped = false;
+      } else if (isAncestorSkipped) {
         // Ancestor was skipped:
         // Descendants cannot be created under a non-existent parent, so action="create" is skipped.
         // If explicitly mapped to an existing category, we still import its budget item.
@@ -158,15 +169,6 @@ const ImportBudgetModal = ({
           });
           currentEffectiveName = resolution.categoryName;
         }
-      } else {
-        // Category already exists in the system
-        items.push({
-          category: cat.name,
-          limit: cat.limit,
-          rolloverEnabled: cat.rolloverEnabled,
-          icon: cat.icon ?? null,
-        });
-        currentEffectiveName = cat.name;
       }
 
       const nextParentSkipped =
@@ -180,6 +182,25 @@ const ImportBudgetModal = ({
     loadedTemplate.categories.forEach((cat) => {
       processCategoryNode(cat, null, false);
     });
+
+    const seenCategories = new Set<string>();
+    const duplicateCategories = new Set<string>();
+    items.forEach((item) => {
+      const key = item.category.toLowerCase();
+      if (seenCategories.has(key)) {
+        duplicateCategories.add(item.category);
+      }
+      seenCategories.add(key);
+    });
+    if (duplicateCategories.size > 0) {
+      showNotification({
+        message: t("budget_import_duplicate_mapping", {
+          categories: Array.from(duplicateCategories).join(", "),
+        }),
+        type: NotificationType.Error,
+      });
+      return;
+    }
 
     const payload: IBudgetImportRequest = {
       month: dayjs(targetMonth).format("YYYY-MM-01"),
@@ -212,7 +233,6 @@ const ImportBudgetModal = ({
           {t("import_budget")}
         </Button>
       )}
-
       <Modal
         opened={isOpened}
         onClose={handleClose}
@@ -229,7 +249,6 @@ const ImportBudgetModal = ({
               launchNextDialog={() => setActiveStep(1)}
             />
           </Stepper.Step>
-
           <Stepper.Step
             label={t("step_2")}
             description={t("budget_import_preview")}
@@ -246,11 +265,7 @@ const ImportBudgetModal = ({
               />
             )}
           </Stepper.Step>
-
-          <Stepper.Step
-            label={t("step_3")}
-            description={t("import")}
-          >
+          <Stepper.Step label={t("step_3")} description={t("import")}>
             {loadedTemplate && (
               <CategoryMapping
                 template={loadedTemplate}
@@ -262,7 +277,6 @@ const ImportBudgetModal = ({
               />
             )}
           </Stepper.Step>
-
           <Stepper.Completed>
             <ImportCompleted
               importedCount={importedResult.itemsCount}

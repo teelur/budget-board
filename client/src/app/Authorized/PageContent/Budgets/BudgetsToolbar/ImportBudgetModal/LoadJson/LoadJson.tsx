@@ -1,5 +1,5 @@
-import { Alert, FileInput, Group, Stack, Text } from "@mantine/core";
-import { Button } from "@teelur/budget-board-ui";
+import { Group, Stack } from "@mantine/core";
+import { Alert, BodyText, Button, FileInput } from "@teelur/budget-board-ui";
 import { AlertCircleIcon, CheckCircle2Icon, FileJsonIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -39,13 +39,13 @@ const LoadJson = ({
 
     const maxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
     if (file.size > maxFileSizeBytes) {
-      setErrors(["File size exceeds the 5 MB limit."]);
+      setErrors([t("budget_import_file_too_large")]);
       return;
     }
 
     try {
       const text = await file.text();
-      const result = validateBudgetTemplateJson(text);
+      const result = validateBudgetTemplateJson(text, t);
 
       if (!result.isValid || !result.template) {
         setErrors(result.errors);
@@ -67,11 +67,10 @@ const LoadJson = ({
   };
 
   return (
-    <Stack gap="1rem" w={700} maw="100%" mx="auto" pt="0.5rem">
-      <Text size="sm" c="dimmed">
+    <Stack gap="0.5rem" maw="100%" mx="auto">
+      <BodyText tone="secondary" size="sm">
         {t("budget_import_load_description")}
-      </Text>
-
+      </BodyText>
       <FileInput
         label={t("budget_import_select_file")}
         placeholder={t("budget_import_file_placeholder")}
@@ -84,16 +83,16 @@ const LoadJson = ({
 
       {errors.length > 0 && (
         <Alert
+          color="error"
+          variant="light"
           icon={<AlertCircleIcon size={16} />}
           title={t("budget_import_validation_failed")}
-          color="red"
-          variant="light"
         >
           <Stack gap="0.25rem">
             {errors.map((error, idx) => (
-              <Text key={idx} size="xs">
+              <BodyText key={idx} tone="primary" size="xs">
                 • {error}
-              </Text>
+              </BodyText>
             ))}
           </Stack>
         </Alert>
@@ -101,16 +100,16 @@ const LoadJson = ({
 
       {warnings.length > 0 && (
         <Alert
-          icon={<AlertCircleIcon size={16} />}
-          title={t("warning")}
-          color="yellow"
+          color="warning"
           variant="light"
+          icon={<AlertCircleIcon size={16} />}
+          title={t("budget_import_validation_warnings")}
         >
           <Stack gap="0.25rem">
             {warnings.map((warn, idx) => (
-              <Text key={idx} size="xs">
+              <BodyText key={idx} tone="primary" size="xs">
                 • {warn}
-              </Text>
+              </BodyText>
             ))}
           </Stack>
         </Alert>
@@ -118,28 +117,29 @@ const LoadJson = ({
 
       {loadedTemplate && (
         <Alert
+          color="success"
+          variant="light"
           icon={<CheckCircle2Icon size={16} />}
           title={t("budget_import_validation_passed")}
-          color="green"
-          variant="light"
         >
-          <Text size="xs">
+          <BodyText tone="primary" size="xs">
             {t("budget_import_valid_summary", {
               name: loadedTemplate.name,
               count: loadedTemplate.categories.length,
             })}
-          </Text>
+          </BodyText>
         </Alert>
       )}
-
-      <Group justify="flex-end" mt="1rem">
+      <Group w="100%">
         <Button
           variant="filled"
           color="primary"
+          size="compact-sm"
+          flex="1 1 auto"
           disabled={!loadedTemplate}
           onClick={handleNext}
         >
-          {t("next")}
+          {t("budget_import_load_json")}
         </Button>
       </Group>
     </Stack>
