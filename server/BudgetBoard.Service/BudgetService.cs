@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
@@ -448,6 +449,19 @@ public class BudgetService(
     /// <inheritdoc />
     public async Task ImportBudgetAsync(Guid userGuid, BudgetImportRequest request)
     {
+        var validationResults = new List<ValidationResult>();
+        if (
+            !Validator.TryValidateObject(
+                request,
+                new ValidationContext(request),
+                validationResults,
+                validateAllProperties: true
+            )
+        )
+        {
+            throw new BudgetBoardServiceException(validationResults[0].ErrorMessage);
+        }
+
         var userData = await UserDataServiceHelper.GetCurrentUserAsync(
             userDataContext,
             logger,
@@ -464,6 +478,33 @@ public class BudgetService(
 
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
         var targetMonth = StartOfMonth(request.Month);
+
+        var availableCategoryNames = allCategories
+            .Select(c => c.Value)
+            .Concat(
+                request.NewCategories?
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                    .Select(c => c.Name.Trim()) ?? []
+            )
+            .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+
+        foreach (var item in request.Items)
+        {
+            var categoryName = item.Category?.Trim() ?? string.Empty;
+            if (
+                string.IsNullOrWhiteSpace(categoryName)
+                || !availableCategoryNames.Contains(categoryName)
+            )
+            {
+                logger.LogWarning(
+                    "{LogMessage}",
+                    logLocalizer["BudgetCreateCategoryNotFoundLog", categoryName]
+                );
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["BudgetCreateCategoryNotFoundError", categoryName]
+                );
+            }
+        }
 
         void ApplyCategoryIcon(string categoryName, string? icon)
         {
@@ -608,22 +649,8 @@ public class BudgetService(
 
         foreach (var item in request.Items)
         {
-            if (string.IsNullOrWhiteSpace(item.Category))
-            {
-                continue;
-            }
-
             var categoryName = item.Category.Trim();
             var categoryKey = categoryName.ToLowerInvariant();
-
-            if (
-                !allCategories.Any(c =>
-                    c.Value.Equals(categoryName, StringComparison.InvariantCultureIgnoreCase)
-                )
-            )
-            {
-                continue;
-            }
 
             if (!string.IsNullOrWhiteSpace(item.Icon))
             {
@@ -717,7 +744,7 @@ public class BudgetService(
 
             if (parentBudget != null)
             {
-                if (childTotal > parentBudget.Limit)
+                if (request.OverwriteExisting && childTotal > parentBudget.Limit)
                 {
                     parentBudget.Limit = childTotal;
                 }
