@@ -526,4 +526,10 @@
   <data name="InvalidDecimalPlacesError" xml:space="preserve">
     <value>The number of decimal places must be between 0 and 3.</value>
   </data>
+  <data name="BudgetImportItemsNullError" xml:space="preserve">
+    <value>Budget import items cannot contain null entries.</value>
+  </data>
+  <data name="BudgetImportNewCategoriesNullError" xml:space="preserve">
+    <value>Budget import new categories cannot contain null entries.</value>
+  </data>
 </root>
