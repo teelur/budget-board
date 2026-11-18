@@ -1,0 +1,294 @@
+import { Button, Modal, Stepper } from "@teelur/budget-board-ui";
+import { useDisclosure } from "@mantine/hooks";
+import { FileUpIcon } from "lucide-react";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { useImportBudgetMutation } from "~/hooks/mutations/budgets/useImportBudgetMutation";
+import {
+  IBudgetImportCategoryCreateRequest,
+  IBudgetImportItemRequest,
+  IBudgetImportRequest,
+  IBudgetTemplateCategoryItem,
+  IBudgetTemplateExport,
+  IMissingCategoryResolution,
+} from "~/models/budgetTemplate";
+import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
+import { NotificationType, showNotification } from "~/helpers/notifications";
+import CategoryMapping from "./CategoryMapping/CategoryMapping";
+import ImportCompleted from "./ImportCompleted/ImportCompleted";
+import LoadJson from "./LoadJson/LoadJson";
+import PreviewBudget from "./PreviewBudget/PreviewBudget";
+
+interface ImportBudgetModalProps {
+  currentDate: Date;
+  opened?: boolean;
+  onOpen?: () => void;
+  onClose?: () => void;
+  showTrigger?: boolean;
+}
+
+const ImportBudgetModal = ({
+  currentDate,
+  opened: externalOpened,
+  onOpen,
+  onClose,
+  showTrigger = false,
+}: ImportBudgetModalProps): React.ReactNode => {
+  const [internalOpened, { open: openInternal, close: closeInternal }] =
+    useDisclosure(false);
+  const isControlled = externalOpened !== undefined;
+  const isOpened = isControlled ? externalOpened : internalOpened;
+  const [activeStep, setActiveStep] = React.useState(0);
+
+  const { t } = useTranslation();
+  const { dayjs } = useLocale();
+  const importBudgetMutation = useImportBudgetMutation();
+
+  const [loadedTemplate, setLoadedTemplate] =
+    React.useState<IBudgetTemplateExport | null>(null);
+  const [targetMonth, setTargetMonth] = React.useState<Date>(currentDate);
+  const [overwriteExisting, setOverwriteExisting] =
+    React.useState<boolean>(true);
+  const [resolutions, setResolutions] = React.useState<
+    Map<string, IMissingCategoryResolution>
+  >(new Map());
+  const [importedResult, setImportedResult] = React.useState<{
+    itemsCount: number;
+    newCategoriesCount: number;
+  }>({ itemsCount: 0, newCategoriesCount: 0 });
+
+  React.useEffect(() => {
+    setTargetMonth(currentDate);
+  }, [currentDate]);
+
+  const resetState = () => {
+    setActiveStep(0);
+    setLoadedTemplate(null);
+    setTargetMonth(currentDate);
+    setOverwriteExisting(true);
+    setResolutions(new Map());
+    setImportedResult({ itemsCount: 0, newCategoriesCount: 0 });
+  };
+
+  const handleOpen = () => {
+    resetState();
+    if (isControlled) {
+      onOpen?.();
+    } else {
+      openInternal();
+    }
+  };
+
+  const handleClose = () => {
+    resetState();
+    if (isControlled) {
+      onClose?.();
+    } else {
+      closeInternal();
+    }
+  };
+
+  const handleTemplateLoaded = (template: IBudgetTemplateExport) => {
+    setLoadedTemplate(template);
+    setResolutions(new Map());
+  };
+
+  const handleSubmitImport = () => {
+    if (!loadedTemplate) {
+      return;
+    }
+
+    const newCategories: IBudgetImportCategoryCreateRequest[] = [];
+    const items: IBudgetImportItemRequest[] = [];
+
+    const processCategoryNode = (
+      cat: IBudgetTemplateCategoryItem,
+      effectiveParentName: string | null,
+      isAncestorSkipped: boolean,
+    ) => {
+      const lower = cat.name.toLowerCase();
+      const resolution = resolutions.get(lower);
+
+      let currentEffectiveName: string | null = null;
+      let isCurrentSkipped = isAncestorSkipped;
+
+      if (!resolution) {
+        // Existing categories can still be imported even when their template parent is skipped.
+        items.push({
+          category: cat.name,
+          limit: cat.limit,
+          rolloverEnabled: cat.rolloverEnabled,
+          icon: cat.icon ?? null,
+        });
+        currentEffectiveName = cat.name;
+        isCurrentSkipped = false;
+      } else if (isAncestorSkipped) {
+        // Ancestor was skipped:
+        // Descendants cannot be created under a non-existent parent, so action="create" is skipped.
+        // If explicitly mapped to an existing category, we still import its budget item.
+        if (
+          resolution &&
+          resolution.action === "map" &&
+          resolution.mappedCategory
+        ) {
+          items.push({
+            category: resolution.mappedCategory,
+            limit: cat.limit,
+            rolloverEnabled: cat.rolloverEnabled,
+            icon: null,
+          });
+          currentEffectiveName = resolution.mappedCategory;
+          isCurrentSkipped = false;
+        } else {
+          isCurrentSkipped = true;
+        }
+      } else if (resolution) {
+        if (resolution.action === "skip") {
+          isCurrentSkipped = true;
+        } else if (resolution.action === "map" && resolution.mappedCategory) {
+          items.push({
+            category: resolution.mappedCategory,
+            limit: cat.limit,
+            rolloverEnabled: cat.rolloverEnabled,
+            icon: null,
+          });
+          currentEffectiveName = resolution.mappedCategory;
+        } else if (resolution.action === "create") {
+          newCategories.push({
+            name: resolution.categoryName,
+            parent: effectiveParentName,
+            categoryType: resolution.categoryType,
+            icon: resolution.icon,
+          });
+
+          items.push({
+            category: resolution.categoryName,
+            limit: cat.limit,
+            rolloverEnabled: cat.rolloverEnabled,
+            icon: resolution.icon ?? cat.icon ?? null,
+          });
+          currentEffectiveName = resolution.categoryName;
+        }
+      }
+
+      const nextParentSkipped =
+        isCurrentSkipped && currentEffectiveName === null;
+
+      cat.subcategories?.forEach((sub) => {
+        processCategoryNode(sub, currentEffectiveName, nextParentSkipped);
+      });
+    };
+
+    loadedTemplate.categories.forEach((cat) => {
+      processCategoryNode(cat, null, false);
+    });
+
+    const seenCategories = new Set<string>();
+    const duplicateCategories = new Set<string>();
+    items.forEach((item) => {
+      const key = item.category.toLowerCase();
+      if (seenCategories.has(key)) {
+        duplicateCategories.add(item.category);
+      }
+      seenCategories.add(key);
+    });
+    if (duplicateCategories.size > 0) {
+      showNotification({
+        message: t("budget_import_duplicate_mapping", {
+          categories: Array.from(duplicateCategories).join(", "),
+        }),
+        type: NotificationType.Error,
+      });
+      return;
+    }
+
+    const payload: IBudgetImportRequest = {
+      month: dayjs(targetMonth).format("YYYY-MM-01"),
+      overwriteExisting,
+      newCategories,
+      items,
+    };
+
+    importBudgetMutation.mutate(payload, {
+      onSuccess: () => {
+        setImportedResult({
+          itemsCount: items.length,
+          newCategoriesCount: newCategories.length,
+        });
+        setActiveStep(3);
+      },
+    });
+  };
+
+  return (
+    <>
+      {showTrigger && (
+        <Button
+          variant="filled"
+          color="primary"
+          size="xs"
+          rightSection={<FileUpIcon size="1rem" />}
+          onClick={handleOpen}
+        >
+          {t("import_budget")}
+        </Button>
+      )}
+      <Modal
+        opened={isOpened}
+        onClose={handleClose}
+        size="lg"
+        title={t("import_budget")}
+      >
+        <Stepper active={activeStep} allowNextStepsSelect={false} w="100%">
+          <Stepper.Step
+            label={t("step_1")}
+            description={t("budget_import_load_json")}
+          >
+            <LoadJson
+              onTemplateLoaded={handleTemplateLoaded}
+              launchNextDialog={() => setActiveStep(1)}
+            />
+          </Stepper.Step>
+          <Stepper.Step
+            label={t("step_2")}
+            description={t("budget_import_preview")}
+          >
+            {loadedTemplate && (
+              <PreviewBudget
+                template={loadedTemplate}
+                targetMonth={targetMonth}
+                setTargetMonth={setTargetMonth}
+                overwriteExisting={overwriteExisting}
+                setOverwriteExisting={setOverwriteExisting}
+                goBack={() => setActiveStep(0)}
+                advanceToNext={() => setActiveStep(2)}
+              />
+            )}
+          </Stepper.Step>
+          <Stepper.Step label={t("step_3")} description={t("import")}>
+            {loadedTemplate && (
+              <CategoryMapping
+                template={loadedTemplate}
+                resolutions={resolutions}
+                setResolutions={setResolutions}
+                goBack={() => setActiveStep(1)}
+                onSubmit={handleSubmitImport}
+                isSubmitting={importBudgetMutation.isPending}
+              />
+            )}
+          </Stepper.Step>
+          <Stepper.Completed>
+            <ImportCompleted
+              importedCount={importedResult.itemsCount}
+              newCategoriesCount={importedResult.newCategoriesCount}
+              targetMonth={targetMonth}
+              closeModal={handleClose}
+            />
+          </Stepper.Completed>
+        </Stepper>
+      </Modal>
+    </>
+  );
+};
+
+export default ImportBudgetModal;

@@ -1,7 +1,7 @@
 import classes from "./TransactionsHeader.module.css";
 
-import { Collapse, Flex, Group, Menu, Stack } from "@mantine/core";
-import { Button, Modal, MonthToolcards } from "@teelur/budget-board-ui";
+import { Collapse, Flex, Group, Stack } from "@mantine/core";
+import { Button, Menu, Modal, MonthToolcards } from "@teelur/budget-board-ui";
 import { useDisclosure } from "@mantine/hooks";
 import {
   CalendarDaysIcon,
@@ -57,12 +57,18 @@ const TransactionsHeader = (
   const isMobile = useIsMobile();
   const [canSelectMultiple, { toggle, open: openMultipleSelection }] =
     useDisclosure(false);
-  const [isMonthPickerOpen, { open: openMonthPicker, close: closeMonthPicker }] =
-    useDisclosure(false);
-  const [isImportModalOpen, { open: openImportModal, close: closeImportModal }] =
-    useDisclosure(false);
-  const [isExportModalOpen, { open: openExportModal, close: closeExportModal }] =
-    useDisclosure(false);
+  const [
+    isMonthPickerOpen,
+    { open: openMonthPicker, close: closeMonthPicker },
+  ] = useDisclosure(false);
+  const [
+    isImportModalOpen,
+    { open: openImportModal, close: closeImportModal },
+  ] = useDisclosure(false);
+  const [
+    isExportModalOpen,
+    { open: openExportModal, close: closeExportModal },
+  ] = useDisclosure(false);
 
   const toggleSelectMultiple = () => {
     if (canSelectMultiple) {
@@ -146,9 +152,7 @@ const TransactionsHeader = (
 
   const monthButtonLabel =
     props.selectedMonths.length === 1
-      ? dayjs(props.selectedMonths[0])
-          .locale(dayjsLocale)
-          .format("MMM YYYY")
+      ? dayjs(props.selectedMonths[0]).locale(dayjsLocale).format("MMM YYYY")
       : props.selectedMonths.length > 1
         ? `${t("select_months")} (${props.selectedMonths.length})`
         : t("select_months");
@@ -241,8 +245,7 @@ const TransactionsHeader = (
               color="primary"
               size="xs"
               selected={
-                isFiltersPanelOpen ||
-                !transactionFilters.isEqual(new Filters())
+                isFiltersPanelOpen || !transactionFilters.isEqual(new Filters())
               }
               rightSection={<FilterIcon size="1rem" />}
               onClick={toggleFiltersPanel}

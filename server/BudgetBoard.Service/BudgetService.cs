@@ -1,4 +1,5 @@
-﻿using BudgetBoard.Database.Data;
+using System.ComponentModel.DataAnnotations;
+using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Helpers;
 using BudgetBoard.Service.Interfaces;
@@ -320,6 +321,455 @@ public class BudgetService(
         await userDataContext.SaveChangesAsync();
     }
 
+    /// <inheritdoc />
+    public async Task<BudgetTemplateExport> ExportBudgetAsync(Guid userGuid, DateOnly month)
+    {
+        var userData = await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            userGuid,
+            users =>
+                users
+                    .Include(u => u.Budgets)
+                    .Include(u => u.TransactionCategories)
+                    .Include(u => u.TransactionCategoryIcons)
+                    .Include(u => u.UserSettings)
+        );
+
+        var monthBudgets = userData
+            .Budgets.Where(b => b.Month.Month == month.Month && b.Month.Year == month.Year)
+            .ToList();
+
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+        var iconsByCategory = userData
+            .TransactionCategoryIcons.GroupBy(i => i.Category.ToLowerInvariant())
+            .ToDictionary(g => g.Key, g => g.First().Icon);
+
+        var budgetsByCategory = monthBudgets
+            .GroupBy(b => b.Category.ToLowerInvariant())
+            .ToDictionary(g => g.Key, g => g.First());
+
+        var export = new BudgetTemplateExport
+        {
+            Version = 1,
+            Name = $"{month:MMMM yyyy} Budget",
+            ExportedAt = DateTime.UtcNow,
+            Categories = [],
+        };
+
+        var parentCategories = allCategories
+            .Where(c => TransactionCategoriesHelpers.GetIsParentCategory(c.Value, allCategories))
+            .ToList();
+
+        foreach (var parent in parentCategories)
+        {
+            var parentKey = parent.Value.ToLowerInvariant();
+            var hasParentBudget = budgetsByCategory.TryGetValue(parentKey, out var parentBudget);
+
+            var children = allCategories
+                .Where(c =>
+                    !TransactionCategoriesHelpers.GetIsParentCategory(c.Value, allCategories)
+                    && TransactionCategoriesHelpers
+                        .GetParentCategory(c.Value, allCategories)
+                        .Equals(parent.Value, StringComparison.InvariantCultureIgnoreCase)
+                )
+                .ToList();
+
+            var childItems = new List<BudgetTemplateCategoryItem>();
+            foreach (var child in children)
+            {
+                var childKey = child.Value.ToLowerInvariant();
+                if (budgetsByCategory.TryGetValue(childKey, out var childBudget))
+                {
+                    childItems.Add(
+                        new BudgetTemplateCategoryItem
+                        {
+                            Name = child.Value,
+                            CategoryType = child.CategoryType,
+                            Limit = childBudget.Limit,
+                            RolloverEnabled = childBudget.RolloverStartMonth.HasValue,
+                            Icon = iconsByCategory.GetValueOrDefault(childKey, child.Icon),
+                            Subcategories = [],
+                        }
+                    );
+                }
+            }
+
+            if (hasParentBudget || childItems.Count > 0)
+            {
+                export.Categories.Add(
+                    new BudgetTemplateCategoryItem
+                    {
+                        Name = parent.Value,
+                        CategoryType = parent.CategoryType,
+                        Limit = parentBudget?.Limit ?? childItems.Sum(c => c.Limit),
+                        RolloverEnabled = parentBudget?.RolloverStartMonth.HasValue ?? false,
+                        Icon = iconsByCategory.GetValueOrDefault(parentKey, parent.Icon),
+                        Subcategories = childItems,
+                    }
+                );
+            }
+        }
+
+        var processedCategoryKeys = export
+            .Categories.SelectMany(p =>
+                new[] { p.Name.ToLowerInvariant() }.Concat(
+                    p.Subcategories.Select(c => c.Name.ToLowerInvariant())
+                )
+            )
+            .ToHashSet();
+
+        foreach (var budget in monthBudgets)
+        {
+            var key = budget.Category.ToLowerInvariant();
+            if (!processedCategoryKeys.Contains(key))
+            {
+                var cat = allCategories.FirstOrDefault(c =>
+                    c.Value.Equals(budget.Category, StringComparison.InvariantCultureIgnoreCase)
+                );
+                export.Categories.Add(
+                    new BudgetTemplateCategoryItem
+                    {
+                        Name = budget.Category,
+                        CategoryType = cat?.CategoryType ?? TransactionCategoryTypes.Expense,
+                        Limit = budget.Limit,
+                        RolloverEnabled = budget.RolloverStartMonth.HasValue,
+                        Icon = iconsByCategory.GetValueOrDefault(key, cat?.Icon ?? string.Empty),
+                        Subcategories = [],
+                    }
+                );
+            }
+        }
+
+        return export;
+    }
+
+    /// <inheritdoc />
+    public async Task ImportBudgetAsync(Guid userGuid, BudgetImportRequest request)
+    {
+        var validationResults = new List<ValidationResult>();
+        if (
+            !Validator.TryValidateObject(
+                request,
+                new ValidationContext(request),
+                validationResults,
+                validateAllProperties: true
+            )
+        )
+        {
+            throw new BudgetBoardServiceException(validationResults[0].ErrorMessage);
+        }
+
+        var userData = await UserDataServiceHelper.GetCurrentUserAsync(
+            userDataContext,
+            logger,
+            logLocalizer,
+            responseLocalizer,
+            userGuid,
+            users =>
+                users
+                    .Include(u => u.Budgets)
+                    .Include(u => u.TransactionCategories)
+                    .Include(u => u.TransactionCategoryIcons)
+                    .Include(u => u.UserSettings)
+        );
+
+        var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+        var targetMonth = StartOfMonth(request.Month);
+
+        var availableCategoryNames = allCategories
+            .Select(c => c.Value)
+            .Concat(
+                request.NewCategories?
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                    .Select(c => c.Name.Trim()) ?? []
+            )
+            .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+
+        foreach (var item in request.Items)
+        {
+            var categoryName = item.Category?.Trim() ?? string.Empty;
+            if (
+                string.IsNullOrWhiteSpace(categoryName)
+                || !availableCategoryNames.Contains(categoryName)
+            )
+            {
+                logger.LogWarning(
+                    "{LogMessage}",
+                    logLocalizer["BudgetCreateCategoryNotFoundLog", categoryName]
+                );
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["BudgetCreateCategoryNotFoundError", categoryName]
+                );
+            }
+        }
+
+        void ApplyCategoryIcon(string categoryName, string? icon)
+        {
+            if (string.IsNullOrWhiteSpace(icon))
+            {
+                return;
+            }
+
+            var iconValue = icon.Trim();
+            if (iconValue.Length > CategoryIcon.MaxIconLength)
+            {
+                iconValue = iconValue[..CategoryIcon.MaxIconLength];
+            }
+
+            var existingIcon = userData.TransactionCategoryIcons.FirstOrDefault(i =>
+                i.Category.Equals(categoryName, StringComparison.OrdinalIgnoreCase)
+            );
+
+            if (existingIcon != null)
+            {
+                existingIcon.Icon = iconValue;
+            }
+            else
+            {
+                var newIcon = new CategoryIcon
+                {
+                    Category = categoryName,
+                    Icon = iconValue,
+                    UserID = userData.Id,
+                };
+                userDataContext.TransactionCategoryIcons.Add(newIcon);
+                if (!userData.TransactionCategoryIcons.Contains(newIcon))
+                {
+                    userData.TransactionCategoryIcons.Add(newIcon);
+                }
+            }
+        }
+
+        // 1. Create any requested new categories that don't exist yet
+        if (request.NewCategories != null && request.NewCategories.Count > 0)
+        {
+            var orderedNewCategories = request
+                .NewCategories.OrderBy(c => string.IsNullOrWhiteSpace(c.Parent) ? 0 : 1)
+                .ToList();
+
+            foreach (var newCat in orderedNewCategories)
+            {
+                if (string.IsNullOrWhiteSpace(newCat.Name))
+                {
+                    continue;
+                }
+
+                var trimmedName = newCat.Name.Trim();
+                var exists = allCategories.Any(c =>
+                    c.Value.Equals(trimmedName, StringComparison.InvariantCultureIgnoreCase)
+                );
+                if (!exists)
+                {
+                    var parentName = newCat.Parent?.Trim() ?? string.Empty;
+                    if (parentName.Equals(trimmedName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        parentName = string.Empty;
+                    }
+
+                    string resolvedType;
+                    if (!string.IsNullOrEmpty(parentName))
+                    {
+                        var parentCategory = allCategories.FirstOrDefault(c =>
+                            c.Value.Equals(parentName, StringComparison.OrdinalIgnoreCase)
+                        );
+                        if (parentCategory == null)
+                        {
+                            logger.LogError(
+                                "{LogMessage}",
+                                logLocalizer["TransactionCategoryParentNotFoundLog"]
+                            );
+                            throw new BudgetBoardServiceException(
+                                responseLocalizer["TransactionCategoryParentNotFoundError"]
+                            );
+                        }
+                        if (
+                            !TransactionCategoriesHelpers.GetIsParentCategory(
+                                parentName,
+                                allCategories
+                            )
+                        )
+                        {
+                            logger.LogError(
+                                "{LogMessage}",
+                                logLocalizer["TransactionCategoryParentNotFoundLog"]
+                            );
+                            throw new BudgetBoardServiceException(
+                                responseLocalizer["TransactionCategoryParentNotFoundError"]
+                            );
+                        }
+
+                        resolvedType = parentCategory.CategoryType;
+                    }
+                    else
+                    {
+                        resolvedType = string.Equals(
+                            newCat.CategoryType,
+                            TransactionCategoryTypes.Income,
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                            ? TransactionCategoryTypes.Income
+                            : TransactionCategoryTypes.Expense;
+                    }
+
+                    var category = new Category
+                    {
+                        Value = trimmedName,
+                        Parent = parentName,
+                        CategoryType = resolvedType,
+                        UserID = userData.Id,
+                    };
+                    userDataContext.TransactionCategories.Add(category);
+                    if (!userData.TransactionCategories.Contains(category))
+                    {
+                        userData.TransactionCategories.Add(category);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(newCat.Icon))
+                    {
+                        ApplyCategoryIcon(category.Value, newCat.Icon);
+                    }
+
+                    allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+                }
+            }
+
+            await userDataContext.SaveChangesAsync();
+            allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
+        }
+
+        // 2. Process budget items
+        var existingBudgetsForMonth = userData
+            .Budgets.Where(b =>
+                b.Month.Month == targetMonth.Month && b.Month.Year == targetMonth.Year
+            )
+            .ToDictionary(b => b.Category.ToLowerInvariant(), b => b);
+
+        foreach (var item in request.Items)
+        {
+            var categoryName = item.Category.Trim();
+            var categoryKey = categoryName.ToLowerInvariant();
+
+            if (!string.IsNullOrWhiteSpace(item.Icon))
+            {
+                ApplyCategoryIcon(categoryName, item.Icon);
+            }
+
+            DateOnly? resolvedRolloverStartMonth = null;
+            if (item.RolloverEnabled)
+            {
+                if (!HasRolloverConflict(userData, categoryName, targetMonth, allCategories))
+                {
+                    var inheritedStart = GetInheritedRolloverStartMonth(
+                        userData,
+                        categoryName,
+                        targetMonth
+                    );
+                    resolvedRolloverStartMonth = inheritedStart ?? targetMonth;
+                }
+            }
+
+            var limit = Math.Max(0, item.Limit);
+
+            if (existingBudgetsForMonth.TryGetValue(categoryKey, out var existingBudget))
+            {
+                if (request.OverwriteExisting)
+                {
+                    existingBudget.Limit = limit;
+                    foreach (
+                        var categoryBudget in userData.Budgets.Where(b =>
+                            b.Category.Equals(
+                                categoryName,
+                                StringComparison.InvariantCultureIgnoreCase
+                            )
+                            && NormalizeToMonth(b.Month) >= targetMonth
+                        )
+                    )
+                    {
+                        categoryBudget.RolloverStartMonth = resolvedRolloverStartMonth;
+                    }
+                }
+            }
+            else
+            {
+                var newBudget = new Budget
+                {
+                    Month = targetMonth,
+                    Category = categoryName,
+                    Limit = limit,
+                    RolloverStartMonth = resolvedRolloverStartMonth,
+                    UserID = userData.Id,
+                };
+                userDataContext.Budgets.Add(newBudget);
+                if (!userData.Budgets.Contains(newBudget))
+                {
+                    userData.Budgets.Add(newBudget);
+                }
+                existingBudgetsForMonth[categoryKey] = newBudget;
+                if (request.OverwriteExisting)
+                {
+                    foreach (
+                        var categoryBudget in userData.Budgets.Where(b =>
+                            !ReferenceEquals(b, newBudget)
+                            && b.Category.Equals(
+                                categoryName,
+                                StringComparison.InvariantCultureIgnoreCase
+                            )
+                            && NormalizeToMonth(b.Month) >= targetMonth
+                        )
+                    )
+                    {
+                        categoryBudget.RolloverStartMonth = resolvedRolloverStartMonth;
+                    }
+                }
+            }
+        }
+
+        // 3. Ensure parent limits are at least the sum of their children
+        foreach (
+            var parent in allCategories.Where(c =>
+                TransactionCategoriesHelpers.GetIsParentCategory(c.Value, allCategories)
+            )
+        )
+        {
+            var parentBudget = userData.Budgets.FirstOrDefault(b =>
+                b.Category.Equals(parent.Value, StringComparison.InvariantCultureIgnoreCase)
+                && b.Month.Month == targetMonth.Month
+                && b.Month.Year == targetMonth.Year
+            );
+
+            var childTotal = GetBudgetChildrenLimit(parent.Value, targetMonth, userData);
+
+            if (parentBudget != null)
+            {
+                if (request.OverwriteExisting && childTotal > parentBudget.Limit)
+                {
+                    parentBudget.Limit = childTotal;
+                }
+            }
+            else if (childTotal > 0)
+            {
+                var newParentBudget = new Budget
+                {
+                    Month = targetMonth,
+                    Category = parent.Value,
+                    Limit = childTotal,
+                    UserID = userData.Id,
+                };
+                userDataContext.Budgets.Add(newParentBudget);
+                if (!userData.Budgets.Contains(newParentBudget))
+                {
+                    userData.Budgets.Add(newParentBudget);
+                }
+            }
+        }
+
+        await userDataContext.SaveChangesAsync();
+    }
+
+
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
     {
         return await UserDataServiceHelper.GetCurrentUserAsync(
@@ -430,9 +880,9 @@ public class BudgetService(
 
         List<Budget> childBudgetsForMonth =
         [
-            .. childBudgets.Where(b =>
-                b.Month.Month == monthDate.Month && b.Month.Year == monthDate.Year
-            ),
+            .. childBudgets
+                .Where(b => b.Month.Month == monthDate.Month && b.Month.Year == monthDate.Year)
+                .DistinctBy(b => b.Category.ToLowerInvariant()),
         ];
 
         return childBudgetsForMonth;
