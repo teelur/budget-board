@@ -36,6 +36,14 @@ public interface ITransactionService
     );
 
     /// <summary>
+    /// Creates and links both transactions for a transfer.
+    /// </summary>
+    Task<IReadOnlyList<ITransactionResponse>> CreateTransferAsync(
+        Guid userGuid,
+        ITransactionTransferCreateRequest request
+    );
+
+    /// <summary>
     /// Retrieves transactions for the specified user.
     /// </summary>
     /// <param name="userGuid">The unique identifier of the user.</param>

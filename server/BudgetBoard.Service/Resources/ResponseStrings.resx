@@ -439,6 +439,15 @@
     <data name="TransactionLinkAmountsError" xml:space="preserve">
         <value>Transactions must have exact opposite amounts.</value>
     </data>
+    <data name="TransactionTransferAmountError" xml:space="preserve">
+        <value>The transfer amount must be greater than zero.</value>
+    </data>
+    <data name="TransactionTransferFromMerchantName" xml:space="preserve">
+        <value>Transfer from {0}</value>
+    </data>
+    <data name="TransactionTransferToMerchantName" xml:space="preserve">
+        <value>Transfer to {0}</value>
+    </data>
     <data name="TransactionNotLinkedError" xml:space="preserve">
         <value>The transaction is not linked.</value>
     </data>

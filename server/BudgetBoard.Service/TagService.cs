@@ -68,6 +68,17 @@ public class TagService(
                 tag.UserID == userGuid && additions.Keys.Contains(tag.NormalizedValue)
             )
             .ToDictionaryAsync(tag => tag.NormalizedValue, StringComparer.Ordinal);
+        foreach (
+            var trackedTag in userDataContext
+                .Tags.Local.Where(tag =>
+                    tag.UserID == userGuid
+                    && additions.Keys.Contains(tag.NormalizedValue)
+                    && userDataContext.Entry(tag).State != EntityState.Deleted
+                )
+        )
+        {
+            tagsByNormalizedValue.TryAdd(trackedTag.NormalizedValue, trackedTag);
+        }
 
         foreach (var (normalizedValue, displayValue) in additions)
         {
