@@ -532,4 +532,13 @@
   <data name="BudgetImportNewCategoriesNullError" xml:space="preserve">
     <value>Budget import new categories cannot contain null entries.</value>
   </data>
+  <data name="TransactionTransferAmountError" xml:space="preserve">
+    <value>The transfer amount must be greater than zero.</value>
+  </data>
+  <data name="TransactionTransferFromMerchantName" xml:space="preserve">
+    <value>Transfer from {0}</value>
+  </data>
+  <data name="TransactionTransferToMerchantName" xml:space="preserve">
+    <value>Transfer to {0}</value>
+  </data>
 </root>
