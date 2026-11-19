@@ -45,11 +45,12 @@ public class TransactionService(
         await CreateTransactionAsync(userData, request, deferSave, null);
     }
 
-    private async Task CreateTransactionAsync(
+    private async Task<Transaction> CreateTransactionAsync(
         ApplicationUser userData,
         ITransactionCreateRequest request,
         bool deferSave,
-        Guid? transactionId
+        Guid? transactionId,
+        bool applyAutomaticAssociations = true
     )
     {
         var account = GetAccountByID(userData, request.AccountID);
@@ -68,10 +69,13 @@ public class TransactionService(
             AccountID = request.AccountID,
             Account = account,
         };
-        await automaticTransactionCategorizerService.AutoCategorizeTransactionAsync(
-            userData.Id,
-            newTransaction
-        );
+        if (applyAutomaticAssociations)
+        {
+            await automaticTransactionCategorizerService.AutoCategorizeTransactionAsync(
+                userData.Id,
+                newTransaction
+            );
+        }
 
         userDataContext.Transactions.Add(newTransaction);
         var tags = request.Tags?.ToArray();
@@ -79,7 +83,10 @@ public class TransactionService(
         {
             await tagService.ApplyTagChangesAsync(userData.Id, newTransaction, tags, null);
         }
-        await recurringRuleService.MatchTransactionAsync(userData.Id, newTransaction);
+        if (applyAutomaticAssociations)
+        {
+            await recurringRuleService.MatchTransactionAsync(userData.Id, newTransaction);
+        }
 
         // Manual accounts need to manually update the balance
         if (account.Source == AccountSource.Manual)
@@ -92,6 +99,8 @@ public class TransactionService(
             await userDataContext.SaveChangesAsync();
         }
 
+        return newTransaction;
+
         void UpdateBalancesForNewTransaction(Account account, ITransactionCreateRequest transaction)
         {
             CreateBalanceForDateIfNotExists(account, transaction.Date);
@@ -102,6 +111,89 @@ public class TransactionService(
                 balance.Amount += transaction.Amount;
             }
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ITransactionResponse>> CreateTransferAsync(
+        Guid userGuid,
+        ITransactionTransferCreateRequest request
+    )
+    {
+        if (request.Amount <= 0)
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionTransferAmountError"]
+            );
+        }
+        if (request.SourceAccountID == request.DestinationAccountID)
+        {
+            throw new BudgetBoardServiceException(
+                responseLocalizer["TransactionLinkSameAccountError"]
+            );
+        }
+
+        var userData = await GetCurrentUserAsync(userGuid);
+        var sourceAccount = GetAccountByID(userData, request.SourceAccountID);
+        var destinationAccount = GetAccountByID(userData, request.DestinationAccountID);
+        if (sourceAccount.Deleted != null || destinationAccount.Deleted != null)
+        {
+            throw new BudgetBoardServiceException(responseLocalizer["TransactionLinkDeletedError"]);
+        }
+
+        var merchantName = string.IsNullOrWhiteSpace(request.MerchantName)
+            ? null
+            : request.MerchantName;
+        var sourceMerchantName =
+            merchantName
+            ?? responseLocalizer["TransactionTransferToMerchantName", destinationAccount.Name];
+        var destinationMerchantName =
+            merchantName
+            ?? responseLocalizer["TransactionTransferFromMerchantName", sourceAccount.Name];
+
+        var sourceTransaction = await CreateTransactionAsync(
+            userData,
+            new TransactionCreateRequest
+            {
+                Amount = -request.Amount,
+                Date = request.Date,
+                Category = TransferCategory,
+                MerchantName = sourceMerchantName,
+                Notes = request.Notes,
+                Tags = request.Tags,
+                Source = TransactionSource.Manual,
+                AccountID = sourceAccount.ID,
+            },
+            true,
+            Guid.NewGuid(),
+            false
+        );
+        var destinationTransaction = await CreateTransactionAsync(
+            userData,
+            new TransactionCreateRequest
+            {
+                Amount = request.Amount,
+                Date = request.Date,
+                Category = TransferCategory,
+                MerchantName = destinationMerchantName,
+                Notes = request.Notes,
+                Tags = request.Tags,
+                Source = TransactionSource.Manual,
+                AccountID = destinationAccount.ID,
+            },
+            true,
+            Guid.NewGuid(),
+            false
+        );
+
+        var result = await LinkTransactionsAsync(
+            userData,
+            sourceTransaction,
+            destinationTransaction,
+            true
+        );
+        await userDataContext.SaveChangesAsync();
+
+        return result;
     }
 
     /// <inheritdoc />
@@ -434,7 +526,16 @@ public class TransactionService(
         var userData = await GetCurrentUserAsync(userGuid);
         var sourceTransaction = GetTransactionByID(userData, request.TransactionID);
         var targetTransaction = GetTransactionByID(userData, request.LinkedTransactionID);
+        return await LinkTransactionsAsync(userData, sourceTransaction, targetTransaction, false);
+    }
 
+    private async Task<IReadOnlyList<ITransactionResponse>> LinkTransactionsAsync(
+        ApplicationUser userData,
+        Transaction sourceTransaction,
+        Transaction targetTransaction,
+        bool deferSave
+    )
+    {
         if (sourceTransaction.ID == targetTransaction.ID)
         {
             throw new BudgetBoardServiceException(
@@ -484,6 +585,10 @@ public class TransactionService(
             userData,
             targetTransaction.Subcategory
         );
+        sourceTransaction.RecurringRuleID = null;
+        sourceTransaction.RecurringRule = null;
+        targetTransaction.RecurringRuleID = null;
+        targetTransaction.RecurringRule = null;
 
         var linkDate =
             sourceTransaction.Date <= targetTransaction.Date
@@ -504,16 +609,19 @@ public class TransactionService(
         sourceTransaction.SourceTransactionLink = link;
         targetTransaction.TargetTransactionLink = link;
         userDataContext.TransactionLinks.Add(link);
-        try
+        if (!deferSave)
         {
-            await userDataContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException exception)
-        {
-            throw new BudgetBoardServiceException(
-                responseLocalizer["TransactionAlreadyLinkedError"],
-                exception
-            );
+            try
+            {
+                await userDataContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException exception)
+            {
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["TransactionAlreadyLinkedError"],
+                    exception
+                );
+            }
         }
 
         return

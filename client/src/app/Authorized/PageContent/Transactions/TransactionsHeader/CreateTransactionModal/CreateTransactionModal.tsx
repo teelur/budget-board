@@ -5,6 +5,7 @@ import {
   DateInput,
   Modal,
   NumberInput,
+  SegmentedControl,
   Select,
   TagsInput,
   Textarea,
@@ -18,17 +19,24 @@ import React from "react";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { AccountSource } from "~/models/account";
-import { ITransactionCreateRequest } from "~/models/transaction";
+import {
+  ITransactionCreateRequest,
+  ITransactionTransferCreateRequest,
+} from "~/models/transaction";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
 import { useCreateTransactionMutation } from "~/hooks/mutations/transactions/useCreateTransactionMutation";
+import { useCreateTransferMutation } from "~/hooks/mutations/transactions/useCreateTransferMutation";
 import { useUserSettings } from "~/providers/UserSettingsProvider/UserSettingsProvider";
 import { useTagSuggestionsQuery } from "~/hooks/queries/useTagSuggestionsQuery";
 
 const CreateTransactionModal = (): React.ReactNode => {
   const [opened, { open, close }] = useDisclosure(false);
   const [tagSearch, setTagSearch] = React.useState("");
+  const [mode, setMode] = React.useState<"transaction" | "transfer">(
+    "transaction",
+  );
 
   const { t } = useTranslation();
   const {
@@ -47,6 +55,7 @@ const CreateTransactionModal = (): React.ReactNode => {
     enabled: opened,
   });
   const createTransactionMutation = useCreateTransactionMutation();
+  const createTransferMutation = useCreateTransferMutation();
 
   const dateField = useField<Date | null>({
     initialValue: dayjs().toDate(),
@@ -65,6 +74,14 @@ const CreateTransactionModal = (): React.ReactNode => {
     initialValue: null,
     validate: (value) => (value ? null : t("account_is_required")),
   });
+  const sourceAccountIdField = useField<string | null>({
+    initialValue: null,
+    validate: (value) => (value ? null : t("account_is_required")),
+  });
+  const destinationAccountIdField = useField<string | null>({
+    initialValue: null,
+    validate: (value) => (value ? null : t("account_is_required")),
+  });
   const notesField = useField<string>({
     initialValue: "",
   });
@@ -79,9 +96,12 @@ const CreateTransactionModal = (): React.ReactNode => {
     categoryField.reset();
     amountField.reset();
     accountIdField.reset();
+    sourceAccountIdField.reset();
+    destinationAccountIdField.reset();
     notesField.reset();
     tagsField.reset();
     setTagSearch("");
+    setMode("transaction");
     close();
   };
 
@@ -92,9 +112,49 @@ const CreateTransactionModal = (): React.ReactNode => {
 
   const onSubmit = () => {
     dateField.validate();
-    accountIdField.validate();
 
-    if (!dateField.getValue() || !accountIdField.getValue()) {
+    if (!dateField.getValue()) {
+      return;
+    }
+
+    if (mode === "transfer") {
+      sourceAccountIdField.validate();
+      destinationAccountIdField.validate();
+      const amount = Number(amountField.getValue());
+      const sourceAccountID = sourceAccountIdField.getValue();
+      const destinationAccountID = destinationAccountIdField.getValue();
+      const invalidAmount = !Number.isFinite(amount) || amount <= 0;
+      amountField.setError(
+        invalidAmount ? t("transfer_amount_must_be_positive") : null,
+      );
+
+      if (!sourceAccountID || !destinationAccountID || invalidAmount) {
+        return;
+      }
+      if (sourceAccountID === destinationAccountID) {
+        destinationAccountIdField.setError(
+          t("transfer_accounts_must_be_different"),
+        );
+        return;
+      }
+
+      destinationAccountIdField.setError(null);
+      const transfer: ITransactionTransferCreateRequest = {
+        date: dayjs(dateField.getValue()!).format("YYYY-MM-DD"),
+        merchantName: null,
+        amount,
+        sourceAccountID,
+        destinationAccountID,
+        notes: notesField.getValue(),
+        tags: tagsField.getValue(),
+      };
+      createTransferMutation.mutate(transfer, { onSuccess: handleClose });
+      return;
+    }
+
+    accountIdField.validate();
+    amountField.setError(null);
+    if (!accountIdField.getValue()) {
       return;
     }
 
@@ -138,9 +198,27 @@ const CreateTransactionModal = (): React.ReactNode => {
       <Modal
         opened={opened}
         onClose={handleClose}
-        title={t("create_transaction")}
+        title={
+          mode === "transfer" ? t("create_transfer") : t("create_transaction")
+        }
       >
         <Stack gap="1rem">
+          <SegmentedControl
+            color="secondary"
+            size="sm"
+            fullWidth
+            value={mode}
+            data={[
+              { value: "transaction", label: t("transaction") },
+              { value: "transfer", label: t("transfer") },
+            ]}
+            onChange={(value) => {
+              setMode(value as "transaction" | "transfer");
+              amountField.setError(null);
+              destinationAccountIdField.setError(null);
+            }}
+            aria-label={t("transaction_creation_mode")}
+          />
           <Stack gap="0.25rem">
             <DateInput
               label={t("date")}
@@ -149,17 +227,21 @@ const CreateTransactionModal = (): React.ReactNode => {
               locale={dayjsLocale}
               valueFormat={longDateFormat}
             />
-            <TextInput
-              label={t("merchant_name")}
-              placeholder={t("enter_merchant_name")}
-              {...merchantNameField.getInputProps()}
-            />
-            <CategorySelect
-              label={t("category")}
-              categories={transactionCategories}
-              {...categoryField.getInputProps()}
-              withinPortal
-            />
+            {mode === "transaction" && (
+              <>
+                <TextInput
+                  label={t("merchant_name")}
+                  placeholder={t("enter_merchant_name")}
+                  {...merchantNameField.getInputProps()}
+                />
+                <CategorySelect
+                  label={t("category")}
+                  categories={transactionCategories}
+                  {...categoryField.getInputProps()}
+                  withinPortal
+                />
+              </>
+            )}
             <NumberInput
               label={t("amount")}
               placeholder={t("enter_amount")}
@@ -169,17 +251,44 @@ const CreateTransactionModal = (): React.ReactNode => {
               decimalSeparator={decimalSeparator}
               {...amountField.getInputProps()}
             />
-            <Select
-              label={t("account")}
-              placeholder={t("select_an_account")}
-              data={
-                selectableAccounts.map((a) => ({
-                  value: a.id,
-                  label: a.name,
-                })) ?? []
-              }
-              {...accountIdField.getInputProps()}
-            />
+            {mode === "transaction" ? (
+              <Select
+                label={t("account")}
+                placeholder={t("select_an_account")}
+                data={
+                  selectableAccounts.map((a) => ({
+                    value: a.id,
+                    label: a.name,
+                  })) ?? []
+                }
+                {...accountIdField.getInputProps()}
+              />
+            ) : (
+              <>
+                <Select
+                  label={t("source_account")}
+                  placeholder={t("select_source_account")}
+                  data={
+                    selectableAccounts.map((a) => ({
+                      value: a.id,
+                      label: a.name,
+                    })) ?? []
+                  }
+                  {...sourceAccountIdField.getInputProps()}
+                />
+                <Select
+                  label={t("destination_account")}
+                  placeholder={t("select_destination_account")}
+                  data={
+                    selectableAccounts.map((a) => ({
+                      value: a.id,
+                      label: a.name,
+                    })) ?? []
+                  }
+                  {...destinationAccountIdField.getInputProps()}
+                />
+              </>
+            )}
             <Textarea
               label={t("notes")}
               placeholder={t("enter_notes")}
@@ -204,7 +313,10 @@ const CreateTransactionModal = (): React.ReactNode => {
             color="primary"
             size="compact-sm"
             onClick={onSubmit}
-            loading={createTransactionMutation.isPending}
+            loading={
+              createTransactionMutation.isPending ||
+              createTransferMutation.isPending
+            }
           >
             {t("submit")}
           </Button>

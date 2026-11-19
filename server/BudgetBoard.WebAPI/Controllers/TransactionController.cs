@@ -38,6 +38,25 @@ public class TransactionController(
         });
     }
 
+    [HttpPost("transfer")]
+    [Authorize]
+    public async Task<IActionResult> CreateTransfer(
+        [FromBody] TransactionTransferCreateRequest request
+    )
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(await transactionService.CreateTransferAsync(parsedUserId, request));
+        });
+    }
+
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Read(
