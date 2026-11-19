@@ -1953,6 +1953,297 @@ public class TransactionServiceTests
     }
     #endregion
 
+    #region Direct transfer creation
+    [Fact]
+    public async Task CreateTransferAsync_WhenValid_ShouldCreateAndLinkTwoTransactions()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.RuleFor(a => a.Source, AccountSource.Manual).Generate();
+        var destinationAccount = accountFaker
+            .RuleFor(a => a.Source, AccountSource.Manual)
+            .Generate();
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, destinationAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+        var date = new DateOnly(2026, 8, 24);
+
+        var result = await transactionService.CreateTransferAsync(
+            helper.demoUser.Id,
+            new TransactionTransferCreateRequest
+            {
+                Amount = 100m,
+                Date = date,
+                SourceAccountID = sourceAccount.ID,
+                DestinationAccountID = destinationAccount.ID,
+                MerchantName = "Savings transfer",
+                Notes = "Monthly contribution",
+                Tags = ["Savings"],
+            }
+        );
+
+        var transactions = helper.UserDataContext.Transactions.ToList();
+        transactions.Should().HaveCount(2);
+        var sourceTransaction = transactions.Single(t => t.AccountID == sourceAccount.ID);
+        var destinationTransaction = transactions.Single(t =>
+            t.AccountID == destinationAccount.ID
+        );
+        sourceTransaction.Amount.Should().Be(-100m);
+        destinationTransaction.Amount.Should().Be(100m);
+        transactions.Should().OnlyContain(t => t.Date == date);
+        transactions.Should().OnlyContain(t => t.Category == "Transfer");
+        transactions.Should().OnlyContain(t => t.MerchantName == "Savings transfer");
+        transactions.Should().OnlyContain(t => t.Notes == "Monthly contribution");
+        transactions.Should().OnlyContain(t => t.Source == TransactionSource.Manual);
+        sourceTransaction.SourceTransactionLink.Should().NotBeNull();
+        destinationTransaction.TargetTransactionLink.Should().NotBeNull();
+        sourceTransaction.SourceTransactionLink.Should().BeSameAs(
+            destinationTransaction.TargetTransactionLink
+        );
+        helper.UserDataContext.Tags.Should().ContainSingle(t => t.Value == "Savings");
+        helper
+            .UserDataContext.TransactionTags.Should()
+            .HaveCount(2)
+            .And.OnlyContain(link => link.Tag!.Value == "Savings");
+        helper
+            .UserDataContext.Balances.Single(balance => balance.AccountID == sourceAccount.ID)
+            .Amount.Should()
+            .Be(-100m);
+        helper
+            .UserDataContext.Balances.Single(balance =>
+                balance.AccountID == destinationAccount.ID
+            )
+            .Amount.Should()
+            .Be(100m);
+        result.Should().HaveCount(2);
+        result.Should().Contain(r => r.ID == sourceTransaction.ID);
+        result.Should().Contain(r => r.ID == destinationTransaction.ID);
+    }
+
+    [Fact]
+    public async Task CreateTransferAsync_ShouldSkipAutomaticAssociations()
+    {
+        var helper = new TestHelper();
+        var automaticCategorizer = new Mock<IAutomaticTransactionCategorizerService>();
+        var recurringRuleService = new Mock<IRecurringRuleService>();
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            automaticCategorizer.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper),
+            recurringRuleService.Object
+        );
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var destinationAccount = accountFaker.Generate();
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, destinationAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await transactionService.CreateTransferAsync(
+            helper.demoUser.Id,
+            new TransactionTransferCreateRequest
+            {
+                Amount = 100m,
+                Date = new DateOnly(2026, 8, 24),
+                SourceAccountID = sourceAccount.ID,
+                DestinationAccountID = destinationAccount.ID,
+                MerchantName = "Savings transfer",
+            }
+        );
+
+        automaticCategorizer.Verify(
+            service =>
+                service.AutoCategorizeTransactionAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Transaction>()
+                ),
+            Times.Never
+        );
+        recurringRuleService.Verify(
+            service =>
+                service.MatchTransactionAsync(It.IsAny<Guid>(), It.IsAny<Transaction>()),
+            Times.Never
+        );
+        helper
+            .UserDataContext.Transactions.Should()
+            .OnlyContain(transaction =>
+                transaction.Category == "Transfer" && transaction.RecurringRuleID == null
+            );
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task CreateTransferAsync_WhenMerchantNameIsMissing_ShouldSetAccountNames(
+        string? merchantName
+    )
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.RuleFor(a => a.Name, "Checking").Generate();
+        var destinationAccount = accountFaker.RuleFor(a => a.Name, "Savings").Generate();
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, destinationAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await transactionService.CreateTransferAsync(
+            helper.demoUser.Id,
+            new TransactionTransferCreateRequest
+            {
+                Amount = 100m,
+                Date = new DateOnly(2026, 8, 24),
+                SourceAccountID = sourceAccount.ID,
+                DestinationAccountID = destinationAccount.ID,
+                MerchantName = merchantName,
+            }
+        );
+
+        var sourceTransaction = helper.UserDataContext.Transactions.Single(t =>
+            t.AccountID == sourceAccount.ID
+        );
+        var destinationTransaction = helper.UserDataContext.Transactions.Single(t =>
+            t.AccountID == destinationAccount.ID
+        );
+        sourceTransaction
+            .MerchantName.Should()
+            .Be("TransactionTransferToMerchantName [Savings]");
+        destinationTransaction
+            .MerchantName.Should()
+            .Be("TransactionTransferFromMerchantName [Checking]");
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-10)]
+    public async Task CreateTransferAsync_WhenAmountIsNotPositive_ShouldNotPersistAnything(
+        decimal amount
+    )
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var destinationAccount = accountFaker.Generate();
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, destinationAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        Func<Task> act = async () =>
+            await transactionService.CreateTransferAsync(
+                helper.demoUser.Id,
+                new TransactionTransferCreateRequest
+                {
+                    Amount = amount,
+                    Date = new DateOnly(2026, 8, 24),
+                    SourceAccountID = sourceAccount.ID,
+                    DestinationAccountID = destinationAccount.ID,
+                    Tags = ["Savings"],
+                }
+            );
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionTransferAmountError");
+        helper.UserDataContext.Transactions.Should().BeEmpty();
+        helper.UserDataContext.TransactionLinks.Should().BeEmpty();
+        helper.UserDataContext.Tags.Should().BeEmpty();
+        helper.UserDataContext.TransactionTags.Should().BeEmpty();
+        helper.UserDataContext.Balances.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task CreateTransferAsync_WhenAccountsMatch_ShouldNotPersistAnything()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        Func<Task> act = async () =>
+            await transactionService.CreateTransferAsync(
+                helper.demoUser.Id,
+                new TransactionTransferCreateRequest
+                {
+                    Amount = 100m,
+                    Date = new DateOnly(2026, 8, 24),
+                    SourceAccountID = account.ID,
+                    DestinationAccountID = account.ID,
+                }
+            );
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionLinkSameAccountError");
+        helper.UserDataContext.Transactions.Should().BeEmpty();
+        helper.UserDataContext.TransactionLinks.Should().BeEmpty();
+        helper.UserDataContext.Balances.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task CreateTransferAsync_WhenAnAccountIsDeleted_ShouldNotPersistAnything()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var destinationAccount = accountFaker.RuleFor(a => a.Deleted, DateTime.UtcNow).Generate();
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, destinationAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        Func<Task> act = async () =>
+            await transactionService.CreateTransferAsync(
+                helper.demoUser.Id,
+                new TransactionTransferCreateRequest
+                {
+                    Amount = 100m,
+                    Date = new DateOnly(2026, 8, 24),
+                    SourceAccountID = sourceAccount.ID,
+                    DestinationAccountID = destinationAccount.ID,
+                }
+            );
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionLinkDeletedError");
+        helper.UserDataContext.Transactions.Should().BeEmpty();
+        helper.UserDataContext.TransactionLinks.Should().BeEmpty();
+        helper.UserDataContext.Balances.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task CreateTransferAsync_WhenAnAccountDoesNotExist_ShouldNotPersistAnything()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        helper.UserDataContext.Accounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        Func<Task> act = async () =>
+            await transactionService.CreateTransferAsync(
+                helper.demoUser.Id,
+                new TransactionTransferCreateRequest
+                {
+                    Amount = 100m,
+                    Date = new DateOnly(2026, 8, 24),
+                    SourceAccountID = account.ID,
+                    DestinationAccountID = Guid.NewGuid(),
+                }
+            );
+
+        await act.Should()
+            .ThrowAsync<BudgetBoardServiceException>()
+            .WithMessage("TransactionAccountNotFoundError");
+        helper.UserDataContext.Transactions.Should().BeEmpty();
+        helper.UserDataContext.TransactionLinks.Should().BeEmpty();
+        helper.UserDataContext.Balances.Should().BeEmpty();
+    }
+    #endregion
+
     #region Transaction linking
     [Fact]
     public async Task LinkTransactionsAsync_WhenValidPair_ShouldLinkAndNormalizeCategories()
@@ -2008,6 +2299,68 @@ public class TransactionServiceTests
         result.Should().Contain(response => response.LinkedTransactionID == targetTransaction.ID);
         result.Should().Contain(response => response.LinkedTransactionID == sourceTransaction.ID);
         result.Should().OnlyContain(response => response.Date == new DateOnly(2026, 8, 23));
+    }
+
+    [Fact]
+    public async Task LinkTransactionsAsync_WhenTransactionsAreRecurring_ShouldClearAssociations()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var targetAccount = accountFaker.Generate();
+        var sourceRule = new RecurringRule
+        {
+            UserID = helper.demoUser.Id,
+            AccountID = sourceAccount.ID,
+            StartDate = new DateOnly(2026, 1, 1),
+        };
+        var targetRule = new RecurringRule
+        {
+            UserID = helper.demoUser.Id,
+            AccountID = targetAccount.ID,
+            StartDate = new DateOnly(2026, 1, 1),
+        };
+        var sourceTransaction = new Transaction
+        {
+            Amount = -100m,
+            Date = new DateOnly(2026, 8, 24),
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+            RecurringRuleID = sourceRule.ID,
+            RecurringRule = sourceRule,
+        };
+        var targetTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 24),
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+            RecurringRuleID = targetRule.ID,
+            RecurringRule = targetRule,
+        };
+        sourceAccount.Transactions.Add(sourceTransaction);
+        targetAccount.Transactions.Add(targetTransaction);
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, targetAccount);
+        helper.UserDataContext.RecurringRules.AddRange(sourceRule, targetRule);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await transactionService.LinkTransactionsAsync(
+            helper.demoUser.Id,
+            new TransactionLinkRequest
+            {
+                TransactionID = sourceTransaction.ID,
+                LinkedTransactionID = targetTransaction.ID,
+            }
+        );
+
+        sourceTransaction.RecurringRuleID.Should().BeNull();
+        sourceTransaction.RecurringRule.Should().BeNull();
+        targetTransaction.RecurringRuleID.Should().BeNull();
+        targetTransaction.RecurringRule.Should().BeNull();
+        helper
+            .UserDataContext.Transactions.Should()
+            .OnlyContain(transaction => transaction.RecurringRuleID == null);
     }
 
     [Fact]
