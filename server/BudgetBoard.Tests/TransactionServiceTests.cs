@@ -2020,6 +2020,60 @@ public class TransactionServiceTests
         result.Should().Contain(r => r.ID == destinationTransaction.ID);
     }
 
+    [Fact]
+    public async Task CreateTransferAsync_ShouldSkipAutomaticAssociations()
+    {
+        var helper = new TestHelper();
+        var automaticCategorizer = new Mock<IAutomaticTransactionCategorizerService>();
+        var recurringRuleService = new Mock<IRecurringRuleService>();
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            automaticCategorizer.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper),
+            recurringRuleService.Object
+        );
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var destinationAccount = accountFaker.Generate();
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, destinationAccount);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await transactionService.CreateTransferAsync(
+            helper.demoUser.Id,
+            new TransactionTransferCreateRequest
+            {
+                Amount = 100m,
+                Date = new DateOnly(2026, 8, 24),
+                SourceAccountID = sourceAccount.ID,
+                DestinationAccountID = destinationAccount.ID,
+                MerchantName = "Savings transfer",
+            }
+        );
+
+        automaticCategorizer.Verify(
+            service =>
+                service.AutoCategorizeTransactionAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Transaction>()
+                ),
+            Times.Never
+        );
+        recurringRuleService.Verify(
+            service =>
+                service.MatchTransactionAsync(It.IsAny<Guid>(), It.IsAny<Transaction>()),
+            Times.Never
+        );
+        helper
+            .UserDataContext.Transactions.Should()
+            .OnlyContain(transaction =>
+                transaction.Category == "Transfer" && transaction.RecurringRuleID == null
+            );
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -2245,6 +2299,68 @@ public class TransactionServiceTests
         result.Should().Contain(response => response.LinkedTransactionID == targetTransaction.ID);
         result.Should().Contain(response => response.LinkedTransactionID == sourceTransaction.ID);
         result.Should().OnlyContain(response => response.Date == new DateOnly(2026, 8, 23));
+    }
+
+    [Fact]
+    public async Task LinkTransactionsAsync_WhenTransactionsAreRecurring_ShouldClearAssociations()
+    {
+        var helper = new TestHelper();
+        var transactionService = CreateTransactionService(helper);
+        var accountFaker = new AccountFaker(helper.demoUser.Id);
+        var sourceAccount = accountFaker.Generate();
+        var targetAccount = accountFaker.Generate();
+        var sourceRule = new RecurringRule
+        {
+            UserID = helper.demoUser.Id,
+            AccountID = sourceAccount.ID,
+            StartDate = new DateOnly(2026, 1, 1),
+        };
+        var targetRule = new RecurringRule
+        {
+            UserID = helper.demoUser.Id,
+            AccountID = targetAccount.ID,
+            StartDate = new DateOnly(2026, 1, 1),
+        };
+        var sourceTransaction = new Transaction
+        {
+            Amount = -100m,
+            Date = new DateOnly(2026, 8, 24),
+            Source = TransactionSource.Manual,
+            AccountID = sourceAccount.ID,
+            RecurringRuleID = sourceRule.ID,
+            RecurringRule = sourceRule,
+        };
+        var targetTransaction = new Transaction
+        {
+            Amount = 100m,
+            Date = new DateOnly(2026, 8, 24),
+            Source = TransactionSource.Manual,
+            AccountID = targetAccount.ID,
+            RecurringRuleID = targetRule.ID,
+            RecurringRule = targetRule,
+        };
+        sourceAccount.Transactions.Add(sourceTransaction);
+        targetAccount.Transactions.Add(targetTransaction);
+        helper.UserDataContext.Accounts.AddRange(sourceAccount, targetAccount);
+        helper.UserDataContext.RecurringRules.AddRange(sourceRule, targetRule);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await transactionService.LinkTransactionsAsync(
+            helper.demoUser.Id,
+            new TransactionLinkRequest
+            {
+                TransactionID = sourceTransaction.ID,
+                LinkedTransactionID = targetTransaction.ID,
+            }
+        );
+
+        sourceTransaction.RecurringRuleID.Should().BeNull();
+        sourceTransaction.RecurringRule.Should().BeNull();
+        targetTransaction.RecurringRuleID.Should().BeNull();
+        targetTransaction.RecurringRule.Should().BeNull();
+        helper
+            .UserDataContext.Transactions.Should()
+            .OnlyContain(transaction => transaction.RecurringRuleID == null);
     }
 
     [Fact]

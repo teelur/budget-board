@@ -49,7 +49,8 @@ public class TransactionService(
         ApplicationUser userData,
         ITransactionCreateRequest request,
         bool deferSave,
-        Guid? transactionId
+        Guid? transactionId,
+        bool applyAutomaticAssociations = true
     )
     {
         var account = GetAccountByID(userData, request.AccountID);
@@ -68,10 +69,13 @@ public class TransactionService(
             AccountID = request.AccountID,
             Account = account,
         };
-        await automaticTransactionCategorizerService.AutoCategorizeTransactionAsync(
-            userData.Id,
-            newTransaction
-        );
+        if (applyAutomaticAssociations)
+        {
+            await automaticTransactionCategorizerService.AutoCategorizeTransactionAsync(
+                userData.Id,
+                newTransaction
+            );
+        }
 
         userDataContext.Transactions.Add(newTransaction);
         var tags = request.Tags?.ToArray();
@@ -79,7 +83,10 @@ public class TransactionService(
         {
             await tagService.ApplyTagChangesAsync(userData.Id, newTransaction, tags, null);
         }
-        await recurringRuleService.MatchTransactionAsync(userData.Id, newTransaction);
+        if (applyAutomaticAssociations)
+        {
+            await recurringRuleService.MatchTransactionAsync(userData.Id, newTransaction);
+        }
 
         // Manual accounts need to manually update the balance
         if (account.Source == AccountSource.Manual)
@@ -157,7 +164,8 @@ public class TransactionService(
                 AccountID = sourceAccount.ID,
             },
             true,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            false
         );
         var destinationTransaction = await CreateTransactionAsync(
             userData,
@@ -173,7 +181,8 @@ public class TransactionService(
                 AccountID = destinationAccount.ID,
             },
             true,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            false
         );
 
         var result = await LinkTransactionsAsync(
@@ -576,6 +585,10 @@ public class TransactionService(
             userData,
             targetTransaction.Subcategory
         );
+        sourceTransaction.RecurringRuleID = null;
+        sourceTransaction.RecurringRule = null;
+        targetTransaction.RecurringRuleID = null;
+        targetTransaction.RecurringRule = null;
 
         var linkDate =
             sourceTransaction.Date <= targetTransaction.Date
