@@ -30,6 +30,28 @@ public class TransactionCreateRequest : ITransactionCreateRequest
     public Guid AccountID { get; set; } = Guid.Empty;
 }
 
+public interface ITransactionTransferCreateRequest
+{
+    decimal Amount { get; }
+    DateOnly Date { get; }
+    Guid SourceAccountID { get; }
+    Guid DestinationAccountID { get; }
+    string? MerchantName { get; }
+    string Notes { get; }
+    IEnumerable<string>? Tags { get; }
+}
+
+public class TransactionTransferCreateRequest : ITransactionTransferCreateRequest
+{
+    public decimal Amount { get; set; } = 0.0M;
+    public DateOnly Date { get; set; } = DateOnly.MinValue;
+    public Guid SourceAccountID { get; set; } = Guid.Empty;
+    public Guid DestinationAccountID { get; set; } = Guid.Empty;
+    public string? MerchantName { get; set; } = null;
+    public string Notes { get; set; } = string.Empty;
+    public IEnumerable<string>? Tags { get; set; } = [];
+}
+
 public interface ITransactionUpdateRequest
 {
     Guid ID { get; }

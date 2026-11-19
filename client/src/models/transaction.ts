@@ -72,6 +72,16 @@ export interface ITransactionCreateRequest {
   tags: string[];
 }
 
+export interface ITransactionTransferCreateRequest {
+  amount: number;
+  date: string;
+  sourceAccountID: string;
+  destinationAccountID: string;
+  merchantName: string | null;
+  notes: string;
+  tags: string[];
+}
+
 export interface ITransactionUpdateRequest {
   id: string;
   amount?: number;
