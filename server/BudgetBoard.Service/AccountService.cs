@@ -5,6 +5,7 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -202,6 +203,34 @@ public class AccountService(
     /// <inheritdoc />
     public async Task PermanentlyDeleteAccountAsync(Guid userGuid, Guid accountGuid)
     {
+        if (userDataContext.Database.IsNpgsql())
+        {
+            // Do not replay a transaction whose tracked changes may already have been saved.
+            await new SingleAttemptExecutionStrategy(userDataContext).ExecuteAsync(async () =>
+            {
+                await using var transaction =
+                    await userDataContext.Database.BeginTransactionAsync();
+                // Serialize hard deletes and prevent new accounts from referencing this institution.
+                await userDataContext.Database.ExecuteSqlInterpolatedAsync(
+                    $"""
+                    SELECT 1 FROM "Institution" AS i
+                    INNER JOIN "Account" AS a ON a."InstitutionID" = i."ID"
+                    WHERE a."ID" = {accountGuid} AND a."UserID" = {userGuid}
+                    FOR UPDATE OF i
+                    """
+                );
+
+                await PermanentlyDeleteAccountCoreAsync(userGuid, accountGuid);
+                await transaction.CommitAsync();
+            });
+            return;
+        }
+
+        await PermanentlyDeleteAccountCoreAsync(userGuid, accountGuid);
+    }
+
+    private async Task PermanentlyDeleteAccountCoreAsync(Guid userGuid, Guid accountGuid)
+    {
         var userData = await GetCurrentUserAsync(userGuid);
         var account = GetAccountById(userData, accountGuid);
         if (account.Deleted == null)
@@ -212,10 +241,27 @@ public class AccountService(
             );
         }
 
+        var institution = account.Institution;
+        var hasOtherAccounts =
+            institution != null
+            && await userDataContext.Accounts.AnyAsync(a =>
+                a.InstitutionID == institution.ID && a.ID != account.ID
+            );
+
         userDataContext.Transactions.RemoveRange(account.Transactions);
         userDataContext.Balances.RemoveRange(account.Balances);
         userDataContext.Accounts.Remove(account);
+        if (institution != null && !hasOtherAccounts)
+        {
+            userDataContext.Institutions.Remove(institution);
+        }
         await userDataContext.SaveChangesAsync();
+    }
+
+    private sealed class SingleAttemptExecutionStrategy(DbContext context)
+        : ExecutionStrategy(context, maxRetryCount: 0, maxRetryDelay: TimeSpan.Zero)
+    {
+        protected override bool ShouldRetryOn(Exception exception) => false;
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)

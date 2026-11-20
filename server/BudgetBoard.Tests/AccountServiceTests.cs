@@ -1,4 +1,6 @@
+using System.Data.Common;
 using Bogus;
+using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
@@ -7,8 +9,11 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Npgsql;
 
 namespace BudgetBoard.IntegrationTests;
 
@@ -699,6 +704,49 @@ public class AccountServiceTests()
     }
 
     [Fact]
+    public async Task DeleteAccountAsync_WhenAllAccountsAreDeleted_ShouldDeleteInstitution()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(DateTime.UtcNow);
+        var institutionService = new InstitutionService(
+            Mock.Of<ILogger<IInstitutionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            institutionService,
+            Mock.Of<ITransactionService>(),
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institution = new InstitutionFaker(helper.demoUser.Id).Generate();
+        var accounts = new AccountFaker(helper.demoUser.Id).Generate(2);
+        accounts.ForEach(account => account.InstitutionID = institution.ID);
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, accounts[0].ID);
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, accounts[1].ID);
+
+        // Assert
+        helper.UserDataContext.Institutions.Single(i => i.ID == institution.ID).Deleted.Should().NotBeNull();
+        helper.UserDataContext.Accounts.Where(a => a.InstitutionID == institution.ID)
+            .Should()
+            .OnlyContain(a => a.Deleted != null);
+    }
+
+    [Fact]
     public async Task DeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldClearLink()
     {
         // Arrange
@@ -1066,6 +1114,184 @@ public class AccountServiceTests()
 
         // Assert
         helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
+    }
+
+    [Fact]
+    public async Task PermanentlyDeleteAccountAsync_WhenAllAccountsAreDeleted_ShouldRemoveInstitutionAfterLastAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institution = new InstitutionFaker(helper.demoUser.Id).Generate();
+        var accounts = new AccountFaker(helper.demoUser.Id).Generate(2);
+        accounts.ForEach(account =>
+        {
+            account.InstitutionID = institution.ID;
+            account.Deleted = DateTime.UtcNow;
+        });
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, accounts[0].ID);
+
+        // Assert
+        helper.UserDataContext.Institutions.Should().Contain(i => i.ID == institution.ID);
+        helper.UserDataContext.Accounts.Should().Contain(a => a.ID == accounts[1].ID);
+
+        // Act
+        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, accounts[1].ID);
+
+        // Assert
+        helper.UserDataContext.Institutions.Should().NotContain(i => i.ID == institution.ID);
+        helper
+            .UserDataContext.Accounts.Should()
+            .NotContain(a => accounts.Any(account => account.ID == a.ID));
+    }
+
+    [SuperuserServiceTests.PostgreSqlFact]
+    public async Task PermanentlyDeleteAccountAsync_ConcurrentDeletes_RemoveEmptyInstitution()
+    {
+        var connectionString = Environment.GetEnvironmentVariable(
+            "BUDGET_BOARD_TEST_POSTGRES_CONNECTION_STRING"
+        )!;
+        var schema = $"account_delete_test_{Guid.NewGuid():N}";
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync();
+        await using (
+            var createSchema = new NpgsqlCommand($"CREATE SCHEMA \"{schema}\"", connection)
+        )
+        {
+            await createSchema.ExecuteNonQueryAsync();
+        }
+
+        try
+        {
+            var scopedConnectionString = new NpgsqlConnectionStringBuilder(connectionString)
+            {
+                SearchPath = schema,
+            }.ConnectionString;
+            var lockAttempts = new InstitutionLockInterceptor();
+            var options = new DbContextOptionsBuilder<UserDataContext>()
+                .UseNpgsql(scopedConnectionString, options => options.EnableRetryOnFailure())
+                .AddInterceptors(lockAttempts)
+                .Options;
+            await using var setup = new UserDataContext(options);
+            await setup.Database.ExecuteSqlRawAsync(setup.Database.GenerateCreateScript());
+
+            var user = new ApplicationUser { Id = Guid.NewGuid() };
+            var institution = new Institution { UserID = user.Id, Name = "Bank" };
+            var accounts = new[]
+            {
+                new Account
+                {
+                    UserID = user.Id,
+                    InstitutionID = institution.ID,
+                    Deleted = DateTime.UtcNow,
+                },
+                new Account
+                {
+                    UserID = user.Id,
+                    InstitutionID = institution.ID,
+                    Deleted = DateTime.UtcNow,
+                },
+            };
+            setup.Users.Add(user);
+            setup.Institutions.Add(institution);
+            setup.Accounts.AddRange(accounts);
+            await setup.SaveChangesAsync();
+
+            var blockerOptions = new DbContextOptionsBuilder<UserDataContext>()
+                .UseNpgsql(scopedConnectionString)
+                .Options;
+            await using var blocker = new UserDataContext(blockerOptions);
+            await using var transaction = await blocker.Database.BeginTransactionAsync();
+            await blocker.Database.ExecuteSqlInterpolatedAsync(
+                $"""SELECT 1 FROM "Institution" WHERE "ID" = {institution.ID} FOR UPDATE"""
+            );
+
+            await using var firstContext = new UserDataContext(options);
+            await using var secondContext = new UserDataContext(options);
+            AccountService CreateService(UserDataContext context) =>
+                new(
+                    Mock.Of<ILogger<IAccountService>>(),
+                    context,
+                    Mock.Of<IInstitutionService>(),
+                    Mock.Of<ITransactionService>(),
+                    Mock.Of<INowProvider>(),
+                    TestHelper.CreateMockLocalizer<ResponseStrings>(),
+                    TestHelper.CreateMockLocalizer<LogStrings>()
+                );
+
+            var deletes = Task.WhenAll(
+                CreateService(firstContext).PermanentlyDeleteAccountAsync(user.Id, accounts[0].ID),
+                CreateService(secondContext).PermanentlyDeleteAccountAsync(user.Id, accounts[1].ID)
+            );
+            try
+            {
+                var firstCompleted = await Task.WhenAny(lockAttempts.BothStarted, deletes)
+                    .WaitAsync(TimeSpan.FromSeconds(15));
+                firstCompleted.Should().BeSameAs(lockAttempts.BothStarted);
+                deletes.IsCompleted.Should().BeFalse();
+            }
+            finally
+            {
+                await transaction.RollbackAsync();
+                await deletes.WaitAsync(TimeSpan.FromSeconds(15));
+            }
+
+            await using var verify = new UserDataContext(options);
+            (await verify.Accounts.AnyAsync(a => a.InstitutionID == institution.ID))
+                .Should()
+                .BeFalse();
+            (await verify.Institutions.AnyAsync(i => i.ID == institution.ID)).Should().BeFalse();
+        }
+        finally
+        {
+            await using var dropSchema = new NpgsqlCommand(
+                $"DROP SCHEMA \"{schema}\" CASCADE",
+                connection
+            );
+            await dropSchema.ExecuteNonQueryAsync();
+        }
+    }
+
+    private sealed class InstitutionLockInterceptor : DbCommandInterceptor
+    {
+        private readonly TaskCompletionSource _bothStarted = new(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+        private int _attempts;
+
+        public Task BothStarted => _bothStarted.Task;
+
+        public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(
+            DbCommand command,
+            CommandEventData eventData,
+            InterceptionResult<int> result,
+            CancellationToken cancellationToken = default
+        )
+        {
+            if (
+                command.CommandText.Contains("FOR UPDATE OF i", StringComparison.Ordinal)
+                && Interlocked.Increment(ref _attempts) == 2
+            )
+            {
+                _bothStarted.TrySetResult();
+            }
+            return base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
+        }
     }
 
     [Fact]
