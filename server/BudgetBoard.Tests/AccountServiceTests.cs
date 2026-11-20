@@ -699,6 +699,49 @@ public class AccountServiceTests()
     }
 
     [Fact]
+    public async Task DeleteAccountAsync_WhenAllAccountsAreDeleted_ShouldDeleteInstitution()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var nowProviderMock = new Mock<INowProvider>();
+        nowProviderMock.Setup(np => np.UtcNow).Returns(DateTime.UtcNow);
+        var institutionService = new InstitutionService(
+            Mock.Of<ILogger<IInstitutionService>>(),
+            helper.UserDataContext,
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            institutionService,
+            Mock.Of<ITransactionService>(),
+            nowProviderMock.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institution = new InstitutionFaker(helper.demoUser.Id).Generate();
+        var accounts = new AccountFaker(helper.demoUser.Id).Generate(2);
+        accounts.ForEach(account => account.InstitutionID = institution.ID);
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, accounts[0].ID);
+        await accountService.DeleteAccountAsync(helper.demoUser.Id, accounts[1].ID);
+
+        // Assert
+        helper.UserDataContext.Institutions.Single(i => i.ID == institution.ID).Deleted.Should().NotBeNull();
+        helper.UserDataContext.Accounts.Where(a => a.InstitutionID == institution.ID)
+            .Should()
+            .OnlyContain(a => a.Deleted != null);
+    }
+
+    [Fact]
     public async Task DeleteAccountAsync_WithLinkedLunchFlowAccount_ShouldClearLink()
     {
         // Arrange
@@ -1066,6 +1109,50 @@ public class AccountServiceTests()
 
         // Assert
         helper.UserDataContext.Accounts.Should().NotContain(a => a.ID == account.ID);
+    }
+
+    [Fact]
+    public async Task PermanentlyDeleteAccountAsync_WhenAllAccountsAreDeleted_ShouldRemoveInstitutionAfterLastAccount()
+    {
+        // Arrange
+        var helper = new TestHelper();
+        var accountService = new AccountService(
+            Mock.Of<ILogger<IAccountService>>(),
+            helper.UserDataContext,
+            Mock.Of<IInstitutionService>(),
+            Mock.Of<ITransactionService>(),
+            Mock.Of<INowProvider>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>()
+        );
+
+        var institution = new InstitutionFaker(helper.demoUser.Id).Generate();
+        var accounts = new AccountFaker(helper.demoUser.Id).Generate(2);
+        accounts.ForEach(account =>
+        {
+            account.InstitutionID = institution.ID;
+            account.Deleted = DateTime.UtcNow;
+        });
+
+        helper.UserDataContext.Institutions.Add(institution);
+        helper.UserDataContext.Accounts.AddRange(accounts);
+        helper.UserDataContext.SaveChanges();
+
+        // Act
+        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, accounts[0].ID);
+
+        // Assert
+        helper.UserDataContext.Institutions.Should().Contain(i => i.ID == institution.ID);
+        helper.UserDataContext.Accounts.Should().Contain(a => a.ID == accounts[1].ID);
+
+        // Act
+        await accountService.PermanentlyDeleteAccountAsync(helper.demoUser.Id, accounts[1].ID);
+
+        // Assert
+        helper.UserDataContext.Institutions.Should().NotContain(i => i.ID == institution.ID);
+        helper
+            .UserDataContext.Accounts.Should()
+            .NotContain(a => accounts.Any(account => account.ID == a.ID));
     }
 
     [Fact]

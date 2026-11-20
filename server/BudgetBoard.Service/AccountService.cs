@@ -212,9 +212,20 @@ public class AccountService(
             );
         }
 
+        var institution = account.Institution;
+        var hasOtherAccounts =
+            institution != null
+            && await userDataContext.Accounts.AnyAsync(a =>
+                a.InstitutionID == institution.ID && a.ID != account.ID
+            );
+
         userDataContext.Transactions.RemoveRange(account.Transactions);
         userDataContext.Balances.RemoveRange(account.Balances);
         userDataContext.Accounts.Remove(account);
+        if (institution != null && !hasOtherAccounts)
+        {
+            userDataContext.Institutions.Remove(institution);
+        }
         await userDataContext.SaveChangesAsync();
     }
 
