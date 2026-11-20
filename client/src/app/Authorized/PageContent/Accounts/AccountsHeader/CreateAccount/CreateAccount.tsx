@@ -104,7 +104,9 @@ const CreateAccount = () => {
             label={t("institution")}
             data={
               institutionQuery.data
-                ? institutionQuery.data.map((i) => i.name)
+                ? institutionQuery.data
+                    .filter((i) => i.deleted === null)
+                    .map((i) => i.name)
                 : []
             }
             clearable
