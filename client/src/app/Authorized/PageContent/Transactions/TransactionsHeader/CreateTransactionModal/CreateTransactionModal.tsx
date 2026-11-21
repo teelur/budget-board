@@ -47,6 +47,8 @@ const CreateTransactionModal = (): React.ReactNode => {
     decimalSeparator,
   } = useLocale();
   const { preferredCurrency, decimalPlaces } = useUserSettings();
+  const minimumPositiveAmount =
+    decimalPlaces > 0 ? 1 / 10 ** decimalPlaces : 1;
   const { allTransactionCategories: transactionCategories } =
     useTransactionCategories();
   const accountsQuery = useAccountsQuery();
@@ -249,6 +251,8 @@ const CreateTransactionModal = (): React.ReactNode => {
               decimalScale={decimalPlaces}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
+              min={mode === "transfer" ? minimumPositiveAmount : undefined}
+              allowNegative={mode !== "transfer"}
               {...amountField.getInputProps()}
             />
             {mode === "transaction" ? (
