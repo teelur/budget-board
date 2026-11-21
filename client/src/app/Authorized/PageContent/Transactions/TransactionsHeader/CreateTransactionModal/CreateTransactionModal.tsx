@@ -251,7 +251,8 @@ const CreateTransactionModal = (): React.ReactNode => {
               decimalScale={decimalPlaces}
               thousandSeparator={thousandsSeparator}
               decimalSeparator={decimalSeparator}
-              min={mode === "transfer" ? minimumPositiveAmount : undefined}
+min={mode === "transfer" ? minimumPositiveAmount : undefined}
+              clampBehavior="none"
               allowNegative={mode !== "transfer"}
               {...amountField.getInputProps()}
             />
