@@ -45,6 +45,7 @@ export interface IFlowsWidgetConfiguration {
 export interface ITransactionTrendsWidgetConfiguration {
   categoryValues: string[];
   transactionType: CategoryType;
+  showProjections: boolean;
 }
 
 export interface INetWorthWidgetConfiguration {

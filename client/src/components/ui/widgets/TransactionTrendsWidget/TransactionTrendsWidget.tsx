@@ -1,8 +1,13 @@
 import { Box, Group, Stack } from "@mantine/core";
-import { BodyText, Card, HeadingText, Skeleton } from "@teelur/budget-board-ui";
+import {
+  Alert,
+  BodyText,
+  Card,
+  HeadingText,
+  Skeleton,
+} from "@teelur/budget-board-ui";
 import TransactionTrendsChart from "~/components/Charts/TransactionTrendsChart/TransactionTrendsChart";
 import { SignDisplay } from "~/helpers/currency";
-import { getRollingTransactionTotalForMonth } from "~/helpers/transactions";
 import React from "react";
 import { useSensitiveAmountFormatter } from "~/hooks/useSensitiveAmountFormatter";
 import { useTranslation } from "react-i18next";
@@ -13,11 +18,17 @@ import { useTransactionCategories } from "~/providers/TransactionCategoryProvide
 import {
   filterTransactionsByCategories,
   filterTransactionsByType,
+  getRollingTransactionTotalForMonth,
 } from "~/helpers/transactions";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseTransactionTrendsConfiguration } from "~/helpers/widgets";
 import TransactionTrendsWidgetSettings from "./TransactionTrendsWidgetSettings/TransactionTrendsWidgetSettings";
 import { CategoryTypes } from "~/models/category";
+import { useRecurringForecastQuery } from "~/hooks/queries/useRecurringForecastQuery";
+import {
+  filterRecurringForecastByCategories,
+  filterRecurringForecastByType,
+} from "~/helpers/recurringRules";
 
 interface TransactionTrendsWidgetProps {
   widget: IWidgetSettingsResponse;
@@ -43,7 +54,7 @@ const TransactionTrendsWidget = ({
     dayjs().startOf("month").toDate(),
     dayjs().subtract(1, "month").startOf("month").toDate(),
   ];
-  const { categoryValues, transactionType } = React.useMemo(
+  const { categoryValues, transactionType, showProjections } = React.useMemo(
     () => parseTransactionTrendsConfiguration(widget.configuration),
     [widget.configuration],
   );
@@ -52,6 +63,10 @@ const TransactionTrendsWidget = ({
       month: dayjs(month).month() + 1,
       year: dayjs(month).year(),
     })),
+  });
+  const forecastQuery = useRecurringForecastQuery({
+    month: dayjs().startOf("month").toDate(),
+    enabled: showProjections,
   });
   const filteredTransactions = React.useMemo(() => {
     const transactions = transactionsQuery.data ?? [];
@@ -73,7 +88,30 @@ const TransactionTrendsWidget = ({
     transactionType,
     transactionsQuery.data,
   ]);
-  const isPending = transactionsQuery.isPending || categoriesPending;
+  const filteredProjectedOccurrences = React.useMemo(() => {
+    const occurrences = forecastQuery.data ?? [];
+    return categoryValues.length > 0
+      ? filterRecurringForecastByCategories(
+          occurrences,
+          categoryValues,
+          allTransactionCategories,
+        )
+      : filterRecurringForecastByType(
+          occurrences,
+          transactionType,
+          getCategoryType,
+        );
+  }, [
+    allTransactionCategories,
+    categoryValues,
+    forecastQuery.data,
+    getCategoryType,
+    transactionType,
+  ]);
+  const isPending =
+    transactionsQuery.isPending ||
+    categoriesPending ||
+    (showProjections && forecastQuery.isPending);
 
   const getTransactionComparison = (): number => {
     const today = dayjs().date();
@@ -182,6 +220,11 @@ const TransactionTrendsWidget = ({
             <Skeleton height="100%" />
           ) : (
             <Stack gap={0} style={{ flex: "1 1 0", minHeight: 0 }}>
+              {showProjections && forecastQuery.isError && (
+                <Alert color="error" variant="light">
+                  {t("transaction_trends_projections_load_error")}
+                </Alert>
+              )}
               <BodyText tone="primary" size="sm" ta="right">
                 {getTransactionComparisonString()}
               </BodyText>
@@ -189,6 +232,8 @@ const TransactionTrendsWidget = ({
                 <TransactionTrendsChart
                   months={months}
                   transactions={filteredTransactions}
+                  projectedOccurrences={filteredProjectedOccurrences}
+                  includeProjections={showProjections && !forecastQuery.isError}
                   includeYAxis={false}
                   getCategoryType={
                     categoryValues.length > 0 ||

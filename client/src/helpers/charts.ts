@@ -17,7 +17,12 @@ import {
 import { getDaysInMonth } from "./datetime";
 import { areStringsEqual } from "./utils";
 import { getFormattedCategoryValue, getParentCategory } from "./category";
-import type { CategoryType, ICategory } from "~/models/category";
+import {
+  CategoryTypes,
+  type CategoryType,
+  type ICategory,
+} from "~/models/category";
+import type { IRecurringForecastOccurrence } from "~/models/recurringRule";
 
 export type { FlowsChartData, FlowType } from "@teelur/budget-board-ui";
 
@@ -46,6 +51,8 @@ export const buildTransactionChartData = (
   transactions: ITransaction[],
   formatDateString: (date: Date) => string,
   getCategoryType?: (category: string) => CategoryType | "",
+  projectedOccurrences: IRecurringForecastOccurrence[] = [],
+  getProjectionSeriesKey?: (seriesKey: string) => string,
 ): TransactionTrendsChartData[] => {
   const transactionTrendsChartData: TransactionTrendsChartData[] = [];
   months.forEach((month) => {
@@ -69,24 +76,68 @@ export const buildTransactionChartData = (
 
     rollingTotalTransactionsForMonth.forEach(
       (rollingTotalTransaction: RollingTransactionTotalPerDay) => {
-        const chartDay = transactionTrendsChartData.find(
-          (data) => data.day === rollingTotalTransaction.day,
-        );
-
-        // On the very first loop, we need to create the data point.
-        if (chartDay == null) {
-          const newChartDay: TransactionTrendsChartData = {
-            day: rollingTotalTransaction.day,
-            [seriesKey]: rollingTotalTransaction.amount,
-          };
-          transactionTrendsChartData.push(newChartDay);
-        } else {
-          chartDay[seriesKey] = rollingTotalTransaction.amount;
-        }
+        getOrCreateTransactionTrendChartDay(
+          transactionTrendsChartData,
+          rollingTotalTransaction.day,
+        )[seriesKey] = rollingTotalTransaction.amount;
       },
     );
+
+    if (isThisMonth && getProjectionSeriesKey) {
+      const projectionSeriesKey = getProjectionSeriesKey(seriesKey);
+      const forecastForMonth = projectedOccurrences.filter((occurrence) => {
+        const occurrenceDate = new Date(`${occurrence.date}T00:00:00`);
+        return (
+          occurrenceDate.getFullYear() === month.getFullYear() &&
+          occurrenceDate.getMonth() === month.getMonth()
+        );
+      });
+      const daysInMonth = getDaysInMonth(month.getMonth(), month.getFullYear());
+      let projectedAmount =
+        rollingTotalTransactionsForMonth[today.getDate() - 1]?.amount ?? 0;
+      const forecastAmountsByDay = new Map<number, number>();
+
+      forecastForMonth.forEach((occurrence) => {
+        const occurrenceDate = new Date(`${occurrence.date}T00:00:00`);
+        const day = occurrenceDate.getDate();
+        if (day > today.getDate()) {
+          forecastAmountsByDay.set(
+            day,
+            (forecastAmountsByDay.get(day) ?? 0) +
+              (getCategoryType?.(occurrence.category ?? "") ===
+              CategoryTypes.Income
+                ? occurrence.amount
+                : -occurrence.amount),
+          );
+        }
+      });
+
+      getOrCreateTransactionTrendChartDay(
+        transactionTrendsChartData,
+        today.getDate(),
+      )[projectionSeriesKey] = projectedAmount;
+
+      for (let day = today.getDate() + 1; day <= daysInMonth; day++) {
+        projectedAmount += forecastAmountsByDay.get(day) ?? 0;
+        getOrCreateTransactionTrendChartDay(transactionTrendsChartData, day)[
+          projectionSeriesKey
+        ] = projectedAmount;
+      }
+    }
   });
   return transactionTrendsChartData;
+};
+
+const getOrCreateTransactionTrendChartDay = (
+  chartData: TransactionTrendsChartData[],
+  day: number,
+): TransactionTrendsChartData => {
+  let chartDay = chartData.find((data) => data.day === day);
+  if (chartDay == null) {
+    chartDay = { day };
+    chartData.push(chartDay);
+  }
+  return chartDay;
 };
 
 /**

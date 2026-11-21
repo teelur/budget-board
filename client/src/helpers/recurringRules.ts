@@ -9,6 +9,14 @@ import {
   RecurringCadenceUnit,
   RecurringCadenceUnits,
 } from "~/models/recurringRule";
+import {
+  CategoryTypes,
+  type CategoryType,
+  type ICategory,
+} from "~/models/category";
+import { getCategoryValuesWithDescendants } from "./category";
+import { areStringsEqual } from "./utils";
+import { uncategorizedTransactionCategory } from "~/models/transaction";
 
 const PREVIEW_OCCURRENCE_COUNT = 6;
 
@@ -267,6 +275,10 @@ const getPerUnitPeriodOccurrences = (
             daysInYear;
           return yearStart.add(dayOfYear, "day");
         }
+        default:
+          throw new Error(
+            `Unsupported recurring cadence unit: ${cadence.unit}`,
+          );
       }
     },
   );
@@ -324,3 +336,49 @@ export const buildCategoryToRecurringForecastTotalMap = (
 
   return totals;
 };
+
+export const filterRecurringForecastByCategories = (
+  occurrences: IRecurringForecastOccurrence[],
+  selectedCategoryValues: string[],
+  categories: ICategory[],
+): IRecurringForecastOccurrence[] => {
+  if (selectedCategoryValues.length === 0) {
+    return occurrences;
+  }
+
+  const matchingCategoryValues = getCategoryValuesWithDescendants(
+    selectedCategoryValues,
+    categories,
+  );
+  const includesUncategorized = matchingCategoryValues.some((category) =>
+    areStringsEqual(category, uncategorizedTransactionCategory),
+  );
+
+  return occurrences.filter((occurrence) => {
+    const category = occurrence.category ?? "";
+    if (
+      category.trim().length === 0 ||
+      areStringsEqual(category, uncategorizedTransactionCategory)
+    ) {
+      return includesUncategorized;
+    }
+
+    return [category, occurrence.subcategory ?? ""].some((value) =>
+      matchingCategoryValues.some((selectedValue) =>
+        areStringsEqual(value, selectedValue),
+      ),
+    );
+  });
+};
+
+export const filterRecurringForecastByType = (
+  occurrences: IRecurringForecastOccurrence[],
+  transactionType: CategoryType,
+  getCategoryType: (category: string) => CategoryType | "",
+): IRecurringForecastOccurrence[] =>
+  occurrences.filter((occurrence) => {
+    const isIncome =
+      getCategoryType(occurrence.category ?? "") === CategoryTypes.Income;
+
+    return transactionType === CategoryTypes.Income ? isIncome : !isIncome;
+  });

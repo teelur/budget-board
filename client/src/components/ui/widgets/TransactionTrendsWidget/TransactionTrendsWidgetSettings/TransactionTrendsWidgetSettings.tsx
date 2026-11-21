@@ -2,6 +2,7 @@ import { Group, Stack } from "@mantine/core";
 import {
   Button,
   CategoryMultiSelect,
+  Checkbox,
   Modal,
   Select,
 } from "@teelur/budget-board-ui";
@@ -32,17 +33,19 @@ const TransactionTrendsWidgetSettings = ({
   const transactionTypeField = useField<CategoryType>({
     initialValue: CategoryTypes.Expense,
   });
-  const [initialized, setInitialized] = React.useState(false);
+  const showProjectionsField = useField<boolean>({ initialValue: true });
+  const initializedRef = React.useRef(false);
 
   const handleClose = () => {
-    setInitialized(false);
+    initializedRef.current = false;
     categoryValuesField.reset();
     transactionTypeField.reset();
+    showProjectionsField.reset();
     onClose();
   };
 
   React.useEffect(() => {
-    if (!opened || initialized) {
+    if (!opened || initializedRef.current) {
       return;
     }
 
@@ -51,11 +54,12 @@ const TransactionTrendsWidgetSettings = ({
     );
     categoryValuesField.setValue(configuration.categoryValues);
     transactionTypeField.setValue(configuration.transactionType);
-    setInitialized(true);
+    showProjectionsField.setValue(configuration.showProjections);
+    initializedRef.current = true;
   }, [
     categoryValuesField,
-    initialized,
     opened,
+    showProjectionsField,
     transactionTypeField,
     widget.configuration,
   ]);
@@ -92,6 +96,13 @@ const TransactionTrendsWidgetSettings = ({
             }}
           />
         )}
+        <Checkbox
+          label={t("show_projected_recurring_transactions")}
+          checked={showProjectionsField.getValue()}
+          onChange={(event) =>
+            showProjectionsField.setValue(event.currentTarget.checked)
+          }
+        />
         <Group gap="0.5rem">
           <Button
             variant="filled"
@@ -114,6 +125,7 @@ const TransactionTrendsWidgetSettings = ({
                   configuration: {
                     categoryValues: categoryValuesField.getValue(),
                     transactionType: transactionTypeField.getValue(),
+                    showProjections: showProjectionsField.getValue(),
                   },
                 },
               ]);
