@@ -197,17 +197,21 @@ export const parseTransactionTrendsConfiguration = (
   const parsed = configuration ? safeParseJson(configuration) : undefined;
   const rawCategoryValues = parsed?.categoryValues ?? parsed?.CategoryValues;
   const categoryValues = Array.isArray(rawCategoryValues)
-    ? rawCategoryValues.filter((value): value is string => typeof value === "string")
+    ? rawCategoryValues.filter(
+        (value): value is string => typeof value === "string",
+      )
     : [];
-  const rawTransactionType =
-    parsed?.transactionType ?? parsed?.TransactionType;
+  const rawTransactionType = parsed?.transactionType ?? parsed?.TransactionType;
+  const rawShowProjections = parsed?.showProjections ?? parsed?.ShowProjections;
 
   const transactionType: CategoryType =
     rawTransactionType === CategoryTypes.Income
       ? CategoryTypes.Income
       : CategoryTypes.Expense;
+  const showProjections =
+    typeof rawShowProjections === "boolean" ? rawShowProjections : true;
 
-  return { categoryValues, transactionType };
+  return { categoryValues, transactionType, showProjections };
 };
 
 /**
