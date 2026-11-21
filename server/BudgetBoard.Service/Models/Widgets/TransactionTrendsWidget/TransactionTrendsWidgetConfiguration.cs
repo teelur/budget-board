@@ -10,4 +10,7 @@ public class TransactionTrendsWidgetConfiguration
 
     [JsonPropertyName("transactionType")]
     public string TransactionType { get; set; } = TransactionCategoryTypes.Expense;
+
+    [JsonPropertyName("showProjections")]
+    public bool ShowProjections { get; set; } = true;
 }

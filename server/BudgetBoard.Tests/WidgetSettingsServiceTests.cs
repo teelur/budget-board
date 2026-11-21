@@ -32,8 +32,14 @@ public class WidgetSettingsServiceTests
                 JsonSerializer.Serialize(WidgetSettingsHelpers.DefaultMetricWidgetConfiguration),
             ],
             [WidgetTypes.Flows, "{\"monthCount\":1}"],
-            [WidgetTypes.TransactionTrends, "{\"categoryValues\":[],\"transactionType\":\"expense\"}"],
-            [WidgetTypes.SpendingTrends, "{\"categoryValues\":[],\"transactionType\":\"expense\"}"],
+            [
+                WidgetTypes.TransactionTrends,
+                "{\"categoryValues\":[],\"transactionType\":\"expense\",\"showProjections\":true}",
+            ],
+            [
+                WidgetTypes.SpendingTrends,
+                "{\"categoryValues\":[],\"transactionType\":\"expense\",\"showProjections\":true}",
+            ],
         ];
 
     private static WidgetSettingsService CreateService(TestHelper helper) =>
@@ -198,7 +204,11 @@ public class WidgetSettingsServiceTests
         settings.LgH.Should().Be(16);
         settings.SmY.Should().Be(47);
         settings.SmH.Should().Be(16);
-        settings.Configuration.Should().Be("{\"categoryValues\":[],\"transactionType\":\"expense\"}");
+        settings
+            .Configuration.Should()
+            .Be(
+                "{\"categoryValues\":[],\"transactionType\":\"expense\",\"showProjections\":true}"
+            );
     }
 
     [Fact]
@@ -881,13 +891,14 @@ public class WidgetSettingsServiceTests
     }
 
     [Theory]
-    [InlineData(WidgetTypes.TransactionTrends, "income", "income")]
-    [InlineData(WidgetTypes.SpendingTrends, "income", "income")]
-    [InlineData(WidgetTypes.TransactionTrends, "expense", "expense")]
-    [InlineData(WidgetTypes.SpendingTrends, "expense", "expense")]
+    [InlineData(WidgetTypes.TransactionTrends, "income", true, "income")]
+    [InlineData(WidgetTypes.SpendingTrends, "income", false, "income")]
+    [InlineData(WidgetTypes.TransactionTrends, "expense", false, "expense")]
+    [InlineData(WidgetTypes.SpendingTrends, "expense", true, "expense")]
     public async Task UpdateWidgetSettingsAsync_WhenTransactionTrendsConfigurationIsValid_ShouldPreserveIt(
         string widgetType,
         string transactionType,
+        bool showProjections,
         string expectedTransactionType
     )
     {
@@ -907,7 +918,12 @@ public class WidgetSettingsServiceTests
             UserID = helper.demoUser.Id,
         };
         var configuration = JsonSerializer.SerializeToElement(
-            new { categoryValues = new[] { "Food" }, transactionType }
+            new
+            {
+                categoryValues = new[] { "Food" },
+                transactionType,
+                showProjections,
+            }
         );
 
         helper.UserDataContext.WidgetSettings.Add(widget);
@@ -924,7 +940,47 @@ public class WidgetSettingsServiceTests
             .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
             .Configuration.Should()
             .Be(
-                $"{{\"categoryValues\":[\"Food\"],\"transactionType\":\"{expectedTransactionType}\"}}"
+                $"{{\"categoryValues\":[\"Food\"],\"transactionType\":\"{expectedTransactionType}\",\"showProjections\":{showProjections.ToString().ToLowerInvariant()}}}"
+            );
+    }
+
+    [Theory]
+    [InlineData(WidgetTypes.TransactionTrends)]
+    [InlineData(WidgetTypes.SpendingTrends)]
+    public async Task UpdateWidgetSettingsAsync_WhenLegacyTransactionTrendsConfiguration_ShouldEnableProjections(
+        string widgetType
+    )
+    {
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var widget = new WidgetSettings
+        {
+            ID = Guid.NewGuid(),
+            WidgetType = widgetType,
+            LgX = 0,
+            LgY = 0,
+            LgW = 4,
+            LgH = 5,
+            SmY = 0,
+            SmH = 5,
+            UserID = helper.demoUser.Id,
+        };
+        var configuration = JsonSerializer.SerializeToElement(
+            new { categoryValues = new[] { "Food" }, transactionType = "expense" }
+        );
+        helper.UserDataContext.WidgetSettings.Add(widget);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await service.UpdateWidgetSettingsAsync(
+            helper.demoUser.Id,
+            [new WidgetSettingsUpdateRequest { ID = widget.ID, Configuration = configuration }]
+        );
+
+        helper
+            .UserDataContext.WidgetSettings.Single(ws => ws.ID == widget.ID)
+            .Configuration.Should()
+            .Be(
+                "{\"categoryValues\":[\"Food\"],\"transactionType\":\"expense\",\"showProjections\":true}"
             );
     }
 
