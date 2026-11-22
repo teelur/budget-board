@@ -22,12 +22,14 @@ import { CategoryTypes } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
 import { useRecurringForecastQueries } from "~/hooks/queries/useRecurringForecastQueries";
 import { usePrivacyMode } from "~/providers/PrivacyModeProvider/PrivacyModeProvider";
+import { isTransactionDirectlyCategorizedToCategory } from "~/helpers/transactions";
 
 interface BudgetDetailsProps {
   isOpen: boolean;
   close: () => void;
   category: string | null;
   months: Date[];
+  directParentOnly: boolean;
 }
 
 const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
@@ -87,6 +89,13 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
   );
 
   const isTransactionForCategory = (transaction: ITransaction): boolean => {
+    if (props.directParentOnly) {
+      return isTransactionDirectlyCategorizedToCategory(
+        transaction,
+        props.category ?? "",
+      );
+    }
+
     if (
       !props.category ||
       getIsParentCategory(props.category, allTransactionCategories)
@@ -112,6 +121,13 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
 
   const forecastForCategory = (forecastQueries.data ?? [])
     .filter((occurrence) => {
+      if (props.directParentOnly) {
+        return isTransactionDirectlyCategorizedToCategory(
+          occurrence,
+          props.category ?? "",
+        );
+      }
+
       if (
         !props.category ||
         getIsParentCategory(props.category, allTransactionCategories)
@@ -147,6 +163,11 @@ const BudgetDetails = (props: BudgetDetailsProps): React.ReactNode => {
               {categoryIcon.length > 0 ? `${categoryIcon} ` : ""}
               {props.category ?? t("no_category")}
             </BodyText>
+            {props.directParentOnly && (
+              <BodyText tone="secondary" size="sm">
+                {t("no_subcategory")}
+              </BodyText>
+            )}
           </Stack>
           <Stack gap={0}>
             <BodyText tone="secondary" size="xs">

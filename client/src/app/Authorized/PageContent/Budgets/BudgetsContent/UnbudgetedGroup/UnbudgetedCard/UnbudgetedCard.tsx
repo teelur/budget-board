@@ -24,8 +24,13 @@ import { SignDisplay } from "~/helpers/currency";
 interface UnbudgetedCardProps {
   categoryTree: ICategoryNode;
   categoryToTransactionsTotalMap: Map<string, number>;
+  categoryToDirectTransactionsTotalMap: Map<string, number>;
   selectedDate: Date | null;
-  openDetails: (category: string, month: Date | null) => void;
+  openDetails: (
+    category: string,
+    month: Date | null,
+    directParentOnly?: boolean,
+  ) => void;
 }
 
 const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
@@ -52,10 +57,6 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
   );
 
   const getUnbudgetedChildCards = (): React.ReactNode => {
-    if (props.categoryTree.subCategories.length === 0) {
-      return null;
-    }
-
     const childCards: React.ReactNode[] = [];
 
     props.categoryTree.subCategories.forEach((subCategory) => {
@@ -79,6 +80,28 @@ const UnbudgetedCard = (props: UnbudgetedCardProps): React.ReactNode => {
         />,
       );
     });
+
+    const directAmount =
+      props.categoryToDirectTransactionsTotalMap.get(
+        props.categoryTree.value.toLocaleLowerCase(),
+      ) ?? 0;
+    if (
+      props.categoryTree.value.length > 0 &&
+      roundAwayFromZero(directAmount) !== 0
+    ) {
+      childCards.push(
+        <UnbudgetedChildCard
+          key={`${props.categoryTree.value}-no-subcategory`}
+          category={t("no_subcategory")}
+          amount={directAmount}
+          selectedDate={props.selectedDate}
+          icon=""
+          openDetails={props.openDetails}
+          directParentCategory={props.categoryTree.value}
+          isDirectParentOnly
+        />,
+      );
+    }
 
     if (childCards.length === 0) {
       return null;

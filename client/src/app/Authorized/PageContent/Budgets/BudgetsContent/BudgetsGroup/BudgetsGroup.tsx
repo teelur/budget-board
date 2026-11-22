@@ -15,10 +15,15 @@ import BudgetCard from "./BudgetCard/BudgetCard";
 interface BudgetsGroupProps {
   budgets: IBudget[];
   categoryToTransactionsTotalMap: Map<string, number>;
+  categoryToDirectTransactionsTotalMap: Map<string, number>;
   categoryToRecurringForecastTotalMap: Map<string, number>;
   categoryNodes: ICategoryNode[];
   selectedDate: Date | null;
-  openDetails: (category: string, month: Date | null) => void;
+  openDetails: (
+    category: string,
+    month: Date | null,
+    directParentOnly?: boolean,
+  ) => void;
 }
 
 const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
@@ -74,6 +79,9 @@ const BudgetsGroup = (props: BudgetsGroupProps): React.ReactNode => {
             categoryToRolloverMap={categoryToRolloverMap}
             categoryToTransactionsTotalMap={
               props.categoryToTransactionsTotalMap
+            }
+            categoryToDirectTransactionsTotalMap={
+              props.categoryToDirectTransactionsTotalMap
             }
             categoryToRecurringForecastTotalMap={
               props.categoryToRecurringForecastTotalMap

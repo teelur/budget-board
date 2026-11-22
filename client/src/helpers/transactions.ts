@@ -130,8 +130,7 @@ export interface ITransactionTransferDisplayItem {
 }
 
 export type TransactionDisplayItem =
-  | ITransactionDisplayItem
-  | ITransactionTransferDisplayItem;
+  ITransactionDisplayItem | ITransactionTransferDisplayItem;
 
 export const getTransactionDisplayItems = (
   transactions: ITransaction[],
@@ -486,6 +485,39 @@ export const buildCategoryToTransactionsTotalMap = (
     }
   });
   return categoryToTransactionsTotalMap;
+};
+
+export const isTransactionDirectlyCategorizedToCategory = (
+  transaction: Pick<ITransaction, "category" | "subcategory">,
+  category: string,
+): boolean => {
+  const transactionCategory = transaction.category ?? "";
+  return (
+    areStringsEqual(transactionCategory, category) &&
+    (transaction.subcategory === null ||
+      transaction.subcategory === "" ||
+      areStringsEqual(transaction.subcategory, transactionCategory))
+  );
+};
+
+export const buildCategoryToDirectTransactionsTotalMap = (
+  transactions: ITransaction[],
+): Map<string, number> => {
+  const categoryToDirectTransactionsTotalMap = new Map<string, number>();
+  transactions.forEach((transaction) => {
+    const category = transaction.category ?? "";
+    if (!isTransactionDirectlyCategorizedToCategory(transaction, category)) {
+      return;
+    }
+
+    const key = category.toLocaleLowerCase();
+    const currentTotal = categoryToDirectTransactionsTotalMap.get(key) ?? 0;
+    categoryToDirectTransactionsTotalMap.set(
+      key,
+      currentTotal + transaction.amount,
+    );
+  });
+  return categoryToDirectTransactionsTotalMap;
 };
 
 /**

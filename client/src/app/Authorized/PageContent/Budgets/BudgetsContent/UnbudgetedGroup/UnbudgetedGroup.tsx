@@ -19,8 +19,13 @@ import {
 interface UnbudgetedGroupProps {
   categoryTree: ICategoryNode[];
   categoryToTransactionsTotalMap: Map<string, number>;
+  categoryToDirectTransactionsTotalMap: Map<string, number>;
   selectedDate: Date | null;
-  openDetails: (category: string, month: Date | null) => void;
+  openDetails: (
+    category: string,
+    month: Date | null,
+    directParentOnly?: boolean,
+  ) => void;
   showUncategorized?: boolean;
 }
 
@@ -59,6 +64,9 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
             })
           }
           categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}
+          categoryToDirectTransactionsTotalMap={
+            props.categoryToDirectTransactionsTotalMap
+          }
           selectedDate={props.selectedDate}
           openDetails={props.openDetails}
         />,
@@ -71,6 +79,9 @@ const UnbudgetedGroup = (props: UnbudgetedGroupProps): React.ReactNode => {
           key={categoryTree.value}
           categoryTree={categoryTree}
           categoryToTransactionsTotalMap={props.categoryToTransactionsTotalMap}
+          categoryToDirectTransactionsTotalMap={
+            props.categoryToDirectTransactionsTotalMap
+          }
           selectedDate={props.selectedDate}
           openDetails={props.openDetails}
         />,
