@@ -77,13 +77,23 @@ const UnbudgetedChildCard = (
               locale={intlLocale}
               signDisplay={SignDisplay.Auto}
             />
-            {props.selectedDate && !props.isDirectParentOnly && (
+            {props.selectedDate && (
               <ActionIcon
                 variant="filled"
                 color="primary"
                 size="compact-xs"
+                disabled={
+                  props.isDirectParentOnly || createBudgetMutation.isPending
+                }
+                aria-hidden={props.isDirectParentOnly}
+                style={{
+                  visibility: props.isDirectParentOnly ? "hidden" : "visible",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
+                  if (props.isDirectParentOnly) {
+                    return;
+                  }
                   createBudgetMutation.mutate([
                     {
                       month: dayjs(props.selectedDate!).format("YYYY-MM-DD"),
