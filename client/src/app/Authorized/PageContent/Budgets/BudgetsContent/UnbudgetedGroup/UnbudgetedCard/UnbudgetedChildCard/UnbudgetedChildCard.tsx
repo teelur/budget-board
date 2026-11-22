@@ -22,7 +22,13 @@ interface UnbudgetedChildCardProps {
   amount: number;
   selectedDate: Date | null;
   icon: string;
-  openDetails: (category: string, month: Date | null) => void;
+  openDetails: (
+    category: string,
+    month: Date | null,
+    directParentOnly?: boolean,
+  ) => void;
+  directParentCategory?: string;
+  isDirectParentOnly?: boolean;
 }
 
 const UnbudgetedChildCard = (
@@ -46,7 +52,11 @@ const UnbudgetedChildCard = (
         w="100%"
         onClick={() => {
           if (props.selectedDate) {
-            props.openDetails(props.category, props.selectedDate);
+            props.openDetails(
+              props.directParentCategory ?? props.category,
+              props.selectedDate,
+              props.isDirectParentOnly,
+            );
           }
         }}
         hoverable
@@ -67,7 +77,7 @@ const UnbudgetedChildCard = (
               locale={intlLocale}
               signDisplay={SignDisplay.Auto}
             />
-            {props.selectedDate && (
+            {props.selectedDate && !props.isDirectParentOnly && (
               <ActionIcon
                 variant="filled"
                 color="primary"

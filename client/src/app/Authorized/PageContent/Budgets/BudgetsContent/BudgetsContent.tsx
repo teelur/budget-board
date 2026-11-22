@@ -6,7 +6,10 @@ import { IBudget } from "~/models/budget";
 import { buildCategoriesTree, getParentCategory } from "~/helpers/category";
 import { CategoryTypes } from "~/models/category";
 import { ITransaction } from "~/models/transaction";
-import { buildCategoryToTransactionsTotalMap } from "~/helpers/transactions";
+import {
+  buildCategoryToDirectTransactionsTotalMap,
+  buildCategoryToTransactionsTotalMap,
+} from "~/helpers/transactions";
 import BudgetSummaryCard from "./BudgetSummaryCard/BudgetSummaryCard";
 import BudgetsGroup from "./BudgetsGroup/BudgetsGroup";
 import UnbudgetedGroup from "./UnbudgetedGroup/UnbudgetedGroup";
@@ -37,6 +40,8 @@ const BudgetsContent = (props: BudgetsContentProps) => {
     null,
   );
   const [selectedMonths, setSelectedMonths] = React.useState<Date[]>([]);
+  const [selectedDirectParentOnly, setSelectedDirectParentOnly] =
+    React.useState(false);
 
   const { t } = useTranslation();
   const { dayjs } = useLocale();
@@ -53,6 +58,8 @@ const BudgetsContent = (props: BudgetsContentProps) => {
 
   const categoryToTransactionsTotalMap: Map<string, number> =
     buildCategoryToTransactionsTotalMap(props.transactions);
+  const categoryToDirectTransactionsTotalMap =
+    buildCategoryToDirectTransactionsTotalMap(props.transactions);
   const categoryToRecurringForecastTotalMap =
     buildCategoryToRecurringForecastTotalMap(recurringForecastQuery.data ?? []);
 
@@ -123,10 +130,15 @@ const BudgetsContent = (props: BudgetsContentProps) => {
       return isBudgetedCategory(category) ? total : total + occurrence.amount;
     }, 0);
 
-  const openBudgetDetails = (category: string, month: Date | null) => {
+  const openBudgetDetails = (
+    category: string,
+    month: Date | null,
+    directParentOnly = false,
+  ) => {
     open();
     setSelectedCategory(category);
     setSelectedMonths(month ? [month] : [...props.selectedDates]);
+    setSelectedDirectParentOnly(directParentOnly);
   };
 
   return (
@@ -136,6 +148,7 @@ const BudgetsContent = (props: BudgetsContentProps) => {
         close={close}
         category={selectedCategory ?? null}
         months={selectedMonths}
+        directParentOnly={selectedDirectParentOnly}
       />
       <Stack w={{ base: "100%", md: "70%" }}>
         <Stack gap="0.5rem">
@@ -149,6 +162,9 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               budgets={incomeBudgets}
               categoryNodes={incomeCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+              categoryToDirectTransactionsTotalMap={
+                categoryToDirectTransactionsTotalMap
+              }
               categoryToRecurringForecastTotalMap={
                 categoryToRecurringForecastTotalMap
               }
@@ -162,6 +178,9 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             <UnbudgetedGroup
               categoryTree={unbudgetedIncomeCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+              categoryToDirectTransactionsTotalMap={
+                categoryToDirectTransactionsTotalMap
+              }
               selectedDate={props.selectedDate}
               openDetails={openBudgetDetails}
             />
@@ -178,6 +197,9 @@ const BudgetsContent = (props: BudgetsContentProps) => {
               budgets={expenseBudgets}
               categoryNodes={expenseCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+              categoryToDirectTransactionsTotalMap={
+                categoryToDirectTransactionsTotalMap
+              }
               categoryToRecurringForecastTotalMap={
                 categoryToRecurringForecastTotalMap
               }
@@ -191,6 +213,9 @@ const BudgetsContent = (props: BudgetsContentProps) => {
             <UnbudgetedGroup
               categoryTree={unbudgetedExpenseCategoryTree}
               categoryToTransactionsTotalMap={categoryToTransactionsTotalMap}
+              categoryToDirectTransactionsTotalMap={
+                categoryToDirectTransactionsTotalMap
+              }
               selectedDate={props.selectedDate}
               openDetails={openBudgetDetails}
               showUncategorized

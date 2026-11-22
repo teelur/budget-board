@@ -15,6 +15,7 @@ interface UnbudgetedChildItemProps {
   amount: number;
   isIncome: boolean;
   icon: string;
+  canCreateBudget?: boolean;
 }
 
 const UnbudgetedChildItem = (
@@ -24,6 +25,7 @@ const UnbudgetedChildItem = (
   const { preferredCurrency } = useUserSettings();
   const { isPrivacyModeEnabled } = usePrivacyMode();
   const createBudgetMutation = useCreateBudgetMutation();
+  const canCreateBudget = props.canCreateBudget !== false;
 
   return (
     <Group
@@ -53,9 +55,14 @@ const UnbudgetedChildItem = (
             variant="filled"
             color="primary"
             size="compact-xs"
-            disabled={createBudgetMutation.isPending}
+            disabled={!canCreateBudget || createBudgetMutation.isPending}
+            aria-hidden={!canCreateBudget}
+            style={{ visibility: canCreateBudget ? "visible" : "hidden" }}
             onClick={(event) => {
               event.stopPropagation();
+              if (!canCreateBudget) {
+                return;
+              }
               createBudgetMutation.mutate([
                 {
                   month: dayjs(props.selectedDate!).format("YYYY-MM-DD"),
