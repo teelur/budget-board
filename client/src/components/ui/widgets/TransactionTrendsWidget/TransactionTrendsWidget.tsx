@@ -20,6 +20,7 @@ import {
   filterTransactionsByType,
   getRollingTransactionTotalForMonth,
 } from "~/helpers/transactions";
+import { getTransactionTrendsComparisonKey } from "~/helpers/transactionTrends";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
 import { parseTransactionTrendsConfiguration } from "~/helpers/widgets";
 import TransactionTrendsWidgetSettings from "./TransactionTrendsWidgetSettings/TransactionTrendsWidgetSettings";
@@ -113,6 +114,13 @@ const TransactionTrendsWidget = ({
     categoriesPending ||
     (showProjections && forecastQuery.isPending);
 
+  const comparisonType =
+    categoryValues.length > 0
+      ? "categories"
+      : transactionType === CategoryTypes.Income
+        ? "income"
+        : "spending";
+
   const getTransactionComparison = (): number => {
     const today = dayjs().date();
 
@@ -156,41 +164,17 @@ const TransactionTrendsWidget = ({
 
   const getTransactionComparisonString = (): string => {
     const transactionComparisonNumber = getTransactionComparison();
-    const categoryComparison = categoryValues.length > 0;
-    const incomeComparison =
-      !categoryComparison && transactionType === CategoryTypes.Income;
-
     const amount = formatSensitiveAmount(
       Math.abs(transactionComparisonNumber),
       SignDisplay.Auto,
     );
 
-    if (transactionComparisonNumber < 0) {
-      return t(
-        categoryComparison
-          ? "transaction_trends_selected_categories_less_than_last_month"
-          : incomeComparison
-            ? "transaction_trends_income_less_than_last_month"
-            : "transaction_trends_spending_less_than_last_month",
-        { amount },
-      );
-    } else if (transactionComparisonNumber > 0) {
-      return t(
-        categoryComparison
-          ? "transaction_trends_selected_categories_more_than_last_month"
-          : incomeComparison
-            ? "transaction_trends_income_more_than_last_month"
-            : "transaction_trends_spending_more_than_last_month",
-        { amount },
-      );
-    }
-
     return t(
-      categoryComparison
-        ? "transaction_trends_selected_categories_same_as_last_month"
-        : incomeComparison
-          ? "transaction_trends_income_same_as_last_month"
-          : "transaction_trends_spending_same_as_last_month",
+      getTransactionTrendsComparisonKey(
+        comparisonType,
+        transactionComparisonNumber,
+      ),
+      { amount },
     );
   };
 

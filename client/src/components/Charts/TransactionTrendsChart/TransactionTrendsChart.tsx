@@ -28,6 +28,8 @@ interface TransactionTrendsChartProps {
   getCategoryType?: (category: string) => CategoryType | "";
 }
 
+const transactionMonthDifferenceKey = "transactionMonthDifference";
+
 const TransactionTrendsChart = (
   props: TransactionTrendsChartProps,
 ): React.ReactNode => {
@@ -60,26 +62,75 @@ const TransactionTrendsChart = (
     currentMonthLabel !== undefined &&
     dayjs().date() < dayjs().daysInMonth();
 
-  const chartData = React.useMemo(
-    () =>
-      buildTransactionChartData(
-        sortedMonths,
-        props.transactions,
-        formatDateString,
-        props.getCategoryType,
-        hasProjection ? props.projectedOccurrences : [],
-        hasProjection ? getProjectionSeriesKey : undefined,
-      ),
-    [
-      formatDateString,
-      getProjectionSeriesKey,
-      hasProjection,
-      props.getCategoryType,
-      props.projectedOccurrences,
-      props.transactions,
+  const chartData = React.useMemo(() => {
+    const transactionChartData = buildTransactionChartData(
       sortedMonths,
-    ],
-  );
+      props.transactions,
+      formatDateString,
+      props.getCategoryType,
+      hasProjection ? props.projectedOccurrences : [],
+      hasProjection ? getProjectionSeriesKey : undefined,
+    );
+
+    if (sortedMonths.length !== 2) {
+      return transactionChartData;
+    }
+
+    const olderMonth = sortedMonths[0];
+    const newerMonth = sortedMonths[1];
+    if (olderMonth === undefined || newerMonth === undefined) {
+      throw new Error(
+        "Expected two selected months for transaction comparison.",
+      );
+    }
+
+    const olderMonthKey = formatDateString(olderMonth);
+    const newerMonthKey = formatDateString(newerMonth);
+    const olderMonthTotalsByDay = new Map<number, number>();
+    let olderMonthLastDay = 0;
+
+    transactionChartData.forEach((dataPoint) => {
+      const amount = dataPoint[olderMonthKey];
+      if (amount !== undefined) {
+        olderMonthTotalsByDay.set(dataPoint.day, amount);
+        olderMonthLastDay = Math.max(olderMonthLastDay, dataPoint.day);
+      }
+    });
+
+    if (olderMonthLastDay === 0) {
+      throw new Error("No earlier-month totals are available for comparison.");
+    }
+
+    return transactionChartData.map((dataPoint) => {
+      const newerMonthTotal =
+        dataPoint[newerMonthKey] ??
+        dataPoint[getProjectionSeriesKey(newerMonthKey)];
+      if (newerMonthTotal === undefined) {
+        return dataPoint;
+      }
+
+      const olderMonthDay = Math.min(dataPoint.day, olderMonthLastDay);
+      const olderMonthTotal = olderMonthTotalsByDay.get(olderMonthDay);
+      if (olderMonthTotal === undefined) {
+        throw new Error(
+          `No earlier-month total is available for day ${olderMonthDay}.`,
+        );
+      }
+
+      return {
+        ...dataPoint,
+        [transactionMonthDifferenceKey]: newerMonthTotal - olderMonthTotal,
+      };
+    });
+  }, [
+    formatDateString,
+    getProjectionSeriesKey,
+    hasProjection,
+    props.getCategoryType,
+    props.projectedOccurrences,
+    props.transactions,
+    sortedMonths,
+  ]);
 
   const chartSeries = React.useMemo(() => {
     const actualSeries: (TransactionTrendsChartSeries & {
@@ -90,29 +141,28 @@ const TransactionTrendsChart = (
         colorIndex: index,
       }),
     );
+    let seriesWithProjection = actualSeries;
 
-    if (!hasProjection || currentMonthLabel === undefined) {
-      return actualSeries;
+    if (hasProjection && currentMonthLabel !== undefined) {
+      const currentSeries = actualSeries.find(
+        (series) => series.key === currentMonthLabel,
+      );
+      if (currentSeries !== undefined) {
+        seriesWithProjection = [
+          ...actualSeries,
+          {
+            key: getProjectionSeriesKey(currentMonthLabel),
+            label: `${currentMonthLabel} (${t("projected")})`,
+            colorIndex: currentSeries.colorIndex,
+            legendLabel: currentMonthLabel,
+            strokeDasharray: "6 4",
+            type: "line",
+          },
+        ];
+      }
     }
 
-    const currentSeries = actualSeries.find(
-      (series) => series.key === currentMonthLabel,
-    );
-    if (currentSeries === undefined) {
-      return actualSeries;
-    }
-
-    return [
-      ...actualSeries,
-      {
-        key: getProjectionSeriesKey(currentMonthLabel),
-        label: `${currentMonthLabel} (${t("projected")})`,
-        colorIndex: currentSeries.colorIndex,
-        legendLabel: currentMonthLabel,
-        strokeDasharray: "6 4",
-        type: "line" as const,
-      },
-    ];
+    return seriesWithProjection;
   }, [
     currentMonthLabel,
     formatDateString,
@@ -147,6 +197,30 @@ const TransactionTrendsChart = (
         includeGrid={props.includeGrid}
         includeYAxis={props.includeYAxis !== false}
         isLoading={props.isPending}
+        tooltipSummary={
+          sortedMonths.length === 2
+            ? (dataPoint) => {
+                const difference = dataPoint[transactionMonthDifferenceKey];
+                if (difference === undefined) {
+                  return null;
+                }
+
+                const differenceKey =
+                  difference < 0
+                    ? "transaction_trends_difference_less"
+                    : difference > 0
+                      ? "transaction_trends_difference_more"
+                      : "transaction_trends_difference";
+
+                return t(differenceKey, {
+                  amount: formatSensitiveAmount(
+                    Math.abs(difference),
+                    SignDisplay.Auto,
+                  ),
+                });
+              }
+            : undefined
+        }
         series={chartSeries}
         style={{ height: "100%" }}
       />
