@@ -13,6 +13,7 @@ const Settings = (): React.ReactNode => {
 
   const navItems = [
     { path: "user", label: t("user_settings") },
+    { path: "notifications", label: t("notification_settings") },
     { path: "security", label: t("security") },
     { path: "advanced", label: t("advanced_settings") },
     ...(applicationUserQuery.data?.isSuperuser

@@ -6,6 +6,8 @@ export const appUpdateQueryKey: string = "appUpdate";
 export const applicationUserQueryKey: string = "applicationUser";
 export const adminAuditEventsQueryKey: string = "adminAuditEvents";
 export const managedUsersQueryKey: string = "managedUsers";
+export const notificationDestinationsQueryKey: string =
+  "notificationDestinations";
 export const assetsQueryKey: string = "assets";
 export const assetTypesQueryKey: string = "assetTypes";
 export const automaticRulesQueryKey: string = "automaticRules";
