@@ -176,7 +176,8 @@ public class TransactionImportServiceTests
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
-            Mock.Of<ILogger<TransactionImportService>>()
+            Mock.Of<ILogger<TransactionImportService>>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var response = await service.EnqueueAsync(
@@ -258,7 +259,8 @@ public class TransactionImportServiceTests
         var now = new DateTime(2026, 8, 16, 12, 0, 0, DateTimeKind.Utc);
         var nowProvider = CreateNowProvider(now);
         var importServiceMock = new Mock<ITransactionService>();
-        var service = CreateService(helper, nowProvider.Object, importServiceMock.Object);
+        var notifications = new Mock<INotificationDispatcher>();
+        var service = CreateService(helper, nowProvider.Object, importServiceMock.Object, notifications.Object);
         var job = AddJob(helper, CreateTransactions(101));
         importServiceMock
             .Setup(transactionService =>
@@ -286,6 +288,7 @@ public class TransactionImportServiceTests
         cancelledJob.ProcessedCount.Should().Be(100);
         cancelledJob.CompletedAt.Should().Be(now);
         cancelledJob.LeaseExpiresAt.Should().BeNull();
+        notifications.Verify(n => n.DispatchAsync(It.IsAny<NotificationEvent>()), Times.Never);
         importServiceMock.Verify(
             transactionService =>
                 transactionService.ImportTransactionsAsync(
@@ -321,7 +324,8 @@ public class TransactionImportServiceTests
                     return Task.CompletedTask;
                 }
             );
-        var service = CreateService(helper, nowProvider.Object, importServiceMock.Object);
+        var notifications = new Mock<INotificationDispatcher>();
+        var service = CreateService(helper, nowProvider.Object, importServiceMock.Object, notifications.Object);
         var job = AddJob(
             helper,
             [
@@ -340,6 +344,9 @@ public class TransactionImportServiceTests
         completedJob.SucceededCount.Should().Be(1);
         completedJob.FailedCount.Should().Be(1);
         completedJob.ErrorMessage.Should().Contain("Row 2");
+        notifications.Verify(n => n.DispatchAsync(It.Is<NotificationEvent>(e =>
+            e.UserId == helper.demoUser.Id && e.Type == NotificationEventTypes.ImportFailed
+        )), Times.Once);
     }
 
     [Fact]
@@ -378,7 +385,10 @@ public class TransactionImportServiceTests
         var helper = new TestHelper();
         var now = new DateTime(2026, 8, 16, 12, 0, 0, DateTimeKind.Utc);
         var nowProvider = CreateNowProvider(now);
-        var service = CreateService(helper, nowProvider.Object);
+        var notifications = new Mock<INotificationDispatcher>();
+        notifications.Setup(n => n.DispatchAsync(It.IsAny<NotificationEvent>()))
+            .ThrowsAsync(new InvalidOperationException("delivery failed"));
+        var service = CreateService(helper, nowProvider.Object, notificationDispatcher: notifications.Object);
         var job = AddJob(helper, [], "null");
 
         var result = await service.ProcessNextAsync(CancellationToken.None);
@@ -391,6 +401,9 @@ public class TransactionImportServiceTests
         failedJob.CompletedAt.Should().Be(now);
         failedJob.LeaseExpiresAt.Should().BeNull();
         failedJob.LastHeartbeatAt.Should().BeNull();
+        notifications.Verify(n => n.DispatchAsync(It.Is<NotificationEvent>(e =>
+            e.UserId == helper.demoUser.Id && e.Type == NotificationEventTypes.ImportFailed
+        )), Times.Once);
     }
 
     [Fact]
@@ -570,7 +583,8 @@ public class TransactionImportServiceTests
             nowProvider.Object,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
-            Mock.Of<ILogger<TransactionImportService>>()
+            Mock.Of<ILogger<TransactionImportService>>(),
+            Mock.Of<INotificationDispatcher>()
         );
         var job = new TransactionImportJob
         {
@@ -602,7 +616,8 @@ public class TransactionImportServiceTests
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
-            Mock.Of<ILogger<TransactionImportService>>()
+            Mock.Of<ILogger<TransactionImportService>>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var result = await service.ProcessNextAsync(CancellationToken.None);
@@ -613,7 +628,8 @@ public class TransactionImportServiceTests
     private static TransactionImportService CreateService(
         TestHelper helper,
         INowProvider nowProvider,
-        ITransactionService? transactionService = null
+        ITransactionService? transactionService = null,
+        INotificationDispatcher? notificationDispatcher = null
     )
     {
         return new TransactionImportService(
@@ -622,7 +638,8 @@ public class TransactionImportServiceTests
             nowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
-            Mock.Of<ILogger<TransactionImportService>>()
+            Mock.Of<ILogger<TransactionImportService>>(),
+            notificationDispatcher ?? Mock.Of<INotificationDispatcher>()
         );
     }
 

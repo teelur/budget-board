@@ -475,4 +475,13 @@
     <data name="RecurringRuleAmbiguousMatchLog" xml:space="preserve">
         <value>Transaction {0} matched multiple recurring rules and was left unassigned.</value>
     </data>
+    <data name="GoalNotificationDispatchFailedLog" xml:space="preserve">
+        <value>Failed to dispatch goal notification. Error type: {0}.</value>
+    </data>
+    <data name="TransactionImportNotificationCheckFailedLog" xml:space="preserve">
+        <value>Failed to check whether the import completed with errors. Error type: {0}.</value>
+    </data>
+    <data name="TransactionImportNotificationDispatchFailedLog" xml:space="preserve">
+        <value>Failed to dispatch import failure notification. Error type: {0}.</value>
+    </data>
 </root>

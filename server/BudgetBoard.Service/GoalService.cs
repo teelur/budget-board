@@ -15,7 +15,8 @@ public class GoalService(
     UserDataContext userDataContext,
     INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
-    IStringLocalizer<LogStrings> logLocalizer
+    IStringLocalizer<LogStrings> logLocalizer,
+    INotificationDispatcher notificationDispatcher
 ) : IGoalService
 {
     /// <inheritdoc />
@@ -225,6 +226,7 @@ public class GoalService(
 
         goal.Completed = completedDate;
         await userDataContext.SaveChangesAsync();
+        await NotifyGoalReachedAsync(userGuid, goal);
     }
 
     /// <inheritdoc />
@@ -233,6 +235,7 @@ public class GoalService(
         var userData = await GetCurrentUserAsync(userGuid);
 
         var goals = userData.Goals.ToList();
+        var completedGoals = new List<Goal>();
         foreach (var goal in goals)
         {
             // Skip goals that are already completed
@@ -245,10 +248,37 @@ public class GoalService(
             if (percentComplete >= 100.0M)
             {
                 goal.Completed = nowProvider.Today;
+                completedGoals.Add(goal);
             }
         }
 
         await userDataContext.SaveChangesAsync();
+        foreach (var goal in completedGoals)
+        {
+            await NotifyGoalReachedAsync(userGuid, goal);
+        }
+    }
+
+    private async Task NotifyGoalReachedAsync(Guid userGuid, Goal goal)
+    {
+        try
+        {
+            await notificationDispatcher.DispatchAsync(
+                new NotificationEvent(
+                    userGuid,
+                    NotificationEventTypes.GoalReached,
+                    responseLocalizer["NotificationGoalReached"],
+                    goal.Name
+                )
+            );
+        }
+        catch (Exception exception)
+        {
+            logger.LogWarning(
+                "{LogMessage}",
+                logLocalizer["GoalNotificationDispatchFailedLog", exception.GetType().Name]
+            );
+        }
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)

@@ -18,7 +18,8 @@ public class TransactionImportService(
     INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer,
-    ILogger<TransactionImportService> logger
+    ILogger<TransactionImportService> logger,
+    INotificationDispatcher notificationDispatcher
 ) : ITransactionImportService
 {
     private const int BatchSize = 100;
@@ -258,6 +259,10 @@ public class TransactionImportService(
             }
 
             await CompleteJobAsync(job.ID, errors, cancellationToken);
+            if (errors.Count > 0)
+            {
+                await NotifyImportFailureIfCompletedAsync(job.ID, job.UserID);
+            }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -281,6 +286,7 @@ public class TransactionImportService(
             job.LastHeartbeatAt = null;
             job.LeaseExpiresAt = null;
             await userDataContext.SaveChangesAsync(cancellationToken);
+            await NotifyImportFailureAsync(job.UserID);
 
             logger.LogError(
                 exception,
@@ -290,6 +296,57 @@ public class TransactionImportService(
         }
 
         return true;
+    }
+
+    private async Task NotifyImportFailureIfCompletedAsync(Guid jobId, Guid userId)
+    {
+        try
+        {
+            var completedWithErrors = await userDataContext.TransactionImportJobs
+                .AsNoTracking()
+                .AnyAsync(job =>
+                    job.ID == jobId
+                    && job.Status == TransactionImportJobStatuses.CompletedWithErrors
+                );
+            if (completedWithErrors)
+            {
+                await NotifyImportFailureAsync(userId);
+            }
+        }
+        catch (Exception exception)
+        {
+            logger.LogWarning(
+                "{LogMessage}",
+                logLocalizer[
+                    "TransactionImportNotificationCheckFailedLog",
+                    exception.GetType().Name
+                ]
+            );
+        }
+    }
+
+    private async Task NotifyImportFailureAsync(Guid userId)
+    {
+        try
+        {
+            await notificationDispatcher.DispatchAsync(
+                new NotificationEvent(
+                    userId,
+                    NotificationEventTypes.ImportFailed,
+                    responseLocalizer["NotificationImportFailure"]
+                )
+            );
+        }
+        catch (Exception exception)
+        {
+            logger.LogWarning(
+                "{LogMessage}",
+                logLocalizer[
+                    "TransactionImportNotificationDispatchFailedLog",
+                    exception.GetType().Name
+                ]
+            );
+        }
     }
 
     private async Task UpdateProgressAsync(

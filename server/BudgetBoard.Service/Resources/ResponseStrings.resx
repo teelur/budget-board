@@ -541,4 +541,10 @@
     <data name="TransactionAlreadyRecurringError" xml:space="preserve">
         <value>This transaction is already associated with a recurring rule.</value>
     </data>
+    <data name="NotificationImportFailure" xml:space="preserve">
+        <value>Transaction import failed or completed with errors.</value>
+    </data>
+    <data name="NotificationGoalReached" xml:space="preserve">
+        <value>A financial goal has been reached.</value>
+    </data>
 </root>
