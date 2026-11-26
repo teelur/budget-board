@@ -49,6 +49,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
     public DbSet<SimpleFinAccount> SimpleFinAccounts { get; set; }
     public DbSet<LunchFlowAccount> LunchFlowAccounts { get; set; }
     public DbSet<TransactionImportJob> TransactionImportJobs { get; set; }
+    public DbSet<NotificationDestination> NotificationDestinations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -200,6 +201,17 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
                 .HasForeignKey(e => e.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
             j.ToTable("TransactionImportJob");
+        });
+
+        modelBuilder.Entity<NotificationDestination>(destination =>
+        {
+            destination.Property(d => d.Name).HasMaxLength(100).IsRequired();
+            destination.HasIndex(d => d.UserID);
+            destination.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+            destination.ToTable("NotificationDestination");
         });
 
         modelBuilder.Entity<Tag>(t =>
