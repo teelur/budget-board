@@ -228,6 +228,12 @@ builder.Host.UseSerilog(
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient(NotificationWebhookSender.ClientName)
+    .RemoveAllLoggers()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+builder.Services.AddScoped<NotificationWebhookSender>();
+builder.Services.AddScoped<INotificationDestinationService, NotificationDestinationService>();
+builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
 builder.Services.AddHttpClient(
     AppUpdateService.GitHubHttpClientName,
     client =>
@@ -306,7 +312,15 @@ builder.Services.AddScoped<ITransactionCategoryService, TransactionCategoryServi
 builder.Services.AddScoped<IAccountTypeService, AccountTypeService>();
 builder.Services.AddScoped<IGoalService, GoalService>();
 builder.Services.AddScoped<IInstitutionService, InstitutionService>();
-builder.Services.AddScoped<ISyncService, SyncService>();
+builder.Services.AddScoped<ISyncService>(services =>
+    new NotificationSyncService(
+        services.GetRequiredService<SyncService>(),
+        services.GetRequiredService<INotificationDispatcher>(),
+        services.GetRequiredService<IStringLocalizer<ApiResponseStrings>>(),
+        services.GetRequiredService<IStringLocalizer<ApiLogStrings>>(),
+        services.GetRequiredService<ILogger<NotificationSyncService>>()
+    )
+);
 builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<ILunchFlowService, LunchFlowService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
