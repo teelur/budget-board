@@ -1,4 +1,4 @@
-import { Group, Paper, Stack } from "@mantine/core";
+import { Paper, Stack } from "@mantine/core";
 import {
   Alert,
   BodyText,
@@ -11,6 +11,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { AlertCircle, ArrowRightLeft, Link2, Unlink } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ModalActions } from "~/components/ModalActions/ModalActions";
 import { convertNumberToCurrency, SignDisplay } from "~/helpers/currency";
 import { useLinkTransactionsMutation } from "~/hooks/mutations/transactions/useLinkTransactionsMutation";
 import { useUnlinkTransactionMutation } from "~/hooks/mutations/transactions/useUnlinkTransactionMutation";
@@ -208,28 +209,14 @@ const TransactionLinkDialog = ({
           <BodyText tone="secondary" size="sm">
             {t("unlink_transfer_message")}
           </BodyText>
-          <Group gap="0.5rem">
-            <Button
-              variant="filled"
-              color="neutral"
-              size="compact-sm"
-              flex="1 1 0"
-              onClick={closeUnlink}
-            >
-              {t("cancel")}
-            </Button>
-            <Button
-              variant="filled"
-              color="error"
-              size="compact-sm"
-              rightSection={<Unlink size="1rem" />}
-              flex="1 1 0"
-              loading={unlinkMutation.isPending}
-              onClick={onUnlink}
-            >
-              {t("unlink_transactions")}
-            </Button>
-          </Group>
+          <ModalActions
+            actionColor="error"
+            actionLabel={t("unlink_transactions")}
+            actionRightSection={<Unlink size="1rem" />}
+            isPending={unlinkMutation.isPending}
+            onAction={onUnlink}
+            onCancel={closeUnlink}
+          />
         </Stack>
       </Modal>
     </>

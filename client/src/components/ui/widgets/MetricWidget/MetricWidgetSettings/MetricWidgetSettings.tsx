@@ -1,7 +1,6 @@
-import { Group, ScrollArea, Stack } from "@mantine/core";
+import { ScrollArea, Stack } from "@mantine/core";
 import {
   BodyText,
-  Button,
   Code,
   CollapsibleCard,
   Modal,
@@ -10,6 +9,7 @@ import {
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ModalActions } from "~/components/ModalActions/ModalActions";
 import { useTransactionCategories } from "~/providers/TransactionCategoryProvider/TransactionCategoryProvider";
 import FormulaTextInput from "./FormulaTextInput/FormulaTextInput";
 import { useLocale } from "~/providers/LocaleProvider/LocaleProvider";
@@ -204,38 +204,23 @@ const MetricWidgetSettings = ({
             </Stack>
           </ScrollArea.Autosize>
         </CollapsibleCard>
-        <Group gap="0.5rem">
-          <Button
-            variant="filled"
-            color="neutral"
-            size="compact-sm"
-            flex="1 1 0"
-            onClick={handleClose}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            variant="filled"
-            color="primary"
-            size="compact-sm"
-            flex="1 1 0"
-            onClick={() => {
-              updateWidgetSettingsMutation.mutate([
-                {
-                  id: widget.id,
-                  configuration: {
-                    title: titleField.getValue(),
-                    value: valueField.getValue(),
-                    label: labelField.getValue(),
-                  },
+        <ModalActions
+          actionLabel={t("save")}
+          isPending={updateWidgetSettingsMutation.isPending}
+          onAction={() => {
+            updateWidgetSettingsMutation.mutate([
+              {
+                id: widget.id,
+                configuration: {
+                  title: titleField.getValue(),
+                  value: valueField.getValue(),
+                  label: labelField.getValue(),
                 },
-              ]);
-            }}
-            loading={updateWidgetSettingsMutation.isPending}
-          >
-            {t("save")}
-          </Button>
-        </Group>
+              },
+            ]);
+          }}
+          onCancel={handleClose}
+        />
       </Stack>
     </Modal>
   );

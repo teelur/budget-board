@@ -1,7 +1,8 @@
-import { Group, Stack } from "@mantine/core";
-import { BodyText, Button, Modal } from "@teelur/budget-board-ui";
+import { Stack } from "@mantine/core";
+import { BodyText, Modal } from "@teelur/budget-board-ui";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ModalActions } from "~/components/ModalActions/ModalActions";
 import type { IManagedUserResponse } from "~/models/managedUser";
 
 type ManagedUserAction = "reset_password" | "disable" | "transfer_superuser";
@@ -57,28 +58,13 @@ const ManagedUserConfirmationModal = ({
         <BodyText tone="secondary" size="sm">
           {confirmationMessage}
         </BodyText>
-        <Group gap="0.5rem">
-          <Button
-            variant="filled"
-            color="neutral"
-            size="xs"
-            flex="1 1 auto"
-            disabled={isPending}
-            onClick={onClose}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            variant="filled"
-            color="error"
-            size="xs"
-            flex="1 1 auto"
-            loading={isPending}
-            onClick={onConfirm}
-          >
-            {t("confirm_action")}
-          </Button>
-        </Group>
+        <ModalActions
+          actionColor="error"
+          actionLabel={t("confirm_action")}
+          isPending={isPending}
+          onAction={onConfirm}
+          onCancel={onClose}
+        />
       </Stack>
     </Modal>
   );

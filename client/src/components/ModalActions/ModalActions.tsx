@@ -7,15 +7,17 @@ interface ModalActionsProps {
   actionColor?: ButtonColor;
   actionDisabled?: boolean;
   actionLabel: ReactNode;
+  actionRightSection?: ReactNode;
   isPending?: boolean;
   onAction: () => void;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
 export const ModalActions = ({
   actionColor = "primary",
   actionDisabled,
   actionLabel,
+  actionRightSection,
   isPending,
   onAction,
   onCancel,
@@ -24,16 +26,18 @@ export const ModalActions = ({
 
   return (
     <Group w="100%" gap="0.5rem">
-      <Button
-        variant="filled"
-        color="neutral"
-        size="compact-sm"
-        flex="1 1 auto"
-        disabled={isPending}
-        onClick={onCancel}
-      >
-        {t("cancel")}
-      </Button>
+      {onCancel && (
+        <Button
+          variant="filled"
+          color="neutral"
+          size="compact-sm"
+          flex="1 1 auto"
+          disabled={isPending}
+          onClick={onCancel}
+        >
+          {t("cancel")}
+        </Button>
+      )}
       <Button
         variant="filled"
         color={actionColor}
@@ -41,6 +45,7 @@ export const ModalActions = ({
         flex="1 1 auto"
         disabled={actionDisabled}
         loading={isPending}
+        rightSection={actionRightSection}
         onClick={onAction}
       >
         {actionLabel}
