@@ -557,6 +557,10 @@ namespace BudgetBoard.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Configuration")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("EventTypes")
                         .IsRequired()
                         .HasColumnType("text");
@@ -568,10 +572,6 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
-
-                    b.Property<string>("ProtectedConfiguration")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uuid");

@@ -26,9 +26,9 @@ public class NotificationDestination
     public required string Name { get; set; }
 
     /// <summary>
-    /// Encrypted webhook configuration, including its URL and headers.
+    /// JSON-serialized webhook configuration, including its URL and headers.
     /// </summary>
-    public required string ProtectedConfiguration { get; set; }
+    public required string Configuration { get; set; }
 
     /// <summary>
     /// JSON-serialized event types subscribed to by this destination.
