@@ -34,7 +34,7 @@ const SettingsNotifications = (): React.ReactNode => {
 
   return (
     <Stack gap="sm">
-      <Group justify="space-between" align="center">
+      <Group justify="space-between" align="center" wrap="nowrap">
         <BodyText tone="secondary" size="sm">
           {t("notification_settings_description")}
         </BodyText>

@@ -16,6 +16,9 @@ public sealed class NotificationDispatcher(
     ILogger<NotificationDispatcher> logger
 ) : INotificationDispatcher
 {
+    private const int MaxConcurrentSends = 4;
+    private const int BatchTimeoutSeconds = 2;
+
     public async Task DispatchAsync(NotificationEvent notification)
     {
         try
@@ -23,32 +26,37 @@ public sealed class NotificationDispatcher(
             var destinations = await context.NotificationDestinations.AsNoTracking()
                 .Where(d => d.UserID == notification.UserId)
                 .ToListAsync();
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            await Task.WhenAll(destinations.Select(async destination =>
+            foreach (var batch in destinations.Chunk(MaxConcurrentSends))
             {
-                try
+                using var timeout = new CancellationTokenSource(
+                    TimeSpan.FromSeconds(BatchTimeoutSeconds)
+                );
+                await Task.WhenAll(batch.Select(async destination =>
                 {
-                    var events = JsonSerializer.Deserialize<string[]>(destination.EventTypes)
-                        ?? throw new InvalidOperationException(
-                            responseLocalizer["NotificationEventConfigurationInvalid"].Value
-                        );
-                    if (events.Contains(notification.Type))
+                    try
                     {
-                        await sender.SendAsync(destination, notification, timeout.Token);
+                        var events = JsonSerializer.Deserialize<string[]>(destination.EventTypes)
+                            ?? throw new InvalidOperationException(
+                                responseLocalizer["NotificationEventConfigurationInvalid"].Value
+                            );
+                        if (events.Contains(notification.Type))
+                        {
+                            await sender.SendAsync(destination, notification, timeout.Token);
+                        }
                     }
-                }
-                catch (Exception exception)
-                {
-                    logger.LogWarning(
-                        "{LogMessage}",
-                        logLocalizer[
-                            "NotificationDestinationDispatchFailedLog",
-                            destination.ID,
-                            exception.GetType().Name
-                        ]
-                    );
-                }
-            }));
+                    catch (Exception exception)
+                    {
+                        logger.LogWarning(
+                            "{LogMessage}",
+                            logLocalizer[
+                                "NotificationDestinationDispatchFailedLog",
+                                destination.ID,
+                                exception.GetType().Name
+                            ]
+                        );
+                    }
+                }));
+            }
         }
         catch (Exception exception)
         {

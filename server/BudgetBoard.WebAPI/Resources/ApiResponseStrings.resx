@@ -232,4 +232,7 @@
     <data name="NotificationDestinationInvalid" xml:space="preserve">
         <value>Invalid notification destination.</value>
     </data>
+    <data name="NotificationDestinationLimitReached" xml:space="preserve">
+        <value>You can configure up to 10 notification destinations per user.</value>
+    </data>
 </root>

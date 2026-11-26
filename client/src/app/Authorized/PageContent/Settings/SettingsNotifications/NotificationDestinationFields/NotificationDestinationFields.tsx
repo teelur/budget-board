@@ -138,6 +138,7 @@ const NotificationDestinationFields = ({
           data={[
             { value: "sync_failed", label: t("notification_sync_failed") },
             { value: "import_failed", label: t("notification_import_failed") },
+            { value: "goal_reached", label: t("notification_goal_reached") },
           ]}
           {...events.getInputProps()}
         />

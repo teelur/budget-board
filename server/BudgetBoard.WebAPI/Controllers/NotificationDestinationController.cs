@@ -156,6 +156,10 @@ public class NotificationDestinationController(
         {
             return await action();
         }
+        catch (NotificationDestinationLimitException)
+        {
+            return Conflict(ResponseLocalizer["NotificationDestinationLimitReached"].Value);
+        }
         catch (ArgumentException)
         {
             return BadRequest(ResponseLocalizer["NotificationInvalidConfiguration"].Value);
