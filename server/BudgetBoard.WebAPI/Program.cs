@@ -184,6 +184,22 @@ builder.Services.AddRateLimiter(options =>
                 }
             )
     );
+    options.AddPolicy(
+        "notification-test",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                    ?? context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }
+            )
+    );
 });
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
@@ -312,6 +328,7 @@ builder.Services.AddScoped<ITransactionCategoryService, TransactionCategoryServi
 builder.Services.AddScoped<IAccountTypeService, AccountTypeService>();
 builder.Services.AddScoped<IGoalService, GoalService>();
 builder.Services.AddScoped<IInstitutionService, InstitutionService>();
+builder.Services.AddScoped<SyncService>();
 builder.Services.AddScoped<ISyncService>(services =>
     new NotificationSyncService(
         services.GetRequiredService<SyncService>(),
