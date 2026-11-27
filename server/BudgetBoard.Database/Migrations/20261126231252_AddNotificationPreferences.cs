@@ -14,26 +14,27 @@ namespace BudgetBoard.Database.Migrations
                 name: "LargeTransactionThreshold",
                 table: "UserSettings",
                 type: "numeric",
-                nullable: true);
+                nullable: true
+            );
 
             migrationBuilder.AddColumn<int>(
                 name: "RecurringReminderLeadTimeDays",
                 table: "UserSettings",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 3
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "LargeTransactionThreshold",
-                table: "UserSettings");
+            migrationBuilder.DropColumn(name: "LargeTransactionThreshold", table: "UserSettings");
 
             migrationBuilder.DropColumn(
                 name: "RecurringReminderLeadTimeDays",
-                table: "UserSettings");
+                table: "UserSettings"
+            );
         }
     }
 }
