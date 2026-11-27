@@ -149,6 +149,27 @@ public sealed class NotificationDestinationService(
         return ToResponse(destination);
     }
 
+    public async Task<NotificationDestinationResponse?> SetEnabledAsync(
+        Guid userId,
+        Guid id,
+        bool enabled,
+        CancellationToken cancellationToken
+    )
+    {
+        var destination = await context.NotificationDestinations.SingleOrDefaultAsync(
+            d => d.UserID == userId && d.ID == id,
+            cancellationToken
+        );
+        if (destination is null)
+        {
+            return null;
+        }
+
+        destination.Enabled = enabled;
+        await context.SaveChangesAsync(cancellationToken);
+        return ToResponse(destination);
+    }
+
     public async Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken cancellationToken)
     {
         var destination = await context.NotificationDestinations.SingleOrDefaultAsync(
@@ -184,6 +205,7 @@ public sealed class NotificationDestinationService(
             destination.ID,
             destination.Name,
             destination.Provider,
+            destination.Enabled,
             JsonSerializer.Deserialize<string[]>(destination.EventTypes)
                 ?? throw new InvalidOperationException(
                     localizer["NotificationEventConfigurationInvalid"].Value
@@ -203,6 +225,7 @@ public sealed class NotificationDestinationService(
             destination.ID,
             destination.Name,
             destination.Provider,
+            destination.Enabled,
             JsonSerializer.Deserialize<string[]>(destination.EventTypes)
                 ?? throw new InvalidOperationException(
                     localizer["NotificationEventConfigurationInvalid"].Value

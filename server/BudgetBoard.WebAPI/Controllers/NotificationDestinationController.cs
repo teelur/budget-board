@@ -105,6 +105,32 @@ public class NotificationDestinationController(
         });
     }
 
+    [HttpPatch("{id:guid}/enabled")]
+    [Authorize]
+    public async Task<IActionResult> SetEnabled(
+        Guid id,
+        [FromBody] NotificationDestinationEnabledRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        return await HandleRequestAsync(async () =>
+        {
+            var userId = userManager.GetUserId(User);
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            {
+                return Unauthorized();
+            }
+
+            var result = await service.SetEnabledAsync(
+                parsedUserId,
+                id,
+                request.Enabled,
+                cancellationToken
+            );
+            return result is null ? NotFound() : Ok(result);
+        });
+    }
+
     [HttpDelete("{id:guid}")]
     [Authorize]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)

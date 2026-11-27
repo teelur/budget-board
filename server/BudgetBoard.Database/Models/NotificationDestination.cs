@@ -58,4 +58,9 @@ public class NotificationDestination
     /// Indicates whether financial details may be included in notifications.
     /// </summary>
     public bool IncludeFinancialDetails { get; set; }
+
+    /// <summary>
+    /// Indicates whether this destination receives automatic notifications.
+    /// </summary>
+    public bool Enabled { get; set; } = true;
 }

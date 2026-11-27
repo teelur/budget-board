@@ -26,7 +26,7 @@ public sealed class NotificationDispatcher(
         try
         {
             var destinations = await context.NotificationDestinations.AsNoTracking()
-                .Where(d => d.UserID == notification.UserId)
+                .Where(d => d.UserID == notification.UserId && d.Enabled)
                 .ToListAsync();
             foreach (var batch in destinations.Chunk(MaxConcurrentSends))
             {

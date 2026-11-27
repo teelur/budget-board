@@ -207,6 +207,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         {
             destination.Property(d => d.Name).HasMaxLength(100).IsRequired();
             destination.Property(d => d.Provider).HasMaxLength(32).IsRequired();
+            destination.Property(d => d.Enabled).HasDefaultValue(true).IsRequired();
             destination.HasIndex(d => d.UserID);
             destination.HasOne(d => d.User)
                 .WithMany()

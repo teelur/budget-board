@@ -52,6 +52,14 @@ public class NotificationDispatcherTests
                 Name = "unsubscribed",
                 Configuration = config,
                 EventTypes = "[]",
+            },
+            new NotificationDestination
+            {
+                UserID = userId,
+                Name = "disabled",
+                Configuration = config,
+                EventTypes = "[\"sync_failed\"]",
+                Enabled = false,
             }
         );
         await helper.UserDataContext.SaveChangesAsync();

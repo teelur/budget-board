@@ -22,11 +22,18 @@ public sealed record NotificationDestinationRequest
     public bool IncludeFinancialDetails { get; init; }
 }
 
+/// <summary>Updates whether automatic delivery is enabled for a destination.</summary>
+public sealed record NotificationDestinationEnabledRequest
+{
+    public required bool Enabled { get; init; }
+}
+
 /// <summary>A notification destination without its webhook configuration.</summary>
 public sealed record NotificationDestinationResponse(
     Guid Id,
     string Name,
     string Provider,
+    bool Enabled,
     string[] EventTypes,
     bool IncludeFinancialDetails
 );
@@ -36,6 +43,7 @@ public sealed record NotificationDestinationDetailsResponse(
     Guid Id,
     string Name,
     string Provider,
+    bool Enabled,
     string[] EventTypes,
     bool IncludeFinancialDetails,
     string? Url,

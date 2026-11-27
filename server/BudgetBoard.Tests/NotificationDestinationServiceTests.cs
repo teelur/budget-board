@@ -144,11 +144,51 @@ public class NotificationDestinationServiceTests
             },
             CancellationToken.None
         );
+        (await service.SetEnabledAsync(userId, destination.Id, false, CancellationToken.None))!
+            .Enabled.Should().BeFalse();
 
         var sent = await service.TestAsync(userId, destination.Id, CancellationToken.None);
 
         sent.Should().BeTrue();
         handler.RequestUri.Should().Be(new Uri("https://ntfy.sh/budget-board"));
+    }
+
+    [Fact]
+    public async Task SetEnabled_IsUserScopedAndUpdatesDestinationState()
+    {
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var userId = helper.demoUser.Id;
+        var destination = await service.CreateAsync(
+            userId,
+            new NotificationDestinationRequest
+            {
+                Name = "Example",
+                Url = "https://example.test/",
+                EventTypes = [],
+            },
+            CancellationToken.None
+        );
+
+        destination.Enabled.Should().BeTrue();
+        var disabled = await service.SetEnabledAsync(
+            userId,
+            destination.Id,
+            false,
+            CancellationToken.None
+        );
+
+        disabled!.Enabled.Should().BeFalse();
+        (await helper.UserDataContext.NotificationDestinations.SingleAsync())
+            .Enabled.Should().BeFalse();
+        (
+            await service.SetEnabledAsync(
+                Guid.NewGuid(),
+                destination.Id,
+                true,
+                CancellationToken.None
+            )
+        ).Should().BeNull();
     }
 
     [Fact]
