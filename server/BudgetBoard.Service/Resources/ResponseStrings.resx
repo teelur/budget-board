@@ -259,6 +259,9 @@
     <data name="InvalidBudgetWarningThresholdError" xml:space="preserve">
         <value>The budget warning threshold must be between 0% and 100%.</value>
     </data>
+    <data name="InvalidLargeTransactionThresholdError" xml:space="preserve">
+        <value>The large transaction threshold must be greater than zero.</value>
+    </data>
     <data name="InvalidConditionError" xml:space="preserve">
         <value>One or more conditions in the automatic rule are invalid.</value>
     </data>
@@ -273,6 +276,9 @@
     </data>
     <data name="InvalidForceSyncLookbackMonthsError" xml:space="preserve">
         <value>The force sync lookback period must be between 0 and 12 months.</value>
+    </data>
+    <data name="InvalidRecurringReminderLeadTimeDaysError" xml:space="preserve">
+        <value>The recurring reminder lead time must be between 1 and 365 days.</value>
     </data>
     <data name="InvalidInstitutionIDError" xml:space="preserve">
         <value>The provided Institution ID is invalid.</value>
@@ -546,5 +552,29 @@
     </data>
     <data name="NotificationGoalReached" xml:space="preserve">
         <value>A financial goal has been reached.</value>
+    </data>
+    <data name="NotificationBudgetWarning" xml:space="preserve">
+        <value>The budget warning threshold was reached for {0}.</value>
+    </data>
+    <data name="NotificationBudgetWarningDetails" xml:space="preserve">
+        <value>Spending reached {0}% of the available budget ({1} of {2}).</value>
+    </data>
+    <data name="NotificationTransactionsAdded" xml:space="preserve">
+        <value>{0} new transaction(s) were added.</value>
+    </data>
+    <data name="NotificationLargeTransactionsAdded" xml:space="preserve">
+        <value>{0} transaction(s) met the large-transaction threshold.</value>
+    </data>
+    <data name="NotificationTransactionDetail" xml:space="preserve">
+        <value>{0} — {1}: {2}</value>
+    </data>
+    <data name="NotificationMoreTransactions" xml:space="preserve">
+        <value>And {0} more.</value>
+    </data>
+    <data name="NotificationRecurringReminder" xml:space="preserve">
+        <value>{0} recurring transaction(s) are due on your reminder date.</value>
+    </data>
+    <data name="NotificationRecurringReminderDetail" xml:space="preserve">
+        <value>{0} — {1}: {2}</value>
     </data>
 </root>

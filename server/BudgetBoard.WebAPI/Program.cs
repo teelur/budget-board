@@ -250,6 +250,7 @@ builder.Services.AddHttpClient(NotificationWebhookSender.ClientName)
 builder.Services.AddScoped<NotificationWebhookSender>();
 builder.Services.AddScoped<INotificationDestinationService, NotificationDestinationService>();
 builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+builder.Services.AddScoped<INotificationActivityService, NotificationActivityService>();
 builder.Services.AddHttpClient(
     AppUpdateService.GitHubHttpClientName,
     client =>
@@ -313,6 +314,23 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
     });
 }
 
+builder.Services.AddQuartz(options =>
+{
+    var jobKey = new JobKey("RecurringReminderBackgroundJob");
+    options.AddJob<RecurringReminderBackgroundJob>(job => job.WithIdentity(jobKey));
+    options.AddTrigger(trigger =>
+        trigger
+            .ForJob(jobKey)
+            .WithCronSchedule("0 0 9 * * ?", schedule =>
+                schedule.InTimeZone(TimeZoneInfo.Local)
+            )
+    );
+});
+builder.Services.AddQuartzHostedService(options =>
+{
+    options.WaitForJobsToComplete = true;
+});
+
 // Used to abstract datetime
 builder.Services.AddSingleton<INowProvider, NowProvider>();
 
@@ -335,7 +353,8 @@ builder.Services.AddScoped<ISyncService>(services =>
         services.GetRequiredService<INotificationDispatcher>(),
         services.GetRequiredService<IStringLocalizer<ApiResponseStrings>>(),
         services.GetRequiredService<IStringLocalizer<ApiLogStrings>>(),
-        services.GetRequiredService<ILogger<NotificationSyncService>>()
+        services.GetRequiredService<ILogger<NotificationSyncService>>(),
+        services.GetRequiredService<INotificationActivityService>()
     )
 );
 builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();

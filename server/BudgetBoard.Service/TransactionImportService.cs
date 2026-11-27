@@ -19,7 +19,8 @@ public class TransactionImportService(
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer,
     ILogger<TransactionImportService> logger,
-    INotificationDispatcher notificationDispatcher
+    INotificationDispatcher notificationDispatcher,
+    INotificationActivityService notificationActivityService
 ) : ITransactionImportService
 {
     private const int BatchSize = 100;
@@ -168,6 +169,8 @@ public class TransactionImportService(
             return false;
         }
 
+        await using var notificationScope = await notificationActivityService.BeginAsync(job.UserID);
+
         try
         {
             var request = JsonSerializer.Deserialize<TransactionImportRequest>(job.Payload);
@@ -254,11 +257,13 @@ public class TransactionImportService(
                 if (await IsCancellationRequestedAsync(job.ID, cancellationToken))
                 {
                     await CancelJobAsync(job.ID, cancellationToken);
+                    await notificationScope.CompleteAsync();
                     return true;
                 }
             }
 
             await CompleteJobAsync(job.ID, errors, cancellationToken);
+            await notificationScope.CompleteAsync();
             if (errors.Count > 0)
             {
                 await NotifyImportFailureIfCompletedAsync(job.ID, job.UserID);
@@ -266,6 +271,7 @@ public class TransactionImportService(
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            await notificationScope.CompleteAsync();
             throw;
         }
         catch (Exception exception)
@@ -286,6 +292,7 @@ public class TransactionImportService(
             job.LastHeartbeatAt = null;
             job.LeaseExpiresAt = null;
             await userDataContext.SaveChangesAsync(cancellationToken);
+            await notificationScope.CompleteAsync();
             await NotifyImportFailureAsync(job.UserID);
 
             logger.LogError(

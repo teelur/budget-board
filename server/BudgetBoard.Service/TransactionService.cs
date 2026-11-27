@@ -18,7 +18,8 @@ public class TransactionService(
     IStringLocalizer<ResponseStrings> responseLocalizer,
     IStringLocalizer<LogStrings> logLocalizer,
     ITagService tagService,
-    IRecurringRuleService recurringRuleService
+    IRecurringRuleService recurringRuleService,
+    INotificationActivityService notificationActivityService
 ) : ITransactionService
 {
     private const int DefaultLinkCandidateDateWindowDays = 3;
@@ -31,6 +32,9 @@ public class TransactionService(
         bool deferSave = false
     )
     {
+        await using var notificationScope = deferSave
+            ? null
+            : await notificationActivityService.BeginAsync(userGuid);
         var userData = await GetCurrentUserAsync(userGuid);
         await CreateTransactionAsync(userData, request, deferSave);
     }
@@ -42,6 +46,9 @@ public class TransactionService(
         bool deferSave = false
     )
     {
+        await using var notificationScope = deferSave
+            ? null
+            : await notificationActivityService.BeginAsync(userData.Id);
         await CreateTransactionAsync(userData, request, deferSave, null);
     }
 
@@ -69,6 +76,7 @@ public class TransactionService(
             AccountID = request.AccountID,
             Account = account,
         };
+        await notificationActivityService.TrackBudgetMonthAsync(userData.Id, newTransaction.Date);
         if (applyAutomaticAssociations)
         {
             await automaticTransactionCategorizerService.AutoCategorizeTransactionAsync(
@@ -97,6 +105,10 @@ public class TransactionService(
         if (!deferSave)
         {
             await userDataContext.SaveChangesAsync();
+            await notificationActivityService.TrackTransactionCreatedAsync(
+                userData.Id,
+                newTransaction
+            );
         }
 
         return newTransaction;
@@ -119,6 +131,7 @@ public class TransactionService(
         ITransactionTransferCreateRequest request
     )
     {
+        await using var notificationScope = await notificationActivityService.BeginAsync(userGuid);
         if (request.Amount <= 0)
         {
             throw new BudgetBoardServiceException(
@@ -249,6 +262,9 @@ public class TransactionService(
         bool deferSave = false
     )
     {
+        await using var notificationScope = deferSave
+            ? null
+            : await notificationActivityService.BeginAsync(userGuid);
         var userData = await GetCurrentUserAsync(userGuid);
         var removedTagIds = new HashSet<Guid>();
         foreach (var request in requests)
@@ -258,6 +274,8 @@ public class TransactionService(
             var originalDate = transaction.Date;
             var finalAmount = request.Amount ?? originalAmount;
             var finalDate = request.Date ?? originalDate;
+            await notificationActivityService.TrackBudgetMonthAsync(userGuid, originalDate);
+            await notificationActivityService.TrackBudgetMonthAsync(userGuid, finalDate);
 
             var linkedTransaction = GetLinkedTransaction(transaction);
             if (
@@ -350,6 +368,9 @@ public class TransactionService(
         bool deferSave = false
     )
     {
+        await using var notificationScope = deferSave
+            ? null
+            : await notificationActivityService.BeginAsync(userGuid);
         var userData = await GetCurrentUserAsync(userGuid);
         var removedTagIds = new HashSet<Guid>();
 
@@ -358,6 +379,7 @@ public class TransactionService(
         foreach (var transactionId in uniqueTransactionIds)
         {
             var transaction = GetTransactionByID(userData, transactionId);
+            await notificationActivityService.TrackBudgetMonthAsync(userGuid, transaction.Date);
 
             var linkedTransactionLink = GetTransactionLink(transaction);
             if (linkedTransactionLink != null)
@@ -393,12 +415,16 @@ public class TransactionService(
         bool deferSave = false
     )
     {
+        await using var notificationScope = deferSave
+            ? null
+            : await notificationActivityService.BeginAsync(userGuid);
         var userData = await GetCurrentUserAsync(userGuid);
 
         var uniqueTransactionIds = transactionIds.Distinct().ToList();
         foreach (var transactionId in uniqueTransactionIds)
         {
             var transaction = GetTransactionByID(userData, transactionId);
+            await notificationActivityService.TrackBudgetMonthAsync(userGuid, transaction.Date);
 
             transaction.Deleted = null;
 
@@ -421,6 +447,7 @@ public class TransactionService(
         ITransactionSplitRequest transactionSplitRequest
     )
     {
+        await using var notificationScope = await notificationActivityService.BeginAsync(userGuid);
         var userData = await GetCurrentUserAsync(userGuid);
         var transaction = GetTransactionByID(userData, transactionSplitRequest.ID);
 
@@ -523,6 +550,7 @@ public class TransactionService(
         ITransactionLinkRequest request
     )
     {
+        await using var notificationScope = await notificationActivityService.BeginAsync(userGuid);
         var userData = await GetCurrentUserAsync(userGuid);
         var sourceTransaction = GetTransactionByID(userData, request.TransactionID);
         var targetTransaction = GetTransactionByID(userData, request.LinkedTransactionID);
@@ -574,6 +602,9 @@ public class TransactionService(
                 responseLocalizer["TransactionAlreadyLinkedError"]
             );
         }
+
+        await notificationActivityService.TrackBudgetMonthAsync(userData.Id, sourceTransaction.Date);
+        await notificationActivityService.TrackBudgetMonthAsync(userData.Id, targetTransaction.Date);
 
         sourceTransaction.Category = TransferCategory;
         sourceTransaction.Subcategory = NormalizeTransferSubcategory(
@@ -652,6 +683,7 @@ public class TransactionService(
         Guid transactionID
     )
     {
+        await using var notificationScope = await notificationActivityService.BeginAsync(userGuid);
         var userData = await GetCurrentUserAsync(userGuid);
         var transaction = GetTransactionByID(userData, transactionID);
         var link =
@@ -710,12 +742,14 @@ public class TransactionService(
     /// <inheritdoc />
     public async Task ImportTransactionsAsync(Guid userGuid, ITransactionImportRequest request)
     {
+        await using var notificationScope = await notificationActivityService.BeginAsync(userGuid);
         var userData = await GetCurrentUserAsync(userGuid);
         var allCategories = TransactionCategoriesHelpers.GetAllTransactionCategories(userData);
         var transactionIds = userData
             .Accounts.SelectMany(account => account.Transactions)
             .Select(transaction => transaction.ID)
             .ToHashSet();
+        var createdTransactions = new List<Transaction>();
 
         foreach (var transaction in request.Transactions)
         {
@@ -753,10 +787,16 @@ public class TransactionService(
             (newTransaction.Category, newTransaction.Subcategory) =
                 TransactionCategoriesHelpers.GetFullCategory(coercedCategoryValue, allCategories);
 
-            await CreateTransactionAsync(userData, newTransaction, true, transaction.ID);
+            createdTransactions.Add(
+                await CreateTransactionAsync(userData, newTransaction, true, transaction.ID)
+            );
         }
 
         await userDataContext.SaveChangesAsync();
+        foreach (var transaction in createdTransactions)
+        {
+            await notificationActivityService.TrackTransactionCreatedAsync(userData.Id, transaction);
+        }
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)

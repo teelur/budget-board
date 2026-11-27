@@ -69,6 +69,7 @@ public class NotificationSyncServiceTests
         dispatcher,
         TestHelper.CreateMockLocalizer<ApiResponseStrings>(),
         TestHelper.CreateMockLocalizer<ApiLogStrings>(),
-        Mock.Of<ILogger<NotificationSyncService>>()
+        Mock.Of<ILogger<NotificationSyncService>>(),
+        TestHelper.CreateMockNotificationActivityService()
     );
 }

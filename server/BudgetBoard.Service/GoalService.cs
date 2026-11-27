@@ -509,31 +509,12 @@ public class GoalService(
 
     private decimal CalculatePercentComplete(Goal goal)
     {
-        decimal effectiveTargetAmount;
-        // An initial amount less than zero indicates a debt.
-        if (goal.InitialAmount < 0)
-        {
-            effectiveTargetAmount = Math.Abs(goal.InitialAmount);
-        }
-        else
-        {
-            effectiveTargetAmount = goal.Amount;
-        }
-
-        // An effective target amount of 0 is invalid, so just return 0 to prevent a divide by zero error.
-        if (effectiveTargetAmount == 0)
+        if (GoalProgressHelpers.GetEffectiveTargetAmount(goal) == 0)
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalPercentCompleteZeroTargetAmountLog"]);
-            return 0.0M;
         }
 
-        var accountsTotalBalance = goal.Accounts.Sum(a =>
-            a.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0
-        );
-        decimal currentProgress = accountsTotalBalance - goal.InitialAmount;
-        decimal percentComplete = currentProgress / effectiveTargetAmount * 100.0M;
-
-        return percentComplete > 100.0M ? 100.0M : percentComplete;
+        return GoalProgressHelpers.CalculatePercentComplete(goal);
     }
 
     private static decimal CalculateAverageInterestRate(Goal goal)

@@ -994,6 +994,12 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<decimal?>("LargeTransactionThreshold")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("RecurringReminderLeadTimeDays")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("UserID")
                         .HasColumnType("uuid");
 

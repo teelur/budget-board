@@ -10,11 +10,13 @@ public sealed class NotificationSyncService(
     INotificationDispatcher dispatcher,
     IStringLocalizer<ApiResponseStrings> localizer,
     IStringLocalizer<ApiLogStrings> logLocalizer,
-    ILogger<NotificationSyncService> logger
+    ILogger<NotificationSyncService> logger,
+    INotificationActivityService notificationActivityService
 ) : ISyncService
 {
     public async Task<IReadOnlyList<SyncError>> SyncAsync(Guid userGuid)
     {
+        await using var notificationScope = await notificationActivityService.BeginAsync(userGuid);
         IReadOnlyList<SyncError> errors;
         try
         {
@@ -22,10 +24,12 @@ public sealed class NotificationSyncService(
         }
         catch (Exception)
         {
+            await notificationScope.CompleteAsync();
             await NotifyFailureAsync(userGuid);
             throw;
         }
 
+        await notificationScope.CompleteAsync();
         if (errors.Count > 0)
         {
             await NotifyFailureAsync(userGuid);

@@ -10,6 +10,8 @@ public interface IUserSettingsResponse
     string Language { get; }
     string DateFormat { get; }
     int BudgetWarningThreshold { get; }
+    decimal? LargeTransactionThreshold { get; }
+    int RecurringReminderLeadTimeDays { get; }
     int ForceSyncLookbackMonths { get; }
     bool DisableBuiltInTransactionCategories { get; }
     bool DisableBuiltInAccountTypes { get; }
@@ -29,6 +31,8 @@ public class UserSettingsResponse : IUserSettingsResponse
     public string Language { get; set; }
     public string DateFormat { get; set; }
     public int BudgetWarningThreshold { get; set; }
+    public decimal? LargeTransactionThreshold { get; set; }
+    public int RecurringReminderLeadTimeDays { get; set; }
     public int ForceSyncLookbackMonths { get; set; }
     public bool DisableBuiltInTransactionCategories { get; set; }
     public bool DisableBuiltInAccountTypes { get; set; }
@@ -48,6 +52,8 @@ public class UserSettingsResponse : IUserSettingsResponse
         Language = "default";
         DateFormat = "default";
         BudgetWarningThreshold = 80;
+        LargeTransactionThreshold = null;
+        RecurringReminderLeadTimeDays = 3;
         ForceSyncLookbackMonths = 0;
         DisableBuiltInTransactionCategories = false;
         DisableBuiltInAccountTypes = false;
@@ -63,6 +69,8 @@ public class UserSettingsResponse : IUserSettingsResponse
         Language = userSettings.Language.ToString();
         DateFormat = userSettings.DateFormat.ToString();
         BudgetWarningThreshold = userSettings.BudgetWarningThreshold;
+        LargeTransactionThreshold = userSettings.LargeTransactionThreshold;
+        RecurringReminderLeadTimeDays = userSettings.RecurringReminderLeadTimeDays;
         ForceSyncLookbackMonths = userSettings.ForceSyncLookbackMonths;
         DisableBuiltInTransactionCategories = userSettings.DisableBuiltInTransactionCategories;
         DisableBuiltInAccountTypes = userSettings.DisableBuiltInAccountTypes;
@@ -84,6 +92,8 @@ public interface IUserSettingsUpdateRequest
     public string? Language { get; }
     public string? DateFormat { get; }
     public int? BudgetWarningThreshold { get; }
+    public OptionalField<decimal?> LargeTransactionThreshold { get; }
+    public int? RecurringReminderLeadTimeDays { get; }
     public int? ForceSyncLookbackMonths { get; }
     public bool? DisableBuiltInTransactionCategories { get; }
     public bool? DisableBuiltInAccountTypes { get; }
@@ -100,6 +110,9 @@ public class UserSettingsUpdateRequest() : IUserSettingsUpdateRequest
     public string? Language { get; set; } = null;
     public string? DateFormat { get; set; } = null;
     public int? BudgetWarningThreshold { get; set; } = null;
+    public OptionalField<decimal?> LargeTransactionThreshold { get; set; } =
+        new OptionalField<decimal?>();
+    public int? RecurringReminderLeadTimeDays { get; set; } = null;
     public int? ForceSyncLookbackMonths { get; set; } = null;
     public bool? DisableBuiltInTransactionCategories { get; set; } = null;
     public bool? DisableBuiltInAccountTypes { get; set; } = null;

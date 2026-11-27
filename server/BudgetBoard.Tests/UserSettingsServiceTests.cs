@@ -129,6 +129,8 @@ public class UserSettingsServiceTests
             Language = "en-US",
             DateFormat = "MM/DD/YYYY",
             BudgetWarningThreshold = 50,
+            LargeTransactionThreshold = new OptionalField<decimal?>(250),
+            RecurringReminderLeadTimeDays = 5,
             ForceSyncLookbackMonths = 6,
             DisableBuiltInTransactionCategories = true,
             DisableBuiltInAccountTypes = false,
@@ -151,6 +153,8 @@ public class UserSettingsServiceTests
         settings
             .BudgetWarningThreshold.Should()
             .Be(userSettingsUpdateRequest.BudgetWarningThreshold);
+        settings.LargeTransactionThreshold.Should().Be(250);
+        settings.RecurringReminderLeadTimeDays.Should().Be(5);
         settings
             .ForceSyncLookbackMonths.Should()
             .Be(userSettingsUpdateRequest.ForceSyncLookbackMonths);
@@ -166,6 +170,30 @@ public class UserSettingsServiceTests
         settings
             .AutoCategorizerMinimumProbabilityPercentage.Should()
             .Be(userSettingsUpdateRequest.AutoCategorizerMinimumProbabilityPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateUserSettingsAsync_WhenLargeTransactionThresholdIsCleared_DisablesLargeTransactionAlerts()
+    {
+        var helper = new TestHelper();
+        helper.demoUser.UserSettings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            LargeTransactionThreshold = 250,
+        };
+        helper.UserDataContext.UserSettings.Add(helper.demoUser.UserSettings);
+        await helper.UserDataContext.SaveChangesAsync();
+        var userSettingsService = CreateUserSettingsService(helper);
+
+        await userSettingsService.UpdateUserSettingsAsync(
+            helper.demoUser.Id,
+            new UserSettingsUpdateRequest
+            {
+                LargeTransactionThreshold = new OptionalField<decimal?>(null),
+            }
+        );
+
+        helper.demoUser.UserSettings.LargeTransactionThreshold.Should().BeNull();
     }
 
     [Fact]

@@ -177,7 +177,8 @@ public class TransactionImportServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             Mock.Of<ILogger<TransactionImportService>>(),
-            Mock.Of<INotificationDispatcher>()
+            Mock.Of<INotificationDispatcher>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var response = await service.EnqueueAsync(
@@ -584,7 +585,8 @@ public class TransactionImportServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             Mock.Of<ILogger<TransactionImportService>>(),
-            Mock.Of<INotificationDispatcher>()
+            Mock.Of<INotificationDispatcher>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
         var job = new TransactionImportJob
         {
@@ -617,7 +619,8 @@ public class TransactionImportServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             Mock.Of<ILogger<TransactionImportService>>(),
-            Mock.Of<INotificationDispatcher>()
+            Mock.Of<INotificationDispatcher>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var result = await service.ProcessNextAsync(CancellationToken.None);
@@ -639,7 +642,8 @@ public class TransactionImportServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             Mock.Of<ILogger<TransactionImportService>>(),
-            notificationDispatcher ?? Mock.Of<INotificationDispatcher>()
+            notificationDispatcher ?? Mock.Of<INotificationDispatcher>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
     }
 

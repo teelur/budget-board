@@ -30,7 +30,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -87,7 +88,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var transaction = new TransactionCreateRequest
@@ -124,7 +126,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -171,7 +174,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -247,7 +251,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -297,7 +302,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -351,7 +357,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -400,7 +407,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -459,7 +467,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -515,7 +524,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -557,6 +567,57 @@ public class TransactionServiceTests
     }
 
     [Fact]
+    public async Task UpdateTransactionsAsync_WhenDateChangesMonths_TracksBothBudgetMonths()
+    {
+        var helper = new TestHelper();
+        var originalDate = new DateOnly(2025, 1, 31);
+        var updatedDate = new DateOnly(2025, 2, 1);
+        var activityScope = new Mock<INotificationActivityScope>();
+        activityScope.Setup(scope => scope.DisposeAsync()).Returns(ValueTask.CompletedTask);
+        var activityService = new Mock<INotificationActivityService>();
+        activityService
+            .Setup(service => service.BeginAsync(helper.demoUser.Id))
+            .ReturnsAsync(activityScope.Object);
+        activityService
+            .Setup(service =>
+                service.TrackBudgetMonthAsync(It.IsAny<Guid>(), It.IsAny<DateOnly>())
+            )
+            .Returns(Task.CompletedTask);
+
+        var transactionService = new TransactionService(
+            Mock.Of<ILogger<ITransactionService>>(),
+            helper.UserDataContext,
+            Mock.Of<INowProvider>(),
+            Mock.Of<IAutomaticTransactionCategorizerService>(),
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            CreateTagService(helper),
+            Mock.Of<IRecurringRuleService>(),
+            activityService.Object
+        );
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        var transaction = new TransactionFaker([account.ID]).Generate();
+        transaction.Date = originalDate;
+        account.Transactions = [transaction];
+        helper.UserDataContext.Accounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await transactionService.UpdateTransactionsAsync(
+            helper.demoUser.Id,
+            [new TransactionUpdateRequest { ID = transaction.ID, Date = updatedDate }]
+        );
+
+        activityService.Verify(
+            service => service.TrackBudgetMonthAsync(helper.demoUser.Id, originalDate),
+            Times.Once
+        );
+        activityService.Verify(
+            service => service.TrackBudgetMonthAsync(helper.demoUser.Id, updatedDate),
+            Times.Once
+        );
+    }
+
+    [Fact]
     public async Task UpdateTransactionsAsync_WhenMultipleTransactions_ShouldUpdateAllTransactions()
     {
         // Arrange
@@ -570,7 +631,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -629,7 +691,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             tagService,
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         await CreateTransactionWithTagsAsync(
@@ -689,7 +752,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var editedTransaction = new TransactionUpdateRequest
@@ -734,7 +798,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -817,7 +882,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -893,7 +959,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var account = new AccountFaker(helper.demoUser.Id).Generate();
@@ -962,7 +1029,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var account = new AccountFaker(helper.demoUser.Id).Generate();
@@ -1024,7 +1092,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1077,7 +1146,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1125,7 +1195,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1174,7 +1245,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         // Act
@@ -1206,7 +1278,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1272,7 +1345,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1337,7 +1411,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1380,7 +1455,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         // Act
@@ -1412,7 +1488,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1467,7 +1544,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             tagService,
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
         var account = new AccountFaker(helper.demoUser.Id).Generate();
         helper.UserDataContext.Accounts.Add(account);
@@ -1506,7 +1584,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1566,7 +1645,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var splitTransactionRequest = new TransactionSplitRequest
@@ -1609,7 +1689,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1662,7 +1743,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1726,7 +1808,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1782,7 +1865,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1835,7 +1919,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var account = new AccountFaker(helper.demoUser.Id).Generate();
@@ -1917,7 +2002,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -2034,7 +2120,8 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            recurringRuleService.Object
+            recurringRuleService.Object,
+            TestHelper.CreateMockNotificationActivityService()
         );
         var accountFaker = new AccountFaker(helper.demoUser.Id);
         var sourceAccount = accountFaker.Generate();
@@ -3144,6 +3231,7 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 }

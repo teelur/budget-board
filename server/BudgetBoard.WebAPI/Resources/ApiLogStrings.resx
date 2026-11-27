@@ -250,4 +250,7 @@
     <data name="NotificationSyncFailureDispatchFailedLog" xml:space="preserve">
         <value>Failed to dispatch sync failure notification. Error type: {0}.</value>
     </data>
+    <data name="NotificationRecurringReminderFailedLog" xml:space="preserve">
+        <value>Failed to send recurring transaction reminders. Error type: {0}.</value>
+    </data>
 </root>
