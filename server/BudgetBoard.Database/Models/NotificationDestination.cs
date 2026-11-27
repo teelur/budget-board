@@ -1,7 +1,21 @@
 namespace BudgetBoard.Database.Models;
 
+public static class NotificationDestinationProviders
+{
+    public const string Webhook = "webhook";
+    public const string Ntfy = "ntfy";
+    public const string Discord = "discord";
+
+    public static readonly IReadOnlySet<string> All = new HashSet<string>
+    {
+        Webhook,
+        Ntfy,
+        Discord,
+    };
+}
+
 /// <summary>
-/// Represents a user's configured webhook notification destination.
+/// Represents a user's configured notification destination.
 /// </summary>
 public class NotificationDestination
 {
@@ -26,7 +40,12 @@ public class NotificationDestination
     public required string Name { get; set; }
 
     /// <summary>
-    /// JSON-serialized webhook configuration, including its URL and headers.
+    /// Provider used to deliver notifications to this destination.
+    /// </summary>
+    public string Provider { get; set; } = NotificationDestinationProviders.Webhook;
+
+    /// <summary>
+    /// JSON-serialized provider configuration, including any destination credentials.
     /// </summary>
     public required string Configuration { get; set; }
 

@@ -3,6 +3,7 @@ using System.Text.Json;
 using BudgetBoard.Database.Data;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
 using BudgetBoard.WebAPI.Models;
 using BudgetBoard.WebAPI.Services;
 using BudgetBoard.WebAPI.Resources;
@@ -75,6 +76,79 @@ public class NotificationDestinationServiceTests
         updated.EventTypes.Should().BeEmpty();
         (await helper.UserDataContext.NotificationDestinations.SingleAsync())
             .Configuration.Should().Contain("https://example.test/secret");
+    }
+
+    [Fact]
+    public async Task NtfyConfigurationIsReturnedAndProviderCannotBeChanged()
+    {
+        var helper = new TestHelper();
+        var service = CreateService(helper);
+        var userId = helper.demoUser.Id;
+        var created = await service.CreateAsync(
+            userId,
+            new NotificationDestinationRequest
+            {
+                Name = "ntfy",
+                Provider = NotificationDestinationProviders.Ntfy,
+                NtfyServerUrl = "https://ntfy.example/",
+                NtfyTopic = "budget-board",
+                NtfyAccessToken = "secret",
+                EventTypes = [NotificationEventTypes.SyncFailed],
+            },
+            CancellationToken.None
+        );
+
+        created.Provider.Should().Be(NotificationDestinationProviders.Ntfy);
+        var details = await service.ReadAsync(userId, created.Id, CancellationToken.None);
+        details!.NtfyServerUrl.Should().Be("https://ntfy.example");
+        details.NtfyTopic.Should().Be("budget-board");
+        details.NtfyAccessToken.Should().Be("secret");
+
+        var update = () =>
+            service.UpdateAsync(
+                userId,
+                created.Id,
+                new NotificationDestinationRequest
+                {
+                    Name = "ntfy",
+                    Provider = NotificationDestinationProviders.Discord,
+                    DiscordWebhookUrl =
+                        "https://discord.com/api/webhooks/123456789012345678/token",
+                    EventTypes = [],
+                },
+                CancellationToken.None
+            );
+        await update.Should().ThrowAsync<ArgumentException>();
+        (await helper.UserDataContext.NotificationDestinations.SingleAsync())
+            .Provider.Should().Be(NotificationDestinationProviders.Ntfy);
+    }
+
+    [Fact]
+    public async Task TestAsync_SendsThroughTheConfiguredProvider()
+    {
+        var helper = new TestHelper();
+        var handler = new NotificationResponseHandler();
+        var factory = new Mock<IHttpClientFactory>();
+        factory.Setup(clientFactory => clientFactory.CreateClient(NotificationNtfySender.ClientName))
+            .Returns(new HttpClient(handler));
+        var service = CreateService(helper.UserDataContext, factory.Object);
+        var userId = helper.demoUser.Id;
+        var destination = await service.CreateAsync(
+            userId,
+            new NotificationDestinationRequest
+            {
+                Name = "ntfy",
+                Provider = NotificationDestinationProviders.Ntfy,
+                NtfyTopic = "budget-board",
+                EventTypes = [],
+            },
+            CancellationToken.None
+        );
+
+        var sent = await service.TestAsync(userId, destination.Id, CancellationToken.None);
+
+        sent.Should().BeTrue();
+        handler.RequestUri.Should().Be(new Uri("https://ntfy.sh/budget-board"));
     }
 
     [Fact]
@@ -308,19 +382,56 @@ public class NotificationDestinationServiceTests
     private static NotificationDestinationService CreateService(TestHelper helper) =>
         CreateService(helper.UserDataContext);
 
-    private static NotificationDestinationService CreateService(UserDataContext context)
+    private static NotificationDestinationService CreateService(UserDataContext context) =>
+        CreateService(context, Mock.Of<IHttpClientFactory>());
+
+    private static NotificationDestinationService CreateService(
+        UserDataContext context,
+        IHttpClientFactory factory
+    )
     {
-        var sender = new NotificationWebhookSender(
-            Mock.Of<IHttpClientFactory>(),
-            Mock.Of<ILogger<NotificationWebhookSender>>(),
-            TestHelper.CreateMockLocalizer<ApiLogStrings>(),
-            TestHelper.CreateMockLocalizer<ApiResponseStrings>()
-        );
+        var apiLogLocalizer = TestHelper.CreateMockLocalizer<ApiLogStrings>();
+        var apiResponseLocalizer = TestHelper.CreateMockLocalizer<ApiResponseStrings>();
         return new NotificationDestinationService(
             context,
-            sender,
+            [
+                new NotificationWebhookSender(
+                    factory,
+                    Mock.Of<ILogger<NotificationWebhookSender>>(),
+                    apiLogLocalizer,
+                    apiResponseLocalizer
+                ),
+                new NotificationNtfySender(
+                    factory,
+                    Mock.Of<ILogger<NotificationNtfySender>>(),
+                    apiLogLocalizer,
+                    apiResponseLocalizer,
+                    TestHelper.CreateMockLocalizer<ResponseStrings>()
+                ),
+                new NotificationDiscordSender(
+                    factory,
+                    Mock.Of<ILogger<NotificationDiscordSender>>(),
+                    apiLogLocalizer,
+                    apiResponseLocalizer,
+                    TestHelper.CreateMockLocalizer<ResponseStrings>()
+                ),
+            ],
             TestHelper.CreateMockLocalizer<ApiResponseStrings>()
         );
+    }
+
+    private sealed class NotificationResponseHandler : HttpMessageHandler
+    {
+        public Uri? RequestUri { get; private set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        )
+        {
+            RequestUri = request.RequestUri;
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
+        }
     }
 
     private sealed class DestinationLimitLockInterceptor : DbCommandInterceptor

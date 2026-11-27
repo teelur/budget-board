@@ -15,12 +15,110 @@ public sealed partial class NotificationWebhookSender(
     ILogger<NotificationWebhookSender> logger,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer
-)
+) : INotificationDestinationProvider
 {
     public const string ClientName = "NotificationWebhook";
 
+    public string Provider => NotificationDestinationProviders.Webhook;
+
     [GeneratedRegex(@"\{\{(event_type|message|financial_details)\}\}")]
     private static partial Regex PlaceholderRegex();
+
+    public string BuildConfiguration(
+        NotificationDestinationRequest request,
+        string? existingConfiguration
+    )
+    {
+        var previous = existingConfiguration is null
+            ? null
+            : JsonSerializer.Deserialize<WebhookConfiguration>(existingConfiguration)
+                ?? throw new InvalidOperationException(
+                    responseLocalizer["NotificationInvalidConfiguration"].Value
+                );
+        var url = request.Url ?? previous?.Url;
+        var headers = request.Headers ?? previous?.Headers ?? new Dictionary<string, string>();
+        var contentType = request.ContentType ?? previous?.ContentType ?? "application/json";
+        var template =
+            request.BodyTemplate ?? previous?.BodyTemplate ?? "{\"content\":\"{{message}}\"}";
+        if (!IsValidUrl(url))
+        {
+            throw new ArgumentException(responseLocalizer["NotificationWebhookUrlInvalid"].Value);
+        }
+        if (contentType is not ("application/json" or "text/plain"))
+        {
+            throw new ArgumentException(
+                responseLocalizer["NotificationWebhookContentTypeInvalid"].Value
+            );
+        }
+        if (
+            template.Length > 8192
+            || headers.Count > 20
+            || headers.Any(h =>
+                h.Key.Length > 128
+                || h.Value is null
+                || h.Value.Length > 2048
+                || h.Key.Contains('\r')
+                || h.Key.Contains('\n')
+                || h.Value.Contains('\r')
+                || h.Value.Contains('\n')
+                || h.Key.Equals("Host", StringComparison.OrdinalIgnoreCase)
+                || h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)
+                || h.Key.Equals("Content-Type", StringComparison.OrdinalIgnoreCase)
+                || h.Key.Equals("Transfer-Encoding", StringComparison.OrdinalIgnoreCase)
+            )
+        )
+        {
+            throw new ArgumentException(
+                responseLocalizer["NotificationWebhookTemplateOrHeadersInvalid"].Value
+            );
+        }
+        using var validationRequest = new HttpRequestMessage();
+        if (
+            headers.Any(header =>
+                !validationRequest.Headers.TryAddWithoutValidation(header.Key, header.Value)
+            )
+        )
+        {
+            throw new ArgumentException(
+                responseLocalizer["NotificationWebhookHeadersInvalid"].Value
+            );
+        }
+
+        var configuration = new WebhookConfiguration(url!, headers, contentType, template);
+        if (contentType == "application/json")
+        {
+            try
+            {
+                var sample = new NotificationEvent(Guid.Empty, "test", "test", "test");
+                using var _ = JsonDocument.Parse(
+                    Render(configuration, sample, request.IncludeFinancialDetails)
+                );
+            }
+            catch (JsonException exception)
+            {
+                throw new ArgumentException(
+                    responseLocalizer["NotificationWebhookJsonTemplateInvalid"].Value,
+                    exception
+                );
+            }
+        }
+
+        return JsonSerializer.Serialize(configuration);
+    }
+
+    public NotificationProviderConfigurationDetails ReadConfiguration(string configuration)
+    {
+        var webhookConfiguration = JsonSerializer.Deserialize<WebhookConfiguration>(configuration)
+            ?? throw new InvalidOperationException(
+                responseLocalizer["NotificationInvalidConfiguration"].Value
+            );
+        return new NotificationProviderConfigurationDetails(
+            Url: webhookConfiguration.Url,
+            Headers: webhookConfiguration.Headers,
+            ContentType: webhookConfiguration.ContentType,
+            BodyTemplate: webhookConfiguration.BodyTemplate
+        );
+    }
 
     public async Task<bool> SendAsync(
         NotificationDestination destination,

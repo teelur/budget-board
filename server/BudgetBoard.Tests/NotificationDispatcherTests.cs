@@ -2,6 +2,8 @@ using System.Net;
 using System.Text.Json;
 using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Models;
+using BudgetBoard.Service.Resources;
+using BudgetBoard.WebAPI.Models;
 using BudgetBoard.WebAPI.Services;
 using FluentAssertions;
 using BudgetBoard.WebAPI.Resources;
@@ -21,19 +23,7 @@ public class NotificationDispatcherTests
         var factory = new Mock<IHttpClientFactory>();
         factory.Setup(f => f.CreateClient(NotificationWebhookSender.ClientName))
             .Returns(new HttpClient(handler));
-        var sender = new NotificationWebhookSender(
-            factory.Object,
-            Mock.Of<ILogger<NotificationWebhookSender>>(),
-            TestHelper.CreateMockLocalizer<ApiLogStrings>(),
-            TestHelper.CreateMockLocalizer<ApiResponseStrings>()
-        );
-        var dispatcher = new NotificationDispatcher(
-            helper.UserDataContext,
-            sender,
-            TestHelper.CreateMockLocalizer<ApiLogStrings>(),
-            TestHelper.CreateMockLocalizer<ApiResponseStrings>(),
-            Mock.Of<ILogger<NotificationDispatcher>>()
-        );
+        var dispatcher = CreateDispatcher(helper, factory.Object);
         var config = JsonSerializer.Serialize(new
         {
             Url = "https://example.test/",
@@ -72,6 +62,82 @@ public class NotificationDispatcherTests
     }
 
     [Fact]
+    public async Task DispatchAsync_RoutesNativeDestinationsToTheirProviders()
+    {
+        var helper = new TestHelper();
+        var userId = helper.demoUser.Id;
+        var ntfyHandler = new CountingHandler();
+        var discordHandler = new CountingHandler();
+        var factory = new Mock<IHttpClientFactory>();
+        factory.Setup(clientFactory => clientFactory.CreateClient(NotificationNtfySender.ClientName))
+            .Returns(new HttpClient(ntfyHandler));
+        factory.Setup(clientFactory =>
+                clientFactory.CreateClient(NotificationDiscordSender.ClientName)
+            )
+            .Returns(new HttpClient(discordHandler));
+        var apiLogLocalizer = TestHelper.CreateMockLocalizer<ApiLogStrings>();
+        var apiResponseLocalizer = TestHelper.CreateMockLocalizer<ApiResponseStrings>();
+        var ntfySender = new NotificationNtfySender(
+            factory.Object,
+            Mock.Of<ILogger<NotificationNtfySender>>(),
+            apiLogLocalizer,
+            apiResponseLocalizer,
+            TestHelper.CreateMockLocalizer<ResponseStrings>()
+        );
+        var discordSender = new NotificationDiscordSender(
+            factory.Object,
+            Mock.Of<ILogger<NotificationDiscordSender>>(),
+            apiLogLocalizer,
+            apiResponseLocalizer,
+            TestHelper.CreateMockLocalizer<ResponseStrings>()
+        );
+        helper.UserDataContext.NotificationDestinations.AddRange(
+            new NotificationDestination
+            {
+                UserID = userId,
+                Name = "ntfy",
+                Provider = NotificationDestinationProviders.Ntfy,
+                Configuration = ntfySender.BuildConfiguration(
+                    new NotificationDestinationRequest
+                    {
+                        Name = "ntfy",
+                        Provider = NotificationDestinationProviders.Ntfy,
+                        NtfyTopic = "budget-board",
+                        EventTypes = [NotificationEventTypes.SyncFailed],
+                    },
+                    null
+                ),
+                EventTypes = "[\"sync_failed\"]",
+            },
+            new NotificationDestination
+            {
+                UserID = userId,
+                Name = "discord",
+                Provider = NotificationDestinationProviders.Discord,
+                Configuration = discordSender.BuildConfiguration(
+                    new NotificationDestinationRequest
+                    {
+                        Name = "discord",
+                        Provider = NotificationDestinationProviders.Discord,
+                        DiscordWebhookUrl =
+                            "https://discord.com/api/webhooks/123456789012345678/secret",
+                        EventTypes = [NotificationEventTypes.SyncFailed],
+                    },
+                    null
+                ),
+                EventTypes = "[\"sync_failed\"]",
+            }
+        );
+        await helper.UserDataContext.SaveChangesAsync();
+        var dispatcher = CreateDispatcher(helper, factory.Object);
+
+        await dispatcher.DispatchAsync(new NotificationEvent(userId, "sync_failed", "test"));
+
+        ntfyHandler.Attempts.Should().Be(1);
+        discordHandler.Attempts.Should().Be(1);
+    }
+
+    [Fact]
     public async Task DispatchAsync_LimitsConcurrentSendsAndProcessesRemainingDestinations()
     {
         var helper = new TestHelper();
@@ -80,19 +146,7 @@ public class NotificationDispatcherTests
         var factory = new Mock<IHttpClientFactory>();
         factory.Setup(f => f.CreateClient(NotificationWebhookSender.ClientName))
             .Returns(new HttpClient(handler));
-        var sender = new NotificationWebhookSender(
-            factory.Object,
-            Mock.Of<ILogger<NotificationWebhookSender>>(),
-            TestHelper.CreateMockLocalizer<ApiLogStrings>(),
-            TestHelper.CreateMockLocalizer<ApiResponseStrings>()
-        );
-        var dispatcher = new NotificationDispatcher(
-            helper.UserDataContext,
-            sender,
-            TestHelper.CreateMockLocalizer<ApiLogStrings>(),
-            TestHelper.CreateMockLocalizer<ApiResponseStrings>(),
-            Mock.Of<ILogger<NotificationDispatcher>>()
-        );
+        var dispatcher = CreateDispatcher(helper, factory.Object);
         var config = JsonSerializer.Serialize(new
         {
             Url = "https://example.test/",
@@ -126,19 +180,7 @@ public class NotificationDispatcherTests
         var factory = new Mock<IHttpClientFactory>();
         factory.Setup(f => f.CreateClient(NotificationWebhookSender.ClientName))
             .Returns(new HttpClient(handler));
-        var sender = new NotificationWebhookSender(
-            factory.Object,
-            Mock.Of<ILogger<NotificationWebhookSender>>(),
-            TestHelper.CreateMockLocalizer<ApiLogStrings>(),
-            TestHelper.CreateMockLocalizer<ApiResponseStrings>()
-        );
-        var dispatcher = new NotificationDispatcher(
-            helper.UserDataContext,
-            sender,
-            TestHelper.CreateMockLocalizer<ApiLogStrings>(),
-            TestHelper.CreateMockLocalizer<ApiResponseStrings>(),
-            Mock.Of<ILogger<NotificationDispatcher>>()
-        );
+        var dispatcher = CreateDispatcher(helper, factory.Object);
         var config = JsonSerializer.Serialize(new
         {
             Url = "https://example.test/",
@@ -165,6 +207,43 @@ public class NotificationDispatcherTests
         handler.CancelledRequests.Should().Be(10);
     }
 
+    private static NotificationDispatcher CreateDispatcher(
+        TestHelper helper,
+        IHttpClientFactory factory
+    )
+    {
+        var apiLogLocalizer = TestHelper.CreateMockLocalizer<ApiLogStrings>();
+        var apiResponseLocalizer = TestHelper.CreateMockLocalizer<ApiResponseStrings>();
+        return new NotificationDispatcher(
+            helper.UserDataContext,
+            [
+                new NotificationWebhookSender(
+                    factory,
+                    Mock.Of<ILogger<NotificationWebhookSender>>(),
+                    apiLogLocalizer,
+                    apiResponseLocalizer
+                ),
+                new NotificationNtfySender(
+                    factory,
+                    Mock.Of<ILogger<NotificationNtfySender>>(),
+                    apiLogLocalizer,
+                    apiResponseLocalizer,
+                    TestHelper.CreateMockLocalizer<ResponseStrings>()
+                ),
+                new NotificationDiscordSender(
+                    factory,
+                    Mock.Of<ILogger<NotificationDiscordSender>>(),
+                    apiLogLocalizer,
+                    apiResponseLocalizer,
+                    TestHelper.CreateMockLocalizer<ResponseStrings>()
+                ),
+            ],
+            apiLogLocalizer,
+            apiResponseLocalizer,
+            Mock.Of<ILogger<NotificationDispatcher>>()
+        );
+    }
+
     private sealed class CountingHandler : HttpMessageHandler
     {
         public int Attempts { get; private set; }
@@ -177,6 +256,7 @@ public class NotificationDispatcherTests
             Attempts++;
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NoContent));
         }
+
     }
 
     private sealed class HangingCountingHandler : HttpMessageHandler

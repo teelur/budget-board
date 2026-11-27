@@ -214,8 +214,26 @@
     <data name="NotificationEventTypesInvalid" xml:space="preserve">
         <value>One or more notification event types are invalid.</value>
     </data>
+    <data name="NotificationProviderInvalid" xml:space="preserve">
+        <value>The notification provider is invalid.</value>
+    </data>
+    <data name="NotificationProviderImmutable" xml:space="preserve">
+        <value>A destination's provider cannot be changed after it is created.</value>
+    </data>
     <data name="NotificationWebhookUrlInvalid" xml:space="preserve">
         <value>A valid HTTP or HTTPS webhook URL is required.</value>
+    </data>
+    <data name="NotificationNtfyServerUrlInvalid" xml:space="preserve">
+        <value>The ntfy server URL is invalid.</value>
+    </data>
+    <data name="NotificationNtfyTopicInvalid" xml:space="preserve">
+        <value>The ntfy topic is invalid.</value>
+    </data>
+    <data name="NotificationNtfyAccessTokenInvalid" xml:space="preserve">
+        <value>The ntfy access token is invalid.</value>
+    </data>
+    <data name="NotificationDiscordWebhookUrlInvalid" xml:space="preserve">
+        <value>The Discord incoming webhook URL is invalid.</value>
     </data>
     <data name="NotificationWebhookContentTypeInvalid" xml:space="preserve">
         <value>Webhook content type must be application/json or text/plain.</value>

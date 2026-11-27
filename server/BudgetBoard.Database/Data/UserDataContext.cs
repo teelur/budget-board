@@ -206,6 +206,7 @@ public class UserDataContext(DbContextOptions<UserDataContext> options)
         modelBuilder.Entity<NotificationDestination>(destination =>
         {
             destination.Property(d => d.Name).HasMaxLength(100).IsRequired();
+            destination.Property(d => d.Provider).HasMaxLength(32).IsRequired();
             destination.HasIndex(d => d.UserID);
             destination.HasOne(d => d.User)
                 .WithMany()

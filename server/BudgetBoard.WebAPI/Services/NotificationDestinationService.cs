@@ -12,12 +12,14 @@ namespace BudgetBoard.WebAPI.Services;
 
 public sealed class NotificationDestinationService(
     UserDataContext context,
-    NotificationWebhookSender sender,
+    IEnumerable<INotificationDestinationProvider> providers,
     IStringLocalizer<ApiResponseStrings> localizer
 ) : INotificationDestinationService
 {
     private const int MaxDestinationsPerUser = 10;
     private const string DestinationLimitLockPrefix = "budget-board:notification-destination-limit:";
+    private readonly IReadOnlyDictionary<string, INotificationDestinationProvider> providerMap =
+        providers.ToDictionary(provider => provider.Provider, StringComparer.Ordinal);
 
     public async Task<IReadOnlyList<NotificationDestinationResponse>> ReadAsync(
         Guid userId,
@@ -51,14 +53,16 @@ public sealed class NotificationDestinationService(
         CancellationToken cancellationToken
     )
     {
-        var configuration = BuildConfiguration(request, null);
+        var provider = GetProvider(request.Provider);
+        var configuration = provider.BuildConfiguration(request, null);
         var events = ValidateEvents(request.EventTypes);
         var name = ValidateName(request.Name);
         var destination = new NotificationDestination
         {
             UserID = userId,
             Name = name,
-            Configuration = JsonSerializer.Serialize(configuration),
+            Provider = provider.Provider,
+            Configuration = configuration,
             EventTypes = JsonSerializer.Serialize(events),
             IncludeFinancialDetails = request.IncludeFinancialDetails,
         };
@@ -130,14 +134,15 @@ public sealed class NotificationDestinationService(
             return null;
         }
 
-        var previous =
-            JsonSerializer.Deserialize<WebhookConfiguration>(destination.Configuration)
-            ?? throw new InvalidOperationException(
-                localizer["NotificationInvalidConfiguration"].Value
-            );
-        var configuration = BuildConfiguration(request, previous);
+        if (!string.Equals(request.Provider, destination.Provider, StringComparison.Ordinal))
+        {
+            throw new ArgumentException(localizer["NotificationProviderImmutable"].Value);
+        }
+
+        var provider = GetProvider(destination.Provider);
+        var configuration = provider.BuildConfiguration(request, destination.Configuration);
         destination.Name = ValidateName(request.Name);
-        destination.Configuration = JsonSerializer.Serialize(configuration);
+        destination.Configuration = configuration;
         destination.EventTypes = JsonSerializer.Serialize(ValidateEvents(request.EventTypes));
         destination.IncludeFinancialDetails = request.IncludeFinancialDetails;
         await context.SaveChangesAsync(cancellationToken);
@@ -167,7 +172,7 @@ public sealed class NotificationDestinationService(
             .SingleOrDefaultAsync(d => d.UserID == userId && d.ID == id, cancellationToken);
         return destination is null
             ? null
-            : await sender.SendAsync(
+            : await GetProvider(destination.Provider).SendAsync(
                 destination,
                 new NotificationEvent(userId, "test", localizer["NotificationTestMessage"]),
                 cancellationToken
@@ -178,6 +183,7 @@ public sealed class NotificationDestinationService(
         new(
             destination.ID,
             destination.Name,
+            destination.Provider,
             JsonSerializer.Deserialize<string[]>(destination.EventTypes)
                 ?? throw new InvalidOperationException(
                     localizer["NotificationEventConfigurationInvalid"].Value
@@ -189,15 +195,14 @@ public sealed class NotificationDestinationService(
         NotificationDestination destination
     )
     {
-        var configuration =
-            JsonSerializer.Deserialize<WebhookConfiguration>(destination.Configuration)
-            ?? throw new InvalidOperationException(
-                localizer["NotificationInvalidConfiguration"].Value
-            );
+        var configuration = GetProvider(destination.Provider).ReadConfiguration(
+            destination.Configuration
+        );
 
         return new NotificationDestinationDetailsResponse(
             destination.ID,
             destination.Name,
+            destination.Provider,
             JsonSerializer.Deserialize<string[]>(destination.EventTypes)
                 ?? throw new InvalidOperationException(
                     localizer["NotificationEventConfigurationInvalid"].Value
@@ -206,8 +211,22 @@ public sealed class NotificationDestinationService(
             configuration.Url,
             configuration.Headers,
             configuration.ContentType,
-            configuration.BodyTemplate
+            configuration.BodyTemplate,
+            configuration.NtfyServerUrl,
+            configuration.NtfyTopic,
+            configuration.NtfyAccessToken,
+            configuration.DiscordWebhookUrl
         );
+    }
+
+    private INotificationDestinationProvider GetProvider(string? provider)
+    {
+        if (provider is not null && providerMap.TryGetValue(provider, out var destinationProvider))
+        {
+            return destinationProvider;
+        }
+
+        throw new ArgumentException(localizer["NotificationProviderInvalid"].Value);
     }
 
     private string ValidateName(string? name)
@@ -226,81 +245,6 @@ public sealed class NotificationDestinationService(
             throw new ArgumentException(localizer["NotificationEventTypesInvalid"].Value);
         }
         return events.Distinct().ToArray();
-    }
-
-    private WebhookConfiguration BuildConfiguration(
-        NotificationDestinationRequest request,
-        WebhookConfiguration? previous
-    )
-    {
-        var url = request.Url ?? previous?.Url;
-        var headers = request.Headers ?? previous?.Headers ?? new Dictionary<string, string>();
-        var contentType = request.ContentType ?? previous?.ContentType ?? "application/json";
-        var template =
-            request.BodyTemplate ?? previous?.BodyTemplate ?? "{\"content\":\"{{message}}\"}";
-        if (!NotificationWebhookSender.IsValidUrl(url))
-        {
-            throw new ArgumentException(localizer["NotificationWebhookUrlInvalid"].Value);
-        }
-        if (contentType is not ("application/json" or "text/plain"))
-        {
-            throw new ArgumentException(localizer["NotificationWebhookContentTypeInvalid"].Value);
-        }
-        if (
-            template.Length > 8192
-            || headers.Count > 20
-            || headers.Any(h =>
-                h.Key.Length > 128
-                || h.Value is null
-                || h.Value.Length > 2048
-                || h.Key.Contains('\r')
-                || h.Key.Contains('\n')
-                || h.Value.Contains('\r')
-                || h.Value.Contains('\n')
-                || h.Key.Equals("Host", StringComparison.OrdinalIgnoreCase)
-                || h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)
-                || h.Key.Equals("Content-Type", StringComparison.OrdinalIgnoreCase)
-                || h.Key.Equals("Transfer-Encoding", StringComparison.OrdinalIgnoreCase)
-            )
-        )
-        {
-            throw new ArgumentException(
-                localizer["NotificationWebhookTemplateOrHeadersInvalid"].Value
-            );
-        }
-        using var validationRequest = new HttpRequestMessage();
-        if (
-            headers.Any(header =>
-                !validationRequest.Headers.TryAddWithoutValidation(header.Key, header.Value)
-            )
-        )
-        {
-            throw new ArgumentException(localizer["NotificationWebhookHeadersInvalid"].Value);
-        }
-
-        var configuration = new WebhookConfiguration(url!, headers, contentType, template);
-        if (contentType == "application/json")
-        {
-            try
-            {
-                var sample = new NotificationEvent(Guid.Empty, "test", "test", "test");
-                using var _ = JsonDocument.Parse(
-                    NotificationWebhookSender.Render(
-                        configuration,
-                        sample,
-                        request.IncludeFinancialDetails
-                    )
-                );
-            }
-            catch (JsonException exception)
-            {
-                throw new ArgumentException(
-                    localizer["NotificationWebhookJsonTemplateInvalid"].Value,
-                    exception
-                );
-            }
-        }
-        return configuration;
     }
 
     private sealed class SingleAttemptExecutionStrategy(DbContext context)

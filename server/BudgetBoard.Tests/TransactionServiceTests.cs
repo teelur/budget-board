@@ -21,7 +21,6 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
-
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
             helper.UserDataContext,
@@ -1575,6 +1574,7 @@ public class TransactionServiceTests
     {
         // Arrange
         var helper = new TestHelper();
+        var notificationActivityService = TestHelper.CreateMockNotificationActivityService();
 
         var transactionService = new TransactionService(
             Mock.Of<ILogger<ITransactionService>>(),
@@ -1585,7 +1585,7 @@ public class TransactionServiceTests
             TestHelper.CreateMockLocalizer<LogStrings>(),
             CreateTagService(helper),
             Mock.Of<IRecurringRuleService>(),
-            TestHelper.CreateMockNotificationActivityService()
+            notificationActivityService
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1629,6 +1629,15 @@ public class TransactionServiceTests
         newTransaction.Category.Should().Be(splitTransactionRequest.Category);
         newTransaction.Subcategory.Should().Be(splitTransactionRequest.Subcategory);
         newTransaction.Date.Should().Be(transaction.Date);
+        Mock.Get(notificationActivityService)
+            .Verify(
+                service =>
+                    service.TrackTransactionCreatedAsync(
+                        helper.demoUser.Id,
+                        It.Is<Transaction>(created => created.ID == newTransaction.ID)
+                    ),
+                Times.Once
+            );
     }
 
     [Fact]

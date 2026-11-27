@@ -477,8 +477,8 @@ public class TransactionService(
             true
         );
 
-        await CreateTransactionAsync(
-            userGuid,
+        var splitTransaction = await CreateTransactionAsync(
+            userData,
             new TransactionCreateRequest
             {
                 SyncID = transaction.SyncID,
@@ -490,10 +490,12 @@ public class TransactionService(
                 Source = transaction.Source,
                 AccountID = transaction.AccountID,
             },
-            true
+            true,
+            null
         );
 
         await userDataContext.SaveChangesAsync();
+        await notificationActivityService.TrackTransactionCreatedAsync(userGuid, splitTransaction);
     }
 
     /// <inheritdoc />

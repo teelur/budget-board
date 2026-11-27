@@ -10,7 +10,7 @@ namespace BudgetBoard.WebAPI.Services;
 
 public sealed class NotificationDispatcher(
     UserDataContext context,
-    NotificationWebhookSender sender,
+    IEnumerable<INotificationDestinationProvider> providers,
     IStringLocalizer<ApiLogStrings> logLocalizer,
     IStringLocalizer<ApiResponseStrings> responseLocalizer,
     ILogger<NotificationDispatcher> logger
@@ -18,6 +18,8 @@ public sealed class NotificationDispatcher(
 {
     private const int MaxConcurrentSends = 4;
     private const int BatchTimeoutSeconds = 2;
+    private readonly IReadOnlyDictionary<string, INotificationDestinationProvider> providerMap =
+        providers.ToDictionary(provider => provider.Provider, StringComparer.Ordinal);
 
     public async Task DispatchAsync(NotificationEvent notification)
     {
@@ -41,7 +43,8 @@ public sealed class NotificationDispatcher(
                             );
                         if (events.Contains(notification.Type))
                         {
-                            await sender.SendAsync(destination, notification, timeout.Token);
+                            await GetProvider(destination.Provider)
+                                .SendAsync(destination, notification, timeout.Token);
                         }
                     }
                     catch (Exception exception)
@@ -65,5 +68,17 @@ public sealed class NotificationDispatcher(
                 logLocalizer["NotificationDispatchFailedLog", exception.GetType().Name]
             );
         }
+    }
+
+    private INotificationDestinationProvider GetProvider(string provider)
+    {
+        if (providerMap.TryGetValue(provider, out var destinationProvider))
+        {
+            return destinationProvider;
+        }
+
+        throw new InvalidOperationException(
+            responseLocalizer["NotificationProviderInvalid"].Value
+        );
     }
 }

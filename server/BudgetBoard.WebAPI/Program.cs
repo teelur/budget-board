@@ -247,7 +247,18 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpClient(NotificationWebhookSender.ClientName)
     .RemoveAllLoggers()
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+builder.Services.AddHttpClient(NotificationNtfySender.ClientName)
+    .RemoveAllLoggers()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+builder.Services.AddHttpClient(NotificationDiscordSender.ClientName)
+    .RemoveAllLoggers()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
 builder.Services.AddScoped<NotificationWebhookSender>();
+builder.Services.AddScoped<INotificationDestinationProvider>(services =>
+    services.GetRequiredService<NotificationWebhookSender>()
+);
+builder.Services.AddScoped<INotificationDestinationProvider, NotificationNtfySender>();
+builder.Services.AddScoped<INotificationDestinationProvider, NotificationDiscordSender>();
 builder.Services.AddScoped<INotificationDestinationService, NotificationDestinationService>();
 builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
 builder.Services.AddScoped<INotificationActivityService, NotificationActivityService>();
