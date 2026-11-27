@@ -7,7 +7,9 @@ import type { INotificationDestinationResponse } from "~/models/notificationDest
 interface NotificationDestinationCardProps {
   destination: INotificationDestinationResponse;
   isTestPending: boolean;
+  isTogglePending: boolean;
   onTest: () => void;
+  onToggle: (enabled: boolean) => void;
   onEdit: () => void;
   onDelete: () => void;
 }
@@ -15,7 +17,9 @@ interface NotificationDestinationCardProps {
 const NotificationDestinationCard = ({
   destination,
   isTestPending,
+  isTogglePending,
   onTest,
+  onToggle,
   onEdit,
   onDelete,
 }: NotificationDestinationCardProps): React.ReactNode => {
@@ -33,6 +37,15 @@ const NotificationDestinationCard = ({
           </BodyText>
         </Group>
         <Group gap="0.5rem">
+          <Button
+            size="compact-sm"
+            variant="ghost"
+            color={destination.enabled ? "success" : "error"}
+            disabled={isTogglePending}
+            onClick={() => onToggle(!destination.enabled)}
+          >
+            {t(destination.enabled ? "enabled" : "disabled")}
+          </Button>
           <Button
             size="compact-sm"
             variant="ghost"

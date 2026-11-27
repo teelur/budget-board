@@ -56,5 +56,15 @@ export const useNotificationDestinationMutations = () => {
       }),
     onError,
   });
-  return { save, remove, test };
+  const setEnabled = useMutation({
+    mutationFn: async ({ id, enabled }: { id: string; enabled: boolean }) =>
+      await request({
+        url: `/api/NotificationDestination/${id}/enabled`,
+        method: "PATCH",
+        data: { enabled },
+      }),
+    onSuccess: refresh,
+    onError,
+  });
+  return { save, remove, test, setEnabled };
 };

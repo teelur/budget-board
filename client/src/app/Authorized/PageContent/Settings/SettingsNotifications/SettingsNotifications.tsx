@@ -21,7 +21,7 @@ const SettingsNotifications = (): React.ReactNode => {
     decimalPlaces,
   } = useUserSettings();
   const destinations = useNotificationDestinationsQuery();
-  const { remove, test } = useNotificationDestinationMutations();
+  const { remove, setEnabled, test } = useNotificationDestinationMutations();
   const updateUserSettingsMutation = useUpdateUserSettingsMutation();
   const [largeThresholdInput, setLargeThresholdInput] = React.useState<
     number | string
@@ -140,6 +140,10 @@ const SettingsNotifications = (): React.ReactNode => {
           key={destination.id}
           destination={destination}
           isTestPending={test.isPending}
+          isTogglePending={setEnabled.isPending}
+          onToggle={(enabled) =>
+            setEnabled.mutate({ id: destination.id, enabled })
+          }
           onTest={() =>
             test.mutate(destination.id, {
               onSuccess: () =>

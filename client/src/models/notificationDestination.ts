@@ -4,6 +4,7 @@ export interface INotificationDestinationResponse {
   id: string;
   name: string;
   provider: NotificationDestinationProvider;
+  enabled: boolean;
   eventTypes: string[];
   includeFinancialDetails: boolean;
 }
