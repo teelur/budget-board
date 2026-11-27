@@ -24,9 +24,14 @@ const NotificationDestinationCard = ({
   return (
     <Card>
       <Group justify="space-between">
-        <BodyText tone="primary" size="md">
-          {destination.name}
-        </BodyText>
+        <Group gap="0.5rem">
+          <BodyText tone="primary" size="md">
+            {destination.name}
+          </BodyText>
+          <BodyText tone="secondary" size="xs">
+            {t(`notification_provider_${destination.provider}`)}
+          </BodyText>
+        </Group>
         <Group gap="0.5rem">
           <Button
             size="compact-sm"

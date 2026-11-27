@@ -13,7 +13,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { NotificationType, showNotification } from "~/helpers/notifications";
 import { useNotificationDestinationMutations } from "~/hooks/mutations/useNotificationDestinationMutations";
-import type { INotificationDestinationDetailsResponse } from "~/models/notificationDestination";
+import type {
+  INotificationDestinationDetailsResponse,
+  INotificationDestinationRequest,
+  NotificationDestinationProvider,
+} from "~/models/notificationDestination";
 
 interface NotificationDestinationFieldsProps {
   destination?: INotificationDestinationDetailsResponse;
@@ -26,26 +30,48 @@ const NotificationDestinationFields = ({
 }: NotificationDestinationFieldsProps): React.ReactNode => {
   const { t } = useTranslation();
   const { save } = useNotificationDestinationMutations();
+  const provider = useField<NotificationDestinationProvider>({
+    initialValue: destination?.provider ?? "webhook",
+  });
   const name = useField<string>({
     initialValue: destination?.name ?? "",
     validate: isNotEmpty(t("notification_name_required")),
   });
+  const webhookDestination =
+    destination?.provider === "webhook" ? destination : undefined;
+  const ntfyDestination =
+    destination?.provider === "ntfy" ? destination : undefined;
+  const discordDestination =
+    destination?.provider === "discord" ? destination : undefined;
   const url = useField<string>({
-    initialValue: destination?.url ?? "",
-    validate: destination
-      ? undefined
-      : isNotEmpty(t("notification_url_required")),
+    initialValue: webhookDestination?.url ?? "",
+    validate: isNotEmpty(t("notification_url_required")),
   });
   const headers = useField<string>({
-    initialValue: destination
-      ? JSON.stringify(destination.headers, null, 2)
+    initialValue: webhookDestination
+      ? JSON.stringify(webhookDestination.headers, null, 2)
       : "",
   });
   const contentType = useField<string>({
-    initialValue: destination?.contentType ?? "application/json",
+    initialValue: webhookDestination?.contentType ?? "application/json",
   });
   const body = useField<string>({
-    initialValue: destination?.bodyTemplate ?? '{"content":"{{message}}"}',
+    initialValue: webhookDestination?.bodyTemplate ?? '{"content":"{{message}}"}',
+  });
+  const ntfyServerUrl = useField<string>({
+    initialValue: ntfyDestination?.ntfyServerUrl ?? "https://ntfy.sh",
+    validate: isNotEmpty(t("notification_ntfy_server_url_required")),
+  });
+  const ntfyTopic = useField<string>({
+    initialValue: ntfyDestination?.ntfyTopic ?? "",
+    validate: isNotEmpty(t("notification_ntfy_topic_required")),
+  });
+  const ntfyAccessToken = useField<string>({
+    initialValue: ntfyDestination?.ntfyAccessToken ?? "",
+  });
+  const discordWebhookUrl = useField<string>({
+    initialValue: discordDestination?.discordWebhookUrl ?? "",
+    validate: isNotEmpty(t("notification_discord_webhook_url_required")),
   });
   const events = useField<string[]>({
     initialValue: destination?.eventTypes ?? [],
@@ -54,49 +80,89 @@ const NotificationDestinationFields = ({
     initialValue: destination?.includeFinancialDetails ?? false,
   });
 
+  const saveDestination = (data: INotificationDestinationRequest) => {
+    save.mutate(
+      { id: destination?.id, data },
+      { onSuccess: onClose },
+    );
+  };
+
   const handleSave = async () => {
-    if ((await name.validate()) || (await url.validate())) {
+    if (await name.validate()) {
       return;
     }
-    let parsedHeaders: Record<string, string> | undefined;
-    if (headers.getValue().trim()) {
-      try {
-        const parsed: unknown = JSON.parse(headers.getValue());
-        if (
-          !parsed ||
-          typeof parsed !== "object" ||
-          Array.isArray(parsed) ||
-          Object.values(parsed).some((value) => typeof value !== "string")
-        ) {
-          throw new Error("Invalid headers");
+
+    const common = {
+      name: name.getValue().trim(),
+      eventTypes: events.getValue(),
+      includeFinancialDetails: includeDetails.getValue(),
+    };
+
+    switch (provider.getValue()) {
+      case "webhook": {
+        if (await url.validate()) {
+          return;
         }
-        parsedHeaders = Object.fromEntries(
-          Object.entries(parsed).map(([key, value]) => [key, String(value)]),
-        );
-      } catch {
-        showNotification({
-          type: NotificationType.Error,
-          message: t("notification_headers_invalid"),
+
+        let parsedHeaders: Record<string, string> | undefined;
+        if (headers.getValue().trim()) {
+          try {
+            const parsed: unknown = JSON.parse(headers.getValue());
+            if (
+              !parsed ||
+              typeof parsed !== "object" ||
+              Array.isArray(parsed) ||
+              Object.values(parsed).some((value) => typeof value !== "string")
+            ) {
+              throw new Error("Invalid headers");
+            }
+            parsedHeaders = Object.fromEntries(
+              Object.entries(parsed).map(([key, value]) => [key, String(value)]),
+            );
+          } catch {
+            showNotification({
+              type: NotificationType.Error,
+              message: t("notification_headers_invalid"),
+            });
+            return;
+          }
+        }
+
+        saveDestination({
+          ...common,
+          provider: "webhook",
+          url: url.getValue().trim(),
+          headers: parsedHeaders,
+          contentType: contentType.getValue(),
+          bodyTemplate: body.getValue(),
         });
         return;
       }
+      case "ntfy":
+        if (
+          (await ntfyServerUrl.validate()) ||
+          (await ntfyTopic.validate())
+        ) {
+          return;
+        }
+        saveDestination({
+          ...common,
+          provider: "ntfy",
+          ntfyServerUrl: ntfyServerUrl.getValue().trim(),
+          ntfyTopic: ntfyTopic.getValue().trim(),
+          ntfyAccessToken: ntfyAccessToken.getValue(),
+        });
+        return;
+      case "discord":
+        if (await discordWebhookUrl.validate()) {
+          return;
+        }
+        saveDestination({
+          ...common,
+          provider: "discord",
+          discordWebhookUrl: discordWebhookUrl.getValue().trim(),
+        });
     }
-
-    save.mutate(
-      {
-        id: destination?.id,
-        data: {
-          name: name.getValue().trim(),
-          url: url.getValue().trim() || undefined,
-          headers: parsedHeaders,
-          contentType: contentType.getValue() || undefined,
-          bodyTemplate: body.getValue() || undefined,
-          eventTypes: events.getValue(),
-          includeFinancialDetails: includeDetails.getValue(),
-        },
-      },
-      { onSuccess: onClose },
-    );
   };
 
   return (
@@ -111,28 +177,69 @@ const NotificationDestinationFields = ({
     >
       <Stack gap="0.5rem">
         <TextInput label={t("name")} {...name.getInputProps()} />
-        <TextInput
-          label={t("notification_webhook_url")}
-          {...url.getInputProps()}
-        />
-        <Textarea
-          label={t("notification_headers")}
-          description={t("notification_headers_description")}
-          {...headers.getInputProps()}
-        />
         <Select
-          label={t("notification_content_type")}
+          label={t("notification_provider")}
           data={[
-            { value: "application/json", label: "application/json" },
-            { value: "text/plain", label: "text/plain" },
+            { value: "webhook", label: t("notification_provider_webhook") },
+            { value: "ntfy", label: t("notification_provider_ntfy") },
+            { value: "discord", label: t("notification_provider_discord") },
           ]}
-          {...contentType.getInputProps()}
+          disabled={Boolean(destination)}
+          {...provider.getInputProps()}
         />
-        <Textarea
-          label={t("notification_body_template")}
-          description={t("notification_template_description")}
-          {...body.getInputProps()}
-        />
+        {provider.getValue() === "webhook" && (
+          <>
+            <TextInput
+              label={t("notification_webhook_url")}
+              {...url.getInputProps()}
+            />
+            <Textarea
+              label={t("notification_headers")}
+              description={t("notification_headers_description")}
+              {...headers.getInputProps()}
+            />
+            <Select
+              label={t("notification_content_type")}
+              data={[
+                { value: "application/json", label: "application/json" },
+                { value: "text/plain", label: "text/plain" },
+              ]}
+              {...contentType.getInputProps()}
+            />
+            <Textarea
+              label={t("notification_body_template")}
+              description={t("notification_template_description")}
+              {...body.getInputProps()}
+            />
+          </>
+        )}
+        {provider.getValue() === "ntfy" && (
+          <>
+            <TextInput
+              label={t("notification_ntfy_server_url")}
+              {...ntfyServerUrl.getInputProps()}
+            />
+            <TextInput
+              label={t("notification_ntfy_topic")}
+              {...ntfyTopic.getInputProps()}
+            />
+            <TextInput
+              type="password"
+              autoComplete="new-password"
+              label={t("notification_ntfy_access_token")}
+              description={t("notification_ntfy_access_token_description")}
+              {...ntfyAccessToken.getInputProps()}
+            />
+          </>
+        )}
+        {provider.getValue() === "discord" && (
+          <TextInput
+            type="password"
+            autoComplete="new-password"
+            label={t("notification_discord_webhook_url")}
+            {...discordWebhookUrl.getInputProps()}
+          />
+        )}
         <MultiSelect
           label={t("notification_events")}
           data={[
