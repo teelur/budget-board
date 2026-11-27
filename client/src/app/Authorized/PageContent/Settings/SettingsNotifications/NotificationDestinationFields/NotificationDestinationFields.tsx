@@ -139,6 +139,19 @@ const NotificationDestinationFields = ({
             { value: "sync_failed", label: t("notification_sync_failed") },
             { value: "import_failed", label: t("notification_import_failed") },
             { value: "goal_reached", label: t("notification_goal_reached") },
+            { value: "budget_warning", label: t("notification_budget_warning") },
+            {
+              value: "transactions_added",
+              label: t("notification_transactions_added"),
+            },
+            {
+              value: "large_transactions_added",
+              label: t("notification_large_transactions_added"),
+            },
+            {
+              value: "recurring_reminder",
+              label: t("notification_recurring_reminder"),
+            },
           ]}
           {...events.getInputProps()}
         />
