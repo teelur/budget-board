@@ -104,8 +104,10 @@ public class NotificationNativeProviderTests
             .GetProperty("parse").GetArrayLength().Should().Be(0);
     }
 
-    [Fact]
-    public void DiscordSender_RejectsNonDiscordWebhookUrls()
+    [Theory]
+    [InlineData("https://discord.com.example/api/webhooks/123456789012345678/secret")]
+    [InlineData("http://discord.com/api/webhooks/123456789012345678/secret")]
+    public void DiscordSender_RejectsInvalidOrInsecureWebhookUrls(string webhookUrl)
     {
         var sender = new NotificationDiscordSender(
             Mock.Of<IHttpClientFactory>(),
@@ -121,14 +123,46 @@ public class NotificationNativeProviderTests
                 {
                     Name = "discord",
                     Provider = NotificationDestinationProviders.Discord,
-                    DiscordWebhookUrl =
-                        "https://discord.com.example/api/webhooks/123456789012345678/secret",
+                    DiscordWebhookUrl = webhookUrl,
                     EventTypes = [],
                 },
                 null
             );
 
         action.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public async Task DiscordSender_DoesNotSendStoredHttpWebhookUrl()
+    {
+        var handler = new CapturingHandler();
+        var factory = new Mock<IHttpClientFactory>();
+        factory.Setup(clientFactory =>
+                clientFactory.CreateClient(NotificationDiscordSender.ClientName)
+            )
+            .Returns(new HttpClient(handler));
+        var sender = new NotificationDiscordSender(
+            factory.Object,
+            Mock.Of<ILogger<NotificationDiscordSender>>(),
+            TestHelper.CreateMockLocalizer<ApiLogStrings>(),
+            TestHelper.CreateMockLocalizer<ApiResponseStrings>(),
+            CreateMessageLocalizer()
+        );
+        var configuration = JsonSerializer.Serialize(
+            new
+            {
+                WebhookUrl = "http://discord.com/api/webhooks/123456789012345678/secret",
+            }
+        );
+
+        var sent = await sender.SendAsync(
+            CreateDestination(NotificationDestinationProviders.Discord, configuration),
+            new NotificationEvent(Guid.NewGuid(), "sync_failed", "Sync failed"),
+            CancellationToken.None
+        );
+
+        sent.Should().BeFalse();
+        handler.RequestUri.Should().BeNull();
     }
 
     private static NotificationDestination CreateDestination(string provider, string configuration) =>

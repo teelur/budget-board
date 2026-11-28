@@ -72,6 +72,13 @@ public sealed class NotificationDiscordSender(
                 ?? throw new InvalidOperationException(
                     responseLocalizer["NotificationInvalidConfiguration"].Value
                 );
+            if (!IsValidWebhookUrl(configuration.WebhookUrl))
+            {
+                throw new InvalidOperationException(
+                    responseLocalizer["NotificationDiscordWebhookUrlInvalid"].Value
+                );
+            }
+
             var financialDetails = NotificationMessageFormatter.GetFinancialDetails(
                 notification,
                 destination.IncludeFinancialDetails,
@@ -150,6 +157,7 @@ public sealed class NotificationDiscordSender(
         if (
             !NotificationWebhookSender.IsValidUrl(value)
             || !Uri.TryCreate(value, UriKind.Absolute, out var uri)
+            || !uri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)
             || !string.IsNullOrEmpty(uri.Query)
             || !(
                 uri.Host.Equals("discord.com", StringComparison.OrdinalIgnoreCase)

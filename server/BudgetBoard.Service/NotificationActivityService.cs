@@ -283,6 +283,7 @@ public sealed class NotificationActivityService(
         var eligibleTransactions = transactions
             .Where(transaction =>
                 transaction.Deleted == null
+                && transaction.Account?.HideTransactions == false
                 && !string.Equals(
                     transaction.Category,
                     TransactionCategoriesConstants.TransferCategory,

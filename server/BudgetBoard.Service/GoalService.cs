@@ -216,7 +216,10 @@ public class GoalService(
         var userData = await GetCurrentUserAsync(userGuid);
         var goal = GetGoalById(userData, goalID);
 
-        if (goal.Completed.HasValue)
+        if (
+            goal.Completed.HasValue
+            || !await TryCompleteGoalAsync(userGuid, goal, completedDate)
+        )
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalCompleteAlreadyCompletedLog"]);
             throw new BudgetBoardServiceException(
@@ -224,8 +227,6 @@ public class GoalService(
             );
         }
 
-        goal.Completed = completedDate;
-        await userDataContext.SaveChangesAsync();
         await NotifyGoalReachedAsync(userGuid, goal);
     }
 
@@ -235,7 +236,6 @@ public class GoalService(
         var userData = await GetCurrentUserAsync(userGuid);
 
         var goals = userData.Goals.ToList();
-        var completedGoals = new List<Goal>();
         foreach (var goal in goals)
         {
             // Skip goals that are already completed
@@ -247,16 +247,52 @@ public class GoalService(
             // Complete the goal if it's 100% complete
             if (percentComplete >= 100.0M)
             {
-                goal.Completed = nowProvider.Today;
-                completedGoals.Add(goal);
+                var completedDate = nowProvider.Today;
+                if (await TryCompleteGoalAsync(userGuid, goal, completedDate))
+                {
+                    await NotifyGoalReachedAsync(userGuid, goal);
+                }
             }
         }
+    }
 
-        await userDataContext.SaveChangesAsync();
-        foreach (var goal in completedGoals)
+    private async Task<bool> TryCompleteGoalAsync(
+        Guid userGuid,
+        Goal goal,
+        DateOnly completedDate
+    )
+    {
+        if (!userDataContext.Database.IsRelational())
         {
-            await NotifyGoalReachedAsync(userGuid, goal);
+            if (goal.Completed.HasValue)
+            {
+                return false;
+            }
+
+            goal.Completed = completedDate;
+            await userDataContext.SaveChangesAsync();
+            return true;
         }
+
+        var updatedCount = await userDataContext.Goals
+            .Where(currentGoal =>
+                currentGoal.ID == goal.ID
+                && currentGoal.UserID == userGuid
+                && currentGoal.Completed == null
+            )
+            .ExecuteUpdateAsync(updates =>
+                updates.SetProperty(currentGoal => currentGoal.Completed, completedDate)
+            );
+        if (updatedCount == 0)
+        {
+            return false;
+        }
+
+        goal.Completed = completedDate;
+        var completedProperty = userDataContext.Entry(goal).Property(currentGoal => currentGoal.Completed);
+        completedProperty.OriginalValue = completedDate;
+        completedProperty.IsModified = false;
+        return true;
     }
 
     private async Task NotifyGoalReachedAsync(Guid userGuid, Goal goal)

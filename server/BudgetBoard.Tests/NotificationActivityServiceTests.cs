@@ -178,6 +178,67 @@ public class NotificationActivityServiceTests
     }
 
     [Fact]
+    public async Task CompleteAsync_WhenHiddenAccountTransactionIsAdded_DoesNotDispatchTransactionActivity()
+    {
+        var helper = new TestHelper();
+        var today = new DateOnly(2026, 11, 12);
+        var settings = new UserSettings
+        {
+            UserID = helper.demoUser.Id,
+            LargeTransactionThreshold = 1,
+        };
+        var account = new AccountFaker(helper.demoUser.Id).Generate();
+        account.HideTransactions = true;
+        helper.UserDataContext.UserSettings.Add(settings);
+        helper.UserDataContext.Accounts.Add(account);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        var budgetService = new Mock<IBudgetService>();
+        budgetService
+            .Setup(service => service.ReadBudgetsAsync(helper.demoUser.Id, It.IsAny<DateOnly>()))
+            .ReturnsAsync((IReadOnlyList<IBudgetResponse>)[]);
+        var categoryService = new Mock<ITransactionCategoryService>();
+        categoryService
+            .Setup(service => service.ReadTransactionCategoriesAsync(helper.demoUser.Id))
+            .ReturnsAsync((IReadOnlyList<ITransactionCategoryResponse>)[]);
+        var nowProvider = new Mock<INowProvider>();
+        nowProvider.Setup(provider => provider.Today).Returns(today);
+        var dispatcher = new Mock<INotificationDispatcher>();
+        dispatcher
+            .Setup(service => service.DispatchAsync(It.IsAny<NotificationEvent>()))
+            .Returns(Task.CompletedTask);
+        var service = new NotificationActivityService(
+            helper.UserDataContext,
+            budgetService.Object,
+            categoryService.Object,
+            dispatcher.Object,
+            nowProvider.Object,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<ILogger<NotificationActivityService>>()
+        );
+
+        await using var scope = await service.BeginAsync(helper.demoUser.Id);
+        var transaction = new Transaction
+        {
+            Amount = -500,
+            Date = today,
+            Source = TransactionSource.Manual,
+            AccountID = account.ID,
+            Account = account,
+        };
+        helper.UserDataContext.Transactions.Add(transaction);
+        await helper.UserDataContext.SaveChangesAsync();
+        await service.TrackTransactionCreatedAsync(helper.demoUser.Id, transaction);
+        await scope.CompleteAsync();
+
+        dispatcher.Verify(
+            item => item.DispatchAsync(It.IsAny<NotificationEvent>()),
+            Times.Never
+        );
+    }
+
+    [Fact]
     public async Task CompleteAsync_WhenOnlyTransfersWereAdded_DoesNotDispatchTransactionActivity()
     {
         var helper = new TestHelper();
