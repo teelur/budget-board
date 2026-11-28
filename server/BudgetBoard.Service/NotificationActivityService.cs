@@ -310,6 +310,24 @@ public sealed class NotificationActivityService(
             )
         );
 
+        var uncategorizedTransactions = eligibleTransactions
+            .Where(transaction => string.IsNullOrWhiteSpace(transaction.Category))
+            .ToList();
+        if (uncategorizedTransactions.Count > 0)
+        {
+            await TryDispatchAsync(
+                new NotificationEvent(
+                    userId,
+                    NotificationEventTypes.TransactionsNeedCategorization,
+                    responseLocalizer[
+                        "NotificationTransactionsNeedCategorization",
+                        uncategorizedTransactions.Count
+                    ],
+                    BuildTransactionDetails(uncategorizedTransactions, settings)
+                )
+            );
+        }
+
         var threshold = settings?.LargeTransactionThreshold;
         if (threshold is not > 0)
         {

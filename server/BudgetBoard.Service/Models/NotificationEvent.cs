@@ -12,6 +12,8 @@ public static class NotificationEventTypes
 
     public const string TransactionsAdded = "transactions_added";
 
+    public const string TransactionsNeedCategorization = "transactions_need_categorization";
+
     public const string LargeTransactionsAdded = "large_transactions_added";
 
     public const string RecurringReminder = "recurring_reminder";
@@ -23,6 +25,7 @@ public static class NotificationEventTypes
         GoalReached,
         BudgetWarning,
         TransactionsAdded,
+        TransactionsNeedCategorization,
         LargeTransactionsAdded,
         RecurringReminder,
     };

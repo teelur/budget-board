@@ -88,6 +88,7 @@ public class NotificationActivityServiceTests
         );
 
         await using var scope = await service.BeginAsync(helper.demoUser.Id);
+        var createdTransactions = new List<Transaction>();
         foreach (
             var (amount, merchantName, category, subcategory) in new (
                 decimal Amount,
@@ -116,8 +117,11 @@ public class NotificationActivityServiceTests
             helper.UserDataContext.Transactions.Add(transaction);
             await helper.UserDataContext.SaveChangesAsync();
             await service.TrackTransactionCreatedAsync(helper.demoUser.Id, transaction);
+            createdTransactions.Add(transaction);
         }
 
+        createdTransactions[0].Subcategory = "Rule applied";
+        await helper.UserDataContext.SaveChangesAsync();
         await scope.CompleteAsync();
 
         dispatcher.Verify(
@@ -139,6 +143,14 @@ public class NotificationActivityServiceTests
         dispatcher.Verify(
             item => item.DispatchAsync(
                 It.Is<NotificationEvent>(notification =>
+                    notification.Type == NotificationEventTypes.TransactionsNeedCategorization
+                )
+            ),
+            Times.Once
+        );
+        dispatcher.Verify(
+            item => item.DispatchAsync(
+                It.Is<NotificationEvent>(notification =>
                     notification.Type == NotificationEventTypes.LargeTransactionsAdded
                 )
             ),
@@ -150,10 +162,18 @@ public class NotificationActivityServiceTests
             .Be(
                 string.Join(
                     Environment.NewLine,
-                    "NotificationTransactionDetail [2026-11-12, Market, Food: Groceries, -$45.00]",
+                    "NotificationTransactionDetail [2026-11-12, Market, Food: Rule applied, -$45.00]",
                     "NotificationTransactionDetail [2026-11-12, Cafe, Food: Restaurants, -$40.00]",
                     "NotificationTransactionDetail [2026-11-12, NotificationUnknownMerchant, NotificationUncategorized, +$12.00]"
                 )
+            );
+        notifications
+            .Single(notification =>
+                notification.Type == NotificationEventTypes.TransactionsNeedCategorization
+            )
+            .FinancialDetails.Should()
+            .Be(
+                "NotificationTransactionDetail [2026-11-12, NotificationUnknownMerchant, NotificationUncategorized, +$12.00]"
             );
     }
 

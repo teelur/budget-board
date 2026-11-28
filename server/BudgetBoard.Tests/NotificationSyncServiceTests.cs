@@ -127,17 +127,51 @@ public class NotificationSyncServiceTests
         );
     }
 
+    [Fact]
+    public async Task SyncAsync_CompletesNotificationScopeAfterSyncFinishes()
+    {
+        var userId = Guid.NewGuid();
+        var order = new List<string>();
+        var sync = new Mock<ISyncService>();
+        sync.Setup(service => service.SyncAsync(userId))
+            .Returns(() =>
+            {
+                order.Add("sync finished");
+                return Task.FromResult<IReadOnlyList<SyncError>>([]);
+            });
+        var activityScope = new Mock<INotificationActivityScope>();
+        activityScope
+            .Setup(scope => scope.CompleteAsync())
+            .Callback(() => order.Add("activity completed"))
+            .Returns(Task.CompletedTask);
+        activityScope.Setup(scope => scope.DisposeAsync()).Returns(ValueTask.CompletedTask);
+        var activityService = new Mock<INotificationActivityService>();
+        activityService
+            .Setup(service => service.BeginAsync(userId))
+            .ReturnsAsync(activityScope.Object);
+        var service = CreateService(
+            sync.Object,
+            Mock.Of<INotificationDispatcher>(),
+            activityService: activityService.Object
+        );
+
+        await service.SyncAsync(userId);
+
+        order.Should().ContainInOrder("sync finished", "activity completed");
+    }
+
     private static NotificationSyncService CreateService(
         ISyncService sync,
         INotificationDispatcher dispatcher,
-        INotificationReminderService? reminderService = null
+        INotificationReminderService? reminderService = null,
+        INotificationActivityService? activityService = null
     ) => new(
         sync,
         dispatcher,
         TestHelper.CreateMockLocalizer<ApiResponseStrings>(),
         TestHelper.CreateMockLocalizer<ApiLogStrings>(),
         Mock.Of<ILogger<NotificationSyncService>>(),
-        TestHelper.CreateMockNotificationActivityService(),
+        activityService ?? TestHelper.CreateMockNotificationActivityService(),
         reminderService ?? Mock.Of<INotificationReminderService>()
     );
 }

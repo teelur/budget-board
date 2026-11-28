@@ -30,7 +30,7 @@ public class NotificationDestinationServiceTests
             Name = "Example",
             Url = "https://example.test/secret",
             Headers = new Dictionary<string, string> { ["Authorization"] = "Bearer secret" },
-            EventTypes = [NotificationEventTypes.SyncFailed],
+            EventTypes = [NotificationEventTypes.TransactionsNeedCategorization],
         };
 
         var created = await service.CreateAsync(userId, request, CancellationToken.None);

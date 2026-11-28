@@ -571,6 +571,9 @@
     <data name="NotificationTransactionsAdded" xml:space="preserve">
         <value>{0} new transaction(s) were added.</value>
     </data>
+    <data name="NotificationTransactionsNeedCategorization" xml:space="preserve">
+        <value>{0} new transaction(s) need categorization.</value>
+    </data>
     <data name="NotificationLargeTransactionsAdded" xml:space="preserve">
         <value>{0} transaction(s) met the large-transaction threshold.</value>
     </data>
