@@ -184,6 +184,22 @@ builder.Services.AddRateLimiter(options =>
                 }
             )
     );
+    options.AddPolicy(
+        "notification-test",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                    ?? context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }
+            )
+    );
 });
 
 // If the user sets the email env variables, then configure confirmation emails, otherwise disable.
@@ -228,6 +244,24 @@ builder.Host.UseSerilog(
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient(NotificationWebhookSender.ClientName)
+    .RemoveAllLoggers()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+builder.Services.AddHttpClient(NotificationNtfySender.ClientName)
+    .RemoveAllLoggers()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+builder.Services.AddHttpClient(NotificationDiscordSender.ClientName)
+    .RemoveAllLoggers()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+builder.Services.AddScoped<NotificationWebhookSender>();
+builder.Services.AddScoped<INotificationDestinationProvider>(services =>
+    services.GetRequiredService<NotificationWebhookSender>()
+);
+builder.Services.AddScoped<INotificationDestinationProvider, NotificationNtfySender>();
+builder.Services.AddScoped<INotificationDestinationProvider, NotificationDiscordSender>();
+builder.Services.AddScoped<INotificationDestinationService, NotificationDestinationService>();
+builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+builder.Services.AddScoped<INotificationActivityService, NotificationActivityService>();
 builder.Services.AddHttpClient(
     AppUpdateService.GitHubHttpClientName,
     client =>
@@ -261,13 +295,17 @@ builder.Services.AddScoped<IOidcTokenService, OidcTokenService>();
 if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 {
     var syncIntervalHours = builder.Configuration.GetValue<int?>("SYNC_INTERVAL_HOURS") ?? 8;
-    if (syncIntervalHours < 1)
+    if (syncIntervalHours is < 1 or > 24)
     {
         throw new ArgumentOutOfRangeException(
             "SYNC_INTERVAL_HOURS",
-            "SYNC_INTERVAL_HOURS must be at least 1"
+            "SYNC_INTERVAL_HOURS must be between 1 and 24"
         );
     }
+    var syncHours = string.Join(
+        ",",
+        Enumerable.Range(0, 24).Where(hour => hour % syncIntervalHours == 0)
+    );
 
     builder.Services.AddQuartz(options =>
     {
@@ -277,10 +315,9 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
         options.AddTrigger(trigger =>
             trigger
                 .ForJob(jobKey)
-                // Allow a minute for everything to settle after boot before starting the job
-                .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
-                .WithSimpleSchedule(schedule =>
-                    schedule.WithInterval(TimeSpan.FromHours(syncIntervalHours)).RepeatForever()
+                .WithCronSchedule(
+                    $"0 0 {syncHours} * * ?",
+                    schedule => schedule.InTimeZone(TimeZoneInfo.Local)
                 )
         );
     });
@@ -306,7 +343,22 @@ builder.Services.AddScoped<ITransactionCategoryService, TransactionCategoryServi
 builder.Services.AddScoped<IAccountTypeService, AccountTypeService>();
 builder.Services.AddScoped<IGoalService, GoalService>();
 builder.Services.AddScoped<IInstitutionService, InstitutionService>();
-builder.Services.AddScoped<ISyncService, SyncService>();
+builder.Services.AddScoped<SyncService>();
+builder.Services.AddScoped<ISyncService>(services =>
+    new NotificationSyncService(
+        services.GetRequiredService<SyncService>(),
+        services.GetRequiredService<INotificationDispatcher>(),
+        services.GetRequiredService<IStringLocalizer<ApiResponseStrings>>(),
+        services.GetRequiredService<IStringLocalizer<ApiLogStrings>>(),
+        services.GetRequiredService<ILogger<NotificationSyncService>>(),
+        services.GetRequiredService<INotificationActivityService>(),
+        services.GetRequiredService<INotificationReminderService>()
+    )
+);
+builder.Services.AddScoped<
+    INotificationReminderService,
+    RecurringReminderNotificationService
+>();
 builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<ILunchFlowService, LunchFlowService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();

@@ -36,6 +36,11 @@ public class ApplicationUser : IdentityUser<Guid>
     public DateTime LastSync { get; set; } = DateTime.MinValue;
 
     /// <summary>
+    /// The local date for which a recurring reminder notification was last claimed.
+    /// </summary>
+    public DateOnly? LastRecurringReminderDate { get; set; }
+
+    /// <summary>
     /// Collection of financial accounts owned by the user.
     /// </summary>
     public ICollection<Account> Accounts { get; set; } = [];

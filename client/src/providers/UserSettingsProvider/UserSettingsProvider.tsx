@@ -8,6 +8,8 @@ export interface UserSettingsContextValue {
   preferredLanguage: string;
   preferredDateFormat: string;
   budgetWarningThreshold: number;
+  largeTransactionThreshold: number | null;
+  recurringReminderLeadTimeDays: number;
   forceSyncLookbackMonths: number;
   disableBuiltInAccountTypes: boolean;
   disableBuiltInAssetTypes: boolean;
@@ -27,6 +29,8 @@ export const UserSettingsContext =
     preferredLanguage: "default",
     preferredDateFormat: "default",
     budgetWarningThreshold: 80,
+    largeTransactionThreshold: null,
+    recurringReminderLeadTimeDays: 3,
     forceSyncLookbackMonths: 0,
     disableBuiltInAccountTypes: false,
     disableBuiltInAssetTypes: false,
@@ -67,6 +71,10 @@ export const UserSettingsProvider = ({
     preferredDateFormat: userSettingsQuery.data?.dateFormat ?? "default",
     budgetWarningThreshold:
       userSettingsQuery.data?.budgetWarningThreshold ?? 80,
+    largeTransactionThreshold:
+      userSettingsQuery.data?.largeTransactionThreshold ?? null,
+    recurringReminderLeadTimeDays:
+      userSettingsQuery.data?.recurringReminderLeadTimeDays ?? 3,
     disableBuiltInAccountTypes:
       userSettingsQuery.data?.disableBuiltInAccountTypes ?? false,
     disableBuiltInAssetTypes:

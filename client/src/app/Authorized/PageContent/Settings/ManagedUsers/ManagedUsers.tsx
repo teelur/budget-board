@@ -102,7 +102,7 @@ const ManagedUsers = (): React.ReactNode => {
 
   return (
     <Stack gap="0.75rem">
-      <Group justify="space-between" align="flex-start">
+      <Group justify="space-between" align="center">
         <BodyText tone="secondary" size="sm">
           {t("managed_users_description")}
         </BodyText>

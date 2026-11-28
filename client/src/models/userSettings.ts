@@ -4,6 +4,8 @@ export interface IUserSettingsResponse {
   language: string;
   dateFormat: string;
   budgetWarningThreshold: number;
+  largeTransactionThreshold: number | null;
+  recurringReminderLeadTimeDays: number;
   forceSyncLookbackMonths: number;
   disableBuiltInTransactionCategories: boolean;
   disableBuiltInAccountTypes: boolean;
@@ -22,6 +24,8 @@ export interface IUserSettingsUpdateRequest {
   language?: string;
   dateFormat?: string;
   budgetWarningThreshold?: number;
+  largeTransactionThreshold?: number | null;
+  recurringReminderLeadTimeDays?: number;
   forceSyncLookbackMonths?: number;
   disableBuiltInTransactionCategories?: boolean;
   disableBuiltInAccountTypes?: boolean;

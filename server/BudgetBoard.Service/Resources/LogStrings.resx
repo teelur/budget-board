@@ -247,6 +247,9 @@
     <data name="InvalidBudgetWarningThresholdLog" xml:space="preserve">
         <value>Attempted to update user settings with an invalid budget threshold value.</value>
     </data>
+    <data name="InvalidLargeTransactionThresholdLog" xml:space="preserve">
+        <value>Attempted to update user settings with a non-positive large transaction threshold.</value>
+    </data>
     <data name="InvalidConditionLog" xml:space="preserve">
         <value>Encountered null condition in automatic rule.</value>
     </data>
@@ -261,6 +264,9 @@
     </data>
     <data name="InvalidForceSyncLookbackMonthsLog" xml:space="preserve">
         <value>Attempted to update user settings with an invalid force sync lookback months value.</value>
+    </data>
+    <data name="InvalidRecurringReminderLeadTimeDaysLog" xml:space="preserve">
+        <value>Attempted to update user settings with an invalid recurring reminder lead time.</value>
     </data>
     <data name="InvalidInstitutionIDLog" xml:space="preserve">
         <value>Attempted to create an account with an invalid institution ID.</value>
@@ -474,5 +480,20 @@
     </data>
     <data name="RecurringRuleAmbiguousMatchLog" xml:space="preserve">
         <value>Transaction {0} matched multiple recurring rules and was left unassigned.</value>
+    </data>
+    <data name="GoalNotificationDispatchFailedLog" xml:space="preserve">
+        <value>Failed to dispatch goal notification. Error type: {0}.</value>
+    </data>
+    <data name="TransactionImportNotificationCheckFailedLog" xml:space="preserve">
+        <value>Failed to check whether the import completed with errors. Error type: {0}.</value>
+    </data>
+    <data name="TransactionImportNotificationDispatchFailedLog" xml:space="preserve">
+        <value>Failed to dispatch import failure notification. Error type: {0}.</value>
+    </data>
+    <data name="NotificationActivityCaptureFailedLog" xml:space="preserve">
+        <value>Failed to capture notification activity state. Error type: {0}.</value>
+    </data>
+    <data name="NotificationActivityDispatchFailedLog" xml:space="preserve">
+        <value>Failed to dispatch notification activity. Error type: {0}.</value>
     </data>
 </root>

@@ -33,6 +33,7 @@ I created this app to be a self-hosted alternative to the now-shut-down personal
 - **Sync Providers**: Integrate with financial institutions through providers like SimpleFIN and LunchFlow for automatic transaction and account balance syncing.
 - **Auto-Categorization**: Train a machine learning model on your categorized transactions to automatically predict categories for new transactions.
 - **Automatic Rules**: Create rules to automatically update transactions based on criteria like description, amount, or date.
+- **Notifications**: Configure generic webhook, ntfy, and Discord destinations to receive notifications for selected Budget Board events.
 
 #### Analytics & Insights
 

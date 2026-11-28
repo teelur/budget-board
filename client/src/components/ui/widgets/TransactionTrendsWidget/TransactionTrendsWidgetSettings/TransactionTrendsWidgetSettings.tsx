@@ -1,6 +1,5 @@
-import { Group, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import {
-  Button,
   CategoryMultiSelect,
   Checkbox,
   Modal,
@@ -9,6 +8,7 @@ import {
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ModalActions } from "~/components/ModalActions/ModalActions";
 import { parseTransactionTrendsConfiguration } from "~/helpers/widgets";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -103,38 +103,23 @@ const TransactionTrendsWidgetSettings = ({
             showProjectionsField.setValue(event.currentTarget.checked)
           }
         />
-        <Group gap="0.5rem">
-          <Button
-            variant="filled"
-            color="neutral"
-            size="compact-sm"
-            flex="1 1 0"
-            onClick={handleClose}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            variant="filled"
-            color="primary"
-            size="compact-sm"
-            flex="1 1 0"
-            onClick={() => {
-              updateWidgetSettingsMutation.mutate([
-                {
-                  id: widget.id,
-                  configuration: {
-                    categoryValues: categoryValuesField.getValue(),
-                    transactionType: transactionTypeField.getValue(),
-                    showProjections: showProjectionsField.getValue(),
-                  },
+        <ModalActions
+          actionLabel={t("save")}
+          isPending={updateWidgetSettingsMutation.isPending}
+          onAction={() => {
+            updateWidgetSettingsMutation.mutate([
+              {
+                id: widget.id,
+                configuration: {
+                  categoryValues: categoryValuesField.getValue(),
+                  transactionType: transactionTypeField.getValue(),
+                  showProjections: showProjectionsField.getValue(),
                 },
-              ]);
-            }}
-            loading={updateWidgetSettingsMutation.isPending}
-          >
-            {t("save")}
-          </Button>
-        </Group>
+              },
+            ]);
+          }}
+          onCancel={handleClose}
+        />
       </Stack>
     </Modal>
   );

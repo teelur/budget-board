@@ -2,6 +2,7 @@
 using BudgetBoard.Database.Helpers;
 using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
+using BudgetBoard.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Moq;
@@ -44,5 +45,31 @@ internal class TestHelper
                     new LocalizedString(key, $"{key} [{string.Join(", ", args)}]")
             );
         return mock.Object;
+    }
+
+    public static INotificationActivityService CreateMockNotificationActivityService()
+    {
+        var mock = new Mock<INotificationActivityService>();
+        mock.Setup(service => service.BeginAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(new NoopNotificationActivityScope());
+        mock.Setup(service =>
+                service.TrackTransactionCreatedAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Transaction>()
+                )
+            )
+            .Returns(Task.CompletedTask);
+        mock.Setup(service =>
+                service.TrackBudgetMonthAsync(It.IsAny<Guid>(), It.IsAny<DateOnly>())
+            )
+            .Returns(Task.CompletedTask);
+        return mock.Object;
+    }
+
+    private sealed class NoopNotificationActivityScope : INotificationActivityScope
+    {
+        public Task CompleteAsync() => Task.CompletedTask;
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 }

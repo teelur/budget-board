@@ -1,4 +1,5 @@
-﻿using BudgetBoard.Database.Models;
+using BudgetBoard.Database.Data;
+using BudgetBoard.Database.Models;
 using BudgetBoard.IntegrationTests.Fakers;
 using BudgetBoard.Service;
 using BudgetBoard.Service.Helpers;
@@ -6,6 +7,8 @@ using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.Service.Resources;
 using FluentAssertions;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -26,7 +29,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -91,7 +95,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -145,7 +150,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -183,7 +189,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -222,7 +229,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var goal = new GoalCreateRequest
@@ -255,7 +263,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -294,7 +303,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -333,7 +343,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -372,7 +383,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var goal = new GoalCreateRequest
@@ -405,7 +417,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var goal = new GoalCreateRequest
@@ -440,7 +453,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -497,7 +511,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -564,7 +579,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -611,7 +627,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -682,7 +699,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -716,7 +734,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -763,7 +782,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -807,7 +827,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -853,7 +874,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -891,7 +913,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -929,7 +952,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -975,7 +999,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1045,7 +1070,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1095,7 +1121,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1142,7 +1169,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1189,7 +1217,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1236,7 +1265,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var updatedGoal = new GoalUpdateRequest
@@ -1268,7 +1298,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1314,7 +1345,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1361,7 +1393,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1405,7 +1438,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1453,7 +1487,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1498,7 +1533,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1529,7 +1565,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             Mock.Of<INowProvider>(),
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         // Act
@@ -1550,12 +1587,14 @@ public class GoalServiceTests
         // Arrange
         var helper = new TestHelper();
         var fakeNowProvider = CreateNowProviderMock();
+        var dispatcher = new Mock<INotificationDispatcher>();
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            dispatcher.Object
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1571,6 +1610,10 @@ public class GoalServiceTests
         helper.UserDataContext.SaveChanges();
 
         var completedDate = fakeNowProvider.Today.AddDays(-1);
+        EntityState? stateAtDispatch = null;
+        dispatcher.Setup(d => d.DispatchAsync(It.IsAny<NotificationEvent>()))
+            .Callback(() => stateAtDispatch = helper.UserDataContext.Entry(goal).State)
+            .Returns(Task.CompletedTask);
 
         // Act
         await goalService.CompleteGoalAsync(helper.demoUser.Id, goal.ID, completedDate);
@@ -1578,6 +1621,39 @@ public class GoalServiceTests
         // Assert
         helper.UserDataContext.Goals.Should().ContainSingle();
         helper.UserDataContext.Goals.Single().Completed.Should().NotBeNull();
+        stateAtDispatch.Should().Be(EntityState.Unchanged);
+        dispatcher.Verify(d => d.DispatchAsync(It.Is<NotificationEvent>(e =>
+            e.UserId == helper.demoUser.Id
+            && e.Type == NotificationEventTypes.GoalReached
+            && e.FinancialDetails == goal.Name
+            && !e.Message.Contains(goal.Name)
+        )), Times.Once);
+    }
+
+    [Fact]
+    public async Task CompleteGoalAsync_WhenNotificationFails_PreservesCompletion()
+    {
+        var helper = new TestHelper();
+        var now = CreateNowProviderMock();
+        var dispatcher = new Mock<INotificationDispatcher>();
+        dispatcher.Setup(d => d.DispatchAsync(It.IsAny<NotificationEvent>()))
+            .ThrowsAsync(new InvalidOperationException("delivery failed"));
+        var service = new GoalService(
+            Mock.Of<ILogger<IGoalService>>(),
+            helper.UserDataContext,
+            now,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            dispatcher.Object
+        );
+        var goal = new GoalFaker(helper.demoUser.Id).Generate();
+        goal.Completed = null;
+        helper.UserDataContext.Goals.Add(goal);
+        await helper.UserDataContext.SaveChangesAsync();
+
+        await service.CompleteGoalAsync(helper.demoUser.Id, goal.ID, now.Today);
+
+        goal.Completed.Should().Be(now.Today);
     }
 
     [Fact]
@@ -1586,12 +1662,14 @@ public class GoalServiceTests
         // Arrange
         var helper = new TestHelper();
         var fakeNowProvider = CreateNowProviderMock();
+        var dispatcher = new Mock<INotificationDispatcher>();
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            dispatcher.Object
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1617,6 +1695,7 @@ public class GoalServiceTests
         await act.Should()
             .ThrowAsync<BudgetBoardServiceException>()
             .WithMessage("GoalCompleteAlreadyCompletedError");
+        dispatcher.Verify(d => d.DispatchAsync(It.IsAny<NotificationEvent>()), Times.Never);
     }
 
     [Fact]
@@ -1630,7 +1709,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var completedDate = fakeNowProvider.Today.AddDays(-1);
@@ -1646,6 +1726,96 @@ public class GoalServiceTests
     }
     #endregion
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task CompleteGoalAsync_WhenAnotherRequestCompletesFirst_DispatchesOnce(
+        bool completeAutomatically
+    )
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<UserDataContext>()
+            .UseSqlite(connection)
+            .Options;
+        await using var firstContext = new UserDataContext(options);
+        await using var secondContext = new UserDataContext(options);
+        await firstContext.Database.EnsureCreatedAsync();
+
+        var user = new ApplicationUserFaker().Generate();
+        var institution = new InstitutionFaker(user.Id).Generate();
+        var account = new AccountFaker(user.Id).Generate();
+        account.Institution = institution;
+        account.InstitutionID = institution.ID;
+        account.Balances.Add(
+            new Balance
+            {
+                Amount = 5000,
+                Date = new DateOnly(2026, 11, 28),
+                AccountID = account.ID,
+                Account = account,
+            }
+        );
+        var goal = new GoalFaker(user.Id).Generate();
+        goal.Amount = 5000;
+        goal.InitialAmount = 0;
+        goal.CompleteDate = null;
+        goal.MonthlyContribution = 100;
+        goal.Completed = null;
+        goal.Accounts = [account];
+
+        firstContext.Users.Add(user);
+        firstContext.Institutions.Add(institution);
+        firstContext.Accounts.Add(account);
+        firstContext.Goals.Add(goal);
+        await firstContext.SaveChangesAsync();
+        await secondContext.Goals
+            .Include(currentGoal => currentGoal.Accounts)
+            .ThenInclude(currentAccount => currentAccount.Balances)
+            .SingleAsync(currentGoal => currentGoal.ID == goal.ID);
+
+        var firstDispatcher = new Mock<INotificationDispatcher>();
+        firstDispatcher
+            .Setup(dispatcher => dispatcher.DispatchAsync(It.IsAny<NotificationEvent>()))
+            .Returns(Task.CompletedTask);
+        var secondDispatcher = new Mock<INotificationDispatcher>();
+        secondDispatcher
+            .Setup(dispatcher => dispatcher.DispatchAsync(It.IsAny<NotificationEvent>()))
+            .Returns(Task.CompletedTask);
+        var today = new DateOnly(2026, 11, 28);
+        var nowProvider = new Mock<INowProvider>();
+        nowProvider.Setup(provider => provider.Today).Returns(today);
+        var firstService = CreateGoalService(firstContext, nowProvider.Object, firstDispatcher.Object);
+        var secondService = CreateGoalService(secondContext, nowProvider.Object, secondDispatcher.Object);
+
+        if (completeAutomatically)
+        {
+            await firstService.CompleteEligibleGoalsAsync(user.Id);
+            await secondService.CompleteEligibleGoalsAsync(user.Id);
+        }
+        else
+        {
+            await firstService.CompleteGoalAsync(user.Id, goal.ID, today);
+            var action = () => secondService.CompleteGoalAsync(user.Id, goal.ID, today);
+
+            await action.Should()
+                .ThrowAsync<BudgetBoardServiceException>()
+                .WithMessage("GoalCompleteAlreadyCompletedError");
+        }
+
+        firstDispatcher.Verify(
+            dispatcher => dispatcher.DispatchAsync(It.IsAny<NotificationEvent>()),
+            Times.Once
+        );
+        secondDispatcher.Verify(
+            dispatcher => dispatcher.DispatchAsync(It.IsAny<NotificationEvent>()),
+            Times.Never
+        );
+        (await firstContext.Goals.AsNoTracking().SingleAsync(currentGoal => currentGoal.ID == goal.ID))
+            .Completed.Should()
+            .Be(today);
+    }
+
     #region CompleteEligibleGoalsAsync
     [Fact]
     public async Task CompleteEligibleGoalsAsync_ShouldCompleteEligibleGoals()
@@ -1653,12 +1823,14 @@ public class GoalServiceTests
         // Arrange
         var helper = new TestHelper();
         var fakeNowProvider = CreateNowProviderMock();
+        var dispatcher = new Mock<INotificationDispatcher>();
         var goalService = new GoalService(
             Mock.Of<ILogger<IGoalService>>(),
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            dispatcher.Object
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1705,6 +1877,14 @@ public class GoalServiceTests
             .UserDataContext.Goals.Single(g => g.ID == ineligibleGoal.ID)
             .Completed.Should()
             .BeNull();
+        dispatcher.Verify(d => d.DispatchAsync(It.Is<NotificationEvent>(e =>
+            e.UserId == helper.demoUser.Id
+            && e.Type == NotificationEventTypes.GoalReached
+            && e.FinancialDetails == eligibleGoal.Name
+        )), Times.Once);
+
+        await goalService.CompleteEligibleGoalsAsync(helper.demoUser.Id);
+        dispatcher.Verify(d => d.DispatchAsync(It.IsAny<NotificationEvent>()), Times.Once);
     }
 
     [Fact]
@@ -1718,7 +1898,8 @@ public class GoalServiceTests
             helper.UserDataContext,
             fakeNowProvider,
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
-            TestHelper.CreateMockLocalizer<LogStrings>()
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            Mock.Of<INotificationDispatcher>()
         );
 
         var accountFaker = new AccountFaker(helper.demoUser.Id);
@@ -1767,4 +1948,18 @@ public class GoalServiceTests
             );
         return nowProviderMock.Object;
     }
+
+    private static GoalService CreateGoalService(
+        UserDataContext context,
+        INowProvider nowProvider,
+        INotificationDispatcher dispatcher
+    ) =>
+        new(
+            Mock.Of<ILogger<IGoalService>>(),
+            context,
+            nowProvider,
+            TestHelper.CreateMockLocalizer<ResponseStrings>(),
+            TestHelper.CreateMockLocalizer<LogStrings>(),
+            dispatcher
+        );
 }

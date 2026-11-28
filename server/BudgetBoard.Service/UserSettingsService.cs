@@ -56,6 +56,8 @@ public class UserSettingsService(
         HandleLanguageChange();
         HandleDateFormatChange();
         HandleBudgetWarningThresholdChange();
+        HandleLargeTransactionThresholdChange();
+        HandleRecurringReminderLeadTimeDaysChange();
         HandleForceSyncLookbackMonthsChange();
         await HandleDisableBuiltInTransactionCategoriesChange();
         await HandleDisableBuiltInAccountTypesChange();
@@ -183,6 +185,50 @@ public class UserSettingsService(
             }
 
             userSettings.BudgetWarningThreshold = request.BudgetWarningThreshold.Value;
+        }
+
+        void HandleLargeTransactionThresholdChange()
+        {
+            if (!request.LargeTransactionThreshold.IsSpecified)
+            {
+                return;
+            }
+
+            var threshold = request.LargeTransactionThreshold.Value;
+            if (threshold.HasValue && threshold.Value <= 0)
+            {
+                logger.LogError("{LogMessage}", logLocalizer["InvalidLargeTransactionThresholdLog"]);
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidLargeTransactionThresholdError"]
+                );
+            }
+
+            userSettings.LargeTransactionThreshold = threshold;
+        }
+
+        void HandleRecurringReminderLeadTimeDaysChange()
+        {
+            if (!request.RecurringReminderLeadTimeDays.HasValue)
+            {
+                return;
+            }
+
+            if (
+                request.RecurringReminderLeadTimeDays.Value < 1
+                || request.RecurringReminderLeadTimeDays.Value > 365
+            )
+            {
+                logger.LogError(
+                    "{LogMessage}",
+                    logLocalizer["InvalidRecurringReminderLeadTimeDaysLog"]
+                );
+                throw new BudgetBoardServiceException(
+                    responseLocalizer["InvalidRecurringReminderLeadTimeDaysError"]
+                );
+            }
+
+            userSettings.RecurringReminderLeadTimeDays =
+                request.RecurringReminderLeadTimeDays.Value;
         }
 
         void HandleForceSyncLookbackMonthsChange()

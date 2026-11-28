@@ -1,4 +1,4 @@
-import { Group, ScrollArea, Stack } from "@mantine/core";
+import { ScrollArea, Stack } from "@mantine/core";
 import {
   BodyText,
   Button,
@@ -9,6 +9,7 @@ import {
   Skeleton,
 } from "@teelur/budget-board-ui";
 import React from "react";
+import { ModalActions } from "~/components/ModalActions/ModalActions";
 import { parseAccountsConfiguration } from "~/helpers/widgets";
 import { useTranslation } from "react-i18next";
 import { useInstitutionsQuery } from "~/hooks/queries/useInstitutionsQuery";
@@ -158,36 +159,21 @@ const AccountsWidgetSettings = ({
           {t("accounts_settings_widget_message")}
         </BodyText>
         {getAccountsWidgetSettingsContent()}
-        <Group gap="0.5rem">
-          <Button
-            variant="filled"
-            color="neutral"
-            size="compact-sm"
-            flex="1 1 0"
-            onClick={handleClose}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            variant="filled"
-            color="primary"
-            size="compact-sm"
-            flex="1 1 0"
-            loading={updateWidgetSettingsMutation.isPending}
-            onClick={() => {
-              updateWidgetSettingsMutation.mutate([
-                {
-                  id: widget.id,
-                  configuration: {
-                    accountIds: showAll ? [] : Array.from(selectedIds),
-                  },
+        <ModalActions
+          actionLabel={t("save")}
+          isPending={updateWidgetSettingsMutation.isPending}
+          onAction={() => {
+            updateWidgetSettingsMutation.mutate([
+              {
+                id: widget.id,
+                configuration: {
+                  accountIds: showAll ? [] : Array.from(selectedIds),
                 },
-              ]);
-            }}
-          >
-            {t("save")}
-          </Button>
-        </Group>
+              },
+            ]);
+          }}
+          onCancel={handleClose}
+        />
       </Stack>
     </Modal>
   );

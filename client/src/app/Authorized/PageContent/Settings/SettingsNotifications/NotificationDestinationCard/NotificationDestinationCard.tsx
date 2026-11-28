@@ -1,0 +1,69 @@
+import { Group } from "@mantine/core";
+import { BodyText, Button, Card } from "@teelur/budget-board-ui";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import type { INotificationDestinationResponse } from "~/models/notificationDestination";
+
+interface NotificationDestinationCardProps {
+  destination: INotificationDestinationResponse;
+  isTestPending: boolean;
+  isTogglePending: boolean;
+  onTest: () => void;
+  onToggle: (enabled: boolean) => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+const NotificationDestinationCard = ({
+  destination,
+  isTestPending,
+  isTogglePending,
+  onTest,
+  onToggle,
+  onEdit,
+  onDelete,
+}: NotificationDestinationCardProps): React.ReactNode => {
+  const { t } = useTranslation();
+
+  return (
+    <Card>
+      <Group justify="space-between">
+        <Group gap="0.5rem">
+          <BodyText tone="primary" size="md">
+            {destination.name}
+          </BodyText>
+          <BodyText tone="secondary" size="xs">
+            {t(`notification_provider_${destination.provider}`)}
+          </BodyText>
+        </Group>
+        <Group gap="0.5rem">
+          <Button
+            size="compact-sm"
+            variant="ghost"
+            color={destination.enabled ? "success" : "error"}
+            disabled={isTogglePending}
+            onClick={() => onToggle(!destination.enabled)}
+          >
+            {t(destination.enabled ? "enabled" : "disabled")}
+          </Button>
+          <Button
+            size="compact-sm"
+            variant="ghost"
+            onClick={onTest}
+            loading={isTestPending}
+          >
+            {t("notification_send_test")}
+          </Button>
+          <Button size="compact-sm" variant="ghost" onClick={onEdit}>
+            {t("edit")}
+          </Button>
+          <Button size="compact-sm" variant="ghost" onClick={onDelete}>
+            {t("delete")}
+          </Button>
+        </Group>
+      </Group>
+    </Card>
+  );
+};
+
+export default NotificationDestinationCard;

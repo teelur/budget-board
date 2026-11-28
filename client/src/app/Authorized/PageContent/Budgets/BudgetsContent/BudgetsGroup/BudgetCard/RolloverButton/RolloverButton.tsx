@@ -1,9 +1,10 @@
-import { Flex, Group, Stack } from "@mantine/core";
+import { Flex, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ActionIcon, BodyText, Button, Modal } from "@teelur/budget-board-ui";
+import { ActionIcon, BodyText, Modal } from "@teelur/budget-board-ui";
 import { RepeatIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ModalActions } from "~/components/ModalActions/ModalActions";
 import RolloverControl from "../../../RolloverControl/RolloverControl";
 
 interface RolloverButtonProps {
@@ -72,26 +73,11 @@ const RolloverButton = (props: RolloverButtonProps): React.ReactNode => {
             disabledReason={props.disabledReason}
             size="sm"
           />
-          <Group justify="flex-end" gap="0.5rem">
-            <Button
-              variant="outline"
-              color="primary"
-              size="compact-sm"
-              flex="1"
-              onClick={close}
-            >
-              {t("cancel")}
-            </Button>
-            <Button
-              variant="filled"
-              color="primary"
-              size="compact-sm"
-              flex="1"
-              onClick={save}
-            >
-              {t("save")}
-            </Button>
-          </Group>
+          <ModalActions
+            actionLabel={t("save")}
+            onAction={save}
+            onCancel={close}
+          />
         </Stack>
       </Modal>
     </Flex>

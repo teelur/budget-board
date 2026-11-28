@@ -80,6 +80,16 @@ public class UserSettings
     public int BudgetWarningThreshold { get; set; } = 80;
 
     /// <summary>
+    /// Optional amount threshold for large-transaction notifications.
+    /// </summary>
+    public decimal? LargeTransactionThreshold { get; set; }
+
+    /// <summary>
+    /// Number of days before a recurring transaction to send a reminder.
+    /// </summary>
+    public int RecurringReminderLeadTimeDays { get; set; } = 3;
+
+    /// <summary>
     /// Number of months to look back for forced sync operations.
     /// </summary>
     public int ForceSyncLookbackMonths { get; set; } = 0;

@@ -1,7 +1,6 @@
 import { Group, Stack } from "@mantine/core";
 import {
   BodyText,
-  Button,
   CategorySelect,
   Checkbox,
   DateInput,
@@ -12,6 +11,7 @@ import {
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ModalActions } from "~/components/ModalActions/ModalActions";
 import { getIsParentCategory, getParentCategory } from "~/helpers/category";
 import { getCurrencySymbol } from "~/helpers/currency";
 import { useCreateRecurringRuleMutation } from "~/hooks/mutations/recurringRules/useCreateRecurringRuleMutation";
@@ -372,30 +372,12 @@ const RecurringRuleForm = (props: RecurringRuleFormProps): React.ReactNode => {
           isActiveField.setValue(event.currentTarget.checked)
         }
       />
-      <Group gap="0.5rem">
-        {props.onCancel && (
-          <Button
-            variant="filled"
-            color="neutral"
-            size="compact-sm"
-            flex="1 1 0"
-            disabled={isPending}
-            onClick={props.onCancel}
-          >
-            {t("cancel")}
-          </Button>
-        )}
-        <Button
-          variant="filled"
-          color="primary"
-          size="compact-sm"
-          flex="1 1 0"
-          loading={isPending}
-          onClick={submit}
-        >
-          {sourceRule ? t("save") : t("add_recurring_rule")}
-        </Button>
-      </Group>
+      <ModalActions
+        actionLabel={sourceRule ? t("save") : t("add_recurring_rule")}
+        isPending={isPending}
+        onAction={submit}
+        onCancel={props.onCancel}
+      />
     </Stack>
   );
 };

@@ -136,6 +136,9 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("boolean");
 
+                    b.Property<DateOnly?>("LastRecurringReminderDate")
+                        .HasColumnType("date");
+
                     b.Property<DateTime>("LastSync")
                         .HasColumnType("timestamp with time zone");
 
@@ -551,6 +554,48 @@ namespace BudgetBoard.Database.Migrations
                     b.ToTable("LunchFlowAccount", (string)null);
                 });
 
+            modelBuilder.Entity("BudgetBoard.Database.Models.NotificationDestination", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Configuration")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Enabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("EventTypes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IncludeFinancialDetails")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("NotificationDestination", (string)null);
+                });
+
             modelBuilder.Entity("BudgetBoard.Database.Models.RecurringRule", b =>
                 {
                     b.Property<Guid>("ID")
@@ -962,6 +1007,12 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<decimal?>("LargeTransactionThreshold")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("RecurringReminderLeadTimeDays")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("UserID")
                         .HasColumnType("uuid");
 
@@ -1341,6 +1392,17 @@ namespace BudgetBoard.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("LinkedAccount");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BudgetBoard.Database.Models.NotificationDestination", b =>
+                {
+                    b.HasOne("BudgetBoard.Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

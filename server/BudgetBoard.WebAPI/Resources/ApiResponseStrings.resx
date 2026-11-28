@@ -193,4 +193,70 @@
     <data name="SuperuserRoleCreationFailed" xml:space="preserve">
         <value>Unable to create the {0} role: {1}</value>
     </data>
+    <data name="NotificationInvalidConfiguration" xml:space="preserve">
+        <value>The notification configuration is invalid.</value>
+    </data>
+    <data name="NotificationTestFailed" xml:space="preserve">
+        <value>The test notification could not be delivered. Check the server logs and destination configuration.</value>
+    </data>
+    <data name="NotificationTestMessage" xml:space="preserve">
+        <value>Budget Board test notification</value>
+    </data>
+    <data name="NotificationSyncFailure" xml:space="preserve">
+        <value>Account synchronization failed or completed with errors.</value>
+    </data>
+    <data name="NotificationSyncFailureWithErrorCount" xml:space="preserve">
+        <value>Account synchronization completed with {0} error(s).</value>
+    </data>
+    <data name="NotificationUnexpectedSyncError" xml:space="preserve">
+        <value>An unexpected sync error occurred ({0}).</value>
+    </data>
+    <data name="NotificationEventConfigurationInvalid" xml:space="preserve">
+        <value>The stored notification event configuration is invalid.</value>
+    </data>
+    <data name="NotificationNameInvalid" xml:space="preserve">
+        <value>A notification name of at most 100 characters is required.</value>
+    </data>
+    <data name="NotificationEventTypesInvalid" xml:space="preserve">
+        <value>One or more notification event types are invalid.</value>
+    </data>
+    <data name="NotificationProviderInvalid" xml:space="preserve">
+        <value>The notification provider is invalid.</value>
+    </data>
+    <data name="NotificationProviderImmutable" xml:space="preserve">
+        <value>A destination's provider cannot be changed after it is created.</value>
+    </data>
+    <data name="NotificationWebhookUrlInvalid" xml:space="preserve">
+        <value>A valid HTTP or HTTPS webhook URL is required.</value>
+    </data>
+    <data name="NotificationNtfyServerUrlInvalid" xml:space="preserve">
+        <value>The ntfy server URL is invalid.</value>
+    </data>
+    <data name="NotificationNtfyTopicInvalid" xml:space="preserve">
+        <value>The ntfy topic is invalid.</value>
+    </data>
+    <data name="NotificationNtfyAccessTokenInvalid" xml:space="preserve">
+        <value>The ntfy access token is invalid.</value>
+    </data>
+    <data name="NotificationDiscordWebhookUrlInvalid" xml:space="preserve">
+        <value>The Discord incoming webhook URL is invalid.</value>
+    </data>
+    <data name="NotificationWebhookContentTypeInvalid" xml:space="preserve">
+        <value>Webhook content type must be application/json or text/plain.</value>
+    </data>
+    <data name="NotificationWebhookTemplateOrHeadersInvalid" xml:space="preserve">
+        <value>Invalid webhook template or headers.</value>
+    </data>
+    <data name="NotificationWebhookHeadersInvalid" xml:space="preserve">
+        <value>Invalid webhook headers.</value>
+    </data>
+    <data name="NotificationWebhookJsonTemplateInvalid" xml:space="preserve">
+        <value>Invalid JSON webhook template.</value>
+    </data>
+    <data name="NotificationDestinationInvalid" xml:space="preserve">
+        <value>Invalid notification destination.</value>
+    </data>
+    <data name="NotificationDestinationLimitReached" xml:space="preserve">
+        <value>You can configure up to 10 notification destinations per user.</value>
+    </data>
 </root>

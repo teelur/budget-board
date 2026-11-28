@@ -15,7 +15,8 @@ public class GoalService(
     UserDataContext userDataContext,
     INowProvider nowProvider,
     IStringLocalizer<ResponseStrings> responseLocalizer,
-    IStringLocalizer<LogStrings> logLocalizer
+    IStringLocalizer<LogStrings> logLocalizer,
+    INotificationDispatcher notificationDispatcher
 ) : IGoalService
 {
     /// <inheritdoc />
@@ -215,7 +216,10 @@ public class GoalService(
         var userData = await GetCurrentUserAsync(userGuid);
         var goal = GetGoalById(userData, goalID);
 
-        if (goal.Completed.HasValue)
+        if (
+            goal.Completed.HasValue
+            || !await TryCompleteGoalAsync(userGuid, goal, completedDate)
+        )
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalCompleteAlreadyCompletedLog"]);
             throw new BudgetBoardServiceException(
@@ -223,8 +227,7 @@ public class GoalService(
             );
         }
 
-        goal.Completed = completedDate;
-        await userDataContext.SaveChangesAsync();
+        await NotifyGoalReachedAsync(userGuid, goal);
     }
 
     /// <inheritdoc />
@@ -244,11 +247,74 @@ public class GoalService(
             // Complete the goal if it's 100% complete
             if (percentComplete >= 100.0M)
             {
-                goal.Completed = nowProvider.Today;
+                var completedDate = nowProvider.Today;
+                if (await TryCompleteGoalAsync(userGuid, goal, completedDate))
+                {
+                    await NotifyGoalReachedAsync(userGuid, goal);
+                }
             }
         }
+    }
 
-        await userDataContext.SaveChangesAsync();
+    private async Task<bool> TryCompleteGoalAsync(
+        Guid userGuid,
+        Goal goal,
+        DateOnly completedDate
+    )
+    {
+        if (!userDataContext.Database.IsRelational())
+        {
+            if (goal.Completed.HasValue)
+            {
+                return false;
+            }
+
+            goal.Completed = completedDate;
+            await userDataContext.SaveChangesAsync();
+            return true;
+        }
+
+        var updatedCount = await userDataContext.Goals
+            .Where(currentGoal =>
+                currentGoal.ID == goal.ID
+                && currentGoal.UserID == userGuid
+                && currentGoal.Completed == null
+            )
+            .ExecuteUpdateAsync(updates =>
+                updates.SetProperty(currentGoal => currentGoal.Completed, completedDate)
+            );
+        if (updatedCount == 0)
+        {
+            return false;
+        }
+
+        goal.Completed = completedDate;
+        var completedProperty = userDataContext.Entry(goal).Property(currentGoal => currentGoal.Completed);
+        completedProperty.OriginalValue = completedDate;
+        completedProperty.IsModified = false;
+        return true;
+    }
+
+    private async Task NotifyGoalReachedAsync(Guid userGuid, Goal goal)
+    {
+        try
+        {
+            await notificationDispatcher.DispatchAsync(
+                new NotificationEvent(
+                    userGuid,
+                    NotificationEventTypes.GoalReached,
+                    responseLocalizer["NotificationGoalReached"],
+                    goal.Name
+                )
+            );
+        }
+        catch (Exception exception)
+        {
+            logger.LogWarning(
+                "{LogMessage}",
+                logLocalizer["GoalNotificationDispatchFailedLog", exception.GetType().Name]
+            );
+        }
     }
 
     private async Task<ApplicationUser> GetCurrentUserAsync(Guid id)
@@ -479,31 +545,12 @@ public class GoalService(
 
     private decimal CalculatePercentComplete(Goal goal)
     {
-        decimal effectiveTargetAmount;
-        // An initial amount less than zero indicates a debt.
-        if (goal.InitialAmount < 0)
-        {
-            effectiveTargetAmount = Math.Abs(goal.InitialAmount);
-        }
-        else
-        {
-            effectiveTargetAmount = goal.Amount;
-        }
-
-        // An effective target amount of 0 is invalid, so just return 0 to prevent a divide by zero error.
-        if (effectiveTargetAmount == 0)
+        if (GoalProgressHelpers.GetEffectiveTargetAmount(goal) == 0)
         {
             logger.LogError("{LogMessage}", logLocalizer["GoalPercentCompleteZeroTargetAmountLog"]);
-            return 0.0M;
         }
 
-        var accountsTotalBalance = goal.Accounts.Sum(a =>
-            a.Balances.OrderByDescending(b => b.Date).FirstOrDefault()?.Amount ?? 0
-        );
-        decimal currentProgress = accountsTotalBalance - goal.InitialAmount;
-        decimal percentComplete = currentProgress / effectiveTargetAmount * 100.0M;
-
-        return percentComplete > 100.0M ? 100.0M : percentComplete;
+        return GoalProgressHelpers.CalculatePercentComplete(goal);
     }
 
     private static decimal CalculateAverageInterestRate(Goal goal)

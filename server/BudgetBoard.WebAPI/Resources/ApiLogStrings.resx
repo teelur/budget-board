@@ -232,4 +232,25 @@
     <data name="UserProvisionedLog" xml:space="preserve">
         <value>A new user was created via OIDC provisioning.</value>
     </data>
+    <data name="NotificationConfigurationRequestFailedLog" xml:space="preserve">
+        <value>Notification configuration request failed. Error type: {0}.</value>
+    </data>
+    <data name="NotificationDestinationDispatchFailedLog" xml:space="preserve">
+        <value>Notification destination {0} could not be dispatched. Error type: {1}.</value>
+    </data>
+    <data name="NotificationDestinationHttpFailureLog" xml:space="preserve">
+        <value>Notification destination {0} returned HTTP {1}.</value>
+    </data>
+    <data name="NotificationDestinationSendFailedLog" xml:space="preserve">
+        <value>Notification destination {0} failed. Failure category: {1}.</value>
+    </data>
+    <data name="NotificationDispatchFailedLog" xml:space="preserve">
+        <value>Notification dispatch failed. Error type: {0}.</value>
+    </data>
+    <data name="NotificationSyncFailureDispatchFailedLog" xml:space="preserve">
+        <value>Failed to dispatch sync failure notification. Error type: {0}.</value>
+    </data>
+    <data name="NotificationRecurringReminderFailedLog" xml:space="preserve">
+        <value>Failed to send recurring transaction reminders. Error type: {0}.</value>
+    </data>
 </root>

@@ -423,6 +423,7 @@ public class TagServiceTests
             TestHelper.CreateMockLocalizer<ResponseStrings>(),
             TestHelper.CreateMockLocalizer<LogStrings>(),
             tagService,
-            Mock.Of<IRecurringRuleService>()
+            Mock.Of<IRecurringRuleService>(),
+            TestHelper.CreateMockNotificationActivityService()
         );
 }

@@ -1,8 +1,9 @@
-import { Group, Stack } from "@mantine/core";
-import { Button, Modal, Select } from "@teelur/budget-board-ui";
+import { Stack } from "@mantine/core";
+import { Modal, Select } from "@teelur/budget-board-ui";
 import { useField } from "@mantine/form";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ModalActions } from "~/components/ModalActions/ModalActions";
 import { parseFlowsConfiguration } from "~/helpers/widgets";
 import { useUpdateWidgetSettingsMutation } from "~/hooks/mutations/widgetSettings/useUpdateWidgetSettingsMutation";
 import { IWidgetSettingsResponse } from "~/models/widgetSettings";
@@ -62,36 +63,21 @@ const FlowsWidgetSettings = ({
           description={t("flows_widget_settings_message")}
           {...monthCountField.getInputProps()}
         />
-        <Group gap="0.5rem">
-          <Button
-            variant="filled"
-            color="neutral"
-            size="compact-sm"
-            flex="1 1 0"
-            onClick={handleClose}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            variant="filled"
-            color="primary"
-            size="compact-sm"
-            flex="1 1 0"
-            onClick={() => {
-              updateWidgetSettingsMutation.mutate([
-                {
-                  id: widget.id,
-                  configuration: {
-                    monthCount: Number(monthCountField.getValue()),
-                  },
+        <ModalActions
+          actionLabel={t("save")}
+          isPending={updateWidgetSettingsMutation.isPending}
+          onAction={() => {
+            updateWidgetSettingsMutation.mutate([
+              {
+                id: widget.id,
+                configuration: {
+                  monthCount: Number(monthCountField.getValue()),
                 },
-              ]);
-            }}
-            loading={updateWidgetSettingsMutation.isPending}
-          >
-            {t("save")}
-          </Button>
-        </Group>
+              },
+            ]);
+          }}
+          onCancel={handleClose}
+        />
       </Stack>
     </Modal>
   );

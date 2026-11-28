@@ -135,6 +135,7 @@ const Navbar = (props: NavbarProps) => {
     label: t("settings"),
     settings: [
       { path: "/settings/user", label: t("user_settings") },
+      { path: "/settings/notifications", label: t("notification_settings") },
       { path: "/settings/security", label: t("security") },
       { path: "/settings/advanced", label: t("advanced_settings") },
       ...(applicationUserQuery.data?.isSuperuser
