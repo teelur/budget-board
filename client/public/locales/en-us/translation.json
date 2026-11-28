@@ -656,6 +656,7 @@
   "notification_test_sent": "Test notification sent.",
   "notification_threshold_disabled": "Disabled",
   "notification_transactions_added": "New transactions added",
+  "notification_transactions_need_categorization": "Transactions needing categorization",
   "notification_url_required": "Enter a webhook URL.",
   "notification_webhook_url": "Webhook URL",
   "oidc_authentication_failed_message": "OIDC authentication failed. Please try logging in again.",

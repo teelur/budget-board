@@ -253,6 +253,10 @@ const NotificationDestinationFields = ({
               label: t("notification_transactions_added"),
             },
             {
+              value: "transactions_need_categorization",
+              label: t("notification_transactions_need_categorization"),
+            },
+            {
               value: "large_transactions_added",
               label: t("notification_large_transactions_added"),
             },
