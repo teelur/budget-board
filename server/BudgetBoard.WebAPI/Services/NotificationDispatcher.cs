@@ -1,5 +1,6 @@
 using System.Text.Json;
 using BudgetBoard.Database.Data;
+using BudgetBoard.Database.Models;
 using BudgetBoard.Service.Interfaces;
 using BudgetBoard.Service.Models;
 using BudgetBoard.WebAPI.Resources;
@@ -21,13 +22,20 @@ public sealed class NotificationDispatcher(
     private readonly IReadOnlyDictionary<string, INotificationDestinationProvider> providerMap =
         providers.ToDictionary(provider => provider.Provider, StringComparer.Ordinal);
 
+    public async Task<bool> HasEnabledDestinationAsync(Guid userId, string eventType)
+    {
+        var destinations = await GetSubscribedDestinationsAsync(userId, eventType);
+        return destinations.Count > 0;
+    }
+
     public async Task DispatchAsync(NotificationEvent notification)
     {
         try
         {
-            var destinations = await context.NotificationDestinations.AsNoTracking()
-                .Where(d => d.UserID == notification.UserId && d.Enabled)
-                .ToListAsync();
+            var destinations = await GetSubscribedDestinationsAsync(
+                notification.UserId,
+                notification.Type
+            );
             foreach (var batch in destinations.Chunk(MaxConcurrentSends))
             {
                 using var timeout = new CancellationTokenSource(
@@ -37,15 +45,8 @@ public sealed class NotificationDispatcher(
                 {
                     try
                     {
-                        var events = JsonSerializer.Deserialize<string[]>(destination.EventTypes)
-                            ?? throw new InvalidOperationException(
-                                responseLocalizer["NotificationEventConfigurationInvalid"].Value
-                            );
-                        if (events.Contains(notification.Type))
-                        {
-                            await GetProvider(destination.Provider)
-                                .SendAsync(destination, notification, timeout.Token);
-                        }
+                        await GetProvider(destination.Provider)
+                            .SendAsync(destination, notification, timeout.Token);
                     }
                     catch (Exception exception)
                     {
@@ -67,6 +68,46 @@ public sealed class NotificationDispatcher(
                 "{LogMessage}",
                 logLocalizer["NotificationDispatchFailedLog", exception.GetType().Name]
             );
+        }
+    }
+
+    private async Task<List<NotificationDestination>> GetSubscribedDestinationsAsync(
+        Guid userId,
+        string eventType
+    )
+    {
+        var destinations = await context.NotificationDestinations.AsNoTracking()
+            .Where(destination => destination.UserID == userId && destination.Enabled)
+            .ToListAsync();
+
+        return destinations.Where(destination => IsSubscribedToEvent(destination, eventType))
+            .ToList();
+    }
+
+    private bool IsSubscribedToEvent(
+        NotificationDestination destination,
+        string eventType
+    )
+    {
+        try
+        {
+            var events = JsonSerializer.Deserialize<string[]>(destination.EventTypes)
+                ?? throw new InvalidOperationException(
+                    responseLocalizer["NotificationEventConfigurationInvalid"].Value
+                );
+            return events.Contains(eventType);
+        }
+        catch (Exception exception)
+        {
+            logger.LogWarning(
+                "{LogMessage}",
+                logLocalizer[
+                    "NotificationDestinationDispatchFailedLog",
+                    destination.ID,
+                    exception.GetType().Name
+                ]
+            );
+            return false;
         }
     }
 

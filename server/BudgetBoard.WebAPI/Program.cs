@@ -295,13 +295,17 @@ builder.Services.AddScoped<IOidcTokenService, OidcTokenService>();
 if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
 {
     var syncIntervalHours = builder.Configuration.GetValue<int?>("SYNC_INTERVAL_HOURS") ?? 8;
-    if (syncIntervalHours < 1)
+    if (syncIntervalHours is < 1 or > 24)
     {
         throw new ArgumentOutOfRangeException(
             "SYNC_INTERVAL_HOURS",
-            "SYNC_INTERVAL_HOURS must be at least 1"
+            "SYNC_INTERVAL_HOURS must be between 1 and 24"
         );
     }
+    var syncHours = string.Join(
+        ",",
+        Enumerable.Range(0, 24).Where(hour => hour % syncIntervalHours == 0)
+    );
 
     builder.Services.AddQuartz(options =>
     {
@@ -311,10 +315,9 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
         options.AddTrigger(trigger =>
             trigger
                 .ForJob(jobKey)
-                // Allow a minute for everything to settle after boot before starting the job
-                .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
-                .WithSimpleSchedule(schedule =>
-                    schedule.WithInterval(TimeSpan.FromHours(syncIntervalHours)).RepeatForever()
+                .WithCronSchedule(
+                    $"0 0 {syncHours} * * ?",
+                    schedule => schedule.InTimeZone(TimeZoneInfo.Local)
                 )
         );
     });
@@ -324,23 +327,6 @@ if (!builder.Configuration.GetValue<bool>("DISABLE_AUTO_SYNC"))
         options.WaitForJobsToComplete = true;
     });
 }
-
-builder.Services.AddQuartz(options =>
-{
-    var jobKey = new JobKey("RecurringReminderBackgroundJob");
-    options.AddJob<RecurringReminderBackgroundJob>(job => job.WithIdentity(jobKey));
-    options.AddTrigger(trigger =>
-        trigger
-            .ForJob(jobKey)
-            .WithCronSchedule("0 0 9 * * ?", schedule =>
-                schedule.InTimeZone(TimeZoneInfo.Local)
-            )
-    );
-});
-builder.Services.AddQuartzHostedService(options =>
-{
-    options.WaitForJobsToComplete = true;
-});
 
 // Used to abstract datetime
 builder.Services.AddSingleton<INowProvider, NowProvider>();
@@ -365,9 +351,14 @@ builder.Services.AddScoped<ISyncService>(services =>
         services.GetRequiredService<IStringLocalizer<ApiResponseStrings>>(),
         services.GetRequiredService<IStringLocalizer<ApiLogStrings>>(),
         services.GetRequiredService<ILogger<NotificationSyncService>>(),
-        services.GetRequiredService<INotificationActivityService>()
+        services.GetRequiredService<INotificationActivityService>(),
+        services.GetRequiredService<INotificationReminderService>()
     )
 );
+builder.Services.AddScoped<
+    INotificationReminderService,
+    RecurringReminderNotificationService
+>();
 builder.Services.AddScoped<ISimpleFinService, SimpleFinService>();
 builder.Services.AddScoped<ILunchFlowService, LunchFlowService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();

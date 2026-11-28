@@ -64,6 +64,11 @@ public class NotificationDispatcherTests
         );
         await helper.UserDataContext.SaveChangesAsync();
 
+        (await dispatcher.HasEnabledDestinationAsync(userId, "sync_failed")).Should().BeTrue();
+        (
+            await dispatcher.HasEnabledDestinationAsync(userId, "recurring_reminder")
+        ).Should().BeFalse();
+
         await dispatcher.DispatchAsync(new NotificationEvent(userId, "sync_failed", "test"));
 
         handler.Attempts.Should().Be(1);

@@ -626,7 +626,7 @@
   "notification_headers_description": "Enter a JSON object of header names and values. Leave blank to keep existing headers; enter {} to clear them.",
   "notification_headers_invalid": "Headers must be a JSON object containing string values.",
   "notification_import_failed": "Import failure",
-  "notification_include_financial_details": "Allow financial details in this destination's notifications",
+  "notification_include_financial_details": "Allow financial details and sync error messages in this destination's notifications",
   "notification_large_transaction_threshold": "Large transaction threshold",
   "notification_large_transaction_threshold_description": "Leave blank to disable large-transaction alerts. Values use your preferred currency.",
   "notification_large_transactions_added": "Large transactions added",

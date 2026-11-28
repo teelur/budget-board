@@ -408,6 +408,56 @@ public class TransactionImportServiceTests
     }
 
     [Fact]
+    public async Task ProcessNextAsync_WhenRowsFail_IncludesErrorSummaryAndDetails()
+    {
+        var helper = new TestHelper();
+        var notifications = new Mock<INotificationDispatcher>();
+        NotificationEvent? notification = null;
+        notifications
+            .Setup(dispatcher => dispatcher.DispatchAsync(It.IsAny<NotificationEvent>()))
+            .Callback<NotificationEvent>(eventData => notification = eventData)
+            .Returns(Task.CompletedTask);
+        var importService = new Mock<ITransactionService>();
+        importService
+            .Setup(service =>
+                service.ImportTransactionsAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<ITransactionImportRequest>()
+                )
+            )
+            .ThrowsAsync(new BudgetBoardServiceException("Invalid imported row"));
+        var service = CreateService(
+            helper,
+            Mock.Of<INowProvider>(),
+            transactionService: importService.Object,
+            notificationDispatcher: notifications.Object
+        );
+        var job = AddJob(
+            helper,
+            [new TransactionImport { Account = "Checking", Amount = 1 }]
+        );
+
+        await service.ProcessNextAsync(CancellationToken.None);
+
+        var failedJob = await helper.UserDataContext.TransactionImportJobs.FindAsync(job.ID);
+        failedJob!.Status.Should().Be(TransactionImportJobStatuses.CompletedWithErrors);
+        failedJob.ErrorMessage.Should().Be("Row 1: Invalid imported row");
+        notification.Should().NotBeNull();
+        notification!.Message.Should().Be("NotificationImportFailureWithErrorCount [1]");
+        notification.FinancialDetails.Should().Be("Row 1: Invalid imported row");
+        notifications.Verify(
+            dispatcher =>
+                dispatcher.DispatchAsync(
+                    It.Is<NotificationEvent>(notification =>
+                        notification.UserId == helper.demoUser.Id
+                        && notification.Type == NotificationEventTypes.ImportFailed
+                    )
+                ),
+            Times.Once
+        );
+    }
+
+    [Fact]
     public async Task ProcessNextAsync_WhenCancelledDuringProcessing_ShouldThrowCancellation()
     {
         var helper = new TestHelper();

@@ -136,6 +136,9 @@ namespace BudgetBoard.Database.Migrations
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("boolean");
 
+                    b.Property<DateOnly?>("LastRecurringReminderDate")
+                        .HasColumnType("date");
+
                     b.Property<DateTime>("LastSync")
                         .HasColumnType("timestamp with time zone");
 

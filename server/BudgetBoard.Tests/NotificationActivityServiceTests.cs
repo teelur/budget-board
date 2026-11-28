@@ -24,6 +24,10 @@ public class NotificationActivityServiceTests
             UserID = helper.demoUser.Id,
             BudgetWarningThreshold = 80,
             LargeTransactionThreshold = 40,
+            Currency = "USD",
+            DecimalPlaces = 2,
+            Language = "en-us",
+            DateFormat = "YYYY-MM-DD",
         };
         var account = new AccountFaker(helper.demoUser.Id).Generate();
         helper.UserDataContext.UserSettings.Add(settings);
@@ -67,8 +71,10 @@ public class NotificationActivityServiceTests
         var nowProvider = new Mock<INowProvider>();
         nowProvider.Setup(provider => provider.Today).Returns(today);
         var dispatcher = new Mock<INotificationDispatcher>();
+        var notifications = new List<NotificationEvent>();
         dispatcher
             .Setup(service => service.DispatchAsync(It.IsAny<NotificationEvent>()))
+            .Callback<NotificationEvent>(notification => notifications.Add(notification))
             .Returns(Task.CompletedTask);
         var service = new NotificationActivityService(
             helper.UserDataContext,
@@ -82,13 +88,27 @@ public class NotificationActivityServiceTests
         );
 
         await using var scope = await service.BeginAsync(helper.demoUser.Id);
-        foreach (var amount in new[] { -45m, -40m })
+        foreach (
+            var (amount, merchantName, category, subcategory) in new (
+                decimal Amount,
+                string? MerchantName,
+                string? Category,
+                string? Subcategory
+            )[]
+            {
+                (-45m, "Market", "Food", "Groceries"),
+                (-40m, "Cafe", "Food", "Restaurants"),
+                (12m, null, null, null),
+            }
+        )
         {
             var transaction = new Transaction
             {
                 Amount = amount,
                 Date = today,
-                Category = "Food",
+                Category = category,
+                Subcategory = subcategory,
+                MerchantName = merchantName,
                 Source = TransactionSource.Manual,
                 AccountID = account.ID,
                 Account = account,
@@ -124,6 +144,17 @@ public class NotificationActivityServiceTests
             ),
             Times.Once
         );
+        notifications
+            .Single(notification => notification.Type == NotificationEventTypes.TransactionsAdded)
+            .FinancialDetails.Should()
+            .Be(
+                string.Join(
+                    Environment.NewLine,
+                    "NotificationTransactionDetail [2026-11-12, Market, Food: Groceries, -$45.00]",
+                    "NotificationTransactionDetail [2026-11-12, Cafe, Food: Restaurants, -$40.00]",
+                    "NotificationTransactionDetail [2026-11-12, NotificationUnknownMerchant, NotificationUncategorized, +$12.00]"
+                )
+            );
     }
 
     [Fact]

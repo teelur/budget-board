@@ -205,6 +205,12 @@
     <data name="NotificationSyncFailure" xml:space="preserve">
         <value>Account synchronization failed or completed with errors.</value>
     </data>
+    <data name="NotificationSyncFailureWithErrorCount" xml:space="preserve">
+        <value>Account synchronization completed with {0} error(s).</value>
+    </data>
+    <data name="NotificationUnexpectedSyncError" xml:space="preserve">
+        <value>An unexpected sync error occurred ({0}).</value>
+    </data>
     <data name="NotificationEventConfigurationInvalid" xml:space="preserve">
         <value>The stored notification event configuration is invalid.</value>
     </data>

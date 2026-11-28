@@ -248,6 +248,20 @@ public sealed partial class NotificationWebhookSender(
         bool includeFinancialDetails
     )
     {
+        var message = notification.Message;
+        if (
+            notification.Type is NotificationEventTypes.SyncFailed
+                or NotificationEventTypes.ImportFailed
+            && includeFinancialDetails
+            && !string.IsNullOrWhiteSpace(notification.FinancialDetails)
+            && !configuration.BodyTemplate.Contains("{{financial_details}}", StringComparison.Ordinal)
+            && configuration.BodyTemplate.Contains("{{message}}", StringComparison.Ordinal)
+        )
+        {
+            message =
+                $"{message}{Environment.NewLine}{Environment.NewLine}{notification.FinancialDetails}";
+        }
+
         string Encode(string value) =>
             configuration.ContentType == "application/json"
                 ? JsonEncodedText.Encode(value).ToString()
@@ -258,7 +272,7 @@ public sealed partial class NotificationWebhookSender(
             match => Encode(match.Groups[1].Value switch
             {
                 "event_type" => notification.Type,
-                "message" => notification.Message,
+                "message" => message,
                 "financial_details" when includeFinancialDetails => notification.FinancialDetails ?? "",
                 _ => "",
             })

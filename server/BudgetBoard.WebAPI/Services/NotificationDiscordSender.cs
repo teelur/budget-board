@@ -81,7 +81,7 @@ public sealed class NotificationDiscordSender(
                 [
                     new DiscordEmbed(
                         NotificationMessageFormatter.Truncate(
-                            NotificationMessageFormatter.GetTitle(notification, messageLocalizer),
+                            NotificationMessageFormatter.GetTitle(messageLocalizer),
                             256
                         ),
                         NotificationMessageFormatter.Truncate(

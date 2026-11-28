@@ -550,29 +550,14 @@
     <data name="NotificationImportFailure" xml:space="preserve">
         <value>Transaction import failed or completed with errors.</value>
     </data>
-    <data name="NotificationTitleSyncFailed" xml:space="preserve">
-        <value>Budget Board: sync failed</value>
+    <data name="NotificationImportFailureWithErrorCount" xml:space="preserve">
+        <value>Import failed for {0} transaction(s).</value>
     </data>
-    <data name="NotificationTitleImportFailed" xml:space="preserve">
-        <value>Budget Board: import failed</value>
+    <data name="NotificationUnexpectedImportError" xml:space="preserve">
+        <value>An unexpected import error occurred ({0}).</value>
     </data>
-    <data name="NotificationTitleGoalReached" xml:space="preserve">
-        <value>Budget Board: goal reached</value>
-    </data>
-    <data name="NotificationTitleBudgetWarning" xml:space="preserve">
-        <value>Budget Board: budget warning</value>
-    </data>
-    <data name="NotificationTitleTransactionsAdded" xml:space="preserve">
-        <value>Budget Board: transactions added</value>
-    </data>
-    <data name="NotificationTitleLargeTransactionsAdded" xml:space="preserve">
-        <value>Budget Board: large transaction</value>
-    </data>
-    <data name="NotificationTitleRecurringReminder" xml:space="preserve">
-        <value>Budget Board: recurring reminder</value>
-    </data>
-    <data name="NotificationTitleTest" xml:space="preserve">
-        <value>Budget Board: test notification</value>
+    <data name="NotificationTitle" xml:space="preserve">
+        <value>Budget Board</value>
     </data>
     <data name="NotificationGoalReached" xml:space="preserve">
         <value>A financial goal has been reached.</value>
@@ -590,7 +575,13 @@
         <value>{0} transaction(s) met the large-transaction threshold.</value>
     </data>
     <data name="NotificationTransactionDetail" xml:space="preserve">
-        <value>{0} — {1}: {2}</value>
+        <value>{0} — {1} — {2} — {3}</value>
+    </data>
+    <data name="NotificationUnknownMerchant" xml:space="preserve">
+        <value>Unknown merchant</value>
+    </data>
+    <data name="NotificationUncategorized" xml:space="preserve">
+        <value>Uncategorized</value>
     </data>
     <data name="NotificationMoreTransactions" xml:space="preserve">
         <value>And {0} more.</value>

@@ -8,6 +8,7 @@ using BudgetBoard.WebAPI.Resources;
 using BudgetBoard.WebAPI.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Localization;
 using Moq;
 
 namespace BudgetBoard.IntegrationTests;
@@ -26,7 +27,7 @@ public class NotificationNativeProviderTests
             Mock.Of<ILogger<NotificationNtfySender>>(),
             TestHelper.CreateMockLocalizer<ApiLogStrings>(),
             TestHelper.CreateMockLocalizer<ApiResponseStrings>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>()
+            CreateMessageLocalizer()
         );
         var configuration = sender.BuildConfiguration(
             new NotificationDestinationRequest
@@ -51,6 +52,7 @@ public class NotificationNativeProviderTests
         handler.Method.Should().Be(HttpMethod.Post);
         handler.RequestUri.Should().Be(new Uri("https://ntfy.example/budget-board"));
         handler.Authorization.Should().Be("Bearer secret");
+        handler.Title.Should().Be("Budget Board");
         handler.ContentType.Should().Be("text/plain; charset=utf-8");
         handler.Body.Should().Be("Sync failed");
     }
@@ -69,7 +71,7 @@ public class NotificationNativeProviderTests
             Mock.Of<ILogger<NotificationDiscordSender>>(),
             TestHelper.CreateMockLocalizer<ApiLogStrings>(),
             TestHelper.CreateMockLocalizer<ApiResponseStrings>(),
-            TestHelper.CreateMockLocalizer<ResponseStrings>()
+            CreateMessageLocalizer()
         );
         var configuration = sender.BuildConfiguration(
             new NotificationDestinationRequest
@@ -94,6 +96,8 @@ public class NotificationNativeProviderTests
         handler.RequestUri!.Host.Should().Be("discord.com");
         handler.RequestUri.Query.Should().Be("?wait=true");
         using var payload = JsonDocument.Parse(handler.Body!);
+        payload.RootElement.GetProperty("embeds")[0]
+            .GetProperty("title").GetString().Should().Be("Budget Board");
         payload.RootElement.GetProperty("embeds")[0]
             .GetProperty("description").GetString().Should().Be("Sync failed");
         payload.RootElement.GetProperty("allowed_mentions")
@@ -138,11 +142,24 @@ public class NotificationNativeProviderTests
             EventTypes = "[]",
         };
 
+    private static IStringLocalizer<ResponseStrings> CreateMessageLocalizer()
+    {
+        var localizer = new Mock<IStringLocalizer<ResponseStrings>>();
+        localizer
+            .Setup(item => item[It.IsAny<string>()])
+            .Returns((string key) => new LocalizedString(key, key));
+        localizer
+            .Setup(item => item["NotificationTitle"])
+            .Returns(new LocalizedString("NotificationTitle", "Budget Board"));
+        return localizer.Object;
+    }
+
     private sealed class CapturingHandler : HttpMessageHandler
     {
         public HttpMethod? Method { get; private set; }
         public Uri? RequestUri { get; private set; }
         public string? Authorization { get; private set; }
+        public string? Title { get; private set; }
         public string? ContentType { get; private set; }
         public string? Body { get; private set; }
 
@@ -154,6 +171,9 @@ public class NotificationNativeProviderTests
             Method = request.Method;
             RequestUri = request.RequestUri;
             Authorization = request.Headers.Authorization?.ToString();
+            Title = request.Headers.TryGetValues("Title", out var titleValues)
+                ? string.Join(", ", titleValues)
+                : null;
             ContentType = request.Content?.Headers.ContentType?.ToString();
             Body = await request.Content!.ReadAsStringAsync(cancellationToken);
             return new HttpResponseMessage(HttpStatusCode.OK);

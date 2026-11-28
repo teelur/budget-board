@@ -38,6 +38,72 @@ public class NotificationWebhookSenderTests
         payload.RootElement.GetProperty("details").GetString().Should().Be(expectedDetails);
     }
 
+    [Theory]
+    [InlineData(false, "Account sync completed with errors.")]
+    [InlineData(true, "Account sync completed with errors.\n\nSimpleFIN: Invalid access token.")]
+    public async Task SendAsync_DefaultStyleSyncMessageIncludesErrorsOnlyWhenOptedIn(
+        bool includeDetails,
+        string expectedMessage
+    )
+    {
+        var handler = new CapturingHandler(HttpStatusCode.NoContent);
+        var sender = CreateSender(handler);
+        var userId = Guid.NewGuid();
+        var destination = CreateDestination(
+            userId,
+            includeDetails,
+            "{\"content\":\"{{message}}\"}"
+        );
+
+        var result = await sender.SendAsync(
+            destination,
+            new NotificationEvent(
+                userId,
+                NotificationEventTypes.SyncFailed,
+                "Account sync completed with errors.",
+                "SimpleFIN: Invalid access token."
+            ),
+            CancellationToken.None
+        );
+
+        result.Should().BeTrue();
+        using var payload = JsonDocument.Parse(handler.Body!);
+        payload.RootElement.GetProperty("content").GetString().Should().Be(expectedMessage);
+    }
+
+    [Theory]
+    [InlineData(false, "Transaction import failed for 2 rows.")]
+    [InlineData(true, "Transaction import failed for 2 rows.\n\nRow 2: Invalid account.")]
+    public async Task SendAsync_DefaultStyleImportMessageIncludesErrorsOnlyWhenOptedIn(
+        bool includeDetails,
+        string expectedMessage
+    )
+    {
+        var handler = new CapturingHandler(HttpStatusCode.NoContent);
+        var sender = CreateSender(handler);
+        var userId = Guid.NewGuid();
+        var destination = CreateDestination(
+            userId,
+            includeDetails,
+            "{\"content\":\"{{message}}\"}"
+        );
+
+        var result = await sender.SendAsync(
+            destination,
+            new NotificationEvent(
+                userId,
+                NotificationEventTypes.ImportFailed,
+                "Transaction import failed for 2 rows.",
+                "Row 2: Invalid account."
+            ),
+            CancellationToken.None
+        );
+
+        result.Should().BeTrue();
+        using var payload = JsonDocument.Parse(handler.Body!);
+        payload.RootElement.GetProperty("content").GetString().Should().Be(expectedMessage);
+    }
+
     [Fact]
     public async Task SendAsync_FailureReturnsFalse()
     {
@@ -112,7 +178,8 @@ public class NotificationWebhookSenderTests
 
     private static NotificationDestination CreateDestination(
         Guid userId,
-        bool includeDetails
+        bool includeDetails,
+        string bodyTemplate = "{\"message\":\"{{message}}\",\"details\":\"{{financial_details}}\"}"
     ) => new()
     {
         UserID = userId,
@@ -124,7 +191,7 @@ public class NotificationWebhookSenderTests
             Url = "https://example.test/secret",
             Headers = new Dictionary<string, string>(),
             ContentType = "application/json",
-            BodyTemplate = "{\"message\":\"{{message}}\",\"details\":\"{{financial_details}}\"}",
+            BodyTemplate = bodyTemplate,
         }),
     };
 

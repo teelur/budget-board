@@ -24,6 +24,7 @@ public class TransactionImportService(
 ) : ITransactionImportService
 {
     private const int BatchSize = 100;
+    private const int MaxNotificationImportErrorDetailsLength = 2000;
     private static readonly TimeSpan JobLeaseDuration = TimeSpan.FromMinutes(10);
 
     public async Task<TransactionImportJobResponse> EnqueueAsync(
@@ -181,6 +182,7 @@ public class TransactionImportService(
 
             var transactions = request.Transactions.ToList();
             var errors = new List<string>();
+            var notificationErrors = new List<string>();
             for (var offset = 0; offset < transactions.Count; offset += BatchSize)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -235,7 +237,11 @@ public class TransactionImportService(
                             failedCount++;
                             if (errors.Count < 10)
                             {
-                                errors.Add($"Row {offset + index + 1}: {rowException.Message}");
+                                var rowNumber = offset + index + 1;
+                                errors.Add($"Row {rowNumber}: {rowException.Message}");
+                                notificationErrors.Add(
+                                    $"Row {rowNumber}: {GetNotificationErrorMessage(rowException)}"
+                                );
                             }
                         }
                         finally
@@ -266,7 +272,11 @@ public class TransactionImportService(
             await notificationScope.CompleteAsync();
             if (errors.Count > 0)
             {
-                await NotifyImportFailureIfCompletedAsync(job.ID, job.UserID);
+                await NotifyImportFailureIfCompletedAsync(
+                    job.ID,
+                    job.UserID,
+                    notificationErrors
+                );
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -293,7 +303,11 @@ public class TransactionImportService(
             job.LeaseExpiresAt = null;
             await userDataContext.SaveChangesAsync(cancellationToken);
             await notificationScope.CompleteAsync();
-            await NotifyImportFailureAsync(job.UserID);
+            await NotifyImportFailureAsync(
+                job.UserID,
+                job.TotalCount,
+                FormatNotificationErrorDetails([GetNotificationErrorMessage(exception)])
+            );
 
             logger.LogError(
                 exception,
@@ -305,19 +319,28 @@ public class TransactionImportService(
         return true;
     }
 
-    private async Task NotifyImportFailureIfCompletedAsync(Guid jobId, Guid userId)
+    private async Task NotifyImportFailureIfCompletedAsync(
+        Guid jobId,
+        Guid userId,
+        IReadOnlyCollection<string> errors
+    )
     {
         try
         {
-            var completedWithErrors = await userDataContext.TransactionImportJobs
+            var failedCount = await userDataContext.TransactionImportJobs
                 .AsNoTracking()
-                .AnyAsync(job =>
-                    job.ID == jobId
-                    && job.Status == TransactionImportJobStatuses.CompletedWithErrors
-                );
-            if (completedWithErrors)
+                .Where(job =>
+                    job.ID == jobId && job.Status == TransactionImportJobStatuses.CompletedWithErrors
+                )
+                .Select(job => (int?)job.FailedCount)
+                .SingleOrDefaultAsync();
+            if (failedCount is > 0)
             {
-                await NotifyImportFailureAsync(userId);
+                await NotifyImportFailureAsync(
+                    userId,
+                    failedCount.Value,
+                    FormatNotificationErrorDetails(errors)
+                );
             }
         }
         catch (Exception exception)
@@ -332,7 +355,11 @@ public class TransactionImportService(
         }
     }
 
-    private async Task NotifyImportFailureAsync(Guid userId)
+    private async Task NotifyImportFailureAsync(
+        Guid userId,
+        int failedCount,
+        string? errorDetails
+    )
     {
         try
         {
@@ -340,7 +367,10 @@ public class TransactionImportService(
                 new NotificationEvent(
                     userId,
                     NotificationEventTypes.ImportFailed,
-                    responseLocalizer["NotificationImportFailure"]
+                    failedCount > 0
+                        ? responseLocalizer["NotificationImportFailureWithErrorCount", failedCount]
+                        : responseLocalizer["NotificationImportFailure"],
+                    errorDetails
                 )
             );
         }
@@ -354,6 +384,27 @@ public class TransactionImportService(
                 ]
             );
         }
+    }
+
+    private string GetNotificationErrorMessage(Exception exception) =>
+        exception is BudgetBoardServiceException
+            ? exception.Message
+            : responseLocalizer[
+                "NotificationUnexpectedImportError",
+                exception.GetType().Name
+            ].Value;
+
+    private static string? FormatNotificationErrorDetails(IReadOnlyCollection<string> errors)
+    {
+        var details = string.Join(Environment.NewLine, errors);
+        if (string.IsNullOrWhiteSpace(details))
+        {
+            return null;
+        }
+
+        return details.Length <= MaxNotificationImportErrorDetailsLength
+            ? details
+            : details[..(MaxNotificationImportErrorDetailsLength - 1)] + "…";
     }
 
     private async Task UpdateProgressAsync(

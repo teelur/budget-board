@@ -121,7 +121,7 @@ public sealed class NotificationNtfySender(
             };
             request.Headers.TryAddWithoutValidation(
                 "Title",
-                NotificationMessageFormatter.GetTitle(notification, messageLocalizer)
+                NotificationMessageFormatter.GetTitle(messageLocalizer)
             );
             if (!string.IsNullOrEmpty(configuration.AccessToken))
             {

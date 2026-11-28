@@ -297,7 +297,10 @@ public sealed class NotificationActivityService(
             return;
         }
 
-        var transactionDetails = BuildTransactionDetails(eligibleTransactions);
+        var settings = await userDataContext.UserSettings
+            .AsNoTracking()
+            .SingleOrDefaultAsync(userSettings => userSettings.UserID == userId);
+        var transactionDetails = BuildTransactionDetails(eligibleTransactions, settings);
         await TryDispatchAsync(
             new NotificationEvent(
                 userId,
@@ -307,11 +310,7 @@ public sealed class NotificationActivityService(
             )
         );
 
-        var threshold = await userDataContext.UserSettings
-            .AsNoTracking()
-            .Where(settings => settings.UserID == userId)
-            .Select(settings => settings.LargeTransactionThreshold)
-            .FirstOrDefaultAsync();
+        var threshold = settings?.LargeTransactionThreshold;
         if (threshold is not > 0)
         {
             return;
@@ -332,23 +331,30 @@ public sealed class NotificationActivityService(
                 userId,
                 NotificationEventTypes.LargeTransactionsAdded,
                 responseLocalizer["NotificationLargeTransactionsAdded", largeTransactions.Count],
-                BuildTransactionDetails(largeTransactions)
+                BuildTransactionDetails(largeTransactions, settings)
             )
         );
     }
 
-    private string BuildTransactionDetails(IReadOnlyCollection<Transaction> transactions)
+    private string BuildTransactionDetails(
+        IReadOnlyCollection<Transaction> transactions,
+        UserSettings? settings
+    )
     {
+        var culture = string.IsNullOrWhiteSpace(settings?.Language)
+            || settings.Language == SupportedLanguages.SystemDefault
+            ? CultureInfo.CurrentCulture
+            : CultureInfo.GetCultureInfo(settings.Language);
+        var dateFormat = GetTransactionDateFormat(settings?.DateFormat, culture);
+        var currencyCode = settings?.Currency ?? "USD";
+        var decimalPlaces = settings?.DecimalPlaces ?? 2;
+        var numberFormat = (NumberFormatInfo)culture.NumberFormat.Clone();
+        numberFormat.CurrencySymbol = GetCurrencySymbol(currencyCode);
+        numberFormat.CurrencyDecimalDigits = decimalPlaces;
+
         var details = transactions
             .Take(MaxTransactionDetails)
-            .Select(transaction =>
-                responseLocalizer[
-                    "NotificationTransactionDetail",
-                    transaction.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                    transaction.MerchantName ?? transaction.Category ?? string.Empty,
-                    FormatAmount(transaction.Amount)
-                ].Value
-            )
+            .Select(transaction => FormatTransactionDetail(transaction, dateFormat, culture, numberFormat))
             .ToList();
 
         if (transactions.Count > MaxTransactionDetails)
@@ -362,6 +368,82 @@ public sealed class NotificationActivityService(
         }
 
         return string.Join(Environment.NewLine, details);
+    }
+
+    private string FormatTransactionDetail(
+        Transaction transaction,
+        string dateFormat,
+        CultureInfo culture,
+        NumberFormatInfo numberFormat
+    )
+    {
+        var merchant = string.IsNullOrWhiteSpace(transaction.MerchantName)
+            ? responseLocalizer["NotificationUnknownMerchant"].Value
+            : transaction.MerchantName.Trim();
+        var category = GetTransactionCategory(transaction);
+        return responseLocalizer[
+            "NotificationTransactionDetail",
+            transaction.Date.ToString(dateFormat, culture),
+            merchant,
+            category,
+            FormatAmount(transaction.Amount, numberFormat)
+        ].Value;
+    }
+
+    private string GetTransactionCategory(Transaction transaction)
+    {
+        var category = string.IsNullOrWhiteSpace(transaction.Category)
+            ? null
+            : transaction.Category.Trim();
+        var subcategory = string.IsNullOrWhiteSpace(transaction.Subcategory)
+            ? null
+            : transaction.Subcategory.Trim();
+
+        if (category is null && subcategory is null)
+        {
+            return responseLocalizer["NotificationUncategorized"].Value;
+        }
+        if (category is null || subcategory is null)
+        {
+            return category ?? subcategory!;
+        }
+        if (category.Equals(subcategory, StringComparison.OrdinalIgnoreCase))
+        {
+            return category;
+        }
+
+        return $"{category}: {subcategory}";
+    }
+
+    private static string GetTransactionDateFormat(string? dateFormat, CultureInfo culture)
+    {
+        if (string.IsNullOrWhiteSpace(dateFormat) || dateFormat == "default")
+        {
+            return culture.DateTimeFormat.ShortDatePattern;
+        }
+
+        return dateFormat
+            .Replace("YYYY", "yyyy", StringComparison.Ordinal)
+            .Replace("DD", "dd", StringComparison.Ordinal);
+    }
+
+    private static string GetCurrencySymbol(string currencyCode)
+    {
+        var region = CultureInfo
+            .GetCultures(CultureTypes.SpecificCultures)
+            .Select(culture => new RegionInfo(culture.Name))
+            .FirstOrDefault(region =>
+                region.ISOCurrencySymbol.Equals(currencyCode, StringComparison.OrdinalIgnoreCase)
+            );
+        return region?.CurrencySymbol ?? currencyCode;
+    }
+
+    private static string FormatAmount(decimal amount, NumberFormatInfo numberFormat)
+    {
+        var formattedAmount = amount.ToString("C", numberFormat);
+        return amount > 0
+            ? $"{numberFormat.PositiveSign}{formattedAmount}"
+            : formattedAmount;
     }
 
     private async Task TryDispatchAsync(NotificationEvent notification)
