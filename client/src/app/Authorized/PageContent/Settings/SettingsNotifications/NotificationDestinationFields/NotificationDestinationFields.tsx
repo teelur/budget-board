@@ -128,13 +128,14 @@ const NotificationDestinationFields = ({
           }
         }
 
+        const bodyTemplate = body.getValue().trim();
         saveDestination({
           ...common,
           provider: "webhook",
           url: url.getValue().trim(),
           headers: parsedHeaders,
           contentType: contentType.getValue(),
-          bodyTemplate: body.getValue(),
+          ...(bodyTemplate ? { bodyTemplate } : {}),
         });
         return;
       }

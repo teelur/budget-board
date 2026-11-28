@@ -45,7 +45,7 @@ export type INotificationDestinationRequest =
           url: string;
           headers?: Record<string, string>;
           contentType: string;
-          bodyTemplate: string;
+          bodyTemplate?: string;
         }
       | {
           provider: "ntfy";
